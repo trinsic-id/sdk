@@ -68,7 +68,11 @@ This will be a *sandbox* ecosystem; suitable for prototyping and testing, but no
 
 === "Trinsic CLI"
     ```
+    # First, create an ecosystem...
     trinsic provider create-ecosystem
+
+    #... then, configure the CLI to use it for future logins
+    trinsic config --default-ecosystem {ECOSYSTEM_ID}
     ```
     
 === "Typescript"
