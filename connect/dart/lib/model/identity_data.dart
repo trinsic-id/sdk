@@ -16,6 +16,7 @@ class IdentityData {
     this.originatingIntegrationId,
     this.person,
     this.document,
+    this.linkedResources,
   });
 
   ///
@@ -42,13 +43,22 @@ class IdentityData {
   ///
   DocumentData? document;
 
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  LinkedResources? linkedResources;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is IdentityData &&
           other.originatingIntegrationId == originatingIntegrationId &&
           other.person == person &&
-          other.document == document;
+          other.document == document &&
+          other.linkedResources == linkedResources;
 
   @override
   int get hashCode =>
@@ -57,11 +67,12 @@ class IdentityData {
           ? 0
           : originatingIntegrationId!.hashCode) +
       (person == null ? 0 : person!.hashCode) +
-      (document == null ? 0 : document!.hashCode);
+      (document == null ? 0 : document!.hashCode) +
+      (linkedResources == null ? 0 : linkedResources!.hashCode);
 
   @override
   String toString() =>
-      'IdentityData[originatingIntegrationId=$originatingIntegrationId, person=$person, document=$document]';
+      'IdentityData[originatingIntegrationId=$originatingIntegrationId, person=$person, document=$document, linkedResources=$linkedResources]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -79,6 +90,11 @@ class IdentityData {
       json[r'document'] = this.document;
     } else {
       json[r'document'] = null;
+    }
+    if (this.linkedResources != null) {
+      json[r'linkedResources'] = this.linkedResources;
+    } else {
+      json[r'linkedResources'] = null;
     }
     return json;
   }
@@ -108,6 +124,7 @@ class IdentityData {
             mapValueOfType<String>(json, r'originatingIntegrationId'),
         person: PersonData.fromJson(json[r'person']),
         document: DocumentData.fromJson(json[r'document']),
+        linkedResources: LinkedResources.fromJson(json[r'linkedResources']),
       );
     }
     return null;
