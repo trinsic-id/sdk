@@ -1,0 +1,1 @@
+& "$PSScriptRoot\generate-client.ps1" -language "php"
