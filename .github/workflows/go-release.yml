@@ -1,0 +1,12 @@
+name: "Release Go"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  go:
+    name: Publish Go Package
+    uses: ./.github/workflows/go-action.yml
+    with:
+      publish: true
+    secrets: inherit

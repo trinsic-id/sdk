@@ -1,0 +1,25 @@
+name: "PR Validation"
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+  nuget:
+    name: Validate Nuget Package
+    uses: ./.github/workflows/nuget-action.yml
+    with:
+      publish: false
+    secrets: inherit
+  go:
+    name: Validate Go Package
+    uses: ./.github/workflows/go-action.yml
+    with:
+      publish: false
+    secrets: inherit
+  java:
+    name: Validate Java Package
+    uses: ./.github/workflows/maven-action.yml
+    with:
+      publish: false
+    secrets: inherit
