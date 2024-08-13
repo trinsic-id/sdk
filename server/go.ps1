@@ -1,4 +1,4 @@
-$version = &"$PSScriptRoot\get-version.ps1" -patchVersion "0"
+$version = &"$PSScriptRoot\get-version.ps1" -patchVersion "1"
 $additionalProperties = @{
     packageName    = "trinsic.id/connect-sdks/go"
     packageVersion = $version

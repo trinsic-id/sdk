@@ -1,4 +1,4 @@
-$version = &"$PSScriptRoot\get-version.ps1" -patchVersion "0"
+$version = &"$PSScriptRoot\get-version.ps1" -patchVersion "1"
 $additionalProperties = @{
     apiPackage               = "id.trinsic.connect.backendclient"
     artifactVersion          = $version
@@ -14,6 +14,6 @@ $additionalProperties = @{
     developerName            = "Trinsic"
     developerOrganization    = "Trinsic"
     developerOrganizationUrl = "https://trinsic.id"
-    artifactDescription      = "Trinsic Connect Backend Client"
+    artifactDescription      = "'Trinsic Connect Backend Client'"
 }
 & "$PSScriptRoot\generate-client.ps1" -language "java" -additionalProperties $additionalProperties

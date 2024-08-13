@@ -3,7 +3,7 @@ param (
     [Parameter(Mandatory = $true)]
     [string]$language,
     [string]$swaggerFileOrUrl = "https://connect.trinsic.id/swagger/api/swagger.json",
-    [string]$outputFolder = "./dist/$language",
+    [string]$outputFolder = "../dist/$language",
     [Parameter(Mandatory = $true)]
     [hashtable]$additionalProperties
 )
@@ -57,3 +57,5 @@ Write-Host "Generating $language SDK from $localSwaggerFilePath in $outputFolder
 if ($LASTEXITCODE -ne 0) {
     throw "Failed to generate SDK for $language from $localSwaggerFilePath to $outputFolder."
 }
+
+Write-Host "Generated $language SDK $outputFolder";
