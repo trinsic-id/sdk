@@ -3,11 +3,10 @@ param (
     [Parameter(Mandatory = $true)]
     [string]$language,
     [string]$swaggerFileOrUrl = "https://connect.trinsic.id/swagger/api/swagger.json",
-    [string]$outputFolder = "./dist/$language"
+    [string]$outputFolder = "./dist/$language",
+    [Parameter(Mandatory = $true)]
+    [hashtable]$additionalProperties
 )
-# Example usage:
-# .\generate-server-sdk.ps1 -language typescript-fetch -swaggerFile "path\to\connect\swagger_api.json" -outputFolder "path\to\connect\sdk\typescript"
-
 #Ensure we run this "from this folder" as we run it personally in a command line as well as through the perspective of builds.
 Set-Location -Path "$PSScriptRoot"
 
@@ -42,13 +41,18 @@ else {
     Write-Host "Created output folder";
 }
 
-Write-Host "Generating SDK for $language from $localSwaggerFilePath in $outputFolder";
+# Concatenate the hashtable into a comma-separated string
+$concatenatedAdditionalProperties = (($additionalProperties.GetEnumerator() | ForEach-Object {
+            "$($_.Key)=$($_.Value)"
+        }) -join ',');
+
+Write-Host "Generating $language SDK from $localSwaggerFilePath in $outputFolder with additional properties: $concatenatedAdditionalProperties";
 
 & npx --yes openapi-generator-cli generate `
     -i "$localSwaggerFilePath" `
     -g "$language" `
     -o $outputFolder `
-    --additional-properties="" 1> $null
+    --additional-properties="$concatenatedAdditionalProperties" 1> $null
 
 if ($LASTEXITCODE -ne 0) {
     throw "Failed to generate SDK for $language from $localSwaggerFilePath to $outputFolder."
