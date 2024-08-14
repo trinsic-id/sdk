@@ -1,0 +1,12 @@
+name: "Release Maven"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  go:
+    name: Publish Maven Package
+    uses: ./.github/workflows/maven-action.yml
+    with:
+      publish: true
+    secrets: inherit
