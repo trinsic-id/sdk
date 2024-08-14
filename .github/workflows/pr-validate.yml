@@ -23,3 +23,9 @@ jobs:
     with:
       publish: false
     secrets: inherit
+  npm:
+    name: Validate NPM Packages
+    uses: ./.github/workflows/npm-action.yml
+    with:
+      publish: false
+    secrets: inherit
