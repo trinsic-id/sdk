@@ -6,7 +6,7 @@ on:
 jobs:
   nuget:
     name: Publish Nuget Package
-    uses: ./.github/actions/nuget.yml
+    uses: ./.github/workflows/reusable/nuget.yml
     with:
       publish: true
     secrets: inherit

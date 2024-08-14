@@ -7,7 +7,7 @@ on:
 jobs:
   nuget:
     name: Validate Nuget Package
-    uses: ./.github/actions/nuget.yml
+    uses: ./.github/workflows/reusable/nuget.yml
     with:
       publish: false
     secrets: inherit
