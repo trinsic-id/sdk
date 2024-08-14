@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  go:
+  release:
     name: Publish NPM Packages
     uses: ./.github/workflows/npm-action.yml
     with:

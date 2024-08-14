@@ -41,3 +41,9 @@ jobs:
     with:
       publish: false
     secrets: inherit
+  rubygems:
+    name: Validate Rubygems Packages
+    uses: ./.github/workflows/rubygems-action.yml
+    with:
+      publish: false
+    secrets: inherit

@@ -1,0 +1,35 @@
+name: Build and Publish Rubygems Package
+
+on:
+  workflow_call:
+    inputs:
+      publish:
+        type: boolean
+        required: false
+        default: false
+        description: "Publish the package, default is false"
+
+jobs:
+  build_and_publish:
+    name: Build and Publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v2
+        with:
+          ruby-version: "3.1.2"
+          bundler-cache: true
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install NPM dependencies
+        run: npm ci
+      - name: Generate SDK
+        run: ./backend/ruby.ps1
+        shell: pwsh
+      - name: Publish SDK
+        if: inputs.publish == true
+        run: ./publish/rubygems.ps1
+        shell: pwsh

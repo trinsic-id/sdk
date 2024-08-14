@@ -18,7 +18,6 @@ $additionalProperties = @{
 & "$PSScriptRoot/generate-client.ps1" -language "java" -patchVersion "1" -additionalProperties $additionalProperties
 
 try {
-    # Java doesn't like building from different directories but I don't want to change location all the time so pop at end back to whatever started the script
     Push-Location "$PSScriptRoot/../dist/java"
 
     # OpenAPI generator doesn't generate archiveClassifier but we use gradle 8+ which requires it

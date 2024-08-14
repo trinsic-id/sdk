@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  nuget:
+  release:
     name: Publish PyPI Package
     uses: ./.github/workflows/pypi-action.yml
     with:
