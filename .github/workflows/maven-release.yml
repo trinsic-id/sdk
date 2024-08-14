@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  go:
+  release:
     name: Publish Maven Package
     uses: ./.github/workflows/maven-action.yml
     with:

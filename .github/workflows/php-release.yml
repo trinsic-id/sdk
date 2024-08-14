@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  go:
+  release:
     name: Publish PHP Package
     uses: ./.github/workflows/php-action.yml
     with:

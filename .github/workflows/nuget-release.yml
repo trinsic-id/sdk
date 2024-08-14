@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  nuget:
+  release:
     name: Publish Nuget Package
     uses: ./.github/workflows/nuget-action.yml
     with:
