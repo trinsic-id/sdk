@@ -1,0 +1,32 @@
+name: Build and Publish NuGet Package
+
+on:
+  workflow_call:
+    inputs:
+      skipPublish:
+        type: boolean
+        required: false
+        default: true
+        description: "Skip publishing the package to NuGet.org by default"
+
+jobs:
+  build_and_publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install dependencies
+        run: npm install
+      - name: Generate SDK
+        run: ./server/csharp.ps1
+        shell: pwsh
+      - name: Publish SDK
+        run: ./publish/nuget.ps1
+        shell: pwsh
