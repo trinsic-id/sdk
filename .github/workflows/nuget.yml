@@ -3,14 +3,15 @@ name: Build and Publish NuGet Package
 on:
   workflow_call:
     inputs:
-      skipPublish:
+      publish:
         type: boolean
         required: false
-        default: true
-        description: "Skip publishing the package to NuGet.org by default"
+        default: false
+        description: "Publish the NuGet package, default is false"
 
 jobs:
   build_and_publish:
+    name: Build and Publish
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,5 +29,6 @@ jobs:
         run: ./server/csharp.ps1
         shell: pwsh
       - name: Publish SDK
+        if: inputs.publish == true
         run: ./publish/nuget.ps1
         shell: pwsh

@@ -6,5 +6,6 @@ on:
 
 jobs:
   validate-nuget:
+    name: Validate Nuget Package
     uses: ./.github/workflows/nuget.yml
     secrets: inherit
