@@ -29,3 +29,9 @@ jobs:
     with:
       publish: false
     secrets: inherit
+  php:
+    name: Validate PHP Packages
+    uses: ./.github/workflows/php-action.yml
+    with:
+      publish: false
+    secrets: inherit
