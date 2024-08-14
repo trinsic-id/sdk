@@ -1,0 +1,12 @@
+name: "Release NPM"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  go:
+    name: Publish NPM Packages
+    uses: ./.github/workflows/npm-action.yml
+    with:
+      publish: true
+    secrets: inherit
