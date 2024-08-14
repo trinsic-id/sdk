@@ -1,0 +1,12 @@
+name: "Release PYPI"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  nuget:
+    name: Publish PyPI Package
+    uses: ./.github/workflows/pypi-action.yml
+    with:
+      publish: true
+    secrets: inherit

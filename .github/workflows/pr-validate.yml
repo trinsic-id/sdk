@@ -35,3 +35,9 @@ jobs:
     with:
       publish: false
     secrets: inherit
+  pypi:
+    name: Validate PyPI Packages
+    uses: ./.github/workflows/pypi-action.yml
+    with:
+      publish: false
+    secrets: inherit
