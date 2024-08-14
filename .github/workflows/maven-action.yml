@@ -27,7 +27,7 @@ jobs:
       - name: Install NPM dependencies
         run: npm ci
       - name: Generate SDK
-        run: ./server/java.ps1
+        run: ./backend/java.ps1
         shell: pwsh
       - name: Publish SDK
         if: inputs.publish == true
