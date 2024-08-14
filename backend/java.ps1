@@ -29,6 +29,7 @@ try {
 
     & gradle compileJava
     & gradle jar
+    Copy-Item -Path "build/libs/*" -Destination "$PSScriptRoot/../dist/publish" -Force
 }
 finally {
     Pop-Location

@@ -1,9 +1,9 @@
 $additionalProperties = @{
     artifactVersion          = "[VERSION]"
-    invokerPackage           = "TrinsicConnect\\BackendClient"
+    invokerPackage           = "Trinsic\\Connect"
     artifactUrl              = "https://trinsic.id"
     developerOrganization    = "Trinsic"
     developerOrganizationUrl = "https://trinsic.id"
-    composerPackageName      = "trinsic/connect-backend-client"
+    composerPackageName      = "trinsic/connect"
 }
 & "$PSScriptRoot/generate-client.ps1" -language "php" -patchVersion "1" -additionalProperties $additionalProperties
