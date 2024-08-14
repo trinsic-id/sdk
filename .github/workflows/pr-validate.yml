@@ -11,3 +11,9 @@ jobs:
     with:
       publish: false
     secrets: inherit
+  go:
+    name: Validate Go Package
+    uses: ./.github/workflows/go-action.yml
+    with:
+      publish: false
+    secrets: inherit
