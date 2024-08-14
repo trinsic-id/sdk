@@ -1,4 +1,3 @@
-$version = &"$PSScriptRoot\get-version.ps1" -patchVersion "1"
 $additionalProperties = @{
     gemAuthor      = "Trinsic"
     gemAuthorEmail = "support@trinsic.id"
@@ -6,7 +5,7 @@ $additionalProperties = @{
     gemHomepage    = "https://trinsic.id"
     gemName        = "trinsic_connect_backendclient"
     gemSummary     = "'Trinsic Connect Backend Client'"
-    gemVersion     = $version
+    gemVersion     = "[VERSION]"
     moduleName     = "TrinsicConnectBackendClient"
 }
-& "$PSScriptRoot\generate-client.ps1" -language "ruby" -additionalProperties $additionalProperties
+& "$PSScriptRoot/generate-client.ps1" -language "ruby" -patchVersion "1" -additionalProperties $additionalProperties

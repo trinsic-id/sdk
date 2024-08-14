@@ -1,7 +1,0 @@
-& "$PSScriptRoot\csharp.ps1"
-& "$PSScriptRoot\go.ps1"
-& "$PSScriptRoot\java.ps1"
-& "$PSScriptRoot\node.ps1"
-& "$PSScriptRoot\php.ps1"
-& "$PSScriptRoot\python.ps1"
-& "$PSScriptRoot\ruby.ps1"

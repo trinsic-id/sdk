@@ -2,19 +2,19 @@
 param (
     [Parameter(Mandatory = $true)]
     [string]$language,
+    [Parameter(Mandatory = $true)]
+    [string]$patchVersion,
     [string]$swaggerFileOrUrl = "https://connect.trinsic.id/swagger/api/swagger.json",
-    [string]$outputFolder = "../dist/$language",
+    [string]$outputFolder = "$PSScriptRoot/../dist/$language",
     [Parameter(Mandatory = $true)]
     [hashtable]$additionalProperties
 )
-#Ensure we run this "from this folder" as we run it personally in a command line as well as through the perspective of builds.
-Set-Location -Path "$PSScriptRoot"
 
 $localSwaggerFilePath = "";
 if ($swaggerFileOrUrl -like "https://*") {
     Write-Host "The URL starts with https://, retrieving the file"
     Write-Host "Downloading specification from $swaggerFileOrUrl";
-    $localSwaggerFilePath = "./swagger.json";
+    $localSwaggerFilePath = "$PSScriptRoot/swagger.json";
 
     $response = Invoke-WebRequest -Uri $swaggerFileOrUrl 
     $response.Content | Out-File -FilePath $localSwaggerFilePath -Encoding utf8
@@ -41,9 +41,11 @@ else {
     Write-Host "Created output folder";
 }
 
-# Concatenate the hashtable into a comma-separated string
+$version = &"$PSScriptRoot\get-version.ps1" -patchVersion $patchVersion;
+
+# Concatenate the hashtable into a comma-separated string and replace version variable
 $concatenatedAdditionalProperties = (($additionalProperties.GetEnumerator() | ForEach-Object {
-            "$($_.Key)=$($_.Value)"
+            "$($_.Key)=$($_.Value -replace "\[VERSION\]", $version)"
         }) -join ',');
 
 Write-Host "Generating $language SDK from $localSwaggerFilePath in $outputFolder with additional properties: $concatenatedAdditionalProperties";
