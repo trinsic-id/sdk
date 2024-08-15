@@ -1,5 +1,5 @@
 Write-Host "Setting npm token"
-npm set //registry.npmjs.org/:_authToken $env.NPM_TOKEN
+npm set //registry.npmjs.org/:_authToken "$($env.NPM_TOKEN)"
 
 try {
     Set-Location "$PSScriptRoot/../dist/publish"
