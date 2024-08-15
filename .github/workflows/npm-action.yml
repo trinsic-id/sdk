@@ -28,3 +28,5 @@ jobs:
         if: inputs.publish == true
         run: ./publish/npm.ps1
         shell: pwsh
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
