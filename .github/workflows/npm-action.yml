@@ -21,8 +21,8 @@ jobs:
         run: ./backend/node.ps1
         shell: pwsh
       - name: Generate web SDK
-        run: npm run build
-        working-directory: ./client/web
+        run: ./client/web/web.ps1
+        shell: pwsh
       - name: Publish SDK
         if: inputs.publish == true
         run: ./publish/npm.ps1
