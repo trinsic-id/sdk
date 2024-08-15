@@ -24,3 +24,5 @@ jobs:
         if: inputs.publish == true
         run: ./publish/npm.ps1
         shell: pwsh
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
