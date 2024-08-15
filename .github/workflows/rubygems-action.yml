@@ -18,12 +18,9 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.1.2"
           bundler-cache: true
       - name: Setup Node.js
         uses: actions/setup-node@v4
-        with:
-          node-version: "20"
       - name: Install NPM dependencies
         run: npm ci
       - name: Generate SDK

@@ -18,12 +18,9 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: "21"
           distribution: "microsoft"
       - name: Setup Node.js
         uses: actions/setup-node@v4
-        with:
-          node-version: "20"
       - name: Install NPM dependencies
         run: npm ci
       - name: Generate SDK
