@@ -1,0 +1,23 @@
+{
+  "name": "@trinsic/connect-node-sample",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "prestart": "cd ../web && npm run build && cd ../node",
+    "start": "ts-node-dev --respawn --transpile-only --env-file=.env -- src/index.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^22.3.0",
+    "nodemon": "3.1.4",
+    "ts-node": "10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "5.5.4"
+  },
+  "dependencies": {
+    "@trinsic/connect-node": "0.2.0",
+    "express": "4.19.2"
+  }
+}
