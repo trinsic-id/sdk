@@ -6,5 +6,6 @@
   "goPatchVersion": "3",
   "pythonPatchVersion": "3",
   "phpPatchVersion": "3",
-  "rubyPatchVersion": "3"
+  "rubyPatchVersion": "3",
+  "webPatchVersion": "3"
 }
