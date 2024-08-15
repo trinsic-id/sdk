@@ -19,7 +19,7 @@ try {
 
     $gemFile = Get-ChildItem -Path "$PSScriptRoot/../dist/publish" -Filter *.gem
     Write-Host "Installing $gemFile"
-    &gem install $gemFile
+    &gem install $gemFile --user-install
     
 }
 finally {
