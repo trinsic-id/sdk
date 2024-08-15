@@ -15,10 +15,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          distribution: "microsoft"
       - name: Setup Node.js
         uses: actions/setup-node@v4
       - name: Install NPM dependencies
