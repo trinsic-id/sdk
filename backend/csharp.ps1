@@ -7,7 +7,7 @@ $additionalProperties = @{
     useDateTimeOffset      = "true"
     validatable            = "false"
 }
-& "$PSScriptRoot/generate-client.ps1" -language "csharp" -patchVersion "1" -additionalProperties $additionalProperties
+& "$PSScriptRoot/generate-client.ps1" -language "csharp" -patchVersion "0" -additionalProperties $additionalProperties
 
 try {
     Push-Location "$PSScriptRoot/../dist/csharp"
