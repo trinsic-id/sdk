@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect samples</title>
+    <script src="/dist/connect-web/index.js"></script>
+
+    <script>
+        function createUrl() {
+            fetch('/create-session', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => response.json()).then(r => window.launchUrl = r.launchUrl);
+        }
+        function exchangeResult(response) {
+            console.log(response);
+            fetch('/exchange-result', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({sessionId: response.sessionId, resultsAccessKey: response.resultsAccessKey})
+            }).then(response => response.json()).then(r => document.getElementById('results').innerText = JSON.stringify(r, null, 2));
+        }
+        createUrl();
+    </script>
+</head>
+<body style="background-color: gray 50%">
+    <h1>Hi! Start a verification by clicking the buttons below. Make sure you're running one of the backend samples.</h1>
+    <ul>
+        <li>
+            <button onclick="new Trinsic.ConnectClient().launchIframe(window.launchUrl).then(r => exchangeResult(r))">Launch an iFrame</button>
+        </li>
+    </ul>    
+    <pre id="results">
+
+    </pre>
+</body>
+</html>

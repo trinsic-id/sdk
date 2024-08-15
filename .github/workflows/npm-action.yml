@@ -17,9 +17,12 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install NPM dependencies
         run: npm ci
-      - name: Generate SDK
+      - name: Generate backend SDK
         run: ./backend/node.ps1
         shell: pwsh
+      - name: Generate web SDK
+        run: npm run build
+        working-directory: ./client/web
       - name: Publish SDK
         if: inputs.publish == true
         run: ./publish/npm.ps1
