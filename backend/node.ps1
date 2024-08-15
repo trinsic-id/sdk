@@ -1,7 +1,9 @@
 $additionalProperties = @{
-    npmName     = "@trinsic/connect-node"
-    npmVersion  = "[VERSION]"
-    supportsES6 = "true"
+    npmName                   = "@trinsic/connect-node"
+    npmVersion                = "[VERSION]"
+    supportsES6               = "true"
+    withInterfaces            = "true"
+    useSingleRequestParameter = "false"
 }
 & "$PSScriptRoot/generate-client.ps1" -language "typescript-fetch" -patchVersion "0" -additionalProperties $additionalProperties -outputFolder "$PSScriptRoot/../dist/node"
 
