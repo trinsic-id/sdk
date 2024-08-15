@@ -40,7 +40,7 @@ else {
     Write-Host "Created output folder";
 }
 
-$version = &"$PSScriptRoot\get-version.ps1" -versionName $versionName;
+$version = &"$PSScriptRoot\..\get-version.ps1" -versionName $versionName;
 
 # Concatenate the hashtable into a comma-separated string and replace version variable
 $concatenatedAdditionalProperties = (($additionalProperties.GetEnumerator() | ForEach-Object {
