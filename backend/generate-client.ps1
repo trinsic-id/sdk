@@ -2,8 +2,7 @@
 param (
     [Parameter(Mandatory = $true)]
     [string]$language,
-    [Parameter(Mandatory = $true)]
-    [string]$patchVersion,
+    [string]$versionName = $language,
     [string]$swaggerFileOrUrl = "https://connect.trinsic.id/swagger/api/swagger.json",
     [string]$outputFolder = "$PSScriptRoot/../dist/$language",
     [Parameter(Mandatory = $true)]
@@ -41,7 +40,7 @@ else {
     Write-Host "Created output folder";
 }
 
-$version = &"$PSScriptRoot\..\get-version.ps1" -patchVersion $patchVersion;
+$version = &"$PSScriptRoot\..\get-version.ps1" -versionName $versionName;
 
 # Concatenate the hashtable into a comma-separated string and replace version variable
 $concatenatedAdditionalProperties = (($additionalProperties.GetEnumerator() | ForEach-Object {

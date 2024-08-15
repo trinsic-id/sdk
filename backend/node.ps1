@@ -5,7 +5,7 @@ $additionalProperties = @{
     withInterfaces            = "true"
     useSingleRequestParameter = "false"
 }
-& "$PSScriptRoot/generate-client.ps1" -language "typescript-fetch" -patchVersion "0" -additionalProperties $additionalProperties -outputFolder "$PSScriptRoot/../dist/node"
+& "$PSScriptRoot/generate-client.ps1" -language "typescript-fetch" -versionName "node" -additionalProperties $additionalProperties -outputFolder "$PSScriptRoot/../dist/node"
 
 try {
     Push-Location "$PSScriptRoot/../dist/node"

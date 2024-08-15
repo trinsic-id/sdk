@@ -1,6 +1,6 @@
 {
   "name": "@trinsic/connect-web",
-  "version": "0.2.0",
+  "version": "0.2.3",
   "description": "Connect's web client to easily launch your verifications",
   "main": "index.js",
   "scripts": {

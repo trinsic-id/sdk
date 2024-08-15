@@ -8,7 +8,7 @@ $additionalProperties = @{
     gemVersion     = "[VERSION]"
     moduleName     = "TrinsicConnect"
 }
-& "$PSScriptRoot/generate-client.ps1" -language "ruby" -patchVersion "0" -additionalProperties $additionalProperties
+& "$PSScriptRoot/generate-client.ps1" -language "ruby" -additionalProperties $additionalProperties
 
 try {
     Push-Location "$PSScriptRoot/../dist/ruby"

@@ -2,7 +2,7 @@ try {
     Push-Location "$PSScriptRoot"
     & npm install
 
-    $version = &"$PSScriptRoot\..\..\get-version.ps1" -patchVersion "0";
+    $version = &"$PSScriptRoot\..\..\get-version.ps1" -versionName "web";
 
     & npm version "$version" --no-git-tag-version
     

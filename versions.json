@@ -1,3 +1,11 @@
 {
-  "backendVersion": "0.2"
+  "backendVersion": "0.2",
+  "nodePatchVersion": "3",
+  "csharpPatchVersion": "3",
+  "javaPatchVersion": "3",
+  "goPatchVersion": "3",
+  "pythonPatchVersion": "3",
+  "phpPatchVersion": "3",
+  "rubyPatchVersion": "3",
+  "webPatchVersion": "3"
 }

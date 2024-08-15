@@ -15,7 +15,7 @@ $additionalProperties = @{
     developerOrganizationUrl = "https://trinsic.id"
     artifactDescription      = "'Trinsic Connect'"
 }
-& "$PSScriptRoot/generate-client.ps1" -language "java" -patchVersion "0" -additionalProperties $additionalProperties
+& "$PSScriptRoot/generate-client.ps1" -language "java" -additionalProperties $additionalProperties
 
 try {
     Push-Location "$PSScriptRoot/../dist/java"
