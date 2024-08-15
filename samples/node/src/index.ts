@@ -28,9 +28,7 @@ app.get("/redirect", (req, res) => {
 app.post("/create-session", async (req, res) => {
   try {
     const result = await api.createSession({
-      createSessionRequest: {
-        direct: false,
-      },
+      direct: false,
     });
     console.debug("Created session", result);
     res.send(result);
