@@ -7,7 +7,7 @@ try {
     Write-Host "Publishing packages"
     foreach ($package in Get-ChildItem -Filter *.tgz) {
         Write-Host "Publishing $package"
-        & npm publish $package.FullName  --yes --no-git-tag-version
+        & npm publish $package.FullName  --yes --no-git-tag-version --access=public
         Write-Host "Published $package"
     }
 }
