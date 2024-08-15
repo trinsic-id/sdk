@@ -17,7 +17,7 @@
     "typescript": "5.5.4"
   },
   "dependencies": {
-    "@trinsic/connect-node": "0.2.0",
+    "@trinsic/connect-node": "0.2.3",
     "express": "4.19.2"
   }
 }
