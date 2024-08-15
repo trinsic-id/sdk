@@ -24,11 +24,48 @@ try {
     $buildGradleFile = "build.gradle"
     $buildGradleFileContent = Get-Content -Path $buildGradleFile
     $buildGradleFileContent = $buildGradleFileContent -replace "classifier =", "archiveClassifier="
+
+    # Convert content to an array for easier manipulation
+    $gradleLines = $buildGradleFileContent -split "`n"
+
+    # Initialize a flag to track whether we are inside the publishing block
+    $insidePublishingBlock = $false
+    $newPublishingContent = @"
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/trinsic-id/connect-sdks")
+                credentials {
+                    username = System.getenv("MAVEN_GITHUB_USERNAME")
+                    password = System.getenv("MAVEN_GITHUB_TOKEN")
+                }
+            }
+    }
+"@
+    $buildGradleFileContent = ""
+
+    foreach ($line in $gradleLines) {
+        # Check if the line contains the start of the publishing block
+        if ($line -match "^\s*publishing\s*{") {
+            $insidePublishingBlock = $true
+        }
+
+        # If we are inside the publishing block and encounter the closing brace
+        if ($insidePublishingBlock -and $line -match "^\s*}\s*$") {
+            # Append the new content before the closing brace
+            $buildGradleFileContent += $newPublishingContent
+            $insidePublishingBlock = $false
+        }
+
+        # Add the current line to the updated content
+        $buildGradleFileContent += $line + "`n"
+    }
+
+
     $buildGradleFileContent | Set-Content -Path $buildGradleFile
 
     & gradle compileJava
     & gradle jar
-    Copy-Item -Path "build/libs/*" -Destination "$PSScriptRoot/../dist/publish" -Force
 }
 finally {
     Pop-Location

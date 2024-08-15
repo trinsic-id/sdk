@@ -24,3 +24,6 @@ jobs:
         if: inputs.publish == true
         run: ./publish/maven.ps1
         shell: pwsh
+        env:
+          MAVEN_GITHUB_USERNAME: ${{ secrets.GITHUB_MAVEN_USERNAME }}
+          MAVEN_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
