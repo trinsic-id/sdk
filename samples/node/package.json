@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "prestart": "cd ../web && npm run build && cd ../node",
-    "start": "ts-node-dev --respawn --transpile-only src/index.ts"
+    "start": "ts-node-dev --respawn --transpile-only --env-file=.env -- src/index.ts"
   },
   "author": "",
   "license": "ISC",

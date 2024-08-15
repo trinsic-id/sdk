@@ -2,91 +2,123 @@ import { detectUserAgents } from "./detectUserAgents";
 import MicroModal from "micromodal";
 import { CSSString } from "./iframeCss";
 
-export class ConnectClient {
-  constructor() {}
-
-  public async launchIframe(launchUrl: string) {
-    launchUrl += "&embed=iframe";
-    const style = document.createElement("style");
-    style.id = "trinsic-connect-style";
-    style.textContent = CSSString;
-    document.head.appendChild(style);
-    MicroModal.init();
-    if (launchUrl === undefined || launchUrl === null || launchUrl === "") {
-      throw new Error(
-        "Please specify a launch url by calling our API via one of our backend SDK's"
-      );
-    }
-    this.showModal(launchUrl);
-    var result = new Promise((resolve, reject) => {
-      window.addEventListener(
-        "message",
-        (event) => {
-          console.debug("event data", event.data);
-          if (event.data?.success === true) {
-            this.hideModal();
-            resolve(event.data);
-          }
-          if (event.data?.success === false) {
-            this.hideModal();
-            reject(event.data);
-          }
-        },
-        false
-      );
-    });
-    return result;
+export async function launchIframe(launchUrl: string) {
+  launchUrl += "&embed=iframe";
+  const style = document.createElement("style");
+  style.id = "trinsic-connect-style";
+  style.textContent = CSSString;
+  document.head.appendChild(style);
+  MicroModal.init();
+  if (launchUrl === undefined || launchUrl === null || launchUrl === "") {
+    throw new Error(
+      "Please specify a launch url by calling our API via one of our backend SDK's"
+    );
   }
-  public async launchRedirect(launchUrl: string) {}
-  public async launchPopup(launchUrl: string) {}
+  showModal(launchUrl);
+  var result = new Promise((resolve, reject) => {
+    window.addEventListener(
+      "message",
+      (event) => {
+        console.debug("event data", event.data);
+        if (event.data?.success === true) {
+          hideModal();
+          resolve(event.data);
+        }
+        if (event.data?.success === false) {
+          hideModal();
+          reject(event.data);
+        }
+      },
+      false
+    );
+  });
+  return result;
+}
 
-  private showModal(launchUrl: string) {
-    this.removeModal();
+export async function launchRedirect(launchUrl: string, redirectUrl: string) {
+  launchUrl += "&redirectUrl=" + redirectUrl;
+  window.location.href = launchUrl;
+}
 
-    const userAgents = detectUserAgents();
+export async function launchPopup(launchUrl: string) {
+  const userAgents = detectUserAgents();
+  const popup = window.open(
+    launchUrl,
+    "Trinsic Connect",
+    userAgents.isDesktop
+      ? "width=600,height=900"
+      : "width=" +
+          window.innerWidth +
+          ",height=" +
+          window.innerHeight +
+          ",top=0,left=0"
+  );
+  var result = new Promise((resolve, reject) => {
+    window?.addEventListener(
+      "message",
+      (event) => {
+        console.debug("event data", event.data);
+        if (event.data?.success === true) {
+          popup?.close();
+          resolve(event.data);
+        }
+        if (event.data?.success === false) {
+          popup?.close();
+          reject(event.data);
+        }
+      },
+      false
+    );
+  });
+  return result;
+}
 
-    const modal = document.createElement("div");
-    modal.id = "trinsic-connect";
-    modal.ariaHidden = "true";
-    modal.className = "micromodal-slide";
+function showModal(launchUrl: string) {
+  removeModal();
 
-    const bgOverlay = document.createElement("div");
-    bgOverlay.tabIndex = -1;
-    // bgOverlay.setAttribute("data-micromodal-close", "true");
-    bgOverlay.className = "fixed inset-0 flex items-center justify-center";
+  const userAgents = detectUserAgents();
 
-    const modalContainer = document.createElement("div");
-    //modalContainer.role = "dialog";
-    modalContainer.ariaModal = "true";
+  const modal = document.createElement("div");
+  modal.id = "trinsic-connect";
+  modal.ariaHidden = "true";
+  modal.className = "micromodal-slide";
 
-    modalContainer.className = userAgents.isDesktop
-      ? "modal__container h-600px w-400px lock-bg"
-      : "modal__container h-full min-h-600px w-full";
+  const bgOverlay = document.createElement("div");
+  bgOverlay.tabIndex = -1;
+  // bgOverlay.setAttribute("data-micromodal-close", "true");
+  bgOverlay.className = "fixed inset-0 flex items-center justify-center";
 
-    const iframe = document.createElement("iframe");
-    iframe.className = "h-full w-full bg-transparent";
-    iframe.allow =
-      "camera *; microphone *; display-capture *; publickey-credentials-get *; publickey-credentials-create *";
-    iframe.src = launchUrl;
+  const modalContainer = document.createElement("div");
+  //modalContainer.role = "dialog";
+  modalContainer.ariaModal = "true";
 
-    modalContainer.append(iframe);
-    bgOverlay.append(modalContainer);
-    modal.append(bgOverlay);
-    document.body.classList.add("lock-bg");
-    document.body.append(modal);
-    MicroModal.show("trinsic-connect");
-  }
+  modalContainer.className = userAgents.isDesktop
+    ? "modal__container h-600px w-400px lock-bg"
+    : "modal__container h-full min-h-600px w-full";
 
-  private hideModal() {
-    try {
-      MicroModal.close("trinsic-connect");
-    } catch (err) {}
-    document.body.classList.remove("lock-bg");
-    this.removeModal();
-  }
+  const iframe = document.createElement("iframe");
+  iframe.className = "h-full w-full bg-transparent";
+  iframe.allow =
+    "camera *; microphone *; display-capture *; publickey-credentials-get *; publickey-credentials-create *";
+  iframe.src = launchUrl;
 
-  private removeModal() {
-    const trinsicConnect = document.getElementById("trinsic-connect");
-    trinsicConnect?.remove();
-  }
+  modalContainer.append(iframe);
+  bgOverlay.append(modalContainer);
+  modal.append(bgOverlay);
+  document.body.classList.add("lock-bg");
+  document.body.append(modal);
+  MicroModal.show("trinsic-connect");
+}
+
+function hideModal() {
+  try {
+    MicroModal.close("trinsic-connect");
+  } catch (err) {}
+  document.body.classList.remove("lock-bg");
+  removeModal();
+}
+
+function removeModal() {
+  const trinsicConnect = document.getElementById("trinsic-connect");
+  trinsicConnect?.remove();
 }
