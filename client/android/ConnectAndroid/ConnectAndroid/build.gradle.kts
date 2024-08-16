@@ -9,7 +9,7 @@ publishing {
         register<MavenPublication>("release") {
             groupId = "id.trinsic"
             artifactId = "connect-android"
-            version = "1.0"
+            version = "[REPLACEME_VERSION]"
 
             afterEvaluate {
                 from(components["release"])
