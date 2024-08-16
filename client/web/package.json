@@ -1,15 +1,18 @@
 {
   "name": "@trinsic/connect-web",
-  "version": "0.2.3",
+  "version": "0.2.5",
   "description": "Connect's web client to easily launch your verifications",
   "main": "dist/index.js",
   "scripts": {
-    "build": "esbuild src/index.ts --bundle --minify --sourcemap --global-name=Trinsic --format=iife --outfile=dist/index.js --target=chrome58,firefox57,safari11,edge16"
+    "build": "esbuild src/index.ts --bundle --minify --sourcemap --global-name=Trinsic --format=iife --outfile=dist/index.js --target=chrome58,firefox57,safari11,edge16",
+    "postbuild": "tsc src/index.ts --declaration --emitDeclarationOnly --lib es2015,dom --outDir dist"
   },
+  "types": "dist/index.d.ts",
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "esbuild": "0.23.0"
+    "esbuild": "0.23.0",
+    "typescript": "5.5.4"
   },
   "dependencies": {
     "micromodal": "0.4.10"
