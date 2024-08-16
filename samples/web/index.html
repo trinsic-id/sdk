@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connect samples</title>
-    <script src="/dist/connect-web/index.js"></script>
 
     <script>
         function enableButtons() {
@@ -51,17 +50,27 @@
     <h1>Hi! Start a verification by clicking the buttons below. Make sure you're running one of the backend samples.</h1>
     <ul>
         <li>
-            <button class="launch-button" disabled="true" onclick="Trinsic.launchIframe(window.launchUrl).then(r => exchangeResult(r))">Launch an iFrame</button>
+            <button class="launch-button" disabled="true" onclick="launchIframe(window.launchUrl).then(r => exchangeResult(r))">Launch an iFrame</button>
         </li>
         <li>
-            <button class="launch-button" disabled="true" onclick="Trinsic.launchRedirect(window.launchUrl, window.location.origin + '/redirect')">Launch redirect flow</button>
+            <button class="launch-button" disabled="true" onclick="launchRedirect(window.launchUrl, window.location.origin + '/redirect')">Launch redirect flow</button>
         </li>
         <li>
-            <button class="launch-button" disabled="true" onclick="Trinsic.launchPopup(window.launchUrl).then(r => exchangeResult(r))">Launch popup</button>
+            <button class="launch-button" disabled="true" onclick="launchPopup(window.launchUrl).then(r => exchangeResult(r))">Launch popup</button>
         </li>
     </ul>    
     <pre id="results">
 
     </pre>
+
+    <script type="module">
+        // Import the function from your module
+        import { launchIframe, launchRedirect, launchPopup } from '/dist/connect-web/index.js';
+
+        // Assign the function to the global scope
+        window.launchIframe = launchIframe;
+        window.launchRedirect = launchRedirect;
+        window.launchPopup = launchPopup;
+    </script>
 </body>
 </html>
