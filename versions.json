@@ -1,6 +1,5 @@
 {
   "backendVersion": "0.2",
-  "androidPatchVersion": "3",
   "nodePatchVersion": "3",
   "csharpPatchVersion": "3",
   "javaPatchVersion": "3",
