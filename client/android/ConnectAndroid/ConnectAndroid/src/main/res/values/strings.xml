@@ -1,0 +1,4 @@
+<resources>
+    <string name="title_activity_callback">CallbackActivity</string>
+    <string name="title_activity_invoke">InvokeActivity</string>
+</resources>
