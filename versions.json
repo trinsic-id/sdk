@@ -2,7 +2,7 @@
   "backendVersion": "0.2",
   "androidPatchVersion": "3",
   "nodePatchVersion": "3",
-  "csharpPatchVersion": "3",
+  "csharpPatchVersion": "4",
   "javaPatchVersion": "3",
   "goPatchVersion": "3",
   "pythonPatchVersion": "3",
