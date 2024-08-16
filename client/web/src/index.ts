@@ -2,7 +2,16 @@ import { detectUserAgents } from "./detectUserAgents";
 import MicroModal from "micromodal";
 import { CSSString } from "./iframeCss";
 
-export async function launchIframe(launchUrl: string) {
+export interface ConnectSessionResult {
+  success: boolean;
+  msg: "user-closed" | "failed" | "complete" | "unrecoverable-error" | string;
+  sessionId?: string;
+  resultsAccessKey?: string;
+}
+
+export async function launchIframe(
+  launchUrl: string
+): Promise<ConnectSessionResult> {
   launchUrl += "&embed=iframe";
   const style = document.createElement("style");
   style.id = "trinsic-connect-style";
@@ -15,18 +24,18 @@ export async function launchIframe(launchUrl: string) {
     );
   }
   showModal(launchUrl);
-  var result = new Promise((resolve, reject) => {
+  var result = new Promise<ConnectSessionResult>((resolve, reject) => {
     window.addEventListener(
       "message",
       (event) => {
         console.debug("event data", event.data);
         if (event.data?.success === true) {
           hideModal();
-          resolve(event.data);
+          resolve(event.data as ConnectSessionResult);
         }
         if (event.data?.success === false) {
           hideModal();
-          reject(event.data);
+          reject(event.data as ConnectSessionResult);
         }
       },
       false
@@ -40,7 +49,9 @@ export async function launchRedirect(launchUrl: string, redirectUrl: string) {
   window.location.href = launchUrl;
 }
 
-export async function launchPopup(launchUrl: string) {
+export async function launchPopup(
+  launchUrl: string
+): Promise<ConnectSessionResult> {
   const userAgents = detectUserAgents();
   const popup = window.open(
     launchUrl,
@@ -53,18 +64,18 @@ export async function launchPopup(launchUrl: string) {
           window.innerHeight +
           ",top=0,left=0"
   );
-  var result = new Promise((resolve, reject) => {
+  var result = new Promise<ConnectSessionResult>((resolve, reject) => {
     window?.addEventListener(
       "message",
       (event) => {
         console.debug("event data", event.data);
         if (event.data?.success === true) {
           popup?.close();
-          resolve(event.data);
+          resolve(event.data as ConnectSessionResult);
         }
         if (event.data?.success === false) {
           popup?.close();
-          reject(event.data);
+          reject(event.data as ConnectSessionResult);
         }
       },
       false
