@@ -1,14 +1,4 @@
 $sourceLocation = "$PSScriptRoot/../dist/php"
+$destinationLocation = "$PSScriptRoot/../php"
 
-if (-not (Test-Path -Path $sourceLocation -PathType Container)) {
-    throw "The source location '$sourceLocation' does not exist."
-}
-
-
-
-#We likely need to split php up into a separate repo as with go.
-throw "Not implemented yet"
-
-$tagName = "php/v$env::VERSION"
-git tag $tagName
-git push origin $tagName
+& "$PSScriptRoot\submodule.ps1" -sourceLocation $sourceLocation -destinationLocation $destinationLocation -githubPAT $Env:PAT_GITHUB -repositoryPath "trinsic-id/php" -packageVersion $Env:PACKAGE_VERSION
