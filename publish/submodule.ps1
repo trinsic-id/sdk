@@ -8,7 +8,9 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$repositoryPath,
     [Parameter(Mandatory = $true)]
-    [string]$packageVersion
+    [string]$packageVersion,
+    [Parameter(Mandatory = $true)]
+    [string]$name
 )
 
 if (-not (Test-Path -Path $sourceLocation -PathType Container)) {
@@ -40,7 +42,7 @@ try {
     Write-Host "Adding files to git"
     git add .
     Write-Host "Committing files"
-    git commit -m "Publishing latest go package for version $packageVersion"
+    git commit -m "Publishing latest $name package for version $packageVersion"
     
     Write-Host "Pushing to submodule repository"
     git push origin main
@@ -60,7 +62,7 @@ try {
 
     # Update reference in main repo
     git add $destinationLocation
-    git commit -m "Update Go submodule reference to version $packageVersion"
+    git commit -m "Update $name submodule reference to version $packageVersion"
     git push origin main
     if ($LASTEXITCODE -ne 0) {
         throw "Failed to push to our main"
