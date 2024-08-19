@@ -34,10 +34,13 @@ public class MainActivity extends AppCompatActivity {
 
         connectClient = new ConnectClient(this, (result) -> {
             if (result.getCanceled()) {
+                // This happens if the user closed the Android Custom Tabs activity by hitting the "X" button or by hitting Back
                 Toast.makeText(MainActivity.this, "User canceled", Toast.LENGTH_SHORT).show();
             } else if (!result.getSuccess()) {
+                // This happens if the flow fails for any other reason
                 Toast.makeText(MainActivity.this, "Failed", Toast.LENGTH_SHORT).show();
             } else {
+                // This happens if the user's identity has been verified
                 Toast.makeText(MainActivity.this, "ResultsAccessKey: " + result.getResultsAccessKey(), Toast.LENGTH_SHORT).show();
             }
         });
