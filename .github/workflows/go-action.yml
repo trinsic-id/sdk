@@ -15,12 +15,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: false
       - name: Install NPM dependencies
         run: npm ci
       - name: Generate SDK
+        id: generate-sdk
         run: ./backend/go.ps1
         shell: pwsh
       - name: Publish SDK
         if: inputs.publish == true
         run: ./publish/go.ps1
         shell: pwsh
+        env:
+          PAT_GITHUB: ${{ secrets.PAT_GITHUB }}
+          PACKAGE_VERSION: ${{ steps.generate-sdk.outputs.connect-package-version }}

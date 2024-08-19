@@ -11,4 +11,6 @@ $patchVersion = $jsonContent."$($versionName)patchVersion"
 $packageVersion = "$backendVersion.$patchVersion"
 Write-Host "Package will be created with version $packageVersion from file based API Version $version and patchVersion $patchVersion"
 
+echo "connect-package-version=$packageVersion" >> $env:GITHUB_OUTPUT
+
 return $packageVersion;

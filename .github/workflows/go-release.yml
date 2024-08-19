@@ -3,6 +3,9 @@ name: "Release Go"
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   release:
     name: Publish Go Package
