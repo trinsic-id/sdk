@@ -7,15 +7,17 @@ import androidx.activity.result.contract.ActivityResultContract;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import id.trinsic.connectandroid.models.ConnectSessionParams;
-import id.trinsic.connectandroid.models.ConnectSessionResult;
+import id.trinsic.connectandroid.InvokeActivity;
+import id.trinsic.connectandroid.models.AcceptanceSessionLaunchParams;
+import id.trinsic.connectandroid.models.AcceptanceSessionResult;
 
-public class InvokeContract extends ActivityResultContract<ConnectSessionParams, ConnectSessionResult>
+class InvokeContract extends ActivityResultContract<AcceptanceSessionLaunchParams, AcceptanceSessionResult>
 {
     @NonNull
     @Override
-    public Intent createIntent(@NonNull Context context, ConnectSessionParams input) {
+    public Intent createIntent(@NonNull Context context, AcceptanceSessionLaunchParams input) {
         Intent intent = new Intent(context, InvokeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         intent.putExtra("sessionId", input.getSessionId());
         intent.putExtra("launchUrl", input.getLaunchUrl());
         intent.putExtra("redirectScheme", input.getRedirectScheme());
@@ -23,9 +25,9 @@ public class InvokeContract extends ActivityResultContract<ConnectSessionParams,
     }
 
     @Override
-    public ConnectSessionResult parseResult(int resultCode, @Nullable Intent intent) {
+    public AcceptanceSessionResult parseResult(int resultCode, @Nullable Intent intent) {
         if (intent != null) {
-            return new ConnectSessionResult(
+            return new AcceptanceSessionResult(
                     intent.getStringExtra("sessionId"),
                     intent.getStringExtra("resultsAccessKey"),
                     intent.getBooleanExtra("success", false),
@@ -33,6 +35,6 @@ public class InvokeContract extends ActivityResultContract<ConnectSessionParams,
             );
         }
 
-        return new ConnectSessionResult(null, null, false, false);
+        return new AcceptanceSessionResult(null, null, false, false);
     }
 }

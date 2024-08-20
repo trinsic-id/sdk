@@ -2,12 +2,15 @@ package id.trinsic.connectandroidsample;
 
 import android.os.Bundle;
 
+import id.trinsic.connectandroid.ConnectClient;
 import id.trinsic.connectandroidsample.R;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -17,9 +20,10 @@ import androidx.navigation.ui.NavigationUI;
 import id.trinsic.connectandroidsample.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
-
-    private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
+    private static String LAUNCH_URL = "https://google.com";
+
+    private ConnectClient connectClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,27 +32,25 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        setSupportActionBar(binding.toolbar);
-
-
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-
-        binding.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAnchorView(R.id.fab)
-                        .setAction("Action", null).show();
+        connectClient = new ConnectClient(this, (result) -> {
+            if (result.getCanceled()) {
+                // This happens if the user closed the Android Custom Tabs activity by hitting the "X" button or by hitting Back
+                Toast.makeText(MainActivity.this, "User canceled", Toast.LENGTH_SHORT).show();
+            } else if (!result.getSuccess()) {
+                // This happens if the flow fails for any other reason
+                Toast.makeText(MainActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+            } else {
+                // This happens if the user's identity has been verified
+                Toast.makeText(MainActivity.this, "ResultsAccessKey: " + result.getResultsAccessKey(), Toast.LENGTH_SHORT).show();
             }
         });
-    }
 
-    @Override
-    public boolean onSupportNavigateUp() {
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        return NavigationUI.navigateUp(navController, appBarConfiguration)
-                || super.onSupportNavigateUp();
+        binding.buttonLaunch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("OnClick", "Invoking connect client");
+                connectClient.Invoke(LAUNCH_URL, "trinsic-testbed");
+            }
+        });
     }
 }

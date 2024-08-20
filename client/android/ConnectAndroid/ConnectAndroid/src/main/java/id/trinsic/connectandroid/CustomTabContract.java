@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.browser.customtabs.CustomTabsIntent;
 
-public class CustomTabContract extends ActivityResultContract<Uri, Uri>
+class CustomTabContract extends ActivityResultContract<Uri, Uri>
 {
     @NonNull
     @Override
