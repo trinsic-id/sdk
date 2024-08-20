@@ -43,6 +43,15 @@ public class ConnectClient {
     public void Invoke(String launchUrl, String redirectScheme) {
         Uri parsedUrl = Uri.parse(launchUrl);
         String sessionId = parsedUrl.getQueryParameter("sessionId");
+
+        if(!parsedUrl.getQueryParameterNames().contains("launchMode")) {
+            launchUrl += "&launchMode=mobile";
+        }
+
+        if(!parsedUrl.getQueryParameterNames().contains("redirectUrl")) {
+            launchUrl += "&redirectUrl=" + redirectScheme + ":///callback";
+        }
+
         invokeLauncher.launch(new AcceptanceSessionLaunchParams(sessionId, launchUrl, redirectScheme));
     }
 }
