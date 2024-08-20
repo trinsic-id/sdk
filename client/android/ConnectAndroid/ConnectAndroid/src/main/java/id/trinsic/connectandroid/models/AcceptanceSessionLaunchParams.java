@@ -1,13 +1,16 @@
 package id.trinsic.connectandroid.models;
 
-public class ConnectSessionParams {
+/**
+ * Internal library class used to package Acceptance Session
+ */
+public class AcceptanceSessionLaunchParams {
     private String sessionId;
 
     private String launchUrl;
 
     private String redirectScheme;
 
-    public ConnectSessionParams(String sessionId, String launchUrl, String redirectScheme) {
+    public AcceptanceSessionLaunchParams(String sessionId, String launchUrl, String redirectScheme) {
         this.sessionId = sessionId;
         this.launchUrl = launchUrl;
         this.redirectScheme = redirectScheme;
