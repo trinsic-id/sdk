@@ -2,6 +2,9 @@ name: "Release PYPI"
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - jp/publish-python
 
 jobs:
   release:
