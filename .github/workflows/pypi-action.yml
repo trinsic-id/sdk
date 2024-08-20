@@ -24,3 +24,5 @@ jobs:
         if: inputs.publish == true
         run: ./publish/pypi.ps1
         shell: pwsh
+        env:
+          PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
