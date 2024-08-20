@@ -2,7 +2,9 @@ name: "Release Rubygems"
 
 on:
   workflow_dispatch:
-
+  push:
+    branches:
+      - jp/publish-python
 jobs:
   release:
     name: Publish Rubygems Package
