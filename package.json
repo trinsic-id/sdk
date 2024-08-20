@@ -1,4 +1,10 @@
 {
+  "private": true,
+  "workspaces": [
+    "dist/node",
+    "client/web",
+    "samples/node"
+  ],
   "name": "connect-sdks",
   "version": "1.0.0",
   "description": "",
