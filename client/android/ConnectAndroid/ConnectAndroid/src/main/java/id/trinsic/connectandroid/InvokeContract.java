@@ -11,7 +11,10 @@ import id.trinsic.connectandroid.InvokeActivity;
 import id.trinsic.connectandroid.models.AcceptanceSessionLaunchParams;
 import id.trinsic.connectandroid.models.AcceptanceSessionResult;
 
-class InvokeContract extends ActivityResultContract<AcceptanceSessionLaunchParams, AcceptanceSessionResult>
+/**
+ * Internal class for Trinsic SDK usage
+ */
+public class InvokeContract extends ActivityResultContract<AcceptanceSessionLaunchParams, AcceptanceSessionResult>
 {
     @NonNull
     @Override
