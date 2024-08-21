@@ -13,6 +13,7 @@
         const data = {
             success: params.get('success') === 'true' ? true : false,
             resultsAccessKey: params.get('resultsAccessKey'),
+            sessionId: params.get('sessionId'),
         };
 
         console.debug("Sending message to opener", data, window.opener);

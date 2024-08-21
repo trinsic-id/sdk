@@ -49,31 +49,21 @@ app.MapPost("/exchange-result", async context =>
 {
     try
     {
-        // Read and deserialize the request body
         var request = await context.Request.ReadFromJsonAsync<ExchangeResultRequest>();
-
-        // Call the method to exchange the results key
         var result = await sessionApi.ExchangeResultsKeyAsync(request.SessionId, new ExchangeResultsKeyRequest()
         {
             ResultsAccessKey = request.ResultsAccessKey
         });
-
-        // Return the result as JSON
         await context.Response.WriteAsJsonAsync(result);
     }
     catch (Exception e)
     {
-        // Log the exception
         Console.Error.WriteLine(e);
-
-        // Set the response status code to 500 Internal Server Error
         context.Response.StatusCode = 500;
         await context.Response.WriteAsync("An error occurred while processing your request.");
     }
 });
 
-
-//Serve web sdk
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "../../web/dist/connect-web")),

@@ -19,7 +19,9 @@ const networkApi = new NetworkApi(newConfiguration);
 
 app.use(express.json());
 
-app.get("/", express.static(path.join("../web")));
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "../../web/index.html"));
+});
 app.get("/redirect", (req, res) => {
   res.sendFile(path.join(__dirname, "../../web/redirect.html"));
 });
