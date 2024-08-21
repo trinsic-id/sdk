@@ -1,11 +1,12 @@
 {
-  "name": "@trinsic/connect-node-sample",
+  "name": "@trinsic/api-node-sample",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "prestart": "cd ../web && npm run build && cd ../node",
-    "start": "ts-node-dev --respawn --transpile-only --env-file=.env -- src/index.ts"
+    "start": "ts-node-dev --respawn --transpile-only --env-file=.env -- src/index.ts",
+    "build": "tsc"
   },
   "author": "",
   "license": "ISC",
@@ -17,7 +18,7 @@
     "typescript": "5.5.4"
   },
   "dependencies": {
-    "@trinsic/connect-node": "file:../../dist/node",
+    "@trinsic/api": "file:../../dist/node",
     "express": "4.19.2"
   }
 }

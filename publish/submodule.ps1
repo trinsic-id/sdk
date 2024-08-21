@@ -10,7 +10,9 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$packageVersion,
     [Parameter(Mandatory = $true)]
-    [string]$name
+    [string]$name,
+    [Parameter(Mandatory = $true)]
+    [string]$sdkRepositoryPath
 )
 
 if (-not (Test-Path -Path $sourceLocation -PathType Container)) {
@@ -56,7 +58,7 @@ try {
     git push origin $tagName
 
     Set-Location "$PSScriptRoot/../"
-    $remoteOrigin = "https://$githubPAT@github.com/trinsic-id/connect-sdks.git"
+    $remoteOrigin = "https://$githubPAT@github.com/$sdkRepositoryPath.git"
     Write-Host "Setting origin to $remoteOrigin"
     git remote set-url origin $remoteOrigin
 

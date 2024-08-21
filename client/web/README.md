@@ -1,4 +1,4 @@
-# Connect Web Client
+# Trinsic Web UI Client
 
 # Usage
 

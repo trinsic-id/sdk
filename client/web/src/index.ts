@@ -2,7 +2,7 @@ import { detectUserAgents } from "./detectUserAgents";
 import MicroModal from "micromodal";
 import { CSSString } from "./iframeCss";
 
-export interface ConnectSessionResult {
+export interface TrinsicSessionResult {
   success: boolean;
   msg: "user-closed" | "failed" | "complete" | "unrecoverable-error" | string;
   sessionId?: string;
@@ -11,10 +11,10 @@ export interface ConnectSessionResult {
 
 export async function launchIframe(
   launchUrl: string
-): Promise<ConnectSessionResult> {
+): Promise<TrinsicSessionResult> {
   launchUrl += "&embed=iframe";
   const style = document.createElement("style");
-  style.id = "trinsic-connect-style";
+  style.id = "trinsic-ui-style";
   style.textContent = CSSString;
   document.head.appendChild(style);
   MicroModal.init();
@@ -24,18 +24,18 @@ export async function launchIframe(
     );
   }
   showModal(launchUrl);
-  var result = new Promise<ConnectSessionResult>((resolve, reject) => {
+  var result = new Promise<TrinsicSessionResult>((resolve, reject) => {
     window.addEventListener(
       "message",
       (event) => {
         console.debug("event data", event.data);
         if (event.data?.success === true) {
           hideModal();
-          resolve(event.data as ConnectSessionResult);
+          resolve(event.data as TrinsicSessionResult);
         }
         if (event.data?.success === false) {
           hideModal();
-          reject(event.data as ConnectSessionResult);
+          reject(event.data as TrinsicSessionResult);
         }
       },
       false
@@ -51,11 +51,11 @@ export async function launchRedirect(launchUrl: string, redirectUrl: string) {
 
 export async function launchPopup(
   launchUrl: string
-): Promise<ConnectSessionResult> {
+): Promise<TrinsicSessionResult> {
   const userAgents = detectUserAgents();
   const popup = window.open(
     launchUrl,
-    "Trinsic Connect",
+    "Trinsic",
     userAgents.isDesktop
       ? "width=600,height=900"
       : "width=" +
@@ -64,18 +64,18 @@ export async function launchPopup(
           window.innerHeight +
           ",top=0,left=0"
   );
-  var result = new Promise<ConnectSessionResult>((resolve, reject) => {
+  var result = new Promise<TrinsicSessionResult>((resolve, reject) => {
     window?.addEventListener(
       "message",
       (event) => {
         console.debug("event data", event.data);
         if (event.data?.success === true) {
           popup?.close();
-          resolve(event.data as ConnectSessionResult);
+          resolve(event.data as TrinsicSessionResult);
         }
         if (event.data?.success === false) {
           popup?.close();
-          reject(event.data as ConnectSessionResult);
+          reject(event.data as TrinsicSessionResult);
         }
       },
       false
@@ -90,7 +90,7 @@ function showModal(launchUrl: string) {
   const userAgents = detectUserAgents();
 
   const modal = document.createElement("div");
-  modal.id = "trinsic-connect";
+  modal.id = "trinsic-ui";
   modal.ariaHidden = "true";
   modal.className = "micromodal-slide";
 
@@ -118,18 +118,18 @@ function showModal(launchUrl: string) {
   modal.append(bgOverlay);
   document.body.classList.add("lock-bg");
   document.body.append(modal);
-  MicroModal.show("trinsic-connect");
+  MicroModal.show("trinsic-ui");
 }
 
 function hideModal() {
   try {
-    MicroModal.close("trinsic-connect");
+    MicroModal.close("trinsic-ui");
   } catch (err) {}
   document.body.classList.remove("lock-bg");
   removeModal();
 }
 
 function removeModal() {
-  const trinsicConnect = document.getElementById("trinsic-connect");
-  trinsicConnect?.remove();
+  const trinsicui = document.getElementById("trinsic-ui");
+  trinsicui?.remove();
 }
