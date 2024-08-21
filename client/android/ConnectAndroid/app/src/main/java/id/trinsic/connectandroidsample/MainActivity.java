@@ -21,7 +21,7 @@ import id.trinsic.connectandroidsample.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
-    private static String LAUNCH_URL = "https://google.com";
+    private static String LAUNCH_URL = "https://trinsic.id";
 
     private ConnectClient connectClient;
 
