@@ -56,7 +56,7 @@ try {
     git push origin $tagName
 
     Set-Location "$PSScriptRoot/../"
-    $remoteOrigin = "https://$githubPAT@github.com/trinsic-id/connect-sdks.git"
+    $remoteOrigin = "https://$githubPAT@github.com/$sdkRepositoryPath.git"
     Write-Host "Setting origin to $remoteOrigin"
     git remote set-url origin $remoteOrigin
 
