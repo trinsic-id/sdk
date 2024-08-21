@@ -1,5 +1,5 @@
 $additionalProperties = @{
-    npmName                   = "@trinsic/connect-node"
+    npmName                   = "@trinsic/api"
     npmVersion                = "[VERSION]"
     supportsES6               = "true"
     withInterfaces            = "true"

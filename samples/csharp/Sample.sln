@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample", "Sample\Sample.csproj", "{7228D373-BB40-4F6F-AFAE-2BE4CDD46182}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trinsic.Connect", "..\..\dist\csharp\src\Trinsic.Connect\Trinsic.Connect.csproj", "{D87C9DA9-05DD-489C-BE94-3567682C791B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trinsic.Api", "..\..\dist\csharp\src\Trinsic.Api\Trinsic.Api.csproj", "{D87C9DA9-05DD-489C-BE94-3567682C791B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

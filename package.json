@@ -5,7 +5,7 @@
     "client/web",
     "samples/node"
   ],
-  "name": "connect-sdks",
+  "name": "trinsic-sdks",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

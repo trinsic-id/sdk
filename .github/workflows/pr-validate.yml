@@ -47,3 +47,12 @@ jobs:
     with:
       publish: false
     secrets: inherit
+  samples-web-ui:
+    name: Validate Web UI sample
+    uses: ./.github/workflows/samples-web-ui.yml
+  samples-node:
+    name: Validate Node sample
+    uses: ./.github/workflows/samples-node.yml
+  samples-csharp:
+    name: Validate C# sample
+    uses: ./.github/workflows/samples-csharp.yml

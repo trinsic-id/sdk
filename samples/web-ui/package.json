@@ -1,11 +1,11 @@
 {
-  "name": "@trinsic/connect-web-sample",
+  "name": "@trinsic/web-ui-sample",
   "version": "1.0.0",
   "description": "Small sample showcasing different interaction modes of Trinsic's library",
   "main": "index.js",
   "scripts": {
     "build": "npm run-script copy-library",
-    "copy-library": "cd ../../client/web && npm install && npm run build && cp dist/index.* ../../samples/web/dist/connect-web && cd ../../samples/web",
+    "copy-library": "cd ../../client/web && npm install && npm run build && cp dist/index.* ../../samples/web-ui/dist/web-ui && cd ../../samples/web-ui",
     "prestart": "npm run-script copy-library",
     "start": "live-server --cross"
   },
