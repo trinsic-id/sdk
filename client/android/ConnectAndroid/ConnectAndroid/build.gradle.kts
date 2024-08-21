@@ -20,7 +20,7 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/trinsic-id/connect-sdks")
+            url = uri("https://maven.pkg.github.com/trinsic-id/sdk")
             credentials {
                 username = System.getenv("MAVEN_GITHUB_USERNAME")
                 password = System.getenv("MAVEN_GITHUB_TOKEN")

@@ -17,7 +17,7 @@ rootProject.allprojects {
         google()
         mavenCentral()
         maven {
-            url=uri("https://maven.pkg.github.com/trinsic-id/connect-sdks")
+            url=uri("https://maven.pkg.github.com/trinsic-id/sdk")
             credentials {
                 username = "[GITHUB_USERNAME]"
                 password = "[GITHUB_CLASSIC_PAT]"
