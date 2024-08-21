@@ -40,8 +40,24 @@ public class InvokeActivity extends ComponentActivity {
         });
 
         // Launch custom tab using parameters from intent
-        Log.i("InvokeActivity", "Incoming intent has extras: " + (getIntent().getExtras() == null ? "false" : "true"));
         Intent intent = getIntent();
+        String dataString = getIntent().getDataString();
+        Bundle extras = intent.getExtras();
+        boolean hasExtras = extras != null && !extras.isEmpty();
+        boolean hasData = dataString != null && !dataString.isEmpty();
+        Log.i("InvokeActivity", "Incoming intent has extras: " + (hasExtras ? "true" : "false"));
+        Log.i("InvokeActivity", "Incoming intent has data: " + (hasData ? "true" : "false"));
+
+        if(hasExtras) {
+            for(String key : extras.keySet()) {
+                Log.i("InvokeActivity", "Extra [" + key + "]: " + extras.get(key));
+            }
+        }
+
+        if(hasData) {
+            Log.i("InvokeActivity", "Intent data: " + dataString);
+        }
+
         launchUrl = intent.getStringExtra("launchUrl");
         sessionId = intent.getStringExtra("sessionId");
         redirectScheme = intent.getStringExtra("redirectScheme");
