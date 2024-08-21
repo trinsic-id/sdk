@@ -38,10 +38,9 @@ app.get("/launch/:providerId", async (req, res) => {
   const request: CreateSessionRequest = {
     launchMethodDirectly: true,
     providers: [req.params.providerId],
-    redirectUrl: req.query.redirectUrl,
   };
   const result = await createSession(request);
-  res.redirect(result.launchUrl);
+  res.redirect(result.launchUrl + "&redirectUrl=" + req.query.redirectUrl);
 });
 
 app.post("/create-session", async (req, res) => {
