@@ -1,7 +1,7 @@
 using Microsoft.Extensions.FileProviders;
-using Trinsic.Ui.Api;
-using Trinsic.Ui.Client;
-using Trinsic.Ui.Model;
+using Trinsic.Api.Api;
+using Trinsic.Api.Client;
+using Trinsic.Api.Model;
 
 var builder = WebApplication.CreateBuilder(args);
 
