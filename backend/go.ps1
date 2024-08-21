@@ -1,5 +1,5 @@
 $additionalProperties = @{
-    packageName    = "trinsic-api"
+    packageName    = "trinsic_api"
     packageVersion = "[VERSION]"
 }
 & "$PSScriptRoot\generate-client.ps1" -language "go" -additionalProperties $additionalProperties
