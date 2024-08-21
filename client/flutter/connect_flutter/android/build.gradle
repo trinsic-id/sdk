@@ -15,7 +15,7 @@ buildscript {
 rootProject.allprojects {
     repositories {
         google()
-//        mavenCentral()
+        mavenCentral()
         maven {
             url=uri("https://maven.pkg.github.com/trinsic-id/connect-sdks")
             credentials {
