@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample", "Sample\Sample.csproj", "{7228D373-BB40-4F6F-AFAE-2BE4CDD46182}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trinsic.Connect", "..\..\dist\csharp\src\Trinsic.Connect\Trinsic.Connect.csproj", "{D87C9DA9-05DD-489C-BE94-3567682C791B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7228D373-BB40-4F6F-AFAE-2BE4CDD46182}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7228D373-BB40-4F6F-AFAE-2BE4CDD46182}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7228D373-BB40-4F6F-AFAE-2BE4CDD46182}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7228D373-BB40-4F6F-AFAE-2BE4CDD46182}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D87C9DA9-05DD-489C-BE94-3567682C791B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D87C9DA9-05DD-489C-BE94-3567682C791B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D87C9DA9-05DD-489C-BE94-3567682C791B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D87C9DA9-05DD-489C-BE94-3567682C791B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
