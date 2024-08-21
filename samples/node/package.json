@@ -1,5 +1,5 @@
 {
-  "name": "@trinsic/connect-node-sample",
+  "name": "@trinsic/api-node-sample",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -17,7 +17,7 @@
     "typescript": "5.5.4"
   },
   "dependencies": {
-    "@trinsic/connect-node": "file:../../dist/node",
+    "@trinsic/api": "file:../../dist/node",
     "express": "4.19.2"
   }
 }

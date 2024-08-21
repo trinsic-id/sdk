@@ -1,18 +1,18 @@
 $additionalProperties = @{
     gemAuthor      = "Trinsic"
     gemAuthorEmail = "support@trinsic.id"
-    gemDescription = "'Trinsic Connect'"
+    gemDescription = "'Trinsic Api'"
     gemHomepage    = "https://trinsic.id"
-    gemName        = "trinsic_connect"
-    gemSummary     = "'Trinsic Connect'"
+    gemName        = "trinsic_api"
+    gemSummary     = "'Trinsic Api'"
     gemVersion     = "[VERSION]"
-    moduleName     = "TrinsicConnect"
+    moduleName     = "TrinsicApi"
 }
 & "$PSScriptRoot/generate-client.ps1" -language "ruby" -additionalProperties $additionalProperties
 
 try {
     Push-Location "$PSScriptRoot/../dist/ruby"
-    &gem build trinsic_connect.gemspec
+    &gem build trinsic_api.gemspec
     
     # Move a file with .gem file extension to the another directory without specifying the exact filename
     Move-Item -Path *.gem -Destination "$PSScriptRoot/../dist/publish" -Force

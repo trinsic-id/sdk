@@ -1,5 +1,5 @@
 $additionalProperties = @{
-    packageName                              = "Trinsic.Connect"
+    packageName                              = "Trinsic.Api"
     packageVersion                           = "[VERSION]"
     nullableReferenceTypes                   = "true"
     modelPropertySorting                     = "alphabetical"

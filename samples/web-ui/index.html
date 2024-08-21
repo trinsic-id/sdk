@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connect samples</title>
+    <title>Trinsic UI sample</title>
     <style>
         button {
             all: unset;
@@ -122,9 +122,9 @@
     </script>
 </head>
 <body class="friendly-text">
-    <h1>Trinsic Connect Frontend Client Sample </h1>
+    <h1>Trinsic Frontend Client Sample </h1>
     
-    <p>You can launch the Trinsic Connect Widget through 3 different modes, an embedded iFrame, a popup or a redirect flow.</p>
+    <p>You can launch the Trinsic Widget through 3 different modes, an embedded iFrame, a popup or a redirect flow.</p>
     <ul>
         <li>
             <button class="launch-button" disabled="true" onclick="launchIframe(window.launchUrl).then(r => exchangeResult(r))"><img src="https://cdn.trinsic.id/assets/logo/192x192.png"/><div class="launch-name">Launch an iFrame</div><div class="chevron"></div></button>
@@ -136,7 +136,7 @@
             <button class="launch-button" disabled="true" onclick="launchRedirect(window.launchUrl, window.location.origin + '/redirect')"><img src="https://cdn.trinsic.id/assets/logo/192x192.png"/><div class="launch-name">Launch redirect flow</div><div class="chevron"></div></button>
         </li>
     </ul>
-    <p>Provider specific methods - this shows how to embed individual methods directly into your website instead of using the full Trinsic Connect Widget. You can easily add only a couple of the methods you want to support right next to your existing identity verification provider.</p>
+    <p>Provider specific methods - this shows how to embed individual methods directly into your website instead of using the full Trinsic Widget. You can easily add only a couple of the methods you want to support right next to your existing identity verification provider.</p>
     <ul id="listOptions">
         
     </ul>    
@@ -146,7 +146,7 @@
 
     <script type="module">
         // Import the function from your module
-        import { launchIframe, launchRedirect, launchPopup } from '/dist/connect-web/index.js';
+        import { launchIframe, launchRedirect, launchPopup } from '/dist/web-ui/index.js';
 
         // Assign the function to the global scope
         window.launchIframe = launchIframe;

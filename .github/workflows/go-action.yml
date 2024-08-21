@@ -31,4 +31,4 @@ jobs:
         shell: pwsh
         env:
           PAT_GITHUB: ${{ secrets.PAT_GITHUB }}
-          PACKAGE_VERSION: ${{ steps.generate-sdk.outputs.connect-package-version }}
+          PACKAGE_VERSION: ${{ steps.generate-sdk.outputs.trinsic-package-version }}

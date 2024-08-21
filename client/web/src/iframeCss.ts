@@ -208,7 +208,7 @@ export const CSSString = `
     width: 400px;
   }
 
-  #trinsic-connect iframe {
+  #trinsic-ui iframe {
     border: 0;
   }
 

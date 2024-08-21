@@ -1,4 +1,4 @@
-# Trinsic Connect SDK's
+# Trinsic SDK's
 
 ## Backend SDK's
 

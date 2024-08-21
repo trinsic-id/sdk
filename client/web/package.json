@@ -1,7 +1,7 @@
 {
-  "name": "@trinsic/connect-web",
+  "name": "@trinsic/web-ui",
   "version": "0.2.7",
-  "description": "Connect's web client to easily launch your verifications",
+  "description": "Trinsic's Web UI SDK to easily launch your verifications and capture the result",
   "main": "dist/index.js",
   "scripts": {
     "build": "esbuild src/index.ts --bundle --minify --sourcemap --format=esm --outdir=dist --target=chrome58,firefox57,safari11,edge16",

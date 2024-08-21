@@ -1,6 +1,6 @@
 [submodule "go"]
 	path = go
-	url = https://github.com/trinsic-id/connect-go.git
+	url = https://github.com/trinsic-id/sdk-go-api.git
 [submodule "php"]
 	path = php
-	url = https://github.com/trinsic-id/connect-php.git
+	url = https://github.com/trinsic-id/sdk-php-api.git

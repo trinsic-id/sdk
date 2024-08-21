@@ -1,19 +1,19 @@
 $additionalProperties = @{
-    apiPackage               = "id.trinsic.connect"
+    apiPackage               = "id.trinsic.api"
     artifactVersion          = "[VERSION]"
     library                  = "native"
-    modelPackage             = "id.trinsic.connect.models"
-    artifactId               = "connect"
+    modelPackage             = "id.trinsic.api.models"
+    artifactId               = "api"
     groupId                  = "id.trinsic"
-    scmConnection            = "scm:git:https://github.com/trinsic-id/connect-sdks.git"
-    scmDeveloperConnection   = "scm:git:ssh://git@github.com/trinsic-id/connect-sdks.git"
-    scmUrl                   = "https://github.com/trinsic-id/connect-sdks"
+    scmConnection            = "scm:git:https://github.com/trinsic-id/sdk.git"
+    scmDeveloperConnection   = "scm:git:ssh://git@github.com/trinsic-id/sdk.git"
+    scmUrl                   = "https://github.com/trinsic-id/sdk"
     artifactUrl              = "https://trinsic.id"
     developerEmail           = "support@Trinsic.id"
     developerName            = "Trinsic"
     developerOrganization    = "Trinsic"
     developerOrganizationUrl = "https://trinsic.id"
-    artifactDescription      = "'Trinsic Connect'"
+    artifactDescription      = "'Trinsic API library'"
 }
 & "$PSScriptRoot/generate-client.ps1" -language "java" -additionalProperties $additionalProperties
 
@@ -34,7 +34,7 @@ try {
         repositories {
             maven {
                 name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/trinsic-id/connect-sdks")
+                url = uri("https://maven.pkg.github.com/trinsic-id/sdk")
                 credentials {
                     username = System.getenv("MAVEN_GITHUB_USERNAME")
                     password = System.getenv("MAVEN_GITHUB_TOKEN")

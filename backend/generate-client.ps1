@@ -3,7 +3,7 @@ param (
     [Parameter(Mandatory = $true)]
     [string]$language,
     [string]$versionName = $language,
-    [string]$swaggerFileOrUrl = "https://connect.trinsic.id/swagger/api/swagger.json",
+    [string]$swaggerFileOrUrl = "https://api.trinsic.id/swagger/api/swagger.json",
     [string]$outputFolder = "$PSScriptRoot/../dist/$language",
     [Parameter(Mandatory = $true)]
     [hashtable]$additionalProperties

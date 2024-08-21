@@ -3,7 +3,7 @@ import {
   Configuration,
   CreateSessionRequest,
   NetworkApi,
-} from "@trinsic/connect-node";
+} from "@trinsic/api";
 const express = require("express");
 const path = require("path");
 const app = express();
@@ -12,22 +12,19 @@ const PORT = 3000;
 //We run with self-signed certificates on localhost :)
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const newConfiguration = new Configuration({
-  accessToken: process.env.CONNECT_ACCESS_TOKEN!,
+  accessToken: process.env.TRINSIC_ACCESS_TOKEN!,
 });
 const sessionsApi = new SessionsApi(newConfiguration);
 const networkApi = new NetworkApi(newConfiguration);
 
 app.use(express.json());
 
-app.get("/", express.static(path.join("../web")));
+app.get("/", express.static(path.join("../web-ui")));
 app.get("/redirect", (req, res) => {
-  res.sendFile(path.join(__dirname, "../../web/redirect.html"));
+  res.sendFile(path.join(__dirname, "../../web-ui/redirect.html"));
 });
 
-app.use(
-  "/dist/connect-web",
-  express.static(path.join("../web/dist/connect-web"))
-);
+app.use("/dist/web-ui", express.static(path.join("../web/dist/web-ui")));
 
 app.get("/providers", async (req, res) => {
   const result = await networkApi.listProviders();

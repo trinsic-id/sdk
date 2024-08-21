@@ -1,7 +1,7 @@
 using Microsoft.Extensions.FileProviders;
-using Trinsic.Connect.Api;
-using Trinsic.Connect.Client;
-using Trinsic.Connect.Model;
+using Trinsic.Ui.Api;
+using Trinsic.Ui.Client;
+using Trinsic.Ui.Model;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,14 +9,14 @@ var app = builder.Build();
 
 var configuration = new Configuration()
 {
-    AccessToken = Environment.GetEnvironmentVariable("CONNECT_ACCESS_TOKEN")!
+    AccessToken = Environment.GetEnvironmentVariable("TRINSIC_ACCESS_TOKEN")!
 };
 
 var networkApi = new NetworkApi(configuration);
 var sessionApi = new SessionsApi(configuration);
 
-app.MapGet("/", context => ServeFile(context, "../../web/index.html"));
-app.MapGet("/redirect", context => ServeFile(context, "../../web/redirect.html"));
+app.MapGet("/", context => ServeFile(context, "../../web-ui/index.html"));
+app.MapGet("/redirect", context => ServeFile(context, "../../web-ui/redirect.html"));
 
 app.MapGet("/providers", async context =>
 {
@@ -76,8 +76,8 @@ app.MapPost("/exchange-result", async context =>
 //Serve web sdk
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "../../web/dist/connect-web")),
-    RequestPath = "/dist/connect-web"
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "../../web/dist/web-ui")),
+    RequestPath = "/dist/web-ui"
 });
 
 app.Run();
