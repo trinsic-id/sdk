@@ -1,15 +1,17 @@
 package id.trinsic.connectandroid;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 
+import androidx.activity.ComponentActivity;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class InvokeActivity extends AppCompatActivity {
+public class InvokeActivity extends ComponentActivity {
     private ActivityResultLauncher<Uri> customTabLauncher;
     private String launchUrl;
     private String sessionId;
