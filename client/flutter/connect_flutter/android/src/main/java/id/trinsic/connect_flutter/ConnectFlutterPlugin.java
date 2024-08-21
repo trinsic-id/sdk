@@ -3,17 +3,12 @@ package id.trinsic.connect_flutter;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.widget.Toast;
-
-import androidx.activity.result.ActivityResultCaller;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
-import id.trinsic.connectandroid.ConnectClient;
 import id.trinsic.connectandroid.InvokeContract;
 import id.trinsic.connectandroid.models.AcceptanceSessionLaunchParams;
 import id.trinsic.connectandroid.models.AcceptanceSessionResult;
@@ -43,6 +38,7 @@ public class ConnectFlutterPlugin implements FlutterPlugin, ActivityAware, Metho
     private Map<String, Result> callbacks = new HashMap<>();
 
     private static InvokeContract invokeContract = new InvokeContract();
+
 
     @Override
     public void onAttachedToActivity(@NonNull ActivityPluginBinding activityPluginBinding) {
@@ -90,7 +86,6 @@ public class ConnectFlutterPlugin implements FlutterPlugin, ActivityAware, Metho
     }
 
     private void disposeActivity() {
-
         activityPluginBinding = null;
     }
 

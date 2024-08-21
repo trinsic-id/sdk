@@ -27,7 +27,7 @@
         </activity>
 
         <activity
-            android:name="id.trinsic.connectandroid.InvokeActivity"
+            android:name="id.trinsic.connectandroid.CallbackActivity"
             android:launchMode="singleTop"
             android:exported="true">
             <intent-filter android:label="trinsic">
