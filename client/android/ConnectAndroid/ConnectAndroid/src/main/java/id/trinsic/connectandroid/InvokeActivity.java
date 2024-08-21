@@ -1,6 +1,5 @@
 package id.trinsic.connectandroid;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,9 +9,11 @@ import android.util.Log;
 import androidx.activity.ComponentActivity;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.appcompat.app.AppCompatActivity;
 
 public class InvokeActivity extends ComponentActivity {
+    public static String ACTION_INVOKE = "invoke";
+    public static String ACTION_CALLBACK = "callback";
+
     private ActivityResultLauncher<Uri> customTabLauncher;
     private String launchUrl;
     private String sessionId;
@@ -39,28 +40,27 @@ public class InvokeActivity extends ComponentActivity {
             }
         });
 
-        // Launch custom tab using parameters from intent
-        Intent intent = getIntent();
-        String dataString = getIntent().getDataString();
-        Bundle extras = intent.getExtras();
-        boolean hasExtras = extras != null && !extras.isEmpty();
-        boolean hasData = dataString != null && !dataString.isEmpty();
-        Log.i("InvokeActivity", "Incoming intent has extras: " + (hasExtras ? "true" : "false"));
-        Log.i("InvokeActivity", "Incoming intent has data: " + (hasData ? "true" : "false"));
+        handleInitializingIntent(getIntent());
+    }
 
-        if(hasExtras) {
-            for(String key : extras.keySet()) {
-                Log.i("InvokeActivity", "Extra [" + key + "]: " + extras.get(key));
-            }
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleInitializingIntent(intent);
+    }
+
+    private void handleInitializingIntent(Intent intent) {
+        if(intent.getAction() == null) {
+            finishAndRemoveTask();
         }
-
-        if(hasData) {
-            Log.i("InvokeActivity", "Intent data: " + dataString);
-            Log.i("InvokeActivity", "Intent has data, so interpreting this as a results scheme callback");
-            handleResultsIntent(intent);
-            return;
+        else if(intent.getAction().equals(ACTION_INVOKE)) {
+            handleInvokeIntent(intent);
+        } else if(intent.getAction().equals(ACTION_CALLBACK)) {
+            handleCallbackIntent(intent);
         }
+    }
 
+    private void handleInvokeIntent(Intent intent) {
         launchUrl = intent.getStringExtra("launchUrl");
         sessionId = intent.getStringExtra("sessionId");
         redirectScheme = intent.getStringExtra("redirectScheme");
@@ -69,28 +69,18 @@ public class InvokeActivity extends ComponentActivity {
         customTabLauncher.launch(uri);
     }
 
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-
-        Log.i("InvokeActivity", "Got onNewIntent");
-
-        handleResultsIntent(intent);
-    }
-
-    private void handleResultsIntent(Intent intent) {
+    private void handleCallbackIntent(Intent intent) {
         Log.i("InvokeActivity", "handleResultsIntent called");
-        Uri data = intent.getData();
-        if (data == null) {
-            Log.i("InvokeActivity", "handleResultsIntent intent has no data");
+        if(!intent.hasExtra("sessionId") || !intent.hasExtra("success")) {
             return;
         }
 
-        String sessionId = data.getQueryParameter("sessionId");
-        String resultsAccessKey = data.getQueryParameter("resultsAccessKey");
-        boolean success = data.getBooleanQueryParameter("success", false);
+        String sessionId = intent.getStringExtra("sessionId");
+        String resultsAccessKey = intent.getStringExtra("resultsAccessKey");
+        boolean success = intent.getBooleanExtra("success", false);
+        boolean canceled = intent.getBooleanExtra("canceled", false);
 
-        handleResult(sessionId, resultsAccessKey, success, false);
+        handleResult(sessionId, resultsAccessKey, success, canceled);
     }
 
     private void handleResult(String sessionId, String resultsAccessKey, boolean success, boolean canceled) {

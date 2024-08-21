@@ -21,6 +21,7 @@ public class InvokeContract extends ActivityResultContract<AcceptanceSessionLaun
     public Intent createIntent(@NonNull Context context, AcceptanceSessionLaunchParams input) {
         Intent intent = new Intent(context, InvokeActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.setAction(InvokeActivity.ACTION_INVOKE);
         intent.putExtra("sessionId", input.getSessionId());
         intent.putExtra("launchUrl", input.getLaunchUrl());
         intent.putExtra("redirectScheme", input.getRedirectScheme());

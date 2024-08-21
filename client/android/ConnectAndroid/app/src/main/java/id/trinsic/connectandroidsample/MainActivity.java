@@ -21,7 +21,7 @@ import id.trinsic.connectandroidsample.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
-    private static String LAUNCH_URL = "https://trinsic.id";
+    private static String LAUNCH_URL = "https://josh.trinsic-local.com/api/mobiletest?sessionId=1234";
 
     private ConnectClient connectClient;
 
