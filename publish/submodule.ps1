@@ -10,7 +10,9 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$packageVersion,
     [Parameter(Mandatory = $true)]
-    [string]$name
+    [string]$name,
+    [Parameter(Mandatory = $true)]
+    [string]$sdkRepositoryPath
 )
 
 if (-not (Test-Path -Path $sourceLocation -PathType Container)) {
