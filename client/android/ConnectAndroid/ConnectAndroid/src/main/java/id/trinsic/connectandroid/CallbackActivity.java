@@ -38,7 +38,7 @@ public class CallbackActivity extends ComponentActivity {
         String resultsAccessKey = data.getQueryParameter("resultsAccessKey");
         boolean success = data.getBooleanQueryParameter("success", false);
 
-        Intent callbackIntent = new Intent(getApplicationContext(), InvokeActivity.class);
+        Intent callbackIntent = new Intent(this, InvokeActivity.class);
         callbackIntent.setAction(InvokeActivity.ACTION_CALLBACK);
         callbackIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         callbackIntent.putExtra("sessionId", sessionId);
