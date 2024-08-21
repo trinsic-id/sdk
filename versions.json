@@ -3,9 +3,9 @@
   "nodePatchVersion": "0",
   "csharpPatchVersion": "0",
   "javaPatchVersion": "0",
-  "goPatchVersion": "1",
+  "goPatchVersion": "2",
   "pythonPatchVersion": "0",
-  "phpPatchVersion": "1",
+  "phpPatchVersion": "2",
   "rubyPatchVersion": "0",
   "webPatchVersion": "0"
 }
