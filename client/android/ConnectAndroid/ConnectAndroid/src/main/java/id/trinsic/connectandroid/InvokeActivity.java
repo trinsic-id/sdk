@@ -56,6 +56,9 @@ public class InvokeActivity extends ComponentActivity {
 
         if(hasData) {
             Log.i("InvokeActivity", "Intent data: " + dataString);
+            Log.i("InvokeActivity", "Intent has data, so interpreting this as a results scheme callback");
+            handleResultsIntent(intent);
+            return;
         }
 
         launchUrl = intent.getStringExtra("launchUrl");
@@ -72,9 +75,14 @@ public class InvokeActivity extends ComponentActivity {
 
         Log.i("InvokeActivity", "Got onNewIntent");
 
+        handleResultsIntent(intent);
+    }
+
+    private void handleResultsIntent(Intent intent) {
+        Log.i("InvokeActivity", "handleResultsIntent called");
         Uri data = intent.getData();
         if (data == null) {
-            Log.i("InvokeActivity", "onNewIntent has no data");
+            Log.i("InvokeActivity", "handleResultsIntent intent has no data");
             return;
         }
 
