@@ -1,4 +1,4 @@
-name: Build Web UI sample
+name: Build Node sample
 
 on:
   workflow_call:
@@ -12,5 +12,5 @@ jobs:
       - name: Install NPM dependencies
         run: npm ci
       - name: Build sample
-        run: npm run build
-        working-directory: ./samples/web-ui
+        run: dotnet build
+        working-directory: ./samples/csharp
