@@ -6,7 +6,7 @@ class ConnectFlutter {
     return ConnectFlutterPlatform.instance.getPlatformVersion();
   }
 
-  static Future<Map?> invoke(String launchUrl) {
-    return ConnectFlutterPlatform.instance.invoke(launchUrl);
+  static Future<Map?> invoke(String launchUrl, String redirectScheme) {
+    return ConnectFlutterPlatform.instance.invoke(launchUrl, redirectScheme);
   }
 }

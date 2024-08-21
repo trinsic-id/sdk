@@ -11,13 +11,15 @@ class MethodChannelConnectFlutter extends ConnectFlutterPlatform {
 
   @override
   Future<String?> getPlatformVersion() async {
-    final version = await methodChannel.invokeMethod<String>('getPlatformVersion');
+    final version =
+        await methodChannel.invokeMethod<String>('getPlatformVersion');
     return version;
   }
 
   @override
-  Future<Map?> invoke(String launchUrl) async {
-    final version = await methodChannel.invokeMethod<Map>('invoke', {'launchUrl': launchUrl});
+  Future<Map?> invoke(String launchUrl, String redirectScheme) async {
+    final version = await methodChannel.invokeMethod<Map>(
+        'invoke', {'launchUrl': launchUrl, 'redirectScheme': redirectScheme});
     return version;
   }
 }

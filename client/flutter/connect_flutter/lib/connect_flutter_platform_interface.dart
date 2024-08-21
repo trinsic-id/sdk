@@ -27,7 +27,7 @@ abstract class ConnectFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 
-  Future<Map?> invoke(String launchUrl) {
+  Future<Map?> invoke(String launchUrl, String redirectScheme) {
     throw UnimplementedError("invoke() has not been implemented.");
   }
 }

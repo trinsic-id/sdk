@@ -59,13 +59,18 @@ class _MyAppState extends State<MyApp> {
             child: ElevatedButton(
                 child: Text('Running on: $_platformVersion\n'),
                 onPressed: () async {
-                  _platformVersion = "1";
+                  setState(() {
+                    _platformVersion = "1";
+                  });
                   Map? result;
                   try {
                     result = await ConnectFlutter.invoke(
-                            "https://google.com/?sessionId=1234");
+                            "https://josh.trinsic-local.com/api/mobiletest?sessionId=2b128be2-7673-4cc7-bd15-1a99c9a3953e",
+                        "blap");
                   } on PlatformException {
-                    _platformVersion = "exception";
+                    setState(() {
+                      _platformVersion = "exception";
+                    });
                     result = null;
                     return;
                   }
@@ -73,29 +78,37 @@ class _MyAppState extends State<MyApp> {
                   log("Result: $result");
 
                   if(result == null) {
-                    _platformVersion = "result null";
+                    setState(() {
+                      _platformVersion = "result null";
+                    });
                     return;
                   }
-                  //
-                  // if(result.containsKey("resultsAccessKey") && result["resultsAccessKey"]!.toString().isNotEmpty) {
-                  //   _platformVersion = "RAK: ${result["resultsAccessKey"]}";
-                  //   return;
-                  // }
-                  //
-                  // if(result.containsKey("canceled") && result["canceled"] == true) {
-                  //   _platformVersion = "canceled";
-                  //   return;
-                  // }
-                  //
-                  // if(result.containsKey("success") && result["success"] == false) {
-                  //   _platformVersion = "failed";
-                  //   return;
-                  // }
 
-                  _platformVersion = "unknown!!";
+                  if(result.containsKey("resultsAccessKey") && result["resultsAccessKey"] != null && result["resultsAccessKey"]!.toString().isNotEmpty) {
+                    setState(() {
+                      _platformVersion = "RAK: ${result!["resultsAccessKey"]}";
+                    });
+                    return;
+                  }
+
+                  if(result.containsKey("canceled") && result["canceled"] == true) {
+                    setState(() {
+                      _platformVersion = "canceled";
+                    });
+                    return;
+                  }
+
+                  if(result.containsKey("success") && result["success"] == false) {
+                    setState(() {
+                      _platformVersion = "failed";
+                    });
+                    return;
+                  }
+
+                  setState(() {
+                    _platformVersion = "unknown!!";
+                  });
                   return;
-
-
                 })),
       ),
     );
