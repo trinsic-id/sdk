@@ -47,3 +47,6 @@ jobs:
     with:
       publish: false
     secrets: inherit
+  samples-web-ui:
+    name: Validate Web UI sample
+    uses: ./.github/workflows/samples-web-ui.yml
