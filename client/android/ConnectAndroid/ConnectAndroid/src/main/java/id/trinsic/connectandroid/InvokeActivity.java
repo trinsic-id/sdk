@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 
 import androidx.activity.ComponentActivity;
 import androidx.activity.result.ActivityResultCallback;
@@ -23,11 +24,14 @@ public class InvokeActivity extends ComponentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Log.i("InvokeActivity", "InvokeActivity launched");
+
         // Register for Custom Tabs activity result -- this indicates the user closing the tab themselves (canceling)
         customTabLauncher = registerForActivityResult(new CustomTabContract(),
         new ActivityResultCallback<Uri>() {
             @Override
             public void onActivityResult(Uri o) {
+                Log.i("InvokeActivity", "Got onActivityResult");
                 if (r == null) {
                     r = InvokeActivity.this::sessionCanceledCallback;
                     handler.postDelayed(r, 100);
@@ -36,6 +40,7 @@ public class InvokeActivity extends ComponentActivity {
         });
 
         // Launch custom tab using parameters from intent
+        Log.i("InvokeActivity", "Incoming intent has extras: " + (getIntent().getExtras() == null ? "false" : "true"));
         Intent intent = getIntent();
         launchUrl = intent.getStringExtra("launchUrl");
         sessionId = intent.getStringExtra("sessionId");
@@ -49,8 +54,11 @@ public class InvokeActivity extends ComponentActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
 
+        Log.i("InvokeActivity", "Got onNewIntent");
+
         Uri data = intent.getData();
         if (data == null) {
+            Log.i("InvokeActivity", "onNewIntent has no data");
             return;
         }
 
@@ -62,6 +70,7 @@ public class InvokeActivity extends ComponentActivity {
     }
 
     private void handleResult(String sessionId, String resultsAccessKey, boolean success, boolean canceled) {
+        Log.i("InvokeActivity", "handleResult() called");
         if (r != null) {
             handler.removeCallbacks(r);
         }
