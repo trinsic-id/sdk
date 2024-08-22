@@ -1,5 +1,5 @@
 try {
-    Set-Location "$PSScriptRoot/../client/android/ConnectAndroid/ConnectAndroid"
+    Set-Location "$PSScriptRoot/../client/android/library"
     Write-Host "Publishing package"
     gradle publish
 }
