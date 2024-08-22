@@ -1,0 +1,62 @@
+group = "id.trinsic.trinsic_flutter_ui"
+version = "1.0"
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath("com.android.tools.build:gradle:7.3.0")
+    }
+}
+
+rootProject.allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url=uri("https://maven.pkg.github.com/trinsic-id/sdk")
+            credentials {
+                username = "[GITHUB_USERNAME]"
+                password = "[GITHUB_CLASSIC_PAT]"
+            }
+        }
+    }
+}
+
+apply plugin: "com.android.library"
+
+android {
+    if (project.android.hasProperty("namespace")) {
+        namespace = "id.trinsic.trinsic_flutter_ui"
+    }
+
+    compileSdk = 34
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    defaultConfig {
+        minSdk = 21
+    }
+
+    dependencies {
+        api("id.trinsic:android-ui:0.0.1")
+        testImplementation("junit:junit:4.13.2")
+        testImplementation("org.mockito:mockito-core:5.0.0")
+    }
+
+    testOptions {
+        unitTests.all {
+            testLogging {
+               events "passed", "skipped", "failed", "standardOut", "standardError"
+               outputs.upToDateWhen {false}
+               showStandardStreams = true
+            }
+        }
+    }
+}
