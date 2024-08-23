@@ -62,3 +62,6 @@ jobs:
   samples-csharp:
     name: Validate C# sample
     uses: ./.github/workflows/samples-csharp.yml
+  samples-go:
+    name: Validate Go sample
+    uses: ./.github/workflows/samples-go.yml

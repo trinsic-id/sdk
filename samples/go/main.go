@@ -20,6 +20,10 @@ func main() {
 
 	app.Static("/", "../web-ui")
 
+	app.Get("/redirect", func(c *fiber.Ctx) error {
+		return c.Redirect("/redirect.html")
+	})
+
 	app.Get("/providers", func(c *fiber.Ctx) error {
 		data, _, err := api.NetworkAPI.ListProviders(c.Context()).Execute()
 
