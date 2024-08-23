@@ -1,0 +1,45 @@
+name: Build and Publish Flutter Package
+
+on:
+  workflow_call:
+    inputs:
+      publish:
+        type: boolean
+        required: false
+        default: false
+        description: "Publish the package, default is false"
+
+jobs:
+  build_and_publish:
+    name: Build and Publish
+    runs-on: ubuntu-latest
+    container:
+      image:  google/dart:latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+      - name: Install NPM dependencies
+        run: npm ci
+      - name: Setup credentials (todo investigate expiration)
+      run: | 
+        mkdir -p ~/.pub-cache 
+        cat <<EOF > ~/.pub-cache/credentials.json
+        {
+          "accessToken":"${{ secrets.DART_PUB_OAUTH_ACCESS_TOKEN }}",
+          "refreshToken":"${{ secrets.DART_PUB_OAUTH_REFRESH_TOKEN }}",
+          "tokenEndpoint":"https://accounts.google.com/o/oauth2/token",
+          "scopes": [ "openid", "https://www.googleapis.com/auth/userinfo.email" ],
+          "expiration": 1570721159348
+        }
+        EOF
+      - name: Publish SDK (dry run)
+        if: inputs.publish == false
+        run: ./publish/flutter.ps1 -dryRun
+        shell: pwsh
+      - name: Publish SDK
+        if: inputs.publish == true
+        run: ./publish/flutter.ps1
+        shell: pwsh
