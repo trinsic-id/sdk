@@ -17,11 +17,7 @@ rootProject.allprojects {
         google()
         mavenCentral()
         maven {
-            url=uri("https://maven.pkg.github.com/trinsic-id/sdk")
-            credentials {
-                username = "[GITHUB_USERNAME]"
-                password = "[GITHUB_CLASSIC_PAT]"
-            }
+            url=uri("https://jitpack.io")
         }
     }
 }
@@ -45,7 +41,7 @@ android {
     }
 
     dependencies {
-        api("id.trinsic:android-ui:0.0.1")
+        api("com.github.trinsic-id:sdk-android-ui:0.1.1")
         testImplementation("junit:junit:4.13.2")
         testImplementation("org.mockito:mockito-core:5.0.0")
     }
