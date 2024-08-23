@@ -15,5 +15,5 @@ jobs:
         run: ./backend/python.ps1
         shell: pwsh
       - name: Build sample
-        run: python validate.py
+        run: python3 validate.py
         working-directory: ./samples/python
