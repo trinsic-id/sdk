@@ -4,3 +4,6 @@
 [submodule "php"]
 	path = php
 	url = https://github.com/trinsic-id/sdk-php-api.git
+[submodule "client/sdk-android-ui"]
+	path = client/sdk-android-ui
+	url = https://github.com/trinsic-id/sdk-android-ui

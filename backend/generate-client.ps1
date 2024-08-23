@@ -26,7 +26,7 @@ else {
     if (-not (Test-Path $swaggerFileOrUrl)) {
         throw "The swagger file '$swaggerFileOrUrl' does not exist."
     }
-    localSwaggerFilePath = swaggerFileOrUrl;
+    $localSwaggerFilePath = $swaggerFileOrUrl;
 }
 
 
