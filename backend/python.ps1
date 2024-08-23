@@ -1,5 +1,5 @@
 $additionalProperties = @{
-    packageName    = "trinsic-api"
+    packageName    = "trinsic_api"
     packageVersion = "[VERSION]"
     packageUrl     = "https://trinsic.id"
     projectName    = "Trinsic-Api"
