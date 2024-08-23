@@ -53,7 +53,7 @@ app.MapPost("/exchange-result", async context =>
         var request = await context.Request.ReadFromJsonAsync<ExchangeResultRequest>();
 
         // Call the method to exchange the results key
-        var result = await sessionApi.ExchangeResultsKeyAsync(request.SessionId, new ExchangeResultsKeyRequest()
+        var result = await sessionApi.GetSessionResultAsync(request.SessionId, new GetSessionResultRequest()
         {
             ResultsAccessKey = request.ResultsAccessKey
         });

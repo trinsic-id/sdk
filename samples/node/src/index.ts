@@ -63,7 +63,7 @@ async function createSession(request: CreateSessionRequest) {
 
 app.post("/exchange-result", async (req: any, res: any) => {
   try {
-    const result = await sessionsApi.exchangeResultsKey(req.body.sessionId, {
+    const result = await sessionsApi.getSessionResult(req.body.sessionId, {
       resultsAccessKey: req.body.resultsAccessKey,
     });
     res.send(result);
