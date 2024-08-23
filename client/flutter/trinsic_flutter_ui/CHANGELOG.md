@@ -1,3 +1,4 @@
 ## 0.0.1
 
-* TODO: Describe initial release.
+- Initial Test Release
+  - Not suitable for production use cases
