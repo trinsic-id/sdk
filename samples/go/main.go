@@ -56,7 +56,7 @@ func main() {
 		request := trinsic_api.CreateSessionRequest{}
 
 		req := api.SessionsAPI.CreateSession(c.Context()).CreateSessionRequest(request)
-		_, _, err := req.Execute()
+		data, _, err := req.Execute()
 
 		if err != nil {
 			return c.Status(500).JSON(fiber.Map{
@@ -64,28 +64,28 @@ func main() {
 			})
 		}
 
-		return c.JSON(nil)
+		return c.JSON(data)
 	})
 
-	type ExchangeResultsRequest struct {
+	type GetResultsRequest struct {
 		SessionId string `json:"sessionId"`
 		AccessKey string `json:"resultsAccessKey"`
 	}
 
-	app.Post("/exchange-results", func(c *fiber.Ctx) error {
-		exchangeRequest := new(ExchangeResultsRequest)
+	app.Post("/exchange-result", func(c *fiber.Ctx) error {
+		req := new(GetResultsRequest)
 
-		if err := c.BodyParser(exchangeRequest); err != nil {
+		if err := c.BodyParser(req); err != nil {
 			return c.Status(400).JSON(fiber.Map{
 				"error": err.Error(),
 			})
 		}
 
-		request := trinsic_api.ExchangeResultsKeyRequest{
-			ResultsAccessKey: exchangeRequest.AccessKey,
+		request := trinsic_api.GetSessionResultRequest{
+			ResultsAccessKey: req.AccessKey,
 		}
 
-		data, _, err := api.SessionsAPI.ExchangeResultsKey(c.Context(), exchangeRequest.SessionId).ExchangeResultsKeyRequest(request).Execute()
+		data, _, err := api.SessionsAPI.GetSessionResult(c.Context(), req.SessionId).GetSessionResultRequest(request).Execute()
 
 		if err != nil {
 			return c.Status(500).JSON(fiber.Map{
