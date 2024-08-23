@@ -14,7 +14,8 @@ from trinsic_api.api.sessions_api import SessionsApi
 from trinsic_api.models.create_session_request import CreateSessionRequest
 from trinsic_api.models.get_session_result_request import GetSessionResultRequest
 
-auth_token = f"Bearer {os.getenv("TRINSIC_AUTH_TOKEN")}"
+token = os.getenv("TRINSIC_AUTH_TOKEN") or ""
+auth_token = "Bearer " + token
 api_client = ApiClient(configuration=None, header_name="Authorization", header_value=auth_token)
 
 app = FastAPI()
