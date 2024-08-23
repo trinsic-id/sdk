@@ -65,3 +65,6 @@ jobs:
   samples-go:
     name: Validate Go sample
     uses: ./.github/workflows/samples-go.yml
+  samples-python:
+    name: Validate Python sample
+    uses: ./.github/workflows/samples-python.yml
