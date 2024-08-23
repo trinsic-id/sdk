@@ -3,23 +3,19 @@
 # Run `pod lib lint connect_flutter.podspec` to validate before publishing.
 #
 Pod::Spec.new do |s|
-  s.name             = 'connect_flutter'
+  s.name             = 'TrinsicUI'
   s.version          = '0.0.1'
-  s.summary          = 'A new Flutter plugin project.'
+  s.summary          = 'Trinsic UI library.'
   s.description      = <<-DESC
-A new Flutter plugin project.
+We help you launch and capture the results of a Trinsic Acceptance session
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'https://trinsic.id'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'Trinsic' => 'hello@trinsic.id' }
   s.source           = { :path => '.' }
-  s.source_files = 'TrinsicFlutterUI/Sources/TrinsicFlutterUI/**/*'
-  s.dependency 'Flutter'
-  s.dependency 'TrinsicUI'
+  s.source_files = 'Sources/**/*.{swift,h,m}'
   s.platform = :ios, '12.0'
-  
-
-  # Flutter.framework does not contain a i386 slice.
+    # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
   s.swift_version = '5.0'
 
