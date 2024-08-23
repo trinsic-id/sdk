@@ -14,6 +14,8 @@ We help you launch and capture the results of a Trinsic Acceptance session
   s.author           = { 'Trinsic' => 'hello@trinsic.id' }
   s.source           = { :path => '.' }
   s.source_files = 'Sources/**/*.{swift,h,m}'
+
+
   s.platform = :ios, '12.0'
     # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }

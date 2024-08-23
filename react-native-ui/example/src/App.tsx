@@ -1,12 +1,17 @@
 import { useState, useEffect } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
-import { multiply } from '@trinsic/react-native-ui';
+import { launchSession } from '@trinsic/react-native-ui';
 
 export default function App() {
-  const [result, setResult] = useState<number | undefined>();
+  const [result, setResult] = useState<string | null>();
 
   useEffect(() => {
-    multiply(3, 7).then(setResult);
+    launchSession('https://test.com', 'example://callback').then((r) =>
+      setResult(
+        r.resultsAccessKey +
+          (r.sessionId === null ? 'session is null' : 'session is not null')
+      )
+    );
   }, []);
 
   return (

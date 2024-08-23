@@ -10,15 +10,17 @@ npm install @trinsic/react-native-ui
 
 ## Usage
 
-
 ```js
-import { multiply } from '@trinsic/react-native-ui';
+import { launchSession } from '@trinsic/react-native-ui';
 
 // ...
 
-const result = await multiply(3, 7);
+const launchUrl = ''; //get this from your backend creating a session using the createSession API
+const result = await launchSession(
+  launchUrl,
+  'yourAppsScheme://your-callback-url'
+);
 ```
-
 
 ## Contributing
 

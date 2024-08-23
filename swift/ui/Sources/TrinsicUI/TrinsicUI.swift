@@ -1,9 +1,9 @@
 import Foundation
 
-public class TrinsicApi {
-    public init() {}
+
+@objc public class TrinsicApi : NSObject {
     
-    public func sayHello() -> String {
+    @objc public func sayHello() -> String {
         return "Hello from MyFramework!";
     }
 }

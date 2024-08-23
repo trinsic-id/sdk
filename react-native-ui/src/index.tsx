@@ -1,4 +1,5 @@
 import { NativeModules, Platform } from 'react-native';
+import type { LaunchSessionResult } from './ReactNativeUi';
 
 const LINKING_ERROR =
   `The package '@trinsic/react-native-ui' doesn't seem to be linked. Make sure: \n\n` +
@@ -10,7 +11,7 @@ const LINKING_ERROR =
 const isTurboModuleEnabled = global.__turboModuleProxy != null;
 
 const ReactNativeUiModule = isTurboModuleEnabled
-  ? require('./NativeReactNativeUi').default
+  ? require('./ReactNativeUi').default
   : NativeModules.ReactNativeUi;
 
 const ReactNativeUi = ReactNativeUiModule
@@ -24,6 +25,9 @@ const ReactNativeUi = ReactNativeUiModule
       }
     );
 
-export function multiply(a: number, b: number): Promise<number> {
-  return ReactNativeUi.multiply(a, b);
+export function launchSession(
+  launchUrl: string,
+  callbackUrl: string
+): Promise<LaunchSessionResult> {
+  return ReactNativeUi.launchSession(launchUrl, callbackUrl);
 }

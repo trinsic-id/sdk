@@ -1,16 +1,29 @@
 #import "ReactNativeUi.h"
+#import <React/RCTBridge.h>
+#import <TrinsicUI/TrinsicUI-Swift.h>
 
 @implementation ReactNativeUi
 RCT_EXPORT_MODULE()
 
 // Example method
 // See // https://reactnative.dev/docs/native-modules-ios
-RCT_EXPORT_METHOD(multiply:(double)a
-                  b:(double)b
+RCT_EXPORT_METHOD(launchSession:(NSString*)launchURl
+                  callbackUrl:(NSString*)callbackUrl
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 {
-    NSNumber *result = @(a * b);
+    NSString *resultsAccessKey = @"someAccessKey"; // Replace with actual logic
+    BOOL success = YES; // Replace with actual logic
+    BOOL cancelled = NO; // Replace with actual logic
+    
+    TrinsicApi *trinsicApi = [[TrinsicApi alloc]init];
+    
+    NSDictionary *result = @{
+        @"sessionId": [NSNull null],
+        @"resultsAccessKey": [trinsicApi sayHello],
+        @"success": @(success),
+        @"cancelled": @(cancelled)
+    };
 
     resolve(result);
 }
@@ -20,7 +33,7 @@ RCT_EXPORT_METHOD(multiply:(double)a
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
     (const facebook::react::ObjCTurboModule::InitParams &)params
 {
-    return std::make_shared<facebook::react::NativeReactNativeUiSpecJSI>(params);
+    return std::make_shared<facebook::react::ReactNativeUiSpecJSI>(params);
 }
 #endif
 
