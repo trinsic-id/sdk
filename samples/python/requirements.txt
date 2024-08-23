@@ -1,0 +1,6 @@
+trinsic_api
+fastapi
+pydantic
+load_dotenv
+uvicorn
+../../dist/python
