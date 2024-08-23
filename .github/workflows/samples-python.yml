@@ -14,6 +14,9 @@ jobs:
       - name: Generate backend SDK
         run: ./backend/python.ps1
         shell: pwsh
+      - name: Install dependencies
+        run: pip3 install -r requirements.txt
+        working-directory: ./samples/python
       - name: Build sample
         run: python3 validate.py
         working-directory: ./samples/python
