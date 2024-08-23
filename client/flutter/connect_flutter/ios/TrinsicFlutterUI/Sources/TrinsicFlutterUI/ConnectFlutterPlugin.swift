@@ -68,8 +68,11 @@ public class TrinsicFlutterUIPlugin: NSObject, FlutterPlugin {
           return
       }
       
+      let trinsicUI = TrinsicApi()
+      
+      
       let returnData: [String: Any] = [
-        "resultsAccessKey": updatedUrl.absoluteString
+        "resultsAccessKey": trinsicUI.sayHello()
       ]
       
       result(returnData)
