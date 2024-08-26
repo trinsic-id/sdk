@@ -13,8 +13,6 @@ jobs:
   build_and_publish:
     name: Build and Publish
     runs-on: ubuntu-latest
-    container:
-      image: google/dart:latest
     steps:
       - uses: actions/checkout@v4
       - name: Set up Flutter
