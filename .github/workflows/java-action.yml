@@ -28,3 +28,7 @@ jobs:
         if: inputs.publish == true
         run: ./publish/java.ps1
         shell: pwsh
+        env:
+          PAT_GITHUB: ${{ secrets.PAT_GITHUB }}
+          PACKAGE_VERSION: ${{ steps.generate-sdk.outputs.trinsic-package-version }}
+          SDK_REPOSITORY_PATH: ${{ github.repository }}
