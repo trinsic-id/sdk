@@ -21,8 +21,6 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
-      - name: Install NPM dependencies
-        run: npm ci
       - name: Setup credentials (todo investigate expiration)
         run: | 
           mkdir -p ~/.pub-cache 
