@@ -11,6 +11,12 @@ jobs:
     with:
       publish: false
     secrets: inherit
+  flutter:
+    name: Validate Flutter Package
+    uses: ./.github/workflows/flutter-action.yml
+    with:
+      publish: false
+    secrets: inherit
   nuget:
     name: Validate Nuget Package
     uses: ./.github/workflows/nuget-action.yml
