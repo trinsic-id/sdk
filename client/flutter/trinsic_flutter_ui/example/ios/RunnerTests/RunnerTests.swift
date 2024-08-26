@@ -2,17 +2,12 @@ import Flutter
 import UIKit
 import XCTest
 
-
 @testable import connect_flutter
-
-// This demonstrates a simple unit test of the Swift portion of this plugin's implementation.
-//
-// See https://developer.apple.com/documentation/xctest for more information about using XCTest.
 
 class RunnerTests: XCTestCase {
 
   func testGetPlatformVersion() {
-    let plugin = ConnectFlutterPlugin()
+    let plugin = TrinsicFlutterUIPlugin()
 
     let call = FlutterMethodCall(methodName: "getPlatformVersion", arguments: [])
 
