@@ -22,8 +22,6 @@ jobs:
         run: mvn clean install
         working-directory: ./dist/java
       - name: Setup Sample Project
-        run: mvn clean install
-        working-directory: ./samples/java
       - name: Build Sample
         run: mvn package
         working-directory: ./samples/java
