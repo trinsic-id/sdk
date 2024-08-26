@@ -1,0 +1,12 @@
+name: "Release Java"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    name: Publish Java Package
+    uses: ./.github/workflows/java-action.yml
+    with:
+      publish: true
+    secrets: inherit
