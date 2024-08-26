@@ -26,8 +26,8 @@ jobs:
       #     java-version: '21'
       - name: Setup credentials (todo investigate expiration)
         run: | 
-          mkdir -p ~/.pub-cache 
-          cat <<EOF > ~/.pub-cache/credentials.json
+          mkdir -p $HOME/.config/dart
+          cat <<EOF > $HOME/.config/dart/credentials.json
           {
             "accessToken":"${{ secrets.DART_PUB_OAUTH_ACCESS_TOKEN }}",
             "refreshToken":"${{ secrets.DART_PUB_OAUTH_REFRESH_TOKEN }}",
