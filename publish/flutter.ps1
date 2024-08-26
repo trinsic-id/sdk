@@ -14,7 +14,7 @@ try {
     if($dryRun) {
         flutter pub publish --dry-run
     } else {
-        flutter pub publish
+        flutter pub publish -f
     }
 }
 finally {
