@@ -26,8 +26,8 @@ jobs:
       #     java-version: '21'
       - name: Setup credentials (todo investigate expiration)
         run: | 
-          mkdir -p $HOME/.config/dart
-          cat <<EOF > $HOME/.config/dart/credentials.json
+          mkdir -p $XDG_CONFIG_HOME/dart
+          cat <<EOF > $XDG_CONFIG_HOME/dart/pub-credentials.json
           {
             "accessToken":"${{ secrets.DART_PUB_OAUTH_ACCESS_TOKEN }}",
             "refreshToken":"${{ secrets.DART_PUB_OAUTH_REFRESH_TOKEN }}",
@@ -36,6 +36,8 @@ jobs:
             "expiration": 1570721159348
           }
           EOF
+      - name: Verify credentials
+        run: cat $XDG_CONFIG_HOME/dart/pub-credentials.json
       - name: Run Flutter Tests
         working-directory: ./client/flutter/trinsic_flutter_ui
         run: flutter test
