@@ -31,7 +31,7 @@ jobs:
     secrets: inherit
   java:
     name: Validate Java Package
-    uses: ./.github/workflows/maven-action.yml
+    uses: ./.github/workflows/java-action.yml
     with:
       publish: false
     secrets: inherit
