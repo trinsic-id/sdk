@@ -74,6 +74,6 @@ jobs:
   samples-python:
     name: Validate Python sample
     uses: ./.github/workflows/samples-python.yml
-  samples-python:
+  samples-java:
     name: Validate Java sample
     uses: ./.github/workflows/samples-java.yml
