@@ -7,3 +7,6 @@
 [submodule "client/sdk-android-ui"]
 	path = client/sdk-android-ui
 	url = https://github.com/trinsic-id/sdk-android-ui
+[submodule "java"]
+	path = java
+	url = https://github.com/trinsic-id/sdk-java-api
