@@ -61,19 +61,25 @@ jobs:
     secrets: inherit
   samples-web-ui:
     name: Validate Web UI sample
+    needs: npm
     uses: ./.github/workflows/samples-web-ui.yml
   samples-node:
     name: Validate Node sample
+    needs: npm
     uses: ./.github/workflows/samples-node.yml
   samples-csharp:
     name: Validate C# sample
+    needs: nuget
     uses: ./.github/workflows/samples-csharp.yml
   samples-go:
     name: Validate Go sample
+    needs: go
     uses: ./.github/workflows/samples-go.yml
   samples-python:
     name: Validate Python sample
+    needs: python
     uses: ./.github/workflows/samples-python.yml
   samples-java:
     name: Validate Java sample
+    needs: java
     uses: ./.github/workflows/samples-java.yml
