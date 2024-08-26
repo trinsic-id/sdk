@@ -77,7 +77,7 @@ jobs:
     uses: ./.github/workflows/samples-go.yml
   samples-python:
     name: Validate Python sample
-    needs: python
+    needs: pypi
     uses: ./.github/workflows/samples-python.yml
   samples-java:
     name: Validate Java sample
