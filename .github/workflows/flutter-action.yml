@@ -24,17 +24,17 @@ jobs:
       - name: Install NPM dependencies
         run: npm ci
       - name: Setup credentials (todo investigate expiration)
-      run: | 
-        mkdir -p ~/.pub-cache 
-        cat <<EOF > ~/.pub-cache/credentials.json
-        {
-          "accessToken":"${{ secrets.DART_PUB_OAUTH_ACCESS_TOKEN }}",
-          "refreshToken":"${{ secrets.DART_PUB_OAUTH_REFRESH_TOKEN }}",
-          "tokenEndpoint":"https://accounts.google.com/o/oauth2/token",
-          "scopes": [ "openid", "https://www.googleapis.com/auth/userinfo.email" ],
-          "expiration": 1570721159348
-        }
-        EOF
+        run: | 
+          mkdir -p ~/.pub-cache 
+          cat <<EOF > ~/.pub-cache/credentials.json
+          {
+            "accessToken":"${{ secrets.DART_PUB_OAUTH_ACCESS_TOKEN }}",
+            "refreshToken":"${{ secrets.DART_PUB_OAUTH_REFRESH_TOKEN }}",
+            "tokenEndpoint":"https://accounts.google.com/o/oauth2/token",
+            "scopes": [ "openid", "https://www.googleapis.com/auth/userinfo.email" ],
+            "expiration": 1570721159348
+          }
+          EOF
       - name: Run Flutter Tests
         working-directory: ./client/flutter/trinsic_flutter_ui
         run: flutter test
