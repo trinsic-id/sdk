@@ -35,11 +35,16 @@ jobs:
           "expiration": 1570721159348
         }
         EOF
+      - name: Run Flutter Tests
+        working-directory: ./client/flutter/trinsic_flutter_ui
+        run: flutter test
       - name: Publish SDK (dry run)
+        working-directory: ./
         if: inputs.publish == false
         run: ./publish/flutter.ps1 -dryRun
         shell: pwsh
       - name: Publish SDK
+        working-directory: ./
         if: inputs.publish == true
         run: ./publish/flutter.ps1
         shell: pwsh
