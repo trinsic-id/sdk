@@ -21,7 +21,6 @@ jobs:
       - name: Setup Maven Local Repository
         run: mvn clean install
         working-directory: ./dist/java
-      - name: Setup Sample Project
       - name: Build Sample
         run: mvn package
         working-directory: ./samples/java
