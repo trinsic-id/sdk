@@ -13,7 +13,7 @@ param(
     [string]$name,
     [Parameter(Mandatory = $true)]
     [string]$sdkRepositoryPath,
-    [switch]$createTag
+    [switch]$tagPrefix = 'v'
 )
 
 if (-not (Test-Path -Path $sourceLocation -PathType Container)) {
@@ -46,12 +46,6 @@ try {
     git add .
     Write-Host "Committing files"
     git commit -m "Publishing latest $name package for version $packageVersion"
-
-    if($createTag) {
-        $tagName = "$packageVersion"
-        Write-Host "Creating tag $tagName"
-        git tag $tagName
-    }
     
     Write-Host "Pushing to submodule repository"
     git push origin main
@@ -60,7 +54,7 @@ try {
         throw "Failed to push to submodule main"
     }
 
-    $tagName = "v$packageVersion"
+    $tagName = "$tagPrefix$packageVersion"
     git tag $tagName
     git push origin $tagName
 
