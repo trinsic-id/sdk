@@ -30,7 +30,7 @@ import AppKit
                     completionHandler = { (url: URL?, err: Error?) in
                         completionHandler = nil
                         
-                        //Clean up resources, but if cancelled we should not as it's already deprovisioned
+                        //Clean up resources, but if canceled we should not as it's already deprovisioned
                         if err == nil || (err as? ASWebAuthenticationSessionError)?.code != .canceledLogin {
                             if (sessionToKeepAlive != nil) {
                                 (sessionToKeepAlive as! ASWebAuthenticationSession).cancel()
@@ -40,7 +40,7 @@ import AppKit
                         
                         if let err = err {
                             if case ASWebAuthenticationSessionError.canceledLogin = err {
-                                continuation.resume(returning: LaunchSessionResult.init(success: false, cancelled: true, sessionId: nil, resultsAccessKey: nil))
+                                continuation.resume(returning: LaunchSessionResult.init(success: false, canceled: true, sessionId: nil, resultsAccessKey: nil))
                                 return;
                             }
                             else {
@@ -111,7 +111,7 @@ import AppKit
             !resultsAccessKey.isEmpty else {
             return (result: nil, parseError: TrinsicError.error(with: .unparsableResultUrl))
         }
-        let result = LaunchSessionResult.init(success: success, cancelled: false, sessionId: sessionId, resultsAccessKey: resultsAccessKey)
+        let result = LaunchSessionResult.init(success: success, canceled: false, sessionId: sessionId, resultsAccessKey: resultsAccessKey)
         return (result: result, parseError: nil)
     }
     

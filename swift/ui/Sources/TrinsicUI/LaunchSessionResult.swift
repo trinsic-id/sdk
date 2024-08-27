@@ -4,11 +4,11 @@ import Foundation
     public let sessionId: String?
     public let resultsAccessKey: String?
     public let success: Bool
-    public let cancelled: Bool
+    public let canceled: Bool
     
-    @objc init(success: Bool, cancelled: Bool, sessionId: String?, resultsAccessKey: String?) {
+    @objc init(success: Bool, canceled: Bool, sessionId: String?, resultsAccessKey: String?) {
             self.success = success
-            self.cancelled = cancelled
+            self.canceled = canceled
             self.sessionId = sessionId
             self.resultsAccessKey = resultsAccessKey
         }

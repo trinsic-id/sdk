@@ -53,7 +53,7 @@ struct ContentView: View {
                 
                 let result = try await trinsicUI.launchSession(launchUrl: url.absoluteString, callbackURL: "trinsic-ui-ios://custom-auth-callback/")
                 print("Success \(result.success)")
-                print("Cancelled \(result.cancelled)")
+                print("Canceled \(result.canceled)")
                 print("Session id \(String(describing: result.sessionId))")
                 print("Result key \(String(describing: result.resultsAccessKey))")
             }
