@@ -3,7 +3,8 @@
   "workspaces": [
     "dist/node",
     "client/web",
-    "samples/node"
+    "samples/node",
+    "react-native-ui"
   ],
   "name": "trinsic-sdks",
   "version": "1.0.0",

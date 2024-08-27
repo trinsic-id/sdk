@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -11,6 +11,8 @@
 		913CAF212C7677B2003B7AA0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913CAF202C7677B2003B7AA0 /* ContentView.swift */; };
 		913CAF232C7677B4003B7AA0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 913CAF222C7677B4003B7AA0 /* Assets.xcassets */; };
 		913CAF262C7677B4003B7AA0 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 913CAF252C7677B4003B7AA0 /* Preview Assets.xcassets */; };
+		915C6A232C7D0AC6000BC8B0 /* TrinsicUI in Frameworks */ = {isa = PBXBuildFile; productRef = 915C6A222C7D0AC6000BC8B0 /* TrinsicUI */; };
+		91FCE5D42C7E580900EA1AB4 /* CustomContextProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91FCE5D32C7E580900EA1AB4 /* CustomContextProvider.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +21,8 @@
 		913CAF202C7677B2003B7AA0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		913CAF222C7677B4003B7AA0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		913CAF252C7677B4003B7AA0 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		915C6A242C7D0E29000BC8B0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		91FCE5D32C7E580900EA1AB4 /* CustomContextProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomContextProvider.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -26,6 +30,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				915C6A232C7D0AC6000BC8B0 /* TrinsicUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -51,10 +56,12 @@
 		913CAF1D2C7677B2003B7AA0 /* ui-ios-sample */ = {
 			isa = PBXGroup;
 			children = (
+				915C6A242C7D0E29000BC8B0 /* Info.plist */,
 				913CAF1E2C7677B2003B7AA0 /* ui_ios_sampleApp.swift */,
 				913CAF202C7677B2003B7AA0 /* ContentView.swift */,
 				913CAF222C7677B4003B7AA0 /* Assets.xcassets */,
 				913CAF242C7677B4003B7AA0 /* Preview Content */,
+				91FCE5D32C7E580900EA1AB4 /* CustomContextProvider.swift */,
 			);
 			path = "ui-ios-sample";
 			sourceTree = "<group>";
@@ -83,6 +90,9 @@
 			dependencies = (
 			);
 			name = "ui-ios-sample";
+			packageProductDependencies = (
+				915C6A222C7D0AC6000BC8B0 /* TrinsicUI */,
+			);
 			productName = "ui-ios-sample";
 			productReference = 913CAF1B2C7677B2003B7AA0 /* ui-ios-sample.app */;
 			productType = "com.apple.product-type.application";
@@ -111,6 +121,9 @@
 				Base,
 			);
 			mainGroup = 913CAF122C7677B2003B7AA0;
+			packageReferences = (
+				915C6A212C7D0AC6000BC8B0 /* XCLocalSwiftPackageReference "../ui" */,
+			);
 			productRefGroup = 913CAF1C2C7677B2003B7AA0 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -137,6 +150,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				91FCE5D42C7E580900EA1AB4 /* CustomContextProvider.swift in Sources */,
 				913CAF212C7677B2003B7AA0 /* ContentView.swift in Sources */,
 				913CAF1F2C7677B2003B7AA0 /* ui_ios_sampleApp.swift in Sources */,
 			);
@@ -272,9 +286,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"ui-ios-sample/Preview Content\"";
-				DEVELOPMENT_TEAM = 5HFVA9J8Q3;
+				DEVELOPMENT_TEAM = D99WQ339U9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "ui-ios-sample/Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -301,9 +316,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"ui-ios-sample/Preview Content\"";
-				DEVELOPMENT_TEAM = 5HFVA9J8Q3;
+				DEVELOPMENT_TEAM = D99WQ339U9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "ui-ios-sample/Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -344,6 +360,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		915C6A212C7D0AC6000BC8B0 /* XCLocalSwiftPackageReference "../ui" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../ui;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		915C6A222C7D0AC6000BC8B0 /* TrinsicUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = TrinsicUI;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 913CAF132C7677B2003B7AA0 /* Project object */;
 }
