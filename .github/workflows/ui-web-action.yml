@@ -1,0 +1,31 @@
+name: Build and Publish Web UI SDK
+
+on:
+  workflow_call:
+    inputs:
+      publish:
+        type: boolean
+        required: false
+        default: false
+        description: "Publish the package, default is false"
+
+jobs:
+  build_and_publish:
+    name: Build and Publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install NPM dependencies
+        run: npm ci
+      - name: Generate api typescript SDK
+        run: ./api-typescript/build-sdk.ps1
+        shell: pwsh
+      - name: Generate ui web SDK
+        run: ./ui-web/build-sdk.ps1
+        shell: pwsh
+      - name: Publish ui web SDK
+        if: inputs.publish == true
+        run: ./ui-web/publish-sdk.ps1
+        shell: pwsh
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

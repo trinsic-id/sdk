@@ -1,0 +1,12 @@
+name: Release API Java SDK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    name: Publish Java Package
+    uses: ./.github/workflows/api-java-action.yml
+    with:
+      publish: true
+    secrets: inherit

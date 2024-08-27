@@ -1,0 +1,19 @@
+name: Build API CSharp SDK sample
+
+on:
+  workflow_call:
+
+jobs:
+  build_and_publish:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install NPM dependencies
+        run: npm ci
+      - name: Generate backend SDK
+        run: ./api-csharp/build-sdk.ps1
+        shell: pwsh
+      - name: Build sample
+        run: dotnet build
+        working-directory: ./api-csharp/samples

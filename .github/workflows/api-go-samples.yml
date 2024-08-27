@@ -1,0 +1,23 @@
+name: Build API Go SDK sample
+
+on:
+  workflow_call:
+
+jobs:
+  build_and_publish:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go 1.21.x
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.21.x"
+      - name: Install NPM dependencies
+        run: npm ci
+      - name: Generate backend SDK
+        run: ./api-go/build-sdk.ps1
+        shell: pwsh
+      - name: Build sample
+        run: go build -o go-sample
+        working-directory: ./api-go/samples

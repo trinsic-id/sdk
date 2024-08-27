@@ -1,0 +1,15 @@
+name: Release API Go SDK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Publish Go Package
+    uses: ./.github/workflows/api-go-action.yml
+    with:
+      publish: true
+    secrets: inherit
