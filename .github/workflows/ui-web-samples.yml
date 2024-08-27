@@ -13,4 +13,4 @@ jobs:
         run: npm ci
       - name: Build sample
         run: npm run build
-        working-directory: ./web-ui/samples
+        working-directory: ./ui-web/samples
