@@ -2,10 +2,10 @@
   "private": true,
   "workspaces": [
     "api-typescript/sdk",
-    "api-typescript/sample",
+    "api-typescript/samples",
     "ui-web/sdk",
     "ui-react-native/sdk",
-    "ui-react-native/sample"
+    "ui-react-native/samples"
   ],
   "name": "trinsic-sdks",
   "version": "0.3.0",
