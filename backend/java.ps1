@@ -17,6 +17,9 @@ $additionalProperties = @{
 }
 & "$PSScriptRoot/generate-client.ps1" -language "java" -additionalProperties $additionalProperties
 
+# Remove the generated github action
+Remove-Item -Path "$PSScriptRoot/../.github/workflows/maven.yml" -Force
+
 try {
     Push-Location "$PSScriptRoot/../dist/java"
 
