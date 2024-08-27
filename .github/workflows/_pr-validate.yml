@@ -5,81 +5,87 @@ on:
   pull_request:
 
 jobs:
-  android:
-    name: Validate Android Package
-    uses: ./.github/workflows/android-action.yml
+  api-csharp:
+    name: Validate API CSharp SDK
+    uses: ./.github/workflows/api-csharp-action.yml
     with:
       publish: false
     secrets: inherit
-  flutter:
-    name: Validate Flutter Package
-    uses: ./.github/workflows/flutter-action.yml
+  api-csharp-samples:
+    name: Validate API CSharp samples
+    needs: api-csharp
+    uses: ./.github/workflows/api-csharp-samples.yml
+  api-go:
+    name: Validate API Go SDK
+    uses: ./.github/workflows/api-go-action.yml
     with:
       publish: false
     secrets: inherit
-  nuget:
-    name: Validate Nuget Package
-    uses: ./.github/workflows/nuget-action.yml
+  api-go-samples:
+    name: Validate API Go samples
+    needs: api-go
+    uses: ./.github/workflows/api-go-samples.yml
+  api-java:
+    name: Validate API Java SDK
+    uses: ./.github/workflows/api-java-action.yml
     with:
       publish: false
     secrets: inherit
-  go:
-    name: Validate Go Package
-    uses: ./.github/workflows/go-action.yml
+  api-java-samples:
+    name: Validate API Java samples
+    needs: api-java
+    uses: ./.github/workflows/api-java-samples.yml
+  api-php:
+    name: Validate API PHP SDK
+    uses: ./.github/workflows/api-php-action.yml
     with:
       publish: false
     secrets: inherit
-  java:
-    name: Validate Java Package
-    uses: ./.github/workflows/java-action.yml
+  api-python:
+    name: Validate API Python SDK
+    uses: ./.github/workflows/api-python-action.yml
     with:
       publish: false
     secrets: inherit
-  npm:
-    name: Validate NPM Packages
-    uses: ./.github/workflows/npm-action.yml
-    with:
-      publish: false
-    secrets: inherit
-  php:
-    name: Validate PHP Packages
-    uses: ./.github/workflows/php-action.yml
-    with:
-      publish: false
-    secrets: inherit
-  pypi:
-    name: Validate PyPI Packages
-    uses: ./.github/workflows/pypi-action.yml
-    with:
-      publish: false
-    secrets: inherit
-  rubygems:
-    name: Validate Rubygems Packages
-    uses: ./.github/workflows/rubygems-action.yml
-    with:
-      publish: false
-    secrets: inherit
-  samples-web-ui:
-    name: Validate Web UI sample
-    needs: npm
-    uses: ./.github/workflows/samples-web-ui.yml
-  samples-node:
-    name: Validate Node sample
-    needs: npm
-    uses: ./.github/workflows/samples-node.yml
-  samples-csharp:
-    name: Validate C# sample
-    needs: nuget
-    uses: ./.github/workflows/samples-csharp.yml
-  samples-go:
-    name: Validate Go sample
-    needs: go
-    uses: ./.github/workflows/samples-go.yml
-  samples-python:
+  api-python-samples:
     name: Validate Python sample
-    needs: pypi
-    uses: ./.github/workflows/samples-python.yml
-  samples-java:
-    name: Validate Java sample
-    needs: java
-    uses: ./.github/workflows/samples-java.yml
+    needs: api-python
+    uses: ./.github/workflows/api-python-samples.yml
+  api-ruby:
+    name: Validate API Ruby SDK
+    uses: ./.github/workflows/api-ruby-action.yml
+    with:
+      publish: false
+    secrets: inherit
+  api-typescript:
+    name: Validate API Typescript
+    uses: ./.github/workflows/api-typescript-action.yml
+    with:
+      publish: false
+    secrets: inherit
+  api-typescript-samples:
+    name: Validate API Typescript samples
+    needs: api-typescript
+    uses: ./.github/workflows/api-typescript-samples.yml
+  ui-android:
+    name: Validate UI Android SDK
+    uses: ./.github/workflows/ui-android-action.yml
+    with:
+      publish: false
+    secrets: inherit
+  ui-flutter:
+    name: Validate UI Flutter SDK
+    uses: ./.github/workflows/ui-flutter-action.yml
+    with:
+      publish: false
+    secrets: inherit
+  ui-web:
+    name: Validate UI Web SDK
+    uses: ./.github/workflows/ui-web-action.yml
+    with:
+      publish: false
+    secrets: inherit
+  ui-web-sample:
+    name: Validate UI Web sample
+    needs: api-typescript
+    uses: ./.github/workflows/ui-web-samples.yml
