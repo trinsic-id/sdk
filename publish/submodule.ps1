@@ -13,7 +13,8 @@ param(
     [string]$name,
     [Parameter(Mandatory = $true)]
     [string]$sdkRepositoryPath,
-    [switch]$tagPrefix = 'v'
+    [Parameter(Mandatory = $false)]
+    [string]$tagPrefix = 'v'
 )
 
 if (-not (Test-Path -Path $sourceLocation -PathType Container)) {
