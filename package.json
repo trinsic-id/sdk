@@ -1,10 +1,11 @@
 {
   "private": true,
   "workspaces": [
-    "dist/node",
-    "client/web",
-    "samples/node",
-    "react-native-ui"
+    "api-typescript/sdk",
+    "api-typescript/sample",
+    "ui-web/sdk",
+    "ui-react-native/sdk",
+    "ui-react-native/sample"
   ],
   "name": "trinsic-sdks",
   "version": "1.0.0",
