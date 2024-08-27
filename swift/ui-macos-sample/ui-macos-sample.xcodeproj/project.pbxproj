@@ -21,6 +21,7 @@
 		913CAF072C767799003B7AA0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		913CAF0A2C767799003B7AA0 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		913CAF0C2C767799003B7AA0 /* ui_macos_sample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ui_macos_sample.entitlements; sourceTree = "<group>"; };
+		915C6A202C7CEB05000BC8B0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +55,7 @@
 		913CAF022C767797003B7AA0 /* ui-macos-sample */ = {
 			isa = PBXGroup;
 			children = (
+				915C6A202C7CEB05000BC8B0 /* Info.plist */,
 				913CAF032C767797003B7AA0 /* ui_macos_sampleApp.swift */,
 				913CAF052C767797003B7AA0 /* ContentView.swift */,
 				913CAF072C767799003B7AA0 /* Assets.xcassets */,
@@ -288,6 +290,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "ui-macos-sample/Info.plist";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -316,6 +319,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "ui-macos-sample/Info.plist";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
