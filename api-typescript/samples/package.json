@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "prestart": "cd ../web && npm run build && cd ../node",
+    "prestart": "cd ../ui-web && npm run build && cd ../api-typescript",
     "start": "ts-node-dev --respawn --transpile-only --env-file=.env -- src/index.ts",
     "build": "tsc"
   },
