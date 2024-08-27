@@ -23,7 +23,7 @@ app = FastAPI()
 network_api = NetworkApi(api_client)
 sessions_api = SessionsApi(api_client)
 
-web_ui_path = pathlib.Path(__file__).parent / "../../web-ui"
+web_ui_path = pathlib.Path(__file__).parent / "../../ui-web"
 
 @app.get("/redirect")
 async def redirect():
