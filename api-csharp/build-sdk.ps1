@@ -8,7 +8,7 @@ $additionalProperties = @{
     validatable                              = "false"
     disallowAdditionalPropertiesIfNotPresent = "false"
 }
-& "$PSScriptRoot/generate-client.ps1" -language "csharp" -additionalProperties $additionalProperties
+& "$PSScriptRoot/../helpers/generate-client.ps1" -language "csharp" -additionalProperties $additionalProperties
 
 try {
     Push-Location "$PSScriptRoot/../dist/csharp"

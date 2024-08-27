@@ -6,4 +6,4 @@ $additionalProperties = @{
     developerOrganizationUrl = "https://trinsic.id"
     composerPackageName      = "trinsic/api"
 }
-& "$PSScriptRoot/generate-client.ps1" -language "php" -additionalProperties $additionalProperties
+& "$PSScriptRoot/../helpers/generate-client.ps1" -language "php" -additionalProperties $additionalProperties

@@ -4,7 +4,7 @@ $additionalProperties = @{
     packageUrl     = "https://trinsic.id"
     projectName    = "Trinsic-Api"
 }
-& "$PSScriptRoot/generate-client.ps1" -language "python" -additionalProperties $additionalProperties
+& "$PSScriptRoot/../helpers/generate-client.ps1" -language "python" -additionalProperties $additionalProperties
 
 try {
     Push-Location "$PSScriptRoot/../dist/python"

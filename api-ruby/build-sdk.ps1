@@ -8,7 +8,7 @@ $additionalProperties = @{
     gemVersion     = "[VERSION]"
     moduleName     = "TrinsicApi"
 }
-& "$PSScriptRoot/generate-client.ps1" -language "ruby" -additionalProperties $additionalProperties
+& "$PSScriptRoot/../helpers/generate-client.ps1" -language "ruby" -additionalProperties $additionalProperties
 
 try {
     Push-Location "$PSScriptRoot/../dist/ruby"

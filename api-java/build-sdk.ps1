@@ -15,7 +15,7 @@ $additionalProperties = @{
     developerOrganizationUrl = "https://trinsic.id"
     artifactDescription      = "Trinsic"
 }
-& "$PSScriptRoot/generate-client.ps1" -language "java" -additionalProperties $additionalProperties
+& "$PSScriptRoot/../helpers/generate-client.ps1" -language "java" -additionalProperties $additionalProperties
 
 
 try {
@@ -35,18 +35,18 @@ try {
     # Initialize a flag to track whether we are inside the publishing block
     $insidePublishingBlock = $false
     $newPublishingContent = "" # This is the content we want to add to the build.gradle file
-#     $newPublishingContent = @"
-#         repositories {
-#             maven {
-#                 name = "GitHubPackages"
-#                 url = uri("https://maven.pkg.github.com/trinsic-id/sdk")
-#                 credentials {
-#                     username = System.getenv("MAVEN_GITHUB_USERNAME")
-#                     password = System.getenv("MAVEN_GITHUB_TOKEN")
-#                 }
-#             }
-#     }
-# "@
+    #     $newPublishingContent = @"
+    #         repositories {
+    #             maven {
+    #                 name = "GitHubPackages"
+    #                 url = uri("https://maven.pkg.github.com/trinsic-id/sdk")
+    #                 credentials {
+    #                     username = System.getenv("MAVEN_GITHUB_USERNAME")
+    #                     password = System.getenv("MAVEN_GITHUB_TOKEN")
+    #                 }
+    #             }
+    #     }
+    # "@
     $buildGradleFileContent = ""
 
     foreach ($line in $gradleLines) {

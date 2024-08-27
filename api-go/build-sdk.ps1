@@ -1,9 +1,9 @@
 $additionalProperties = @{
-    packageName    = "trinsic_api"
-    packageVersion = "[VERSION]"
+    packageName                              = "trinsic_api"
+    packageVersion                           = "[VERSION]"
     disallowAdditionalPropertiesIfNotPresent = "false"
 }
-& "$PSScriptRoot\generate-client.ps1" -language "go" -additionalProperties $additionalProperties
+& "$PSScriptRoot/../helpers/generate-client.ps1" -language "go" -additionalProperties $additionalProperties
 try {
     Push-Location "$PSScriptRoot/../dist/go"
     $goModFile = "go.mod"
