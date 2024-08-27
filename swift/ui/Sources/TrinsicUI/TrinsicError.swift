@@ -2,7 +2,7 @@ import Foundation
 
 @objc public enum TrinsicErrorCode: Int {
     case unknownError = 0
-    case userCancelled = 1
+    case unparsableResultUrl = 1
     case couldNotAcquireRootViewController = 2
     case unsupportedIosVersion = 3
     case noRegisteredApplicationForLaunchUrl = 4
@@ -13,8 +13,10 @@ import Foundation
     case emptyRedirectUrl = 9
     case cannotReconstructLaunchUrl = 10
     case unparsableCallbackUrl = 11
-    case unparsableResultUrl = 12
+    case unsupportedHttpsLinking = 12
 }
+
+
 
 @objc public class TrinsicError: NSObject {
     @objc public static func error(with code: TrinsicErrorCode, message: String? = nil) -> NSError {

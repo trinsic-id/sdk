@@ -13,54 +13,63 @@ import AppKit
 @objc public class TrinsicUI : NSObject {
     private var presentationContextProvider: ASWebAuthenticationPresentationContextProviding
     public init(presentationContextProvider: ASWebAuthenticationPresentationContextProviding? = nil){
-        //TODO set and verify this works
-        self.presentationContextProvider = TrinsicPresentationContextProvider()
+        // Use a custom one if provided by library consumer, otherwise we will attempt to grab the correct presentation context.
+        self.presentationContextProvider = presentationContextProvider ?? TrinsicPresentationContextProvider()
         super.init()
     }
     
+    
     @objc public func launchSession(launchUrl: String, callbackURL: String) async throws -> LaunchSessionResult {
         return try await withCheckedThrowingContinuation( { continuation in
-            Task {
+            let task = Task {
                 var completionHandler: ((URL?, Error?) -> Void)?
+                var sessionToKeepAlive: Any? // if we do not keep the session alive, it will get closed immediately while showing the dialog
                 do {
                     let (formattedLaunchUrl, callbackURLScheme, callbackURLHost, callbackURLPath) = try self.validateAndFormatLaunchUrl(launchUrl: launchUrl, callbackURL: callbackURL)
-                    var sessionToKeepAlive: Any? // if we do not keep the session alive, it will get closed immediately while showing the dialog
+                    
                     completionHandler = { (url: URL?, err: Error?) in
                         completionHandler = nil
                         
-                        if (sessionToKeepAlive != nil) {
-                            (sessionToKeepAlive as! ASWebAuthenticationSession).cancel()
-                            sessionToKeepAlive = nil
+                        //Clean up resources, but if cancelled we should not as it's already deprovisioned
+                        if err == nil || (err as? ASWebAuthenticationSessionError)?.code != .canceledLogin {
+                            if (sessionToKeepAlive != nil) {
+                                (sessionToKeepAlive as! ASWebAuthenticationSession).cancel()
+                                sessionToKeepAlive = nil
+                            }
                         }
                         
                         if let err = err {
                             if case ASWebAuthenticationSessionError.canceledLogin = err {
-                                continuation.resume(throwing: TrinsicError.error(with: .userCancelled))
+                                continuation.resume(returning: LaunchSessionResult.init(success: false, cancelled: true, sessionId: nil, resultsAccessKey: nil))
                                 return;
                             }
-                            continuation.resume(throwing:  TrinsicError.error(with: .unknownError, message: err.localizedDescription))
-                            return
+                            else {
+                                
+                                continuation.resume(throwing:  TrinsicError.error(with: .unknownError, message: err.localizedDescription))
+                                return
+                            }
                         }
                         guard let url = url else {
                             continuation.resume(throwing: TrinsicError.error(with: .unknownError))
                             return
                         }
-                        let result = parseUrl(url: url)
-                        continuation.resume(returning: url)
+                        let (result, parseError) = self.parseUrl(url: url)
+                        if let parseError = parseError {
+                            continuation.resume(throwing: parseError)
+                        }
+                        else if let result = result {
+                            continuation.resume(returning: result)
+                        }
+                        else {
+                            continuation.resume(throwing: TrinsicError.error(with: .unknownError))
+                        }
                     }
                     
                     var _session: ASWebAuthenticationSession? = nil
                     if #available(iOS 17.4, *) {
                         if (callbackURLScheme == "https") {
-                            //TODO test this path
-                            guard let callbackURLHostChecked = callbackURLHost, !callbackURLHostChecked.isEmpty else {
-                                throw TrinsicError.error(with: .unparsableLaunchUrl)
-                            }
-                            guard let callbackURLPathChecked = callbackURLPath, !callbackURLPathChecked.isEmpty else {
-                                throw TrinsicError.error(with: .unparsableLaunchUrl)
-                            }
-                            
-                            _session = ASWebAuthenticationSession(url: formattedLaunchUrl, callback: ASWebAuthenticationSession.Callback.https(host: callbackURLHostChecked, path: callbackURLPathChecked), completionHandler: completionHandler!)
+                            //When appropriate we should investigate/dive deeper.
+                            throw TrinsicError.error(with: .unsupportedHttpsLinking)
                         } else {
                             _session = ASWebAuthenticationSession(url: formattedLaunchUrl, callback: ASWebAuthenticationSession.Callback.customScheme(callbackURLScheme), completionHandler: completionHandler!)
                         }
@@ -68,9 +77,9 @@ import AppKit
                         _session = ASWebAuthenticationSession(url: formattedLaunchUrl, callbackURLScheme: formattedLaunchUrl.scheme, completionHandler: completionHandler!)
                     }
                     let session = _session!
+                    sessionToKeepAlive = session
                     session.presentationContextProvider = self.presentationContextProvider;
                     session.start()
-                    sessionToKeepAlive = session
                 }
                 catch {
                     continuation.resume(throwing: error)
@@ -79,10 +88,10 @@ import AppKit
         })
     }
     
-    private func parseUrl(url: URL) throws -> LaunchSessionResult {
+    private func parseUrl(url: URL) -> (result: LaunchSessionResult?, parseError: Error?) {
         // Parse launchUrl into a URLComponents object
-        guard var urlComponents = URLComponents(url: url) else {
-            throw TrinsicError.error(with: .unparsableResultUrl)
+        guard var urlComponents = URLComponents(string: url.absoluteString) else {
+            return (result: nil, parseError: TrinsicError.error(with: .unparsableResultUrl))
         }
         
         var queryItems = urlComponents.queryItems ?? []
@@ -90,26 +99,20 @@ import AppKit
         guard let successString = queryItems.first(where: { $0.name == "success" })?.value,
             !successString.isEmpty,
             let success = Bool(successString) else {
-            throw TrinsicError.error(with: .unparsableResultUrl)
-        }
-
-        guard let cancelledString = queryItems.first(where: { $0.name == "cancelled" })?.value,
-            !cancelledString.isEmpty,
-            let cancelled = Bool(cancelledString) else {
-            throw TrinsicError.error(with: .unparsableResultUrl)
+            return (result: nil, parseError: TrinsicError.error(with: .unparsableResultUrl))
         }
         
         guard let sessionId = queryItems.first(where: { $0.name == "sessionId" })?.value,
             !sessionId.isEmpty else {
-            throw TrinsicError.error(with: .unparsableResultUrl)
+            return (result: nil, parseError: TrinsicError.error(with: .unparsableResultUrl))
         }
         
         guard let resultsAccessKey = queryItems.first(where: { $0.name == "resultsAccessKey" })?.value,
             !resultsAccessKey.isEmpty else {
-            throw TrinsicError.error(with: .unparsableResultUrl)
+            return (result: nil, parseError: TrinsicError.error(with: .unparsableResultUrl))
         }
-        let result = LaunchSessionResult.init(success: success, cancelled: cancelled, sessionId: sessionId, resultsAccessKey: resultsAccessKey)
-        return result
+        let result = LaunchSessionResult.init(success: success, cancelled: false, sessionId: sessionId, resultsAccessKey: resultsAccessKey)
+        return (result: result, parseError: nil)
     }
     
     private func validateAndFormatLaunchUrl(launchUrl: String, callbackURL: String) throws -> (formattedLaunchUrl: URL, callbackURLScheme: String, callbackURLHost: String?, callbackURLPath: String?) {

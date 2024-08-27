@@ -14,6 +14,16 @@
 				<string>trinsic-ui-ios</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>https://trinsic.id/custom-auth-callback</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>https</string>
+			</array>
+		</dict>
 	</array>
 </dict>
 </plist>
