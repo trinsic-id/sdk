@@ -1,4 +1,4 @@
-name: "Release API Typescript SDK
+name: "Release API Typescript SDK"
 
 on:
   workflow_dispatch:
