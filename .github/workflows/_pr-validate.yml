@@ -87,5 +87,5 @@ jobs:
     secrets: inherit
   ui-web-sample:
     name: Validate UI Web sample
-    needs: api-typescript
+    needs: ui-web
     uses: ./.github/workflows/ui-web-samples.yml
