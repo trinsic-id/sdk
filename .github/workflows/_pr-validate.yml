@@ -48,7 +48,7 @@ jobs:
       publish: false
     secrets: inherit
   api-python-samples:
-    name: Validate Python sample
+    name: Validate API Python sample
     needs: api-python
     uses: ./.github/workflows/api-python-samples.yml
   api-ruby:

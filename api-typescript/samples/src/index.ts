@@ -19,12 +19,15 @@ const networkApi = new NetworkApi(newConfiguration);
 
 app.use(express.json());
 
-app.get("/", express.static(path.join("../web-ui")));
+app.get("/", express.static(path.join("../../ui-web/samples")));
 app.get("/redirect", (req: any, res: any) => {
-  res.sendFile(path.join(__dirname, "../../web-ui/redirect.html"));
+  res.sendFile(path.join(__dirname, "../../ui-web/samples/redirect.html"));
 });
 
-app.use("/dist/web-ui", express.static(path.join("../web/dist/web-ui")));
+app.use(
+  "/dist/web-ui",
+  express.static(path.join("../../ui-web/samples/dist/web-ui"))
+);
 
 app.get("/providers", async (req: any, res: any) => {
   const result = await networkApi.listProviders();
