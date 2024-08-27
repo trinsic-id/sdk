@@ -1,4 +1,4 @@
-name: "Release Android"
+name: Release UI Android SDK
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
 jobs:
   release:
     name: Publish Android Package
-    uses: ./.github/workflows/android-action.yml
+    uses: ./.github/workflows/ui-android-action.yml
     with:
       publish: true
     secrets: inherit

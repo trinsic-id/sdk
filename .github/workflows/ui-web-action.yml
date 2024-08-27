@@ -1,4 +1,4 @@
-name: Build and Publish NPM Packages
+name: Build and Publish Web UI SDK
 
 on:
   workflow_call:

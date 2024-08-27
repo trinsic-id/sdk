@@ -1,4 +1,4 @@
-name: Build and Publish Java Package
+name: Build and Publish API Java SDK
 
 on:
   workflow_call:
@@ -23,11 +23,11 @@ jobs:
         run: npm ci
       - name: Generate SDK
         id: generate-sdk
-        run: ./backend/java.ps1
+        run: ./api-java/build-sdk.ps1
         shell: pwsh
       - name: Publish SDK
         if: inputs.publish == true
-        run: ./publish/java.ps1
+        run: ./api-java/publish-sdk.ps1
         shell: pwsh
         env:
           PAT_GITHUB: ${{ secrets.PAT_GITHUB }}

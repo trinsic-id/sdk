@@ -1,4 +1,4 @@
-name: "Release Rubygems"
+name: Release API Ruby SDK
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ on:
 jobs:
   release:
     name: Publish Rubygems Package
-    uses: ./.github/workflows/rubygems-action.yml
+    uses: ./.github/workflows/api-ruby-action.yml
     with:
       publish: true
     secrets: inherit

@@ -1,4 +1,4 @@
-name: "Release Java"
+name: Release API Java SDK
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
 jobs:
   release:
     name: Publish Java Package
-    uses: ./.github/workflows/java-action.yml
+    uses: ./.github/workflows/api-java-action.yml
     with:
       publish: true
     secrets: inherit

@@ -1,4 +1,4 @@
-name: Build CSharp sample
+name: Build API CSharp SDK sample
 
 on:
   workflow_call:
@@ -16,4 +16,4 @@ jobs:
         shell: pwsh
       - name: Build sample
         run: dotnet build
-        working-directory: ./samples/csharp
+        working-directory: ./api-csharp/samples

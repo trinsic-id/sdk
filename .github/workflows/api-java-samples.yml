@@ -1,4 +1,4 @@
-name: Build Node sample
+name: Build API Java SDK sample
 
 on:
   workflow_call:
@@ -16,11 +16,11 @@ jobs:
       - name: Install NPM dependencies
         run: npm ci
       - name: Generate backend SDK
-        run: ./backend/java.ps1
+        run: ./api-java/build-sdk.ps1
         shell: pwsh
       - name: Setup Maven Local Repository
         run: mvn clean install
         working-directory: ./dist/java
       - name: Build Sample
         run: mvn package
-        working-directory: ./samples/java
+        working-directory: ./api-java/samples

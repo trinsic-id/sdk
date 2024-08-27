@@ -1,4 +1,4 @@
-name: Build and Publish Rubygems Package
+name: Build and Publish API Ruby SDK
 
 on:
   workflow_call:
@@ -18,11 +18,11 @@ jobs:
       - name: Install NPM dependencies
         run: npm ci
       - name: Generate SDK
-        run: ./backend/ruby.ps1
+        run: ./api-ruby/build-sdk.ps1
         shell: pwsh
       - name: Publish SDK
         if: inputs.publish == true
-        run: ./publish/rubygems.ps1
+        run: ./api-ruby/publish-sdk.ps1
         shell: pwsh
         env:
           RUBYGEMS_API_TOKEN: ${{ secrets.RUBYGEMS_API_TOKEN }}

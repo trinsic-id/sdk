@@ -1,4 +1,4 @@
-name: "Release Flutter"
+name: Release UI Flutter SDK"
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
 jobs:
   release:
     name: Publish Flutter Package
-    uses: ./.github/workflows/flutter-action.yml
+    uses: ./.github/workflows/ui-flutter-action.yml
     with:
       publish: true
     secrets: inherit

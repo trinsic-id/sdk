@@ -1,4 +1,4 @@
-name: Build Web UI sample
+name: Build Web UI SDK sample
 
 on:
   workflow_call:
@@ -13,4 +13,4 @@ jobs:
         run: npm ci
       - name: Build sample
         run: npm run build
-        working-directory: ./samples/web-ui
+        working-directory: ./web-ui/samples

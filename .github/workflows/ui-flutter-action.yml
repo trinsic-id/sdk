@@ -1,4 +1,4 @@
-name: Build and Publish Flutter Package
+name: Build and Publish UI Flutter SDK
 
 on:
   workflow_call:
@@ -25,7 +25,7 @@ jobs:
       #     distribution: 'temurin'
       #     java-version: '21'
       - name: Setup credentials (todo investigate expiration)
-        run: | 
+        run: |
           mkdir -p $XDG_CONFIG_HOME/dart
           cat <<EOF > $XDG_CONFIG_HOME/dart/pub-credentials.json
           {
@@ -39,15 +39,15 @@ jobs:
       - name: Verify credentials
         run: cat $XDG_CONFIG_HOME/dart/pub-credentials.json
       - name: Run Flutter Tests
-        working-directory: ./client/flutter/trinsic_flutter_ui
+        working-directory: ./ui-flutter/sdk
         run: flutter test
       - name: Publish SDK (dry run)
         working-directory: ./
         if: inputs.publish == false
-        run: ./publish/flutter.ps1 -dryRun
+        run: ./ui-flutter/publish-sdk.ps1 -dryRun
         shell: pwsh
       - name: Publish SDK
         working-directory: ./
         if: inputs.publish == true
-        run: ./publish/flutter.ps1
+        run: ./ui-flutter/publish-sdk.ps1
         shell: pwsh

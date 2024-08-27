@@ -1,4 +1,4 @@
-name: Build and Publish NuGet Package
+name: Build and Publish API CSharp SDK
 
 on:
   workflow_call:

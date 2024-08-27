@@ -1,4 +1,4 @@
-name: "Release Nuget"
+name: Release API CSharp SDK
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
 jobs:
   release:
     name: Publish Nuget Package
-    uses: ./.github/workflows/nuget-action.yml
+    uses: ./.github/workflows/api-csharp-action.yml
     with:
       publish: true
     secrets: inherit

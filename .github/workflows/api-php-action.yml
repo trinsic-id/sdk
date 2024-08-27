@@ -1,4 +1,4 @@
-name: Build and Publish PHP Package
+name: Build and Publish API PHP SDK
 
 on:
   workflow_call:
@@ -23,11 +23,11 @@ jobs:
         run: npm ci
       - name: Generate SDK
         id: generate-sdk
-        run: ./backend/php.ps1
+        run: ./api-php/build-sdk.ps1
         shell: pwsh
       - name: Publish SDK
         if: inputs.publish == true
-        run: ./publish/php.ps1
+        run: ./api-php/publish-sdk.ps1
         shell: pwsh
         env:
           PAT_GITHUB: ${{ secrets.PAT_GITHUB }}

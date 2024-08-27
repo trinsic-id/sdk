@@ -1,4 +1,4 @@
-name: "Release NPM"
+name: "Release API Typescript SDK
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
 jobs:
   release:
     name: Publish NPM Packages
-    uses: ./.github/workflows/npm-action.yml
+    uses: ./.github/workflows/api-typescript-action.yml
     with:
       publish: true
     secrets: inherit

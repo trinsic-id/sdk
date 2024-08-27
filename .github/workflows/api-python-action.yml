@@ -1,4 +1,4 @@
-name: Build and Publish Python PYPI Package
+name: Build and Publish API Python SDK
 
 on:
   workflow_call:
@@ -18,11 +18,11 @@ jobs:
       - name: Install NPM dependencies
         run: npm ci
       - name: Generate SDK
-        run: ./backend/python.ps1
+        run: ./api-python/build-sdk.ps1
         shell: pwsh
       - name: Publish SDK
         if: inputs.publish == true
-        run: ./publish/pypi.ps1
+        run: ./api-python/publish-sdk.ps1
         shell: pwsh
         env:
           PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}

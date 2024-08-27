@@ -1,4 +1,4 @@
-name: Build Node sample
+name: Build API Typescript SDK sample
 
 on:
   workflow_call:
@@ -12,8 +12,8 @@ jobs:
       - name: Install NPM dependencies
         run: npm ci
       - name: Generate backend SDK
-        run: ./backend/node.ps1
+        run: ./api-typescript/build-sdk.ps1
         shell: pwsh
       - name: Build sample
         run: npm run build
-        working-directory: ./samples/node
+        working-directory: ./api-typescript/samples
