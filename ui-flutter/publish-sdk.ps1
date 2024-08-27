@@ -3,7 +3,7 @@ param(
 )
 
 try {
-    Set-Location "$PSScriptRoot/../client/flutter/trinsic_flutter_ui"
+    Set-Location "$PSScriptRoot/sdk"
     # Write-Host "Setting version to $version"
 
     # $fileContent = Get-Content -Path "pubspe c.yaml"
@@ -11,9 +11,10 @@ try {
     # $fileContent | Set-Content -Path "pubspec.yaml"
 
     Write-Host "Publishing package"
-    if($dryRun) {
+    if ($dryRun) {
         flutter pub publish --dry-run
-    } else {
+    }
+    else {
         flutter pub publish -f
     }
 }
