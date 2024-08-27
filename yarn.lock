@@ -2954,8 +2954,8 @@ __metadata:
 
 "@trinsic/api@file:../../dist/node::locator=%40trinsic%2Fapi-node-sample%40workspace%3Asamples%2Fnode":
   version: 0.3.0
-  resolution: "@trinsic/api@file:../../dist/node#../../dist/node::hash=90508e&locator=%40trinsic%2Fapi-node-sample%40workspace%3Asamples%2Fnode"
-  checksum: badd8cd47612a82cc51e91ea928663b173fb81ba26f43b8465807f05038bd55a3b12e407ec924c8828cc27ae522ddfc6708e05706873433ebfe8b3fc96fa1a36
+  resolution: "@trinsic/api@file:../../dist/node#../../dist/node::hash=190b0c&locator=%40trinsic%2Fapi-node-sample%40workspace%3Asamples%2Fnode"
+  checksum: f05f0d3bbe5268ef67213be086d2fbd113a3c496510fde1497b182f6db1595bb16962365f0621ad3094bfba3e5e77b3d1cc06a538278f950526b00222bad40c3
   languageName: node
   linkType: hard
 
