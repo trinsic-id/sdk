@@ -12,8 +12,10 @@ import AppKit
 @available(iOS 13.0, macOS 14.4, *)
 @objc public class TrinsicUI : NSObject {
     private var presentationContextProvider: ASWebAuthenticationPresentationContextProviding
-    public override init(){
+    public init(presentationContextProvider: ASWebAuthenticationPresentationContextProviding? = nil){
+        //TODO set and verify this works
         self.presentationContextProvider = TrinsicPresentationContextProvider()
+        super.init()
     }
     
     @objc public func launchSession(launchUrl: String, callbackURL: String) async throws -> URL {
@@ -43,35 +45,33 @@ import AppKit
                             continuation.resume(throwing: TrinsicError.error(with: .unknownError))
                             return
                         }
+                        //TODO MAP TO REAL RETURN TYPE
                         
                         continuation.resume(returning: url)
                     }
                     
-                    if #available(iOS 12, *) {
-                        var _session: ASWebAuthenticationSession? = nil
-                        if #available(iOS 17.4, *) {
-                            if (callbackURLScheme == "https") {
-                                guard let callbackURLHostChecked = callbackURLHost, !callbackURLHostChecked.isEmpty else {
-                                    throw TrinsicError.error(with: .unparsableLaunchUrl)
-                                }
-                                guard let callbackURLPathChecked = callbackURLPath, !callbackURLPathChecked.isEmpty else {
-                                    throw TrinsicError.error(with: .unparsableLaunchUrl)
-                                }
-                                
-                                _session = ASWebAuthenticationSession(url: formattedLaunchUrl, callback: ASWebAuthenticationSession.Callback.https(host: callbackURLHostChecked, path: callbackURLPathChecked), completionHandler: completionHandler!)
-                            } else {
-                                _session = ASWebAuthenticationSession(url: formattedLaunchUrl, callback: ASWebAuthenticationSession.Callback.customScheme(callbackURLScheme), completionHandler: completionHandler!)
+                    var _session: ASWebAuthenticationSession? = nil
+                    if #available(iOS 17.4, *) {
+                        if (callbackURLScheme == "https") {
+                            //TODO test this path
+                            guard let callbackURLHostChecked = callbackURLHost, !callbackURLHostChecked.isEmpty else {
+                                throw TrinsicError.error(with: .unparsableLaunchUrl)
                             }
+                            guard let callbackURLPathChecked = callbackURLPath, !callbackURLPathChecked.isEmpty else {
+                                throw TrinsicError.error(with: .unparsableLaunchUrl)
+                            }
+                            
+                            _session = ASWebAuthenticationSession(url: formattedLaunchUrl, callback: ASWebAuthenticationSession.Callback.https(host: callbackURLHostChecked, path: callbackURLPathChecked), completionHandler: completionHandler!)
                         } else {
-                            _session = ASWebAuthenticationSession(url: formattedLaunchUrl, callbackURLScheme: formattedLaunchUrl.scheme, completionHandler: completionHandler!)
+                            _session = ASWebAuthenticationSession(url: formattedLaunchUrl, callback: ASWebAuthenticationSession.Callback.customScheme(callbackURLScheme), completionHandler: completionHandler!)
                         }
-                        let session = _session!
-                        session.presentationContextProvider = self.presentationContextProvider;
-                        session.start()
-                        sessionToKeepAlive = session
                     } else {
-                        throw TrinsicError.error(with: .noSupportForiOSBelow12)
+                        _session = ASWebAuthenticationSession(url: formattedLaunchUrl, callbackURLScheme: formattedLaunchUrl.scheme, completionHandler: completionHandler!)
                     }
+                    let session = _session!
+                    session.presentationContextProvider = self.presentationContextProvider;
+                    session.start()
+                    sessionToKeepAlive = session
                 }
                 catch {
                     continuation.resume(throwing: error)
@@ -147,7 +147,7 @@ import AppKit
             callbackPath = callbackURLParsed.path
         }
         
-        return (formattedLaunchUrl: updatedUrl, callbackURLScheme: callbackScheme, callbackURLPath: callbackPath, callbackURLHost: callbackHost)
+        return (formattedLaunchUrl: updatedUrl, callbackURLScheme: callbackScheme, callbackURLHost: callbackHost, callbackURLPath: callbackPath)
     }
     
     @objc public func sayHello() -> String {

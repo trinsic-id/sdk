@@ -57,7 +57,7 @@ struct ContentView: View {
                 guard window != nil else {
                     return;
                 }
-                let resultUrl = try await trinsicUI.launchSession(launchUrl: url.absoluteString, callbackURL: "trinsic-ui-ios://custom-callback")
+                let resultUrl = try await trinsicUI.launchSession(launchUrl: url.absoluteString, callbackURL: "trinsic-aui-ios://custom-callback")
                 print("Result url \(resultUrl)")
                 // Call another function here if needed
             }
