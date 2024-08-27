@@ -22,7 +22,7 @@ RCT_EXPORT_METHOD(launchSession:(NSString*)launchURl
         @"sessionId": [NSNull null],
         @"resultsAccessKey": [trinsicApi sayHello],
         @"success": @(success),
-        @"cancelled": @(cancelled)
+        @"canceled": @(cancelled)
     };
 
     resolve(result);

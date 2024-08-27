@@ -5,7 +5,7 @@ export interface LaunchSessionResult {
   sessionId: string | null;
   resultsAccessKey: string | null;
   success: boolean;
-  cancelled: boolean;
+  canceled: boolean;
 }
 
 export interface Spec extends TurboModule {
