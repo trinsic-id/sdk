@@ -1,6 +1,6 @@
 {
   "name": "@trinsic/web-ui",
-  "version": "0.2.7",
+  "version": "0.3.0",
   "description": "Trinsic's Web UI SDK to easily launch your verifications and capture the result",
   "main": "dist/index.js",
   "scripts": {

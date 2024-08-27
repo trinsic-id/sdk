@@ -8,7 +8,7 @@
     "ui-react-native/sample"
   ],
   "name": "trinsic-sdks",
-  "version": "1.0.0",
+  "version": "0.3.0",
   "description": "",
   "main": "index.js",
   "scripts": {
