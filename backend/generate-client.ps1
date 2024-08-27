@@ -53,7 +53,7 @@ Write-Host "Generating $language SDK from $localSwaggerFilePath in $outputFolder
     -i "$localSwaggerFilePath" `
     -g "$language" `
     -o $outputFolder `
-    --additional-properties="$concatenatedAdditionalProperties" 1> $null
+    --additional-properties=$concatenatedAdditionalProperties 1> $null
 
 if ($LASTEXITCODE -ne 0) {
     throw "Failed to generate SDK for $language from $localSwaggerFilePath to $outputFolder."

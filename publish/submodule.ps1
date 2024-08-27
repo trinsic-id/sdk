@@ -12,7 +12,9 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$name,
     [Parameter(Mandatory = $true)]
-    [string]$sdkRepositoryPath
+    [string]$sdkRepositoryPath,
+    [Parameter(Mandatory = $false)]
+    [string]$tagPrefix = 'v'
 )
 
 if (-not (Test-Path -Path $sourceLocation -PathType Container)) {
@@ -53,7 +55,7 @@ try {
         throw "Failed to push to submodule main"
     }
 
-    $tagName = "v$packageVersion"
+    $tagName = "$tagPrefix$packageVersion"
     git tag $tagName
     git push origin $tagName
 
