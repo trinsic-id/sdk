@@ -51,12 +51,9 @@ import Foundation
     public override init() {
         super.init()
         DispatchQueue.main.async {
-            self.presentationAnchor = ASWebAuthenticationPresentationContextProvider.getPresentationAnchor()
+            self.presentationAnchor = NSApplication.shared.windows.first!
             self.semaphore.signal()
         }
-    }
-    public static func getPresentationAnchor() -> ASPresentationAnchor {
-        return NSApplication.shared.windows.first!
     }
 #endif
     
