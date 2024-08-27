@@ -14,13 +14,9 @@ try {
     Push-Location "$PSScriptRoot/../dist/ruby"
     &gem build trinsic_api.gemspec
     
-    Write-Host "Writing current directory files"
-    Get-ChildItem -Filter "*.gem" -Recurse | ForEach-Object { Write-Host $_.FullName }
     # Move a file with .gem file extension to the another directory without specifying the exact filename
     Move-Item -Path *.gem -Destination "$PSScriptRoot/../dist/publish" -Force
-    Write-Host "Writing target directory files"
-    Get-ChildItem -Path "$PSScriptRoot/../dist/publish" -Filter "*.gem" -Recurse | ForEach-Object { Write-Host $_.FullName }
-
+    
     $gemFile = Get-ChildItem -Path "$PSScriptRoot/../dist/publish" -Filter *.gem
     Write-Host "Installing $gemFile"
     &gem install $gemFile --user-install   
