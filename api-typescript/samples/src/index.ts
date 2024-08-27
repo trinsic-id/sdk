@@ -21,12 +21,12 @@ app.use(express.json());
 
 app.get("/", express.static(path.join("../../ui-web/samples")));
 app.get("/redirect", (req: any, res: any) => {
-  res.sendFile(path.join(__dirname, "../../ui-web/samples/redirect.html"));
+  res.sendFile(path.join(__dirname, "../../../ui-web/samples/redirect.html"));
 });
 
 app.use(
-  "/dist/web-ui",
-  express.static(path.join("../../ui-web/samples/dist/web-ui"))
+  "/dist/ui-web",
+  express.static(path.join("../../ui-web/samples/dist/ui-web"))
 );
 
 app.get("/providers", async (req: any, res: any) => {
