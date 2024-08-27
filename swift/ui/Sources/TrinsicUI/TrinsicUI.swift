@@ -1,5 +1,6 @@
 import Foundation
 import AuthenticationServices
+
 //UIKit is only available on iOS
 #if canImport(UIKit)
 import UIKit
@@ -7,109 +8,13 @@ import UIKit
 #if canImport(AppKit)
 import AppKit
 #endif
-#if canImport(RTCBridge)
-import RTCBridge
-#endif
-
-
-@objc enum TrinsicErrorCode: Int {
-    case unknownError = 0
-    case userCancelled = 1
-    case couldNotAcquireRootViewController = 2
-    case unsupportedIosVersion = 3
-    case noRegisteredApplicationForLaunchUrl = 4
-    case unparsableLaunchUrl = 5
-    case missingSessionId = 6
-    case noSupportForiOSBelow12 = 7;
-    case emptyLaunchUrl = 8;
-    case emptyRedirectUrl = 9
-    case cannotReconstructLaunchUrl = 10
-    case unparsableCallbackUrl = 11
-}
-
-@objc class TrinsicError: NSObject {
-    @objc static func error(with code: TrinsicErrorCode, message: String? = nil) -> NSError {
-        let domain = "id.trinsic.TrinsicError"
-        let userInfo = [NSLocalizedDescriptionKey: message]
-        return NSError(domain: domain, code: code.rawValue, userInfo: userInfo)
-    }
-}
-
-@available(iOS 13.0, macOS 14.4, *)
-private class ASWebAuthenticationPresentationContextProvider : NSObject, ASWebAuthenticationPresentationContextProviding {
-    private weak var presentationAnchor: ASPresentationAnchor?
-    private let semaphore = DispatchSemaphore(value: 0)
-    
-#if canImport(UIKit)
-    public init(window: UIWindow? = nil) {
-        super.init()
-        DispatchQueue.main.async {
-            self.presentationAnchor = ASWebAuthenticationPresentationContextProvider.getPresentationAnchor(window: window)
-            self.semaphore.signal()
-        }
-    }
-    public static func getPresentationAnchor(window: UIWindow? = nil) -> ASPresentationAnchor {
-        //If an explicit option is provided, use those.
-        if let window = window {
-            return window
-        }
-        #if os(iOS)
-        if #available(iOS 13.0, *) {
-            //Iterate through scenes, on some iOS versions there are multiple windows
-            let scenes = UIApplication.shared.connectedScenes
-            
-            for scene in scenes {
-                if let windowScene = scene as? UIWindowScene {
-                    for window in windowScene.windows where window.isKeyWindow {
-                        return window
-                    }
-                }
-            }
-        }
-        return UIWindow()
-        
-        #elseif os(macOS)
-        return NSApplication.shared.windows.first
-        #endif
-    }
-#endif
-#if canImport(AppKit)
-    public override init() {
-        super.init()
-        DispatchQueue.main.async {
-            self.presentationAnchor = ASWebAuthenticationPresentationContextProvider.getPresentationAnchor()
-            self.semaphore.signal()
-        }
-    }
-    public static func getPresentationAnchor() -> ASPresentationAnchor {
-        return NSApplication.shared.windows.first!
-    }
-#endif
-    
-    public func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        semaphore.wait()
-        return self.presentationAnchor!;
-    }
-    
-    
-    
-    
-}
 
 @available(iOS 13.0, macOS 14.4, *)
 @objc public class TrinsicUI : NSObject {
-    private var presentationContextProvider: ASWebAuthenticationPresentationContextProvider
-    #if canImport(UIKit)
-    public init(window: UIWindow? = nil){
-        self.presentationContextProvider = ASWebAuthenticationPresentationContextProvider(window: window)
-        super.init()
+    private var presentationContextProvider: ASWebAuthenticationPresentationContextProviding
+    public override init(){
+        self.presentationContextProvider = TrinsicPresentationContextProvider()
     }
-    #else
-    public override init() {
-        self.presentationContextProvider = ASWebAuthenticationPresentationContextProvider()
-        super.init()
-    }
-    #endif
     
     @objc public func launchSession(launchUrl: String, callbackURL: String) async throws -> URL {
         return try await withCheckedThrowingContinuation( { continuation in
@@ -161,27 +66,7 @@ private class ASWebAuthenticationPresentationContextProvider : NSObject, ASWebAu
                             _session = ASWebAuthenticationSession(url: formattedLaunchUrl, callbackURLScheme: formattedLaunchUrl.scheme, completionHandler: completionHandler!)
                         }
                         let session = _session!
-#if canImport(UIKit)
-                        if #available(iOS 13, *) {
-                            do {
-                                session.presentationContextProvider = self.presentationContextProvider;
-                                //TODO
-                                //                if let preferEphemeral = options["preferEphemeral"] as? Bool {
-                                //                    session.prefersEphemeralWebBrowserSession = preferEphemeral
-                                //                }
-                            }
-                            catch {
-                                throw TrinsicError.error(with: .couldNotAcquireRootViewController, message: error.localizedDescription)
-                            }
-                            
-                        }
-#else
-                        let contextProvider = WebAuthenticationPresentationContextProvider()
-                        session.presentationContextProvider = contextProvider
-#endif
-                        
-                        //https://api.trinsic-development.com/api/session/launch?clientToken=2vBC1M9F7MT54vBgKUam4rTKMFLsuEaRoqpB9peg5xUnT1c5Ed68Jz9fAdnc1Yas31iU9YQaKdxkiGoHe7hXRmEjStkmuTNBUCMgeDdKFaiwwGK7S7XL38yjgAAoZ93bGjU286hCsWh6ozyft6Jmz289BTwxbM2JXqTnYnJ7CjmgQadgTwowpkeWHPjWgibgVKpbGujLHKLG8qs3eidbMzygbffXjoNNh1os4xYMwMF7PCQVyisZujfBXDdDfQwD4X9bwtrGfJBwWzRUhNxJffHkvq6bX2u5FY2sGWWBhiJQWzbeczN&sessionId=fe3173f0-5d80-4748-8dbc-98417d0cf03c&launchMode=mobile&redirectUrl=trinsic-ui-macos://custom-callback
-                        
+                        session.presentationContextProvider = self.presentationContextProvider;
                         session.start()
                         sessionToKeepAlive = session
                     } else {
@@ -269,15 +154,3 @@ private class ASWebAuthenticationPresentationContextProvider : NSObject, ASWebAu
         return "Hello from MyFramework!";
     }
 }
-#if canImport(AppKit)
-@available(macOS 14.4, *)
-class WebAuthenticationPresentationContextProvider: NSObject, ASWebAuthenticationPresentationContextProviding {
-    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        
-        // Return the window in which the authentication session should be presented
-        return NSApplication.shared.windows.first!
-        
-    
-    }
-}
-#endif
