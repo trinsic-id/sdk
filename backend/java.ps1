@@ -17,11 +17,12 @@ $additionalProperties = @{
 }
 & "$PSScriptRoot/generate-client.ps1" -language "java" -additionalProperties $additionalProperties
 
-# Remove the generated github action
-Remove-Item -Path "$PSScriptRoot/../.github/workflows/maven.yml" -Force
 
 try {
     Push-Location "$PSScriptRoot/../dist/java"
+
+    # Remove the auto-generated github action; our PAT doesn't let us push it and we don't need it
+    Remove-Item -Path ".github/workflows/maven.yml" -Force
 
     # OpenAPI generator doesn't generate archiveClassifier but we use gradle 8+ which requires it
     $buildGradleFile = "build.gradle"
