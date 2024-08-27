@@ -13,6 +13,7 @@ import Foundation
     case emptyRedirectUrl = 9
     case cannotReconstructLaunchUrl = 10
     case unparsableCallbackUrl = 11
+    case unparsableResultUrl = 12
 }
 
 @objc public class TrinsicError: NSObject {

@@ -18,7 +18,7 @@ import AppKit
         super.init()
     }
     
-    @objc public func launchSession(launchUrl: String, callbackURL: String) async throws -> URL {
+    @objc public func launchSession(launchUrl: String, callbackURL: String) async throws -> LaunchSessionResult {
         return try await withCheckedThrowingContinuation( { continuation in
             Task {
                 var completionHandler: ((URL?, Error?) -> Void)?
@@ -45,8 +45,7 @@ import AppKit
                             continuation.resume(throwing: TrinsicError.error(with: .unknownError))
                             return
                         }
-                        //TODO MAP TO REAL RETURN TYPE
-                        
+                        let result = parseUrl(url: url)
                         continuation.resume(returning: url)
                     }
                     
@@ -78,6 +77,39 @@ import AppKit
                 }
             }
         })
+    }
+    
+    private func parseUrl(url: URL) throws -> LaunchSessionResult {
+        // Parse launchUrl into a URLComponents object
+        guard var urlComponents = URLComponents(url: url) else {
+            throw TrinsicError.error(with: .unparsableResultUrl)
+        }
+        
+        var queryItems = urlComponents.queryItems ?? []
+
+        guard let successString = queryItems.first(where: { $0.name == "success" })?.value,
+            !successString.isEmpty,
+            let success = Bool(successString) else {
+            throw TrinsicError.error(with: .unparsableResultUrl)
+        }
+
+        guard let cancelledString = queryItems.first(where: { $0.name == "cancelled" })?.value,
+            !cancelledString.isEmpty,
+            let cancelled = Bool(cancelledString) else {
+            throw TrinsicError.error(with: .unparsableResultUrl)
+        }
+        
+        guard let sessionId = queryItems.first(where: { $0.name == "sessionId" })?.value,
+            !sessionId.isEmpty else {
+            throw TrinsicError.error(with: .unparsableResultUrl)
+        }
+        
+        guard let resultsAccessKey = queryItems.first(where: { $0.name == "resultsAccessKey" })?.value,
+            !resultsAccessKey.isEmpty else {
+            throw TrinsicError.error(with: .unparsableResultUrl)
+        }
+        let result = LaunchSessionResult.init(success: success, cancelled: cancelled, sessionId: sessionId, resultsAccessKey: resultsAccessKey)
+        return result
     }
     
     private func validateAndFormatLaunchUrl(launchUrl: String, callbackURL: String) throws -> (formattedLaunchUrl: URL, callbackURLScheme: String, callbackURLHost: String?, callbackURLPath: String?) {

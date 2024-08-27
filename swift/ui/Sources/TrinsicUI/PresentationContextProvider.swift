@@ -18,7 +18,7 @@ import Foundation
     public init(window: UIWindow? = nil) {
         super.init()
         DispatchQueue.main.async {
-            self.presentationAnchor = ASWebAuthenticationPresentationContextProvider.getPresentationAnchor(window: window)
+            self.presentationAnchor = TrinsicPresentationContextProvider.getPresentationAnchor(window: window)
             self.semaphore.signal()
         }
     }
