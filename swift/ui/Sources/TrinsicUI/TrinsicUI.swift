@@ -1,5 +1,6 @@
 import Foundation
 import AuthenticationServices
+
 //UIKit is only available on iOS
 #if canImport(UIKit)
 import UIKit
@@ -7,192 +8,111 @@ import UIKit
 #if canImport(AppKit)
 import AppKit
 #endif
-#if canImport(RTCBridge)
-import RTCBridge
-#endif
-
-
-@objc enum TrinsicErrorCode: Int {
-    case unknownError = 0
-    case userCancelled = 1
-    case couldNotAcquireRootViewController = 2
-    case unsupportedIosVersion = 3
-    case noRegisteredApplicationForLaunchUrl = 4
-    case unparsableLaunchUrl = 5
-    case missingSessionId = 6
-    case noSupportForiOSBelow12 = 7;
-    case emptyLaunchUrl = 8;
-    case emptyRedirectUrl = 9
-    case cannotReconstructLaunchUrl = 10
-    case unparsableCallbackUrl = 11
-}
-
-@objc class TrinsicError: NSObject {
-    @objc static func error(with code: TrinsicErrorCode, message: String? = nil) -> NSError {
-        let domain = "id.trinsic.TrinsicError"
-        let userInfo = [NSLocalizedDescriptionKey: message]
-        return NSError(domain: domain, code: code.rawValue, userInfo: userInfo)
-    }
-}
-
-@available(iOS 13.0, macOS 14.4, *)
-private class ASWebAuthenticationPresentationContextProvider : NSObject, ASWebAuthenticationPresentationContextProviding {
-    private weak var presentationAnchor: ASPresentationAnchor?
-    private let semaphore = DispatchSemaphore(value: 0)
-    
-#if canImport(UIKit)
-    public init(window: UIWindow? = nil) {
-        super.init()
-        DispatchQueue.main.async {
-            self.presentationAnchor = ASWebAuthenticationPresentationContextProvider.getPresentationAnchor(window: window)
-            self.semaphore.signal()
-        }
-    }
-    public static func getPresentationAnchor(window: UIWindow? = nil) -> ASPresentationAnchor {
-        //If an explicit option is provided, use those.
-        if let window = window {
-            return window
-        }
-        #if os(iOS)
-        if #available(iOS 13.0, *) {
-            //Iterate through scenes, on some iOS versions there are multiple windows
-            let scenes = UIApplication.shared.connectedScenes
-            
-            for scene in scenes {
-                if let windowScene = scene as? UIWindowScene {
-                    for window in windowScene.windows where window.isKeyWindow {
-                        return window
-                    }
-                }
-            }
-        }
-        return UIWindow()
-        
-        #elseif os(macOS)
-        return NSApplication.shared.windows.first
-        #endif
-    }
-#endif
-#if canImport(AppKit)
-    public override init() {
-        super.init()
-        DispatchQueue.main.async {
-            self.presentationAnchor = ASWebAuthenticationPresentationContextProvider.getPresentationAnchor()
-            self.semaphore.signal()
-        }
-    }
-    public static func getPresentationAnchor() -> ASPresentationAnchor {
-        return NSApplication.shared.windows.first!
-    }
-#endif
-    
-    public func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        semaphore.wait()
-        return self.presentationAnchor!;
-    }
-    
-    
-    
-    
-}
 
 @available(iOS 13.0, macOS 14.4, *)
 @objc public class TrinsicUI : NSObject {
-    private var presentationContextProvider: ASWebAuthenticationPresentationContextProvider
-    #if canImport(UIKit)
-    public init(window: UIWindow? = nil){
-        self.presentationContextProvider = ASWebAuthenticationPresentationContextProvider(window: window)
+    private var presentationContextProvider: ASWebAuthenticationPresentationContextProviding
+    public init(presentationContextProvider: ASWebAuthenticationPresentationContextProviding? = nil){
+        // Use a custom one if provided by library consumer, otherwise we will attempt to grab the correct presentation context.
+        self.presentationContextProvider = presentationContextProvider ?? TrinsicPresentationContextProvider()
         super.init()
     }
-    #else
-    public override init() {
-        self.presentationContextProvider = ASWebAuthenticationPresentationContextProvider()
-        super.init()
-    }
-    #endif
     
-    @objc public func launchSession(launchUrl: String, callbackURL: String) async throws -> URL {
+    
+    @objc public func launchSession(launchUrl: String, callbackURL: String) async throws -> LaunchSessionResult {
         return try await withCheckedThrowingContinuation( { continuation in
-            Task {
+            let task = Task {
                 var completionHandler: ((URL?, Error?) -> Void)?
+                var sessionToKeepAlive: Any? // if we do not keep the session alive, it will get closed immediately while showing the dialog
                 do {
                     let (formattedLaunchUrl, callbackURLScheme, callbackURLHost, callbackURLPath) = try self.validateAndFormatLaunchUrl(launchUrl: launchUrl, callbackURL: callbackURL)
-                    var sessionToKeepAlive: Any? // if we do not keep the session alive, it will get closed immediately while showing the dialog
+                    
                     completionHandler = { (url: URL?, err: Error?) in
                         completionHandler = nil
                         
-                        if (sessionToKeepAlive != nil) {
-                            (sessionToKeepAlive as! ASWebAuthenticationSession).cancel()
-                            sessionToKeepAlive = nil
+                        //Clean up resources, but if cancelled we should not as it's already deprovisioned
+                        if err == nil || (err as? ASWebAuthenticationSessionError)?.code != .canceledLogin {
+                            if (sessionToKeepAlive != nil) {
+                                (sessionToKeepAlive as! ASWebAuthenticationSession).cancel()
+                                sessionToKeepAlive = nil
+                            }
                         }
                         
                         if let err = err {
                             if case ASWebAuthenticationSessionError.canceledLogin = err {
-                                continuation.resume(throwing: TrinsicError.error(with: .userCancelled))
+                                continuation.resume(returning: LaunchSessionResult.init(success: false, cancelled: true, sessionId: nil, resultsAccessKey: nil))
                                 return;
                             }
-                            continuation.resume(throwing:  TrinsicError.error(with: .unknownError, message: err.localizedDescription))
-                            return
+                            else {
+                                
+                                continuation.resume(throwing:  TrinsicError.error(with: .unknownError, message: err.localizedDescription))
+                                return
+                            }
                         }
                         guard let url = url else {
                             continuation.resume(throwing: TrinsicError.error(with: .unknownError))
                             return
                         }
-                        
-                        continuation.resume(returning: url)
+                        let (result, parseError) = self.parseUrl(url: url)
+                        if let parseError = parseError {
+                            continuation.resume(throwing: parseError)
+                        }
+                        else if let result = result {
+                            continuation.resume(returning: result)
+                        }
+                        else {
+                            continuation.resume(throwing: TrinsicError.error(with: .unknownError))
+                        }
                     }
                     
-                    if #available(iOS 12, *) {
-                        var _session: ASWebAuthenticationSession? = nil
-                        if #available(iOS 17.4, *) {
-                            if (callbackURLScheme == "https") {
-                                guard let callbackURLHostChecked = callbackURLHost, !callbackURLHostChecked.isEmpty else {
-                                    throw TrinsicError.error(with: .unparsableLaunchUrl)
-                                }
-                                guard let callbackURLPathChecked = callbackURLPath, !callbackURLPathChecked.isEmpty else {
-                                    throw TrinsicError.error(with: .unparsableLaunchUrl)
-                                }
-                                
-                                _session = ASWebAuthenticationSession(url: formattedLaunchUrl, callback: ASWebAuthenticationSession.Callback.https(host: callbackURLHostChecked, path: callbackURLPathChecked), completionHandler: completionHandler!)
-                            } else {
-                                _session = ASWebAuthenticationSession(url: formattedLaunchUrl, callback: ASWebAuthenticationSession.Callback.customScheme(callbackURLScheme), completionHandler: completionHandler!)
-                            }
+                    var _session: ASWebAuthenticationSession? = nil
+                    if #available(iOS 17.4, *) {
+                        if (callbackURLScheme == "https") {
+                            //When appropriate we should investigate/dive deeper.
+                            throw TrinsicError.error(with: .unsupportedHttpsLinking)
                         } else {
-                            _session = ASWebAuthenticationSession(url: formattedLaunchUrl, callbackURLScheme: formattedLaunchUrl.scheme, completionHandler: completionHandler!)
+                            _session = ASWebAuthenticationSession(url: formattedLaunchUrl, callback: ASWebAuthenticationSession.Callback.customScheme(callbackURLScheme), completionHandler: completionHandler!)
                         }
-                        let session = _session!
-#if canImport(UIKit)
-                        if #available(iOS 13, *) {
-                            do {
-                                session.presentationContextProvider = self.presentationContextProvider;
-                                //TODO
-                                //                if let preferEphemeral = options["preferEphemeral"] as? Bool {
-                                //                    session.prefersEphemeralWebBrowserSession = preferEphemeral
-                                //                }
-                            }
-                            catch {
-                                throw TrinsicError.error(with: .couldNotAcquireRootViewController, message: error.localizedDescription)
-                            }
-                            
-                        }
-#else
-                        let contextProvider = WebAuthenticationPresentationContextProvider()
-                        session.presentationContextProvider = contextProvider
-#endif
-                        
-                        //https://api.trinsic-development.com/api/session/launch?clientToken=2vBC1M9F7MT54vBgKUam4rTKMFLsuEaRoqpB9peg5xUnT1c5Ed68Jz9fAdnc1Yas31iU9YQaKdxkiGoHe7hXRmEjStkmuTNBUCMgeDdKFaiwwGK7S7XL38yjgAAoZ93bGjU286hCsWh6ozyft6Jmz289BTwxbM2JXqTnYnJ7CjmgQadgTwowpkeWHPjWgibgVKpbGujLHKLG8qs3eidbMzygbffXjoNNh1os4xYMwMF7PCQVyisZujfBXDdDfQwD4X9bwtrGfJBwWzRUhNxJffHkvq6bX2u5FY2sGWWBhiJQWzbeczN&sessionId=fe3173f0-5d80-4748-8dbc-98417d0cf03c&launchMode=mobile&redirectUrl=trinsic-ui-macos://custom-callback
-                        
-                        session.start()
-                        sessionToKeepAlive = session
                     } else {
-                        throw TrinsicError.error(with: .noSupportForiOSBelow12)
+                        _session = ASWebAuthenticationSession(url: formattedLaunchUrl, callbackURLScheme: formattedLaunchUrl.scheme, completionHandler: completionHandler!)
                     }
+                    let session = _session!
+                    sessionToKeepAlive = session
+                    session.presentationContextProvider = self.presentationContextProvider;
+                    session.start()
                 }
                 catch {
                     continuation.resume(throwing: error)
                 }
             }
         })
+    }
+    
+    private func parseUrl(url: URL) -> (result: LaunchSessionResult?, parseError: Error?) {
+        // Parse launchUrl into a URLComponents object
+        guard var urlComponents = URLComponents(string: url.absoluteString) else {
+            return (result: nil, parseError: TrinsicError.error(with: .unparsableResultUrl))
+        }
+        
+        var queryItems = urlComponents.queryItems ?? []
+
+        guard let successString = queryItems.first(where: { $0.name == "success" })?.value,
+            !successString.isEmpty,
+            let success = Bool(successString) else {
+            return (result: nil, parseError: TrinsicError.error(with: .unparsableResultUrl))
+        }
+        
+        guard let sessionId = queryItems.first(where: { $0.name == "sessionId" })?.value,
+            !sessionId.isEmpty else {
+            return (result: nil, parseError: TrinsicError.error(with: .unparsableResultUrl))
+        }
+        
+        guard let resultsAccessKey = queryItems.first(where: { $0.name == "resultsAccessKey" })?.value,
+            !resultsAccessKey.isEmpty else {
+            return (result: nil, parseError: TrinsicError.error(with: .unparsableResultUrl))
+        }
+        let result = LaunchSessionResult.init(success: success, cancelled: false, sessionId: sessionId, resultsAccessKey: resultsAccessKey)
+        return (result: result, parseError: nil)
     }
     
     private func validateAndFormatLaunchUrl(launchUrl: String, callbackURL: String) throws -> (formattedLaunchUrl: URL, callbackURLScheme: String, callbackURLHost: String?, callbackURLPath: String?) {
@@ -262,22 +182,10 @@ private class ASWebAuthenticationPresentationContextProvider : NSObject, ASWebAu
             callbackPath = callbackURLParsed.path
         }
         
-        return (formattedLaunchUrl: updatedUrl, callbackURLScheme: callbackScheme, callbackURLPath: callbackPath, callbackURLHost: callbackHost)
+        return (formattedLaunchUrl: updatedUrl, callbackURLScheme: callbackScheme, callbackURLHost: callbackHost, callbackURLPath: callbackPath)
     }
     
     @objc public func sayHello() -> String {
         return "Hello from MyFramework!";
     }
 }
-#if canImport(AppKit)
-@available(macOS 14.4, *)
-class WebAuthenticationPresentationContextProvider: NSObject, ASWebAuthenticationPresentationContextProviding {
-    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        
-        // Return the window in which the authentication session should be presented
-        return NSApplication.shared.windows.first!
-        
-    
-    }
-}
-#endif

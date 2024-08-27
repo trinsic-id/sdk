@@ -1,10 +1,3 @@
-//
-//  ContentView.swift
-//  ui-ios-sample
-//
-//  Created by Jan-Pieter George on 8/21/24.
-//
-
 import SwiftUI
 import AuthenticationServices
 import TrinsicUI
@@ -13,8 +6,12 @@ import TrinsicUI
 struct ContentView: View {
     @State private var isButtonEnabled = false
     @State private var redirectedURL: URL?
+    // Pick between our default one presentationContextProvider
     let trinsicUI = TrinsicUI()
-    let startUrl =  "https://api.trinsic-development.com/connect/launch-test?authToken=CiVodHRwczovL3RyaW5zaWMuaWQvc2VjdXJpdHkvdjEvb2Jlcm9uEkkKK3Vybjp0cmluc2ljOndhbGxldHM6eldWcFpVdWJVV1ZaTHJZcXBUM1pTa3ciGnVybjp0cmluc2ljOmVjb3N5c3RlbXM6aWR2GjCV/9d67y0X9vdWRbL62YswBC8drOGXO/KQqBlZGRa0OUZ307fltCgpmOKWrP2UyqwiAA%3D%3D&idvProvierSelection=trinsicfake&noRedirect=true"
+    // Or a customized one that you can provide yourself
+    //let trinsicUI = TrinsicUI(presentationContextProvider: CustomContextProvider.init())
+    
+    let startUrl =  ""
     
     
     var body: some View {
@@ -32,7 +29,8 @@ struct ContentView: View {
             }
                 .disabled(!isButtonEnabled)
                 .onAppear {
-                    fetchData(from: startUrl) { result in
+                    //Change this to a function that gets a launch url from a backend you control
+                    fetchLaunchUrlFromTrinsicBackend(from: startUrl) { result in
                         switch result {
                         case .success(let content):
                             print("Got url \(content)");
@@ -49,17 +47,15 @@ struct ContentView: View {
     
     func handleButtonClick() async {
         do {
-            // Handle the button click, using redirectedURL if needed
             if let url = redirectedURL {
                 
                 print("Button clicked, opening: \(url)")
-                let window = getWindow()
-                guard window != nil else {
-                    return;
-                }
-                let resultUrl = try await trinsicUI.launchSession(launchUrl: url.absoluteString, callbackURL: "trinsic-ui-ios://custom-callback")
-                print("Result url \(resultUrl)")
-                // Call another function here if needed
+                
+                let result = try await trinsicUI.launchSession(launchUrl: url.absoluteString, callbackURL: "trinsic-ui-ios://custom-auth-callback/")
+                print("Success \(result.success)")
+                print("Cancelled \(result.cancelled)")
+                print("Session id \(String(describing: result.sessionId))")
+                print("Result key \(String(describing: result.resultsAccessKey))")
             }
         }
         catch {
@@ -67,22 +63,10 @@ struct ContentView: View {
         }
         
     }
-    
-    func getWindow() -> UIWindow? {
-        let scenes = UIApplication.shared.connectedScenes
-                
-                for scene in scenes {
-                    if let windowScene = scene as? UIWindowScene {
-                        for window in windowScene.windows where window.isKeyWindow {
-                            return window
-                        }
-                    }
-                }
-                return nil
-    }
 }
 
-func fetchData(from urlString: String, completion: @escaping (Result<String, Error>) -> Void) {
+//You should provide a backend function yourself that generates a launch url with your (protected) auth token. This is here for a Trinsic protected backend server to easily generate a test url, but you should not use that.
+func fetchLaunchUrlFromTrinsicBackend(from urlString: String, completion: @escaping (Result<String, Error>) -> Void) {
     guard let url = URL(string: urlString) else {
         completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])))
         return

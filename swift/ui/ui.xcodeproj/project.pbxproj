@@ -7,14 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		913CAF452C767A56003B7AA0 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913CAF442C767A56003B7AA0 /* Package.swift */; };
 		913CAF542C767C1C003B7AA0 /* TrinsicUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913CAF532C767C1C003B7AA0 /* TrinsicUI.swift */; };
+		915C6A282C7D5FB3000BC8B0 /* TrinsicError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915C6A272C7D5FB3000BC8B0 /* TrinsicError.swift */; };
+		915C6A2D2C7D6797000BC8B0 /* PresentationContextProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915C6A252C7D5F90000BC8B0 /* PresentationContextProvider.swift */; };
+		91F8779A2C7E456300CEF342 /* LaunchSessionResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F877992C7E456300CEF342 /* LaunchSessionResult.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		913CAF362C7677CB003B7AA0 /* ui.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ui.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		913CAF442C767A56003B7AA0 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		913CAF532C767C1C003B7AA0 /* TrinsicUI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrinsicUI.swift; sourceTree = "<group>"; };
+		915C6A252C7D5F90000BC8B0 /* PresentationContextProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresentationContextProvider.swift; sourceTree = "<group>"; };
+		915C6A272C7D5FB3000BC8B0 /* TrinsicError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrinsicError.swift; sourceTree = "<group>"; };
+		91F877992C7E456300CEF342 /* LaunchSessionResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchSessionResult.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,6 +62,9 @@
 			isa = PBXGroup;
 			children = (
 				913CAF532C767C1C003B7AA0 /* TrinsicUI.swift */,
+				915C6A252C7D5F90000BC8B0 /* PresentationContextProvider.swift */,
+				915C6A272C7D5FB3000BC8B0 /* TrinsicError.swift */,
+				91F877992C7E456300CEF342 /* LaunchSessionResult.swift */,
 			);
 			path = TrinsicUI;
 			sourceTree = "<group>";
@@ -140,8 +148,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				915C6A2D2C7D6797000BC8B0 /* PresentationContextProvider.swift in Sources */,
 				913CAF542C767C1C003B7AA0 /* TrinsicUI.swift in Sources */,
-				913CAF452C767A56003B7AA0 /* Package.swift in Sources */,
+				91F8779A2C7E456300CEF342 /* LaunchSessionResult.swift in Sources */,
+				915C6A282C7D5FB3000BC8B0 /* TrinsicError.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

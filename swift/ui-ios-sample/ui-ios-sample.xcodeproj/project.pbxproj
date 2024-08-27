@@ -12,6 +12,7 @@
 		913CAF232C7677B4003B7AA0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 913CAF222C7677B4003B7AA0 /* Assets.xcassets */; };
 		913CAF262C7677B4003B7AA0 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 913CAF252C7677B4003B7AA0 /* Preview Assets.xcassets */; };
 		915C6A232C7D0AC6000BC8B0 /* TrinsicUI in Frameworks */ = {isa = PBXBuildFile; productRef = 915C6A222C7D0AC6000BC8B0 /* TrinsicUI */; };
+		91FCE5D42C7E580900EA1AB4 /* CustomContextProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91FCE5D32C7E580900EA1AB4 /* CustomContextProvider.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +22,7 @@
 		913CAF222C7677B4003B7AA0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		913CAF252C7677B4003B7AA0 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		915C6A242C7D0E29000BC8B0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		91FCE5D32C7E580900EA1AB4 /* CustomContextProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomContextProvider.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +61,7 @@
 				913CAF202C7677B2003B7AA0 /* ContentView.swift */,
 				913CAF222C7677B4003B7AA0 /* Assets.xcassets */,
 				913CAF242C7677B4003B7AA0 /* Preview Content */,
+				91FCE5D32C7E580900EA1AB4 /* CustomContextProvider.swift */,
 			);
 			path = "ui-ios-sample";
 			sourceTree = "<group>";
@@ -147,6 +150,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				91FCE5D42C7E580900EA1AB4 /* CustomContextProvider.swift in Sources */,
 				913CAF212C7677B2003B7AA0 /* ContentView.swift in Sources */,
 				913CAF1F2C7677B2003B7AA0 /* ui_ios_sampleApp.swift in Sources */,
 			);
