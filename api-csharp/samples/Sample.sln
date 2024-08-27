@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample", "Sample\Sample.csproj", "{7228D373-BB40-4F6F-AFAE-2BE4CDD46182}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trinsic.Api", "..\..\dist\csharp\src\Trinsic.Api\Trinsic.Api.csproj", "{D87C9DA9-05DD-489C-BE94-3567682C791B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trinsic.Api", "..\..\dist\csharp\src\Trinsic.Api\Trinsic.Api.csproj", "{BDCCD9C7-58DD-43A5-B994-D10D7BA20A0E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,9 +14,9 @@ Global
 		{7228D373-BB40-4F6F-AFAE-2BE4CDD46182}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7228D373-BB40-4F6F-AFAE-2BE4CDD46182}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7228D373-BB40-4F6F-AFAE-2BE4CDD46182}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D87C9DA9-05DD-489C-BE94-3567682C791B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D87C9DA9-05DD-489C-BE94-3567682C791B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D87C9DA9-05DD-489C-BE94-3567682C791B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D87C9DA9-05DD-489C-BE94-3567682C791B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDCCD9C7-58DD-43A5-B994-D10D7BA20A0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDCCD9C7-58DD-43A5-B994-D10D7BA20A0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDCCD9C7-58DD-43A5-B994-D10D7BA20A0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDCCD9C7-58DD-43A5-B994-D10D7BA20A0E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

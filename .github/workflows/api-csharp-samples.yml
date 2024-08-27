@@ -12,7 +12,7 @@ jobs:
       - name: Install NPM dependencies
         run: npm ci
       - name: Generate backend SDK
-        run: ./backend/csharp.ps1
+        run: ./api-csharp/build-sdk.ps1
         shell: pwsh
       - name: Build sample
         run: dotnet build
