@@ -15,7 +15,7 @@
   "repositories": [
     {
       "type": "path",
-      "url": "../sdk/generated"
+      "url": "../sdk"
     }
   ]
 }

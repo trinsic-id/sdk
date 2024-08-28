@@ -3,4 +3,4 @@ fastapi
 pydantic
 load_dotenv
 uvicorn
-../sdk/generated
+../sdk/
