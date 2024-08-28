@@ -612,7 +612,3 @@ vendor
 sdk-build
 
 dist
-
-# Do not ignore the web-ui dist folder
-!ui-web/samples/dist
-!ui-web/samples/dist/assets/*.js.map
