@@ -2,10 +2,10 @@
   "backendVersion": "0.3",
   "nodePatchVersion": "0",
   "csharpPatchVersion": "0",
-  "javaPatchVersion": "9",
-  "goPatchVersion": "9",
+  "javaPatchVersion": "10",
+  "goPatchVersion": "10",
   "pythonPatchVersion": "1",
-  "phpPatchVersion": "9",
+  "phpPatchVersion": "10",
   "rubyPatchVersion": "0",
   "webPatchVersion": "0"
 }

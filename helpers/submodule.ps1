@@ -51,7 +51,6 @@ try {
 
     Write-Host "Copying source code to destination"
     Copy-Item -Path $sourceLocation/* -Destination $destinationLocation -Recurse -Force
-    return;
     Write-Host "Adding files to git"
     git add .
 
