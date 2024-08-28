@@ -41,6 +41,10 @@ jobs:
     with:
       publish: false
     secrets: inherit
+  api-php-samples:
+    name: Validate API PHP samples
+    needs: api-php
+    uses: ./.github/workflows/api-php-samples.yml
   api-python:
     name: Validate API Python SDK
     uses: ./.github/workflows/api-python-action.yml
