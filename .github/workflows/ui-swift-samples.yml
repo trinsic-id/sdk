@@ -1,0 +1,20 @@
+name: Build UI Swift SDK samples
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Ensure all history and tags are fetched
+      - name: Build iOS sample
+        run: swift build -v
+        working-directory: ./ui-swift/samples/iOS
+      - name: Build macOS sample
+        run: swift build -v
+        working-directory: ./ui-swift/samples/macOS
