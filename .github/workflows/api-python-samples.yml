@@ -14,9 +14,6 @@ jobs:
       - name: Generate backend SDK
         run: ./api-python/build-sdk.ps1
         shell: pwsh
-      - name: Install NPM dependncies for ui-web sample
-        run: npm ci
-        working-directory: ./ui-web/samples
       - name: Build ui-web sample
         run: npm run build
         working-directory: ./ui-web/samples
