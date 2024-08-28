@@ -8,7 +8,6 @@ $additionalProperties = @{
 & "$PSScriptRoot/../helpers/generate-client.ps1" -language "typescript-fetch" -outputFolder "$PSScriptRoot/sdk" -versionName "node" -additionalProperties $additionalProperties 
 
 try {
-    Write-Host "Installing npm dependencies of package..."
     Push-Location "$PSScriptRoot/sdk"
     & npm install
     & npm pack --pack-destination "$PSScriptRoot/sdk/publish"
