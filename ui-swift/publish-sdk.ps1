@@ -7,7 +7,7 @@ try {
     git config --global user.email "github-actions[bot]@users.noreply.github.com"
     
     # Commit and push to sub module
-    $remoteOrigin = "https://$githubPAT@github.com/sdk-swift-ui.git"
+    $remoteOrigin = "https://$githubPAT@github.com/trinsic-id/sdk-swift-ui.git"
     Write-Host "Setting origin to $remoteOrigin"
     git remote set-url origin $remoteOrigin
 
