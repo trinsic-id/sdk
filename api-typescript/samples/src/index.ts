@@ -45,7 +45,7 @@ app.get("/launch/:providerId", async (req: any, res: any) => {
 
 app.post("/create-session", async (req: any, res: any) => {
   const request: CreateSessionRequest = {};
-  const result = createSession(request);
+  const result = await createSession(request);
   res.send(result);
 });
 
