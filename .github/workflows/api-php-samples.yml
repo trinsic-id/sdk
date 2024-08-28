@@ -20,7 +20,7 @@ jobs:
         run: composer install
         working-directory: ./api-php/samples
       - name: Start PHP server
-        run: php -S localhost:8080 -t public
+        run: php -S localhost:8080 -t public &
         working-directory: ./api-php/samples
       - name: Wait to ensure server is up
         run: sleep 3
