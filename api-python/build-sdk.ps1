@@ -7,7 +7,7 @@ $additionalProperties = @{
 & "$PSScriptRoot/../helpers/generate-client.ps1" -language "python" -outputFolder "$PSScriptRoot/sdk" -additionalProperties $additionalProperties
 
 try {
-    Push-Location "$PSScriptRoot/sdk/generated"
+    Push-Location "$PSScriptRoot/sdk"
     # Check if 'python' is available
     $pythonPath = (Get-Command python -ErrorAction SilentlyContinue).Path
     $pipPath = (Get-Command pip -ErrorAction SilentlyContinue).Path
