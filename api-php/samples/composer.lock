@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "30eaf20651c51b0f6a5bd6647f012e9c",
+    "content-hash": "2aed5f8f01a9d77e9e2fdcae4ceb8a13",
     "packages": [
         {
             "name": "fig/http-message-util",
@@ -1500,11 +1500,11 @@
         },
         {
             "name": "trinsic/api",
-            "version": "0.3.2",
+            "version": "0.4.0",
             "dist": {
                 "type": "path",
-                "url": "../sdk/generated",
-                "reference": "ab90bec9dd3ffa9b87749c56796e4d4bdd44f1d8"
+                "url": "../sdk-build",
+                "reference": "4b1f01fdef95a109683b4276749c7f6aa345d5e9"
             },
             "require": {
                 "ext-curl": "*",
