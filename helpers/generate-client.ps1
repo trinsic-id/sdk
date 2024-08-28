@@ -13,6 +13,9 @@ param (
 if (-not (Test-Path -Path $outputFolder)) {
     New-Item -ItemType Directory -Path $outputFolder
 }
+if (-not (Test-Path -Path $outputFolder + "\publish")) {
+    New-Item -ItemType Directory -Path $outputFolder + "\publish"
+}
 
 $localSwaggerFilePath = "";
 if ($swaggerFileOrUrl -like "https://*") {
