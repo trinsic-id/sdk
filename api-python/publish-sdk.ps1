@@ -5,6 +5,6 @@ $env:TWINE_PASSWORD = "$env:PYPI_API_TOKEN"
 
 &pip install twine 1> $null
 
-&twine upload sdk/publish/*
+&twine upload api-python/sdk/publish/*
 
 Write-Host "Published to PyPi"
