@@ -19,5 +19,5 @@ jobs:
         run: ./api-go/build-sdk.ps1
         shell: pwsh
       - name: Build sample
-        run: go build -o go-sample
+        run: make build
         working-directory: ./api-go/samples
