@@ -15,7 +15,7 @@ try {
     # If we don't do this we're in a detached head state
     git checkout main
 
-    $version = &"$PSScriptRoot\..\get-version.ps1" -versionName "swiftUIVersion";
+    $packageVersion = &"$PSScriptRoot\..\get-version.ps1" -versionName "swiftUIVersion";
 
     # Define the path to the podspec file
     $podspecPath = "TrinsicUI.podspec"
@@ -24,13 +24,13 @@ try {
     $podspecContent = Get-Content $podspecPath
 
     # Update the version and tag in the podspec content
-    $updatedContent = $podspecContent -replace "s.version\s*=\s*'[\d\.]+'", "s.version          = '$version'"
-    $updatedContent = $updatedContent -replace "s.source\s*=\s*{ :git => '[^']+', :tag => 'v[\d\.]+' }", "s.source       = { :git => 'https://github.com/trinsic-id/sdk-swift-ui.git', :tag => 'v$version' }"
+    $updatedContent = $podspecContent -replace "s.version\s*=\s*'[\d\.]+'", "s.version          = '$packageVersion'"
+    $updatedContent = $updatedContent -replace "s.source\s*=\s*{ :git => '[^']+', :tag => 'v[\d\.]+' }", "s.source       = { :git => 'https://github.com/trinsic-id/sdk-swift-ui.git', :tag => 'v$packageVersion' }"
 
     # Write the updated content back to the podspec file
     $updatedContent | Set-Content $podspecPath
 
-    Write-Host "Podspec file updated with version $version."
+    Write-Host "Podspec file updated with version $packageVersion."
 
     Write-Host "Adding files to git"
     git add .
@@ -45,7 +45,7 @@ try {
         throw "Failed to push to submodule main"
     }
 
-    $tagName = "v$version"
+    $tagName = "v$packageVersion"
     git tag $tagName
     git push origin $tagName
 
