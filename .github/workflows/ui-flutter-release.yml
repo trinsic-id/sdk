@@ -1,4 +1,4 @@
-name: Release UI Flutter SDK"
+name: Release UI Flutter SDK
 
 on:
   workflow_dispatch:

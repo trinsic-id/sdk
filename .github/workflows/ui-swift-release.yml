@@ -1,0 +1,22 @@
+name: Release UI Swift SDK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    name: Publish
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: false
+      - name: Publish SDK
+        run: ./ui-swift/publish-sdk.ps1
+        shell: pwsh
+        env:
+          PAT_GITHUB: ${{ secrets.PAT_GITHUB }}
+          SDK_REPOSITORY_PATH: ${{ github.repository }}
+          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}

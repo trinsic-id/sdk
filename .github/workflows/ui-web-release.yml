@@ -1,4 +1,4 @@
-name: Release Web UI SDK
+name: Release UI Web SDK
 
 on:
   workflow_dispatch:
