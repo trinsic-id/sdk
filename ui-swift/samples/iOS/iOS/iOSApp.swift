@@ -1,14 +1,14 @@
 //
-//  ui_ios_sampleApp.swift
-//  ui-ios-sample
+//  iOSApp.swift
+//  iOS
 //
-//  Created by Jan-Pieter George on 8/21/24.
+//  Created by Jan-Pieter George on 8/28/24.
 //
 
 import SwiftUI
 
 @main
-struct ui_ios_sampleApp: App {
+struct iOSApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
