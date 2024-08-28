@@ -13,5 +13,10 @@ if (-not (Test-Path -Path $destination)) {
     New-Item -ItemType Directory -Force -Path $destination
 }
 
+$cwd = Get-Location
+cd $PSScriptRoot
+npm run build
+cd $cwd
+
 # Copy the dist directory recursively
 Copy-Item -Path "$PSScriptRoot/dist/*" -Destination $destination -Recurse -Force

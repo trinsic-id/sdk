@@ -18,7 +18,7 @@ func main() {
 
 	app := fiber.New()
 
-	app.Static("/", "../../ui-web/samples")
+	app.Static("/", "../../ui-web/samples/dist")
 
 	app.Get("/redirect", func(c *fiber.Ctx) error {
 		return c.Redirect("/redirect.html")

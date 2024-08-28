@@ -22,7 +22,7 @@ public class Main {
             System.exit(1);
         }
 
-        var webUiPath = Paths.get("../../ui-web/samples").normalize().toString();
+        var webUiPath = Paths.get("../../ui-web/samples/dist").normalize().toString();
 
         var apiClient = new ApiClient();
         apiClient.setRequestInterceptor(interceptor -> {

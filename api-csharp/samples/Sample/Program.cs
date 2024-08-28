@@ -17,8 +17,8 @@ var configuration = new Configuration()
 var networkApi = new NetworkApi(configuration);
 var sessionApi = new SessionsApi(configuration);
 
-app.MapGet("/", context => ServeFile(context, "../../../ui-web/samples/index.html"));
-app.MapGet("/redirect", context => ServeFile(context, "../../../ui-web/samples/redirect.html"));
+app.MapGet("/", context => ServeFile(context, "../../../ui-web/samples/dist/index.html"));
+app.MapGet("/redirect", context => ServeFile(context, "../../../ui-web/samples/dist/redirect.html"));
 
 app.MapGet("/providers", async context =>
 {
@@ -75,8 +75,8 @@ app.MapPost("/exchange-result", async context =>
 //Serve web sdk
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "../../../ui-web/samples/dist/ui-web")),
-    RequestPath = "/dist/ui-web"
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "../../../ui-web/samples/dist/assets")),
+    RequestPath = "/assets"
 });
 
 app.Run();
