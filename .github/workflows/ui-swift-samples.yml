@@ -31,5 +31,5 @@ jobs:
         run: xcodebuild -resolvePackageDependencies -project macOS.xcodeproj
         working-directory: ui-swift/samples/macOS
       - name: Build the project
-        run: xcodebuild -project macOS.xcodeproj -scheme macOS -sdk macosx -destination ''platform=macOS' build
+        run: xcodebuild -project macOS.xcodeproj -scheme macOS -sdk macosx -destination 'platform=macOS' build
         working-directory: ui-swift/samples/macOS
