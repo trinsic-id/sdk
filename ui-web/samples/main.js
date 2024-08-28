@@ -3,6 +3,8 @@ import { launchIframe, launchRedirect, launchPopup } from "@trinsic/web-ui";
 window.launchIframe = launchIframe;
 window.launchRedirect = launchRedirect;
 window.launchPopup = launchPopup;
+window.launchPopupMethod = launchPopupMethod;
+window.exchangeResult = exchangeResult;
 
 function enableButtons() {
   const elements = document.getElementsByClassName("launch-button");
