@@ -1,7 +1,12 @@
-import SwiftUI
-import AuthenticationServices
-import TrinsicUI
+//
+//  ContentView.swift
+//  iOS
+//
+//  Created by Jan-Pieter George on 8/28/24.
+//
 
+import SwiftUI
+import TrinsicUI
 
 struct ContentView: View {
     @State private var isButtonEnabled = false
@@ -10,10 +15,9 @@ struct ContentView: View {
     let trinsicUI = TrinsicUI()
     // Or a customized one that you can provide yourself
     //let trinsicUI = TrinsicUI(presentationContextProvider: CustomContextProvider.init())
-    
     let startUrl =  ""
-    
-    
+
+
     var body: some View {
         VStack {
             Image(systemName: "globe")
@@ -88,7 +92,6 @@ func fetchLaunchUrlFromTrinsicBackend(from urlString: String, completion: @escap
 
     task.resume()
 }
-
 #Preview {
     ContentView()
 }
