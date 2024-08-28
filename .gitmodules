@@ -7,3 +7,6 @@
 [submodule "api-php/sdk"]
 	path = api-php/sdk
 	url = https://github.com/trinsic-id/sdk-php-api
+[submodule "ui-swift/sdk"]
+	path = ui-swift/sdk
+	url = https://github.com/trinsic-id/sdk-swift-ui
