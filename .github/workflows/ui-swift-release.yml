@@ -1,11 +1,11 @@
-name: Build and Publish UI Swift SDK
+name: Release UI Swift SDK
 
 on:
-  workflow_call:
+  workflow_dispatch:
 
 jobs:
-  build_and_publish:
-    name: Build and Publish
+  release:
+    name: Publish
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
