@@ -60,7 +60,7 @@ try {
     # Update reference in main repo
     git add $destinationLocation
     git commit -m "Update ui-swift submodule reference to version $packageVersion"
-    git push origin main
+    git push origin jp/swift-library
     if ($LASTEXITCODE -ne 0) {
         throw "Failed to push to our main"
     }
