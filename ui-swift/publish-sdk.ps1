@@ -58,7 +58,7 @@ try {
     git remote set-url origin $remoteOrigin
 
     # Update reference in main repo
-    git add $destinationLocation
+    git add "ui-swift/sdk"
     git commit -m "Update ui-swift submodule reference to version $packageVersion"
     git push origin jp/swift-library
     if ($LASTEXITCODE -ne 0) {
