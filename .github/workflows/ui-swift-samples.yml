@@ -12,9 +12,15 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Ensure all history and tags are fetched
+      - name: Restore iOS Dependencies
+        run: swift package resolve
+        working-directory: ./ui-swift/samples/iOS
       - name: Build iOS sample
         run: swift build -v
         working-directory: ./ui-swift/samples/iOS
+      - name: Restore macOS Dependencies
+        run: swift package resolve
+        working-directory: ./ui-swift/samples/macOS
       - name: Build macOS sample
         run: swift build -v
         working-directory: ./ui-swift/samples/macOS
