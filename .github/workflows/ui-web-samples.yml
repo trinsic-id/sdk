@@ -11,6 +11,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install NPM dependencies
         run: npm ci
+      - name: Install NPM dependncies for ui-web sample
+        run: npm ci
+        working-directory: ./ui-web/samples
       - name: Build sample
         run: npm run build
         working-directory: ./ui-web/samples
