@@ -13,10 +13,6 @@ param (
 if (-not (Test-Path -Path $outputFolder)) {
     New-Item -ItemType Directory -Path $outputFolder
 }
-$publishFolder = Join-Path -Path $outputFolder -ChildPath "publish"
-if (-not (Test-Path -Path $publishFolder)) {
-    New-Item -ItemType Directory -Path $publishFolder
-}
 
 $localSwaggerFilePath = "";
 if ($swaggerFileOrUrl -like "https://*") {
@@ -47,6 +43,11 @@ if (Test-Path -Path $outputFolder -PathType Container) {
 else {
     New-Item -ItemType Directory -Path $outputFolder -ErrorAction Stop > $null 2>&1
     Write-Host "Created output folder";
+}
+
+$publishFolder = Join-Path -Path $outputFolder -ChildPath "publish"
+if (-not (Test-Path -Path $publishFolder)) {
+    New-Item -ItemType Directory -Path $publishFolder
 }
 
 $version = &"$PSScriptRoot\..\get-version.ps1" -versionName $versionName;

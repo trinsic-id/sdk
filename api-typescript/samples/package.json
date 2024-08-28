@@ -18,7 +18,7 @@
     "typescript": "5.5.4"
   },
   "dependencies": {
-    "@trinsic/api": "file:../sdk/generated",
+    "@trinsic/api": "file:../sdk",
     "express": "4.19.2"
   }
 }
