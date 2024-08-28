@@ -20,7 +20,7 @@ jobs:
         shell: pwsh
       - name: Setup Maven Local Repository
         run: mvn clean install
-        working-directory: ./api-java/sdk
+        working-directory: ./api-java/sdk-build
       - name: Build Sample
         run: mvn package
         working-directory: ./api-java/samples
