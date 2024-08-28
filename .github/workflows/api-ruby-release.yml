@@ -1,0 +1,14 @@
+name: Release API Ruby SDK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - jp/publish-python
+jobs:
+  release:
+    name: Publish Rubygems Package
+    uses: ./.github/workflows/api-ruby-action.yml
+    with:
+      publish: true
+    secrets: inherit

@@ -1,0 +1,16 @@
+name: Build Web UI SDK sample
+
+on:
+  workflow_call:
+
+jobs:
+  build_and_publish:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install NPM dependencies
+        run: npm ci
+      - name: Build sample
+        run: npm run build
+        working-directory: ./ui-web/samples

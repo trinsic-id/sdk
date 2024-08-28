@@ -1,0 +1,28 @@
+name: Build and Publish API CSharp SDK
+
+on:
+  workflow_call:
+    inputs:
+      publish:
+        type: boolean
+        required: false
+        default: false
+        description: "Publish the package, default is false"
+
+jobs:
+  build_and_publish:
+    name: Build and Publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install NPM dependencies
+        run: npm ci
+      - name: Generate SDK
+        run: ./api-csharp/build-sdk.ps1
+        shell: pwsh
+      - name: Publish SDK
+        if: inputs.publish == true
+        run: ./api-csharp/publish-sdk.ps1
+        shell: pwsh
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}

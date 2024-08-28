@@ -1,0 +1,26 @@
+name: Build API Java SDK sample
+
+on:
+  workflow_call:
+
+jobs:
+  build_and_publish:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+      - name: Install NPM dependencies
+        run: npm ci
+      - name: Generate backend SDK
+        run: ./api-java/build-sdk.ps1
+        shell: pwsh
+      - name: Setup Maven Local Repository
+        run: mvn clean install
+        working-directory: ./dist/java
+      - name: Build Sample
+        run: mvn package
+        working-directory: ./api-java/samples

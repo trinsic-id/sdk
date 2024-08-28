@@ -1,0 +1,17 @@
+{
+  "name": "@trinsic/web-ui-sample",
+  "version": "1.0.0",
+  "description": "Small sample showcasing different interaction modes of Trinsic's library",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm run-script copy-library",
+    "copy-library": "cd ../sdk && npm install && npm run build && cp dist/index.* ../samples/dist/ui-web && cd ../samples",
+    "prestart": "npm run-script copy-library",
+    "start": "live-server --cross"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "live-server": "1.2.2"
+  }
+}

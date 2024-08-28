@@ -1,0 +1,35 @@
+name: Build and Publish API Go SDK
+
+on:
+  workflow_call:
+    inputs:
+      publish:
+        type: boolean
+        required: false
+        default: false
+        description: "Publish the package, default is false"
+
+jobs:
+  build_and_publish:
+    name: Build and Publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: false
+      - name: Install NPM dependencies
+        run: npm ci
+      - name: Generate SDK
+        id: generate-sdk
+        run: ./api-go/build-sdk.ps1
+        shell: pwsh
+      - name: Publish SDK
+        if: inputs.publish == true
+        run: ./api-go/publish-sdk.ps1
+        shell: pwsh
+        env:
+          PAT_GITHUB: ${{ secrets.PAT_GITHUB }}
+          PACKAGE_VERSION: ${{ steps.generate-sdk.outputs.trinsic-package-version }}
+          SDK_REPOSITORY_PATH: ${{ github.repository }}

@@ -1,0 +1,12 @@
+name: Release API CSharp SDK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    name: Publish Nuget Package
+    uses: ./.github/workflows/api-csharp-action.yml
+    with:
+      publish: true
+    secrets: inherit
