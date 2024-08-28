@@ -49,7 +49,12 @@ try {
     git tag $tagName
     git push origin $tagName
 
-    # TODO: push to cocoa pods
+
+    $netrcContent = "machine https://github.com`nlogin engineering@trinsic.id`npassword $env:COCOAPODS_TRUNK_TOKEN"
+    $netrcContent | Out-File -FilePath $HOME/.netrc -Encoding utf8
+    chmod 600 $HOME/.netrc
+
+    pod trunk push ./TrinsicUI.podspec
 
     # Go back to main repo and update reference
     Set-Location "$PSScriptRoot/../"
@@ -60,7 +65,7 @@ try {
     # Update reference in main repo
     git add "ui-swift/sdk"
     git commit -m "Update ui-swift submodule reference to version $packageVersion"
-    git push origin jp/swift-library
+    git push origin main
     if ($LASTEXITCODE -ne 0) {
         throw "Failed to push to our main"
     }

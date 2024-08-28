@@ -21,3 +21,4 @@ jobs:
         env:
           PAT_GITHUB: ${{ secrets.PAT_GITHUB }}
           SDK_REPOSITORY_PATH: ${{ github.repository }}
+          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
