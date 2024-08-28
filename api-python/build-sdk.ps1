@@ -7,7 +7,7 @@ $additionalProperties = @{
 & "$PSScriptRoot/../helpers/generate-client.ps1" -language "python" -outputFolder "$PSScriptRoot/sdk" -additionalProperties $additionalProperties
 
 try {
-    Push-Location "$PSScriptRoot/sdk"
+    Push-Location "$PSScriptRoot/sdk/generated"
     # Check if 'python' is available
     $pythonPath = (Get-Command python -ErrorAction SilentlyContinue).Path
     $pipPath = (Get-Command pip -ErrorAction SilentlyContinue).Path
@@ -25,7 +25,7 @@ try {
     }
 
     # Execute the Python script using the found interpreter
-    & $pythonPath setup.py sdist --dist-dir "$PSScriptRoot/sdk/publish" bdist_wheel --dist-dir "$PSScriptRoot/../dist/publish"
+    & $pythonPath setup.py sdist --dist-dir "$PSScriptRoot/sdk/publish" bdist_wheel --dist-dir "$PSScriptRoot/sdk/publish"
     & $pipPath install .
 }
 finally {

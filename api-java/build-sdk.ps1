@@ -19,7 +19,7 @@ $additionalProperties = @{
 
 
 try {
-    Push-Location "$PSScriptRoot/sdk"
+    Push-Location "$PSScriptRoot/sdk/generated"
 
     # Remove the auto-generated github action; our PAT doesn't let us push it and we don't need it
     Remove-Item -Path ".github/workflows/maven.yml" -Force

@@ -11,7 +11,7 @@ $additionalProperties = @{
 & "$PSScriptRoot/../helpers/generate-client.ps1" -language "ruby" -outputFolder "$PSScriptRoot/sdk" -additionalProperties $additionalProperties
 
 try {
-    Push-Location "$PSScriptRoot/sdk"
+    Push-Location "$PSScriptRoot/sdk/generated"
     &gem build trinsic_api.gemspec
     
     # Move a file with .gem file extension to the another directory without specifying the exact filename

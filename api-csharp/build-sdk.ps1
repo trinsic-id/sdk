@@ -11,7 +11,7 @@ $additionalProperties = @{
 & "$PSScriptRoot/../helpers/generate-client.ps1" -language "csharp" -outputFolder "$PSScriptRoot/sdk" -additionalProperties $additionalProperties
 
 try {
-    Push-Location "$PSScriptRoot/sdk"
+    Push-Location "$PSScriptRoot/sdk/generated"
     & dotnet restore
     & dotnet build --configuration Release --no-restore
     & dotnet pack --configuration Release --no-build --no-restore --include-source --include-symbols -p:SymbolPackageFormat=snupkg --output "$PSScriptRoot/sdk/publish"

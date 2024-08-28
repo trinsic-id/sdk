@@ -608,3 +608,4 @@ doc/api/
 .flutter-plugins-dependencies
 
 */sdk/publish/
+*/sdk/generated/
