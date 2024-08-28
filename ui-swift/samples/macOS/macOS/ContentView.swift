@@ -9,7 +9,7 @@ struct ContentView: View {
     // Or a customized one that you can provide yourself
     //let trinsicUI = TrinsicUI(presentationContextProvider: CustomContextProvider.init())
     let startUrl =  ""
-    
+
     var body: some View {
         VStack {
             Image(systemName: "globe")
@@ -39,9 +39,8 @@ struct ContentView: View {
             }
                     
         }
-    .padding()
+        .padding()
     }
-    
     func handleButtonClick() async {
         do {
             if let url = redirectedURL {
@@ -58,7 +57,6 @@ struct ContentView: View {
         catch {
             print("Error: \(error)")
         }
-        
     }
 }
 
@@ -85,6 +83,7 @@ func fetchLaunchUrlFromTrinsicBackend(from urlString: String, completion: @escap
 
     task.resume()
 }
+
 #Preview {
     ContentView()
 }

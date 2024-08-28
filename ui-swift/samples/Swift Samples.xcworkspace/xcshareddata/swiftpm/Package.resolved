@@ -1,0 +1,15 @@
+{
+  "originHash" : "585e3c21edabeba9f9ba555a09b0f953e800d83746add7ebc3d7dedeb21e8244",
+  "pins" : [
+    {
+      "identity" : "sdk-swift-ui",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/trinsic-id/sdk-swift-ui",
+      "state" : {
+        "branch" : "main",
+        "revision" : "9cb0c6c8f47f82a264e5a86f7af01daccfa858eb"
+      }
+    }
+  ],
+  "version" : 3
+}
