@@ -49,12 +49,10 @@ try {
     git tag $tagName
     git push origin $tagName
 
-
     $netrcContent = "machine https://github.com`nlogin engineering@trinsic.id`npassword $Env:COCOAPODS_TRUNK_TOKEN"
     $netrcContent | Out-File -FilePath $HOME/.netrc -Encoding utf8
     chmod 600 $HOME/.netrc
 
-    pod trunk push ./TrinsicUI.podspec
     $netrcContent = Get-Content -Path $HOME/.netrc
     Write-Host "Contents of .netrc file: $netrcContent"
 
