@@ -1,0 +1,9 @@
+[submodule "api-java/sdk"]
+	path = api-java/sdk
+	url = https://github.com/trinsic-id/sdk-java-api
+[submodule "api-go/sdk"]
+	path = api-go/sdk
+	url = https://github.com/trinsic-id/sdk-go-api
+[submodule "api-php/sdk"]
+	path = api-php/sdk
+	url = https://github.com/trinsic-id/sdk-php-api

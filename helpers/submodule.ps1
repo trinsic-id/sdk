@@ -1,7 +1,5 @@
 param(
     [Parameter(Mandatory = $true)]
-    [string]$sourceLocation,
-    [Parameter(Mandatory = $true)]
     [string]$destinationLocation,
     [Parameter(Mandatory = $true)]
     [string]$githubPAT,
@@ -16,10 +14,6 @@ param(
     [Parameter(Mandatory = $false)]
     [string]$tagPrefix = 'v'
 )
-
-if (-not (Test-Path -Path $sourceLocation -PathType Container)) {
-    throw "The source location '$sourceLocation' does not exist."
-}
 
 if (-not (Test-Path -Path $destinationLocation -PathType Container)) {
     throw "The destination location '$destinationLocation' does not exist."
@@ -40,9 +34,6 @@ try {
     # If we don't do this we're in a detached head state
     git checkout main
 
-    Write-Host "Copying source code to destination"
-    Copy-Item -Path $sourceLocation/* -Destination $destinationLocation -Recurse -Force
-    
     Write-Host "Adding files to git"
     git add .
     Write-Host "Committing files"
