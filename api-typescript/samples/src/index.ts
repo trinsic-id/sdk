@@ -10,7 +10,6 @@ const app = express();
 const PORT = 3000;
 
 //We run with self-signed certificates on localhost :)
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const newConfiguration = new Configuration({
   accessToken: process.env.TRINSIC_ACCESS_TOKEN!,
 });

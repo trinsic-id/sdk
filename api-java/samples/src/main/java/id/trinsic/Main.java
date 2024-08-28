@@ -15,14 +15,14 @@ import java.util.Arrays;
 public class Main {
     public static void main(String[] args) {
         var dotenv = Dotenv.load();
-        var authToken = dotenv.get("TRINSIC_AUTH_TOKEN");
+        var authToken = dotenv.get("TRINSIC_ACCESS_TOKEN");
 
         if (authToken == null) {
-            System.err.println("TRINSIC_AUTH_TOKEN is not set");
+            System.err.println("TRINSIC_ACCESS_TOKEN is not set");
             System.exit(1);
         }
 
-        var webUiPath = Paths.get("../web-ui").normalize().toString();
+        var webUiPath = Paths.get("../../ui-web/samples").normalize().toString();
 
         var apiClient = new ApiClient();
         apiClient.setRequestInterceptor(interceptor -> {

@@ -11,7 +11,7 @@ use Trinsic\Api\Model\CreateSessionResponse as CreateSessionResponse;
 use Trinsic\Api\Model\GetSessionResultRequest as GetSessionResultRequest;
 
 $config = new Configuration();
-$config->setAccessToken($_ENV['TRINSIC_AUTH_TOKEN']);
+$config->setAccessToken($_ENV['TRINSIC_ACCESS_TOKEN']);
 
 $network = new NetworkApi(null, $config);
 $sessions = new SessionsApi(null, $config);

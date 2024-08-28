@@ -11,14 +11,14 @@ import (
 var api *trinsic_api.APIClient
 
 func main() {
-	authToken := os.Getenv("TRINSIC_AUTH_TOKEN")
+	authToken := os.Getenv("TRINSIC_ACCESS_TOKEN")
 	config := trinsic_api.NewConfiguration()
 	config.AddDefaultHeader("Authorization", "Bearer "+authToken)
 	api = trinsic_api.NewAPIClient(config)
 
 	app := fiber.New()
 
-	app.Static("/", "../web-ui")
+	app.Static("/", "../../ui-web/samples")
 
 	app.Get("/redirect", func(c *fiber.Ctx) error {
 		return c.Redirect("/redirect.html")

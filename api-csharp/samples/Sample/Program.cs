@@ -3,6 +3,8 @@ using Trinsic.Api.Api;
 using Trinsic.Api.Client;
 using Trinsic.Api.Model;
 
+DotNetEnv.Env.Load();
+
 var builder = WebApplication.CreateBuilder(args);
 
 var app = builder.Build();
@@ -15,8 +17,8 @@ var configuration = new Configuration()
 var networkApi = new NetworkApi(configuration);
 var sessionApi = new SessionsApi(configuration);
 
-app.MapGet("/", context => ServeFile(context, "../../web-ui/index.html"));
-app.MapGet("/redirect", context => ServeFile(context, "../../web-ui/redirect.html"));
+app.MapGet("/", context => ServeFile(context, "../../../ui-web/samples/index.html"));
+app.MapGet("/redirect", context => ServeFile(context, "../../../ui-web/samples/redirect.html"));
 
 app.MapGet("/providers", async context =>
 {
@@ -53,10 +55,7 @@ app.MapPost("/exchange-result", async context =>
         var request = await context.Request.ReadFromJsonAsync<ExchangeResultRequest>();
 
         // Call the method to exchange the results key
-        var result = await sessionApi.GetSessionResultAsync(request.SessionId, new GetSessionResultRequest()
-        {
-            ResultsAccessKey = request.ResultsAccessKey
-        });
+        var result = await sessionApi.GetSessionResultAsync(request.SessionId, new GetSessionResultRequest(request.ResultsAccessKey));
 
         // Return the result as JSON
         await context.Response.WriteAsJsonAsync(result);
@@ -76,8 +75,8 @@ app.MapPost("/exchange-result", async context =>
 //Serve web sdk
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "../../web/dist/web-ui")),
-    RequestPath = "/dist/web-ui"
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "../../../ui-web/samples/dist/ui-web")),
+    RequestPath = "/dist/ui-web"
 });
 
 app.Run();
