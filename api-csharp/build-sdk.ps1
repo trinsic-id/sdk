@@ -8,13 +8,13 @@ $additionalProperties = @{
     validatable                              = "false"
     disallowAdditionalPropertiesIfNotPresent = "false"
 }
-& "$PSScriptRoot/../helpers/generate-client.ps1" -language "csharp" -additionalProperties $additionalProperties
+& "$PSScriptRoot/../helpers/generate-client.ps1" -language "csharp" -outputFolder "$PSScriptRoot/sdk" -additionalProperties $additionalProperties
 
 try {
-    Push-Location "$PSScriptRoot/../dist/csharp"
+    Push-Location "$PSScriptRoot/sdk"
     & dotnet restore
     & dotnet build --configuration Release --no-restore
-    & dotnet pack --configuration Release --no-build --no-restore --include-source --include-symbols -p:SymbolPackageFormat=snupkg --output "$PSScriptRoot/../dist/publish"
+    & dotnet pack --configuration Release --no-build --no-restore --include-source --include-symbols -p:SymbolPackageFormat=snupkg --output "$PSScriptRoot/sdk/publish"
 }
 finally {
     Pop-Location

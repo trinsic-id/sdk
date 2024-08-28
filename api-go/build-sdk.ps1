@@ -3,9 +3,9 @@ $additionalProperties = @{
     packageVersion                           = "[VERSION]"
     disallowAdditionalPropertiesIfNotPresent = "false"
 }
-& "$PSScriptRoot/../helpers/generate-client.ps1" -language "go" -additionalProperties $additionalProperties
+& "$PSScriptRoot/../helpers/generate-client.ps1" -language "go" -outputFolder "$PSScriptRoot/sdk" -additionalProperties $additionalProperties
 try {
-    Push-Location "$PSScriptRoot/../dist/go"
+    Push-Location "$PSScriptRoot/sdk"
     $goModFile = "go.mod"
     $goModFileContent = Get-Content -Path $goModFile
     $goModFileContent = $goModFileContent -replace "/GIT_USER_ID/GIT_REPO_ID", "/trinsic-id/sdk-go-api"

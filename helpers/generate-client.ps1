@@ -4,10 +4,15 @@ param (
     [string]$language,
     [string]$versionName = $language,
     [string]$swaggerFileOrUrl = "https://api.trinsic.id/swagger/api/swagger.json",
-    [string]$outputFolder = "$PSScriptRoot/../dist/$language",
+    [Parameter(Mandatory = $true)]
+    [string]$outputFolder,
     [Parameter(Mandatory = $true)]
     [hashtable]$additionalProperties
 )
+
+if (-not (Test-Path -Path $outputFolder)) {
+    New-Item -ItemType Directory -Path $outputFolder
+}
 
 $localSwaggerFilePath = "";
 if ($swaggerFileOrUrl -like "https://*") {

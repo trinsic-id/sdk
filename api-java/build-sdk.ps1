@@ -15,11 +15,11 @@ $additionalProperties = @{
     developerOrganizationUrl = "https://trinsic.id"
     artifactDescription      = "Trinsic"
 }
-& "$PSScriptRoot/../helpers/generate-client.ps1" -language "java" -additionalProperties $additionalProperties
+& "$PSScriptRoot/../helpers/generate-client.ps1" -language "java" -outputFolder "$PSScriptRoot/sdk" -additionalProperties $additionalProperties
 
 
 try {
-    Push-Location "$PSScriptRoot/../dist/java"
+    Push-Location "$PSScriptRoot/sdk"
 
     # Remove the auto-generated github action; our PAT doesn't let us push it and we don't need it
     Remove-Item -Path ".github/workflows/maven.yml" -Force
