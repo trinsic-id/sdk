@@ -83,3 +83,7 @@ jobs:
     name: Validate Java sample
     needs: java
     uses: ./.github/workflows/samples-java.yml
+  samples-php:
+    name: Validate php sample
+    needs: php
+    uses: ./.github/workflows/samples-php.yml
