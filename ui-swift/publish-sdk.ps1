@@ -49,12 +49,17 @@ try {
     git tag $tagName
     git push origin $tagName
 
-
-    $netrcContent = "machine https://github.com`nlogin engineering@trinsic.id`npassword $env:COCOAPODS_TRUNK_TOKEN"
+    $netrcContent = "machine https://github.com`nlogin engineering@trinsic.id`npassword $Env:COCOAPODS_TRUNK_TOKEN"
     $netrcContent | Out-File -FilePath $HOME/.netrc -Encoding utf8
     chmod 600 $HOME/.netrc
 
-    pod trunk push ./TrinsicUI.podspec
+    Write-Host "Pushing to CocoaPods trunk"
+
+    pod trunk push TrinsicUI.podspec
+
+    if ($LASTEXITCODE -ne 0) {
+        throw "Failed to push to CocoaPods trunk"
+    }
 
     # Go back to main repo and update reference
     Set-Location "$PSScriptRoot/../"

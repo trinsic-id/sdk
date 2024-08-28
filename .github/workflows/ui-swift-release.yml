@@ -2,8 +2,6 @@ name: Build and Publish UI Swift SDK
 
 on:
   workflow_call:
-  push:
-    branches: ["jp/swift-library"]
 
 jobs:
   build_and_publish:
