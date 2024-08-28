@@ -1,5 +1,7 @@
 param(
     [Parameter(Mandatory = $true)]
+    [string]$sourceLocation,
+    [Parameter(Mandatory = $true)]
     [string]$destinationLocation,
     [Parameter(Mandatory = $true)]
     [string]$githubPAT,
@@ -18,7 +20,9 @@ param(
 if (-not (Test-Path -Path $destinationLocation -PathType Container)) {
     throw "The destination location '$destinationLocation' does not exist."
 }
-
+if (-not (Test-Path -Path $sourceLocation -PathType Container)) {
+    throw "The source location '$sourceLocation' does not exist."
+}
 try {
     Set-Location $destinationLocation
 
@@ -34,8 +38,15 @@ try {
     # If we don't do this we're in a detached head state
     git checkout main
 
+    git rm -r --cached .
+    git clean -fdx
+
+    Write-Host "Copying source code to destination"
+    Copy-Item -Path $sourceLocation/* -Destination $destinationLocation -Recurse -Force
+    return;
     Write-Host "Adding files to git"
     git add .
+
     Write-Host "Committing files"
     git commit -m "Publishing latest $name package for version $packageVersion"
     
