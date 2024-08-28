@@ -19,4 +19,4 @@ require (
 	golang.org/x/sys v0.24.0 // indirect
 )
 
-replace github.com/trinsic-id/sdk-go-api => ../sdk
+replace github.com/trinsic-id/sdk-go-api => ../sdk-build
