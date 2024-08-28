@@ -8,7 +8,7 @@ try {
 
     & npm run build
     
-    & npm pack --pack-destination "$PSScriptRoot/../dist/publish"
+    & npm pack --pack-destination "$PSScriptRoot/sdk/publish"
 }
 finally {
     Pop-Location
