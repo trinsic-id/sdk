@@ -5,9 +5,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  ios:
     runs-on: macos-latest
-
     steps:
       - uses: actions/checkout@v4
         with:
@@ -18,5 +17,19 @@ jobs:
         run: xcodebuild -resolvePackageDependencies -project iOS.xcodeproj
         working-directory: ui-swift/samples/iOS
       - name: Build the project
-        run: xcodebuild -project iOS.xcodeproj -scheme iOS -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 12,OS=latest' build -allowProvisioningUpdates
+        run: xcodebuild -project iOS.xcodeproj -scheme iOS -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 12,OS=latest' build
         working-directory: ui-swift/samples/iOS
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Ensure all history and tags are fetched
+      - name: Set up Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+      - name: Install Dependencies
+        run: xcodebuild -resolvePackageDependencies -project macOS.xcodeproj
+        working-directory: ui-swift/samples/macOS
+      - name: Build the project
+        run: xcodebuild -project macOS.xcodeproj -scheme macOS -sdk macosx -destination ''platform=macOS,arch=x86_64' build
+        working-directory: ui-swift/samples/macOS
