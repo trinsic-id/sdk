@@ -1,10 +1,3 @@
-//
-//  CustomContextProvider.swift
-//  ui-ios-sample
-//
-//  Created by Jan-Pieter George on 8/27/24.
-//
-
 import Foundation
 import AuthenticationServices
 import UIKit
