@@ -54,7 +54,16 @@ try {
     $netrcContent | Out-File -FilePath $HOME/.netrc -Encoding utf8
     chmod 600 $HOME/.netrc
 
-    pod trunk push ./TrinsicUI.podspec
+    $netrcContent = Get-Content -Path $HOME/.netrc
+    Write-Host "Contents of .netrc file: $netrcContent"
+
+    Write-Host "Pushing to CocoaPods trunk"
+
+    pod trunk push TrinsicUI.podspec
+
+    if ($LASTEXITCODE -ne 0) {
+        throw "Failed to push to CocoaPods trunk"
+    }
 
     # Go back to main repo and update reference
     Set-Location "$PSScriptRoot/../"
