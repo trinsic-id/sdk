@@ -53,9 +53,6 @@ try {
     $netrcContent | Out-File -FilePath $HOME/.netrc -Encoding utf8
     chmod 600 $HOME/.netrc
 
-    $netrcContent = Get-Content -Path $HOME/.netrc
-    Write-Host "Contents of .netrc file: $netrcContent"
-
     Write-Host "Pushing to CocoaPods trunk"
 
     pod trunk push TrinsicUI.podspec
