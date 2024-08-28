@@ -608,3 +608,5 @@ doc/api/
 .flutter-plugins-dependencies
 
 go-sample
+
+vendor
