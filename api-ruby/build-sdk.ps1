@@ -8,16 +8,16 @@ $additionalProperties = @{
     gemVersion     = "[VERSION]"
     moduleName     = "TrinsicApi"
 }
-& "$PSScriptRoot/../helpers/generate-client.ps1" -language "ruby" -additionalProperties $additionalProperties
+& "$PSScriptRoot/../helpers/generate-client.ps1" -language "ruby" -outputFolder "$PSScriptRoot/sdk" -additionalProperties $additionalProperties
 
 try {
-    Push-Location "$PSScriptRoot/../dist/ruby"
+    Push-Location "$PSScriptRoot/sdk/generated"
     &gem build trinsic_api.gemspec
     
     # Move a file with .gem file extension to the another directory without specifying the exact filename
-    Move-Item -Path *.gem -Destination "$PSScriptRoot/../dist/publish" -Force
+    Move-Item -Path *.gem -Destination "$PSScriptRoot/sdk/publish" -Force
     
-    $gemFile = Get-ChildItem -Path "$PSScriptRoot/../dist/publish" -Filter *.gem
+    $gemFile = Get-ChildItem -Path "$PSScriptRoot/sdk/publish" -Filter *.gem
     Write-Host "Installing $gemFile"
     &gem install $gemFile --user-install   
 }

@@ -3,7 +3,7 @@ Write-Host "Setting npm token"
 
 &npm whoami
 try {
-    Set-Location "$PSScriptRoot/../dist/publish"
+    Set-Location "$PSScriptRoot/sdk/publish"
     Write-Host "Publishing packages"
     foreach ($package in Get-ChildItem -Filter "trinsic-web-ui-*.tgz") {
         Write-Host "Publishing $package"

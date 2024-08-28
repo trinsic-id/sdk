@@ -1,4 +1,4 @@
-$sourceLocation = "$PSScriptRoot/../dist/go"
+$sourceLocation = "$PSScriptRoot/sdk"
 $destinationLocation = "$PSScriptRoot/../go"
 $repositoryPath = "trinsic-id/sdk-go-api"
 $name = "Go"

@@ -4,10 +4,23 @@ param (
     [string]$language,
     [string]$versionName = $language,
     [string]$swaggerFileOrUrl = "https://api.trinsic.id/swagger/api/swagger.json",
-    [string]$outputFolder = "$PSScriptRoot/../dist/$language",
+    [Parameter(Mandatory = $true)]
+    [string]$outputFolder,
     [Parameter(Mandatory = $true)]
     [hashtable]$additionalProperties
 )
+
+if (-not (Test-Path -Path $outputFolder)) {
+    New-Item -ItemType Directory -Path $outputFolder
+}
+$outputGeneratedFolder = Join-Path -Path $outputFolder -ChildPath "generated"
+if (-not (Test-Path -Path $outputGeneratedFolder)) {
+    New-Item -ItemType Directory -Path $outputGeneratedFolder
+}
+$publishFolder = Join-Path -Path $outputFolder -ChildPath "publish"
+if (-not (Test-Path -Path $publishFolder)) {
+    New-Item -ItemType Directory -Path $publishFolder
+}
 
 $localSwaggerFilePath = "";
 if ($swaggerFileOrUrl -like "https://*") {
@@ -30,13 +43,13 @@ else {
 }
 
 
-if (Test-Path -Path $outputFolder -PathType Container) {
-    Write-Host "Cleaning up output folder $outputFolder";
-    Remove-Item -Recurse -Force $outputFolder;
-    Write-Host "Cleaned up destination folder $outputFolder";
+if (Test-Path -Path $outputGeneratedFolder -PathType Container) {
+    Write-Host "Cleaning up output folder $outputGeneratedFolder";
+    Remove-Item -Recurse -Force $outputGeneratedFolder;
+    Write-Host "Cleaned up destination folder $outputGeneratedFolder";
 }
 else {
-    New-Item -ItemType Directory -Path $outputFolder -ErrorAction Stop > $null 2>&1
+    New-Item -ItemType Directory -Path $outputGeneratedFolder -ErrorAction Stop > $null 2>&1
     Write-Host "Created output folder";
 }
 
@@ -47,16 +60,16 @@ $concatenatedAdditionalProperties = (($additionalProperties.GetEnumerator() | Fo
             "$($_.Key)=$($_.Value -replace "\[VERSION\]", $version)"
         }) -join ',');
 
-Write-Host "Generating $language SDK from $localSwaggerFilePath in $outputFolder with additional properties: $concatenatedAdditionalProperties";
+Write-Host "Generating $language SDK from $localSwaggerFilePath in $outputGeneratedFolder with additional properties: $concatenatedAdditionalProperties";
 
 & npx --yes openapi-generator-cli generate `
     -i "$localSwaggerFilePath" `
     -g "$language" `
-    -o $outputFolder `
+    -o $outputGeneratedFolder `
     --additional-properties=$concatenatedAdditionalProperties 1> $null
 
 if ($LASTEXITCODE -ne 0) {
-    throw "Failed to generate SDK for $language from $localSwaggerFilePath to $outputFolder."
+    throw "Failed to generate SDK for $language from $localSwaggerFilePath to $outputGeneratedFolder."
 }
 
-Write-Host "Generated $language SDK $outputFolder";
+Write-Host "Generated $language SDK $outputGeneratedFolder";

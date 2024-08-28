@@ -15,7 +15,7 @@
   "repositories": [
     {
       "type": "path",
-      "url": "../../dist/php"
+      "url": "../sdk/generated"
     }
   ]
 }

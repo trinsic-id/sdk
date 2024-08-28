@@ -1,1 +1,1 @@
-& dotnet nuget push "$PSScriptRoot/../dist/publish/*.nupkg" --source "https://api.nuget.org/v3/index.json" --api-key $env:NUGET_API_KEY
+& dotnet nuget push "$PSScriptRoot/sdk/publish/*.nupkg" --source "https://api.nuget.org/v3/index.json" --api-key $env:NUGET_API_KEY
