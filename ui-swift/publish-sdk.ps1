@@ -54,6 +54,7 @@ try {
     $netrcContent | Out-File -FilePath $HOME/.netrc -Encoding utf8
     chmod 600 $HOME/.netrc
 
+    pod trunk push ./TrinsicUI.podspec
     $netrcContent = Get-Content -Path $HOME/.netrc
     Write-Host "Contents of .netrc file: $netrcContent"
 
@@ -64,20 +65,20 @@ try {
     if ($LASTEXITCODE -ne 0) {
         throw "Failed to push to CocoaPods trunk"
     }
+
+    # Go back to main repo and update reference
+    Set-Location "$PSScriptRoot/../"
+    $remoteOrigin = "https://$githubPAT@github.com/$sdkRepositoryPath.git"
+    Write-Host "Setting origin to $remoteOrigin"
+    git remote set-url origin $remoteOrigin
+
+    # Update reference in main repo
+    git add "ui-swift/sdk"
     git commit -m "Update ui-swift submodule reference to version $packageVersion"
     git push origin main
     if ($LASTEXITCODE -ne 0) {
         throw "Failed to push to our main"
     }
-}
-finally {
-    Pop-Location    
-}   git add "ui-swift/sdk"
-git commit -m "Update ui-swift submodule reference to version $packageVersion"
-git push origin main
-if ($LASTEXITCODE -ne 0) {
-    throw "Failed to push to our main"
-}
 }
 finally {
     Pop-Location    
