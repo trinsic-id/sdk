@@ -15,6 +15,9 @@ try {
     # If we don't do this we're in a detached head state
     git checkout main
 
+    # Pull so we both A) update the submodule to the latest ref and B) commit on top of HEAD
+    git pull
+
     $packageVersion = &"$PSScriptRoot\..\get-version.ps1" -versionName "swiftUIVersion";
 
     # Define the path to the podspec file
