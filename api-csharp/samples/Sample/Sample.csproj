@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\sdk\src\Trinsic.Api\Trinsic.Api.csproj" />
+    <PackageReference Include="DotNetEnv" Version="3.1.1" />
+    <PackageReference Include="Trinsic.Api" Version="0.4.0" />
   </ItemGroup>
-
 </Project>

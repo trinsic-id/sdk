@@ -89,7 +89,6 @@ out
 
 # Nuxt.js build / generate output
 .nuxt
-dist
 
 # Gatsby files
 .cache/
@@ -611,3 +610,6 @@ doc/api/
 */sdk/generated/
 vendor
 sdk-build
+
+dist
+go-sample

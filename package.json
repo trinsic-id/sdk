@@ -4,6 +4,7 @@
     "api-typescript/sdk",
     "api-typescript/samples",
     "ui-web/sdk",
+    "ui-web/samples",
     "ui-react-native/sdk",
     "ui-react-native/samples"
   ],
@@ -12,7 +13,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build:ui-web": "cd ui-web/samples && npm run build"
   },
   "author": "",
   "license": "ISC",

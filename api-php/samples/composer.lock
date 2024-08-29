@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2aed5f8f01a9d77e9e2fdcae4ceb8a13",
+    "content-hash": "2f8cd5d290200a21454500f480a940f8",
     "packages": [
         {
             "name": "fig/http-message-util",
@@ -1501,10 +1501,16 @@
         {
             "name": "trinsic/api",
             "version": "0.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/trinsic-id/sdk-php-api.git",
+                "reference": "b6b37d6e1571fad634c4451f068f4d5a4d75e6cf"
+            },
             "dist": {
-                "type": "path",
-                "url": "../sdk-build",
-                "reference": "4b1f01fdef95a109683b4276749c7f6aa345d5e9"
+                "type": "zip",
+                "url": "https://api.github.com/repos/trinsic-id/sdk-php-api/zipball/b6b37d6e1571fad634c4451f068f4d5a4d75e6cf",
+                "reference": "b6b37d6e1571fad634c4451f068f4d5a4d75e6cf",
+                "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
@@ -1524,11 +1530,7 @@
                     "Trinsic\\Api\\": "lib/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "Trinsic\\Api\\Test\\": "test/"
-                }
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "unlicense"
             ],
@@ -1549,9 +1551,11 @@
                 "rest",
                 "sdk"
             ],
-            "transport-options": {
-                "relative": true
-            }
+            "support": {
+                "issues": "https://github.com/trinsic-id/sdk-php-api/issues",
+                "source": "https://github.com/trinsic-id/sdk-php-api/tree/v0.4.0"
+            },
+            "time": "2024-08-28T19:15:10+00:00"
         },
         {
             "name": "vlucas/phpdotenv",

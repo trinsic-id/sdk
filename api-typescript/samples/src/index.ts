@@ -10,7 +10,6 @@ const app = express();
 const PORT = 3000;
 
 //We run with self-signed certificates on localhost :)
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const newConfiguration = new Configuration({
   accessToken: process.env.TRINSIC_ACCESS_TOKEN!,
 });
@@ -19,14 +18,16 @@ const networkApi = new NetworkApi(newConfiguration);
 
 app.use(express.json());
 
-app.get("/", express.static(path.join("../../ui-web/samples")));
+app.get("/", express.static(path.join("../../ui-web/samples/dist")));
 app.get("/redirect", (req: any, res: any) => {
-  res.sendFile(path.join(__dirname, "../../../ui-web/samples/redirect.html"));
+  res.sendFile(
+    path.join(__dirname, "../../../ui-web/samples/dist/redirect.html")
+  );
 });
 
 app.use(
-  "/dist/ui-web",
-  express.static(path.join("../../ui-web/samples/dist/ui-web"))
+  "/assets",
+  express.static(path.join("../../ui-web/samples/dist/assets"))
 );
 
 app.get("/providers", async (req: any, res: any) => {

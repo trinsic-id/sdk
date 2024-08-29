@@ -14,7 +14,7 @@ from trinsic_api.api.sessions_api import SessionsApi
 from trinsic_api.models.create_session_request import CreateSessionRequest
 from trinsic_api.models.get_session_result_request import GetSessionResultRequest
 
-token = os.getenv("TRINSIC_AUTH_TOKEN") or ""
+token = os.getenv("TRINSIC_ACCESS_TOKEN") or ""
 auth_token = "Bearer " + token
 api_client = ApiClient(configuration=None, header_name="Authorization", header_value=auth_token)
 
@@ -23,7 +23,7 @@ app = FastAPI()
 network_api = NetworkApi(api_client)
 sessions_api = SessionsApi(api_client)
 
-web_ui_path = pathlib.Path(__file__).parent / "../../ui-web"
+web_ui_path = pathlib.Path(__file__).parent / "../../ui-web/samples/dist"
 
 @app.get("/redirect")
 async def redirect():

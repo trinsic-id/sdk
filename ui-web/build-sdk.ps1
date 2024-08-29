@@ -3,7 +3,7 @@ try {
     
     & npm install
 
-    $version = &"$PSScriptRoot\..\get-version.ps1" -versionName "web";
+    $version = &"$PSScriptRoot\..\get-version.ps1" -versionName "webUIVersion";
 
     & npm version "$version" --no-git-tag-version
 

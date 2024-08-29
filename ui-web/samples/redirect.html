@@ -1,27 +1,25 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Trinsic redirect</title>
-</head>
-<body>
-
+  </head>
+  <body>
     <script type="module">
+      const params = new URLSearchParams(window.location.search);
+      const data = {
+        success: params.get("success") === "true" ? true : false,
+        resultsAccessKey: params.get("resultsAccessKey"),
+      };
 
-        const params = new URLSearchParams(window.location.search)
-        const data = {
-            success: params.get('success') === 'true' ? true : false,
-            resultsAccessKey: params.get('resultsAccessKey'),
-        };
+      console.debug("Sending message to opener", data, window.opener);
 
-        console.debug("Sending message to opener", data, window.opener);
-
-        window.opener?.postMessage(data, '*');
+      window.opener?.postMessage(data, "*");
     </script>
     <noscript>
-        <p>This page requires JavaScript to work properly.</p>
+      <p>This page requires JavaScript to work properly.</p>
     </noscript>
     <div>Completing the flow</div>
-</body>
+  </body>
 </html>

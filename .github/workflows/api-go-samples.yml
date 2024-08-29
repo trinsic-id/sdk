@@ -15,9 +15,6 @@ jobs:
           go-version: "1.21.x"
       - name: Install NPM dependencies
         run: npm ci
-      - name: Generate backend SDK
-        run: ./api-go/build-sdk.ps1
-        shell: pwsh
       - name: Build sample
-        run: go build -o go-sample
-        working-directory: ./api-go/samples
+        run: ./api-go/build-sample.ps1
+        shell: pwsh
