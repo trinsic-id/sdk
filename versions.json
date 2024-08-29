@@ -9,7 +9,7 @@
   "rubyPatchVersion": "0",
   "webPatchVersion": "0",
 
-  "swiftUIVersion": "0.3.10",
+  "swiftUIVersion": "0.3.11",
   "androidUIVersion": "0.3.3",
   "flutterUIVersion": "0.1.0"
 }
