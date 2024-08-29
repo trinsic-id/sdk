@@ -25,10 +25,10 @@ jobs:
           java-version: "21"
       - name: Install NPM dependencies
         run: npm ci
-      - name: Build package
+      - name: Build library
         run: |
           cd ./ui-android/sdk
-          ./gradlew build
+          ./gradlew :library:build
       - name: Publish SDK
         if: inputs.publish == true
         run: ./ui-android/publish-sdk.ps1
