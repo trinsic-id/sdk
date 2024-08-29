@@ -2,14 +2,22 @@
 
 Enables invocation of the Trinsic Identity Acceptance flow on iOS and Android.
 
-## Getting Started
+## Installation
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/to/develop-plugins),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+Simply add this library to your Flutter project:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```shell
+flutter pub add trinsic_flutter_ui
+```
 
+Then import it in your code:
+
+```dart
+import 'package:trinsic_flutter_ui/trinsic_flutter_ui.dart';
+```
+
+## Setup (Android)
+
+
+
+## Setup (iOS)
