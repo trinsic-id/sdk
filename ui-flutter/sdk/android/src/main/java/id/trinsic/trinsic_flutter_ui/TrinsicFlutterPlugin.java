@@ -102,7 +102,7 @@ public class TrinsicFlutterPlugin implements FlutterPlugin, ActivityAware, Metho
 
         if (call.method.equals("invoke") && call.hasArgument("launchUrl")) {
             String launchUrl = call.argument("launchUrl");
-            String redirectScheme = call.argument("redirectScheme");
+            String redirectUrl = call.argument("redirectUrl");
 
             Uri parsedUrl = Uri.parse(call.argument("launchUrl"));
             if (!parsedUrl.getQueryParameterNames().contains("sessionId")) {
@@ -111,18 +111,10 @@ public class TrinsicFlutterPlugin implements FlutterPlugin, ActivityAware, Metho
             }
             String sessionId = parsedUrl.getQueryParameter("sessionId");
 
-            if(!parsedUrl.getQueryParameterNames().contains("launchMode")) {
-                launchUrl += "&launchMode=mobile";
-            }
-
-            if(!parsedUrl.getQueryParameterNames().contains("redirectUrl")) {
-                launchUrl += "&redirectUrl=" + redirectScheme + ":///callback";
-            }
-
             // TODO: race condition prevention on `callbacks`?
             callbacks.put(sessionId, result);
 
-            AcceptanceSessionLaunchParams launchParams = new AcceptanceSessionLaunchParams(sessionId, launchUrl, redirectScheme);
+            AcceptanceSessionLaunchParams launchParams = new AcceptanceSessionLaunchParams(sessionId, launchUrl, redirectUrl);
             activityPluginBinding.getActivity().startActivityForResult(invokeContract.createIntent(context, launchParams), 1);
             return;
         }
