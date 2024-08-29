@@ -10,3 +10,6 @@
 [submodule "ui-swift/sdk"]
 	path = ui-swift/sdk
 	url = https://github.com/trinsic-id/sdk-swift-ui
+[submodule "ui-android/sdk"]
+	path = ui-android/sdk
+	url = https://github.com/trinsic-id/sdk-android-ui
