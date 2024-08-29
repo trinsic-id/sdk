@@ -35,10 +35,6 @@ target 'ReactNativeUiExample' do
     system("cd ../../ && yarn bob build --target codegen")
   end
 
-
-
-  pod 'TrinsicUI', :path => '../../../swift/ui'
-
   post_install do |installer|
     # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
     react_native_post_install(

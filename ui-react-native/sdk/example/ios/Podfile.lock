@@ -1520,7 +1520,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - TrinsicUI
     - Yoga
-  - TrinsicUI (0.0.1)
+  - TrinsicUI (0.3.7)
   - Yoga (0.0.0)
 
 DEPENDENCIES:
@@ -1588,12 +1588,12 @@ DEPENDENCIES:
   - ReactCodegen (from `build/generated/ios`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - trinsic-react-native-ui (from `../..`)
-  - TrinsicUI (from `../../../swift/ui`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
   trunk:
     - SocketRocket
+    - TrinsicUI
 
 EXTERNAL SOURCES:
   boost:
@@ -1721,8 +1721,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   trinsic-react-native-ui:
     :path: "../.."
-  TrinsicUI:
-    :path: "../../../swift/ui"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -1790,9 +1788,9 @@ SPEC CHECKSUMS:
   ReactCommon: 8da2bad9c1e5901f7b5484e42e59578edeece142
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   trinsic-react-native-ui: 22a5e4cabd1e27aa7f564b695e753de32adaa8d3
-  TrinsicUI: a63561468da5de165485bd5aae19bd4a8612a046
+  TrinsicUI: 2eef09672c051b26f1d71cd1bf06203886d28ff3
   Yoga: 36d44f1d31d7c11be1067e5c7a70a12c2eed355c
 
-PODFILE CHECKSUM: 7a36ea6d59f27194aaa6d14aa3a158c9c46d8595
+PODFILE CHECKSUM: e254c0f4b3ef9840649de13611a53fa9cc6432f0
 
 COCOAPODS: 1.15.2
