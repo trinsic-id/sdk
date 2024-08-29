@@ -17,10 +17,11 @@ RCT_EXPORT_METHOD(launchSession:(NSString*)launchURl
     BOOL success = YES; // Replace with actual logic
     BOOL cancelled = NO; // Replace with actual logic
     
-    TrinsicUI *trinsicUI = [TrinsicUI alloc];
+    TrinsicUI *trinsicUI = [[TrinsicUI alloc]init];
     [trinsicUI launchSessionWithLaunchUrl:launchURl callbackURL:callbackUrl completionHandler:^(LaunchSessionResult * _Nullable result, NSError * _Nullable error) {
         if(error) {
-            reject(@"launch_session_error", @"Failed to launch session", error);
+            NSString *errorMessage = [error localizedDescription];
+            reject(@"launch_session_error", errorMessage, error);
             return;
         }
         // Assuming LaunchSessionResult has these properties (replace with actual logic)
@@ -36,7 +37,7 @@ RCT_EXPORT_METHOD(launchSession:(NSString*)launchURl
             @"canceled": @(canceled)
         };
 
-        resolve(result);
+        resolve(resultDict);
     }];
 }
 
