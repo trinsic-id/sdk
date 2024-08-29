@@ -11,15 +11,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install NPM dependencies
         run: npm ci
-      - name: Generate backend SDK
-        run: ./api-python/build-sdk.ps1
-        shell: pwsh
-      - name: Build ui-web sample
-        run: npm run build
-        working-directory: ./ui-web/samples
-      - name: Install dependencies
-        run: pip3 install -r requirements.txt
-        working-directory: ./api-python/samples
       - name: Build sample
-        run: make validate
-        working-directory: ./api-python/samples
+        run: ./api-python/build-sample.ps1
+        shell: pwsh

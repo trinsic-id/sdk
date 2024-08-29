@@ -11,9 +11,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install NPM dependencies
         run: npm ci
-      - name: Generate backend SDK
-        run: ./api-csharp/build-sdk.ps1
-        shell: pwsh
       - name: Build sample
-        run: dotnet build
-        working-directory: ./api-csharp/samples
+        run: ./api-csharp/build-sample.ps1
+        shell: pwsh

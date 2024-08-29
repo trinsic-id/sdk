@@ -15,12 +15,6 @@ jobs:
           distribution: "temurin"
       - name: Install NPM dependencies
         run: npm ci
-      - name: Generate backend SDK
-        run: ./api-java/build-sdk.ps1
+      - name: Build sample
+        run: ./api-java/build-sample.ps1
         shell: pwsh
-      - name: Setup Maven Local Repository
-        run: mvn clean install
-        working-directory: ./api-java/sdk-build
-      - name: Build Sample
-        run: mvn package
-        working-directory: ./api-java/samples

@@ -13,16 +13,6 @@ jobs:
         uses: shivammathur/setup-php@v2
       - name: Install NPM dependencies
         run: npm ci
-      - name: Generate backend SDK
-        run: ./api-php/build-sdk.ps1
-        shell: pwsh
       - name: Build sample
-        run: composer install
-        working-directory: ./api-php/samples
-      - name: Start PHP server
-        run: php -S localhost:8080 -t public &
-        working-directory: ./api-php/samples
-      - name: Wait to ensure server is up
-        run: sleep 3
-      - name: Check if server is running
-        run: curl -X POST http://localhost:8080/create-session || exit 1
+        run: ./api-php/build-sample.ps1
+        shell: pwsh

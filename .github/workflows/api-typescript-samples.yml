@@ -11,9 +11,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install NPM dependencies
         run: npm ci
-      - name: Generate backend SDK
-        run: ./api-typescript/build-sdk.ps1
-        shell: pwsh
       - name: Build sample
-        run: npm run build
-        working-directory: ./api-typescript/samples
+        run: ./api-typescript/build-sample.ps1
+        shell: pwsh
