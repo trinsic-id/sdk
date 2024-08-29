@@ -1,4 +1,3 @@
-
 import 'trinsic_flutter_platform_interface.dart';
 
 class TrinsicFlutter {
@@ -6,7 +5,7 @@ class TrinsicFlutter {
     return TrinsicFlutterPlatform.instance.getPlatformVersion();
   }
 
-  static Future<Map?> invoke(String launchUrl, String redirectScheme) {
-    return TrinsicFlutterPlatform.instance.invoke(launchUrl, redirectScheme);
+  static Future<Map?> invoke(String launchUrl, String redirectUrl) {
+    return TrinsicFlutterPlatform.instance.invoke(launchUrl, redirectUrl);
   }
 }

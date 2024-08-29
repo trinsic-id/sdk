@@ -67,18 +67,9 @@ class ReactNativeUiModule internal constructor(context: ReactApplicationContext)
     }
 
     val sessionId = parsedUrl.getQueryParameter("sessionId")!!
-    var newLaunchUrl = launchUrl
-    if (!parsedUrl.queryParameterNames.contains("launchMode")) {
-      newLaunchUrl += "&launchMode=mobile"
-    }
-
-    if (!parsedUrl.queryParameterNames.contains("redirectUrl")) {
-      newLaunchUrl += "&redirectUrl=$callbackUrl"
-    }
-
     Callbacks[sessionId] = promise;
 
-    val launchParams : AcceptanceSessionLaunchParams = AcceptanceSessionLaunchParams(sessionId, newLaunchUrl, "trinsic-ui-example-redirect-scheme-react-native");
+    val launchParams : AcceptanceSessionLaunchParams = AcceptanceSessionLaunchParams(sessionId, launchUrl, callbackUrl);
     currentActivity?.startActivityForResult(currentActivity?.let { invokeContract.createIntent(it, launchParams) }, 1)
   }
 
