@@ -27,17 +27,17 @@ RCT_EXPORT_METHOD(launchSession:(NSString*)launchURl
         NSString *sessionId = result.sessionId ? result.sessionId : @"";
         NSString *resultsAccessKey = result.resultsAccessKey ? result.resultsAccessKey : @"";
         BOOL success = result.success;
-        BOOL cancelled = result.cancelled;
+        BOOL canceled = result.canceled;
 
         NSDictionary *resultDict = @{
             @"sessionId": sessionId,
             @"resultsAccessKey": resultsAccessKey,
             @"success": @(success),
-            @"canceled": @(cancelled)
+            @"canceled": @(canceled)
         };
 
         resolve(result);
-    }
+    }];
 }
 
 // Don't compile this code when we build for the old architecture.
