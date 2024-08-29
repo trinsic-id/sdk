@@ -1,0 +1,23 @@
+name: Build UI Android SDK Sample
+
+on:
+  workflow_call:
+
+jobs:
+  build_and_publish:
+    name: Build Android Sample
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+      - name: Build sample
+        run: |
+          cd ./ui-android/samples
+          ./gradlew build
