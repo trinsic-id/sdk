@@ -23,7 +23,7 @@ public class TrinsicFlutterUIPlugin: NSObject, FlutterPlugin {
   private func handleInvoke(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
       // Safely access arguments
       guard let args = call.arguments as? [String: Any],
-            let redirectScheme = args["redirectScheme"] as? String,
+            let redirectUrl = args["redirectUrl"] as? String,
             let launchUrlString = args["launchUrl"] as? String else {
           result(FlutterError(code: "BAD_ARGS", message: "Missing or invalid arguments", details: nil))
           return
@@ -53,10 +53,9 @@ public class TrinsicFlutterUIPlugin: NSObject, FlutterPlugin {
           queryItems.append(URLQueryItem(name: "launchMode", value: "mobile"))
       }
 
-      // Check if redirectUrl exists, if not, add it based on the redirectScheme parameter
+      // Check if redirectUrl exists, if not, add it based on the redirectUrl parameter
       if queryItems.first(where: { $0.name == "redirectUrl" }) == nil {
-          let redirectUrlString = "\(redirectScheme)://callback"
-          queryItems.append(URLQueryItem(name: "redirectUrl", value: redirectUrlString))
+          queryItems.append(URLQueryItem(name: "redirectUrl", value: redirectUrl))
       }
 
       // Update the URL components with the new query items

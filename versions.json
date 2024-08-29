@@ -10,6 +10,6 @@
   "webPatchVersion": "0",
 
   "swiftUIVersion": "0.3.8",
-  "androidUIVersion": "0.3.2",
+  "androidUIVersion": "0.3.3",
   "flutterUIVersion": "0.1.0"
 }
