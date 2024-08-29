@@ -77,6 +77,10 @@ jobs:
     with:
       publish: false
     secrets: inherit
+  ui-android-samples:
+    name: Validate UI Android Samples
+    uses: ./.github/workflows/ui-android-samples.yml
+    secrets: inherit
   ui-flutter:
     name: Validate UI Flutter SDK
     uses: ./.github/workflows/ui-flutter-action.yml
