@@ -21,6 +21,11 @@ try {
     Write-Host "Installing api-php sample project dependencies..."
     composer install
 
+    Write-Host "Ensure there's an .env file..."
+    if (-not (Test-Path "$PHP_SAMPLES_DIR/.env")) {
+        New-Item -Path "$PHP_SAMPLES_DIR/.env" -ItemType "File"
+    }
+
     Write-Host "Validating php script..."
     php public/index.php
     $exitCode = $LASTEXITCODE
