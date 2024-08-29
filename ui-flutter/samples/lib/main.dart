@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -6,6 +7,16 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:trinsic_flutter_ui/trinsic_flutter_ui.dart';
 
+// Replace the below with a URL that, when called with a GET request, will return a session launch URL as the only text content of the response.
+// It will likely do so by using the Trinsic backend API SDK to create a session and return the launch URL.
+const String BACKEND_CREATE_SESSION_ENDPOINT = '';
+
+// Replace the below with a URL that uses a custom scheme that you've properly registered in your app's AndroidManifest.xml
+// The path (in this case "/callback") can be anything.
+const String CALLBACK_REDIRECT_URL =
+    "trinsic-flutter-ui-example-redirect-scheme:///callback";
+
+//----------- No need to modify anything below here -----------
 void main() {
   runApp(const MyApp());
 }
@@ -18,7 +29,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _buttonText = 'Unknown';
+  String _stateText = 'Welcome!';
 
   @override
   void initState() {
@@ -26,30 +37,67 @@ class _MyAppState extends State<MyApp> {
     initPlatformState();
   }
 
-  void setButtonText(String text) {
+  void setStateText(String text) {
     setState(() {
-      _buttonText = text;
+      _stateText = text;
     });
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
     String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
     try {
       platformVersion = await TrinsicFlutter.getPlatformVersion() ??
           'Unknown platform version';
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
     }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
     if (!mounted) return;
 
-    setButtonText("Running on: $platformVersion");
+    setStateText("Running on: $platformVersion");
+  }
+
+  Future<String> getLaunchUrl() async {
+    setStateText("Getting launch URL...");
+    return await http.read(Uri.parse(BACKEND_CREATE_SESSION_ENDPOINT));
+  }
+
+  Future<void> launchSession() async {
+    var launchUrl = await getLaunchUrl();
+
+    setStateText("Launching...");
+    Map? result;
+    try {
+      result = await TrinsicFlutter.invoke(launchUrl, CALLBACK_REDIRECT_URL);
+    } on PlatformException {
+      setStateText("Failed to launch");
+      result = null;
+      return;
+    }
+
+    if (result == null) {
+      setStateText("Result null");
+      return;
+    }
+
+    if (result.containsKey("resultsAccessKey") &&
+        result["resultsAccessKey"] != null &&
+        result["resultsAccessKey"]!.toString().isNotEmpty) {
+      setStateText("Got ResultAccessKey: ${result!["resultsAccessKey"]}");
+      return;
+    }
+
+    if (result.containsKey("canceled") && result["canceled"] == true) {
+      setStateText("User canceled");
+      return;
+    }
+
+    if (result.containsKey("success") && result["success"] == false) {
+      setStateText("Session failed");
+      return;
+    }
+
+    setStateText("Unknown result");
+    return;
   }
 
   @override
@@ -57,49 +105,15 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('Trinsic Flutter UI Sample'),
         ),
+        floatingActionButton: FloatingActionButton(
+            onPressed: launchSession,
+            tooltip: 'Launch Session',
+            child: const Icon(Icons.add)),
         body: Center(
-            child: ElevatedButton(
-                child: Text(_buttonText),
-                onPressed: () async {
-                  setButtonText("Invoking...");
-                  Map? result;
-                  try {
-                    result = await TrinsicFlutter.invoke(
-                            "https://josh.trinsic-local.com/api/mobiletest?sessionId=2b128be2-7673-4cc7-bd15-1a99c9a3953e",
-                        "trinsic-ui-example-redirect-scheme");
-                  } on PlatformException {
-                    setButtonText("Failed to invoke");
-                    result = null;
-                    return;
-                  }
-
-                  log("Result: $result");
-
-                  if(result == null) {
-                    setButtonText("Result null");
-                    return;
-                  }
-
-                  if(result.containsKey("resultsAccessKey") && result["resultsAccessKey"] != null && result["resultsAccessKey"]!.toString().isNotEmpty) {
-                    setButtonText("Got ResultAccessKey: ${result!["resultsAccessKey"]}");
-                    return;
-                  }
-
-                  if(result.containsKey("canceled") && result["canceled"] == true) {
-                    setButtonText("User canceled");
-                    return;
-                  }
-
-                  if(result.containsKey("success") && result["success"] == false) {
-                    setButtonText("Session failed");
-                    return;
-                  }
-
-                  setButtonText("Unknown result");
-                  return;
-                })),
+          child: Text(_stateText),
+        ),
       ),
     );
   }
