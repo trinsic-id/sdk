@@ -42,7 +42,7 @@ jobs:
         working-directory: ./ui-flutter/sdk
         run: flutter test
       - name: Build Sample Android App
-        working-directory: ./ui-flutter/sample
+        working-directory: ../sample
         run: flutter build apk
       - name: Publish SDK (dry run)
         working-directory: ./
