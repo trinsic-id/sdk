@@ -3,12 +3,16 @@ param(
 )
 
 try {
-    Set-Location "$PSScriptRoot/sdk"
-    # Write-Host "Setting version to $version"
+    Push-Location "$PSScriptRoot/sdk"
 
-    # $fileContent = Get-Content -Path "pubspe c.yaml"
-    # $fileContent = $fileContent -replace "VERSION_REPLACEME", "$version"
-    # $fileContent | Set-Content -Path "pubspec.yaml"
+    Write-Host "Getting current version"
+    $packageVersion = &"$PSScriptRoot\..\get-version.ps1" -versionName "flutterUIVersion"
+
+    Write-Host "Setting version to $packageVersion"
+
+    $fileContent = Get-Content -Path "pubspec.yaml"
+    $fileContent = $fileContent -replace "^version: [\d\.]+$", "version: $packageVersion"
+    $fileContent | Set-Content -Path "pubspec.yaml"
 
     Write-Host "Publishing package"
     if ($dryRun) {
