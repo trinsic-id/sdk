@@ -7,18 +7,18 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 class MockTrinsicFlutterPlatform
     with MockPlatformInterfaceMixin
     implements TrinsicFlutterPlatform {
-
   @override
   Future<String?> getPlatformVersion() => Future.value('42');
 
   @override
-  Future<Map?> invoke(String launchUrl, String redirectScheme) {
+  Future<Map?> invoke(String launchUrl, String redirectUrl) {
     throw UnimplementedError("invoke() has not been implemented.");
   }
 }
 
 void main() {
-  final TrinsicFlutterPlatform initialPlatform = TrinsicFlutterPlatform.instance;
+  final TrinsicFlutterPlatform initialPlatform =
+      TrinsicFlutterPlatform.instance;
 
   test('$MethodChannelTrinsicFlutter is the default instance', () {
     expect(initialPlatform, isInstanceOf<MethodChannelTrinsicFlutter>());
