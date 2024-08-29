@@ -15,6 +15,9 @@ try {
     # If we don't do this we're in a detached head state
     git checkout main
 
+    # Pull latest version of code
+    git pull
+
     $packageVersion = &"$PSScriptRoot\..\get-version.ps1" -versionName "androidUIVersion";
 
     # Define the path to the gradle file
