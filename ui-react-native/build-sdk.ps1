@@ -14,6 +14,17 @@ try {
     }
     
     & npm pack --pack-destination "$PSScriptRoot/sdk/publish"
+
+    try {
+        Push-Location "$PSScriptRoot\sdk\example"
+        & npm ci
+        & npm run build:ios
+        & npm run build:android
+
+    }
+    finally {
+        Pop-Location
+    }
 }
 finally {
     Pop-Location
