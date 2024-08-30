@@ -22,6 +22,16 @@ try {
     try {
         Push-Location "$PSScriptRoot\sdk\example"
         & npm ci
+        try {
+            Push-Location "$PSScriptRoot\sdk\example\ios"
+            & pod install
+            if ($LASTEXITCODE -ne 0) {
+                throw "Failed to install iOS pods"
+            }
+        }
+        finally {
+            Pop-Location
+        }
         #& npm run build:ios  --verbose
         # if ($LASTEXITCODE -ne 0) {
         #     throw "Failed to build iOS testbed"
