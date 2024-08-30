@@ -1,5 +1,4 @@
 {
   "expo.jsEngine": "hermes",
-  "EX_DEV_CLIENT_NETWORK_INSPECTOR": "true",
-  "ios.useFrameworks": "linkage.to_sym"
+  "EX_DEV_CLIENT_NETWORK_INSPECTOR": "true"
 }
