@@ -7,7 +7,11 @@ try {
 
     & npm version "$version" --no-git-tag-version
 
-    & npm run build
+    & npm run prepare
+
+    if ($LASTEXITCODE -ne 0) {
+        throw "Failed to prepare React Native SDK"
+    }
 
     if (-not (Test-Path -Path "publish")) {
         New-Item -ItemType Directory -Path "publish"
