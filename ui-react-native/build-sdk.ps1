@@ -3,7 +3,7 @@ try {
     
     & npm ci
 
-    $version = &"$PSScriptRoot\..\get-version.ps1" -versionName "webUIVersion";
+    $version = &"$PSScriptRoot\..\get-version.ps1" -versionName "reactNativeUIVersion";
 
     & npm version "$version" --no-git-tag-version
 

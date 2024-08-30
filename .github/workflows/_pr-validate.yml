@@ -87,6 +87,12 @@ jobs:
     with:
       publish: false
     secrets: inherit
+  ui-react-native:
+    name: Validate UI React Native SDK
+    uses: ./.github/workflows/ui-react-native-action.yml
+    with:
+      publish: false
+    secrets: inherit
   ui-web:
     name: Validate UI Web SDK
     uses: ./.github/workflows/ui-web-action.yml
