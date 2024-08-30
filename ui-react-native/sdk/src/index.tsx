@@ -1,5 +1,4 @@
 import { NativeModules, Platform } from 'react-native';
-import type { LaunchSessionResult } from './ReactNativeUi';
 
 const LINKING_ERROR =
   `The package '@trinsic/react-native-ui' doesn't seem to be linked. Make sure: \n\n` +
@@ -30,4 +29,11 @@ export function launchSession(
   callbackUrl: string
 ): Promise<LaunchSessionResult> {
   return ReactNativeUi.launchSession(launchUrl, callbackUrl);
+}
+
+export interface LaunchSessionResult {
+  sessionId: string | null;
+  resultsAccessKey: string | null;
+  success: boolean;
+  canceled: boolean;
 }

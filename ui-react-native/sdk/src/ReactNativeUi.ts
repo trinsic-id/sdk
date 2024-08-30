@@ -1,12 +1,6 @@
 import type { TurboModule } from 'react-native';
 import { TurboModuleRegistry } from 'react-native';
-
-export interface LaunchSessionResult {
-  sessionId: string | null;
-  resultsAccessKey: string | null;
-  success: boolean;
-  canceled: boolean;
-}
+import type { LaunchSessionResult } from '.';
 
 export interface Spec extends TurboModule {
   launchSession(
