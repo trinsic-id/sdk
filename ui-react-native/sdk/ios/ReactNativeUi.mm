@@ -12,11 +12,6 @@ RCT_EXPORT_METHOD(launchSession:(NSString*)launchURl
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 {
-    
-    NSString *resultsAccessKey = @"someAccessKey"; // Replace with actual logic
-    BOOL success = YES; // Replace with actual logic
-    BOOL cancelled = NO; // Replace with actual logic
-    
     TrinsicUI *trinsicUI = [[TrinsicUI alloc]init];
     [trinsicUI launchSessionWithLaunchUrl:launchURl callbackURL:callbackUrl completionHandler:^(LaunchSessionResult * _Nullable result, NSError * _Nullable error) {
         if(error) {
