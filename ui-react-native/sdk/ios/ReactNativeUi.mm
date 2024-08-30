@@ -12,20 +12,33 @@ RCT_EXPORT_METHOD(launchSession:(NSString*)launchURl
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 {
+    
     NSString *resultsAccessKey = @"someAccessKey"; // Replace with actual logic
     BOOL success = YES; // Replace with actual logic
     BOOL cancelled = NO; // Replace with actual logic
     
-    TrinsicApi *trinsicApi = [[TrinsicApi alloc]init];
-    
-    NSDictionary *result = @{
-        @"sessionId": [NSNull null],
-        @"resultsAccessKey": [trinsicApi sayHello],
-        @"success": @(success),
-        @"canceled": @(cancelled)
-    };
+    TrinsicUI *trinsicUI = [[TrinsicUI alloc]init];
+    [trinsicUI launchSessionWithLaunchUrl:launchURl callbackURL:callbackUrl completionHandler:^(LaunchSessionResult * _Nullable result, NSError * _Nullable error) {
+        if(error) {
+            NSString *errorMessage = [error localizedDescription];
+            reject(@"launch_session_error", errorMessage, error);
+            return;
+        }
+        // Assuming LaunchSessionResult has these properties (replace with actual logic)
+        NSString *sessionId = result.sessionId ? result.sessionId : @"";
+        NSString *resultsAccessKey = result.resultsAccessKey ? result.resultsAccessKey : @"";
+        BOOL success = result.success;
+        BOOL canceled = result.canceled;
 
-    resolve(result);
+        NSDictionary *resultDict = @{
+            @"sessionId": sessionId,
+            @"resultsAccessKey": resultsAccessKey,
+            @"success": @(success),
+            @"canceled": @(canceled)
+        };
+
+        resolve(resultDict);
+    }];
 }
 
 // Don't compile this code when we build for the old architecture.
