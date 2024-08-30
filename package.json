@@ -6,7 +6,7 @@
     "ui-web/sdk",
     "ui-web/samples",
     "ui-react-native/sdk",
-    "ui-react-native/samples"
+    "ui-react-native/sdk/example"
   ],
   "name": "trinsic-sdks",
   "version": "0.3.0",
