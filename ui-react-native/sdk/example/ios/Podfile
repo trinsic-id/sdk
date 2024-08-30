@@ -32,7 +32,7 @@ target 'ReactNativeUiExample' do
 
 
   pre_install do |installer|
-    system("cd ../../ && npx bob build --target codegen")
+    system("cd ../../ && yarn bob build --target codegen")
   end
 
   post_install do |installer|

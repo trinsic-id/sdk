@@ -10,7 +10,7 @@
             ActionType="Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
                title="Invoke Codegen"
-               scriptText="export PATH=/Users/jpgeorge/.nvm/versions/node/v20.10.0/bin/:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin&#10;cd &quot;$WORKSPACE_PATH/../../../&quot; &amp;&amp; npx bob build --target codegen&#10;">
+               scriptText="export PATH=/Users/jpgeorge/.nvm/versions/node/v20.10.0/bin/:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin&#10;cd &quot;$WORKSPACE_PATH/../../../&quot; &amp;&amp; yarn bob build --target codegen&#10;">
             </ActionContent>
          </ExecutionAction>
       </PreActions>
