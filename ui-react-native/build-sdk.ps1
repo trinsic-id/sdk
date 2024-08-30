@@ -19,7 +19,13 @@ try {
         Push-Location "$PSScriptRoot\sdk\example"
         & npm ci
         & npm run build:ios
+        if ($LASTEXITCODE -ne 0) {
+            throw "Failed to build iOS testbed"
+        }
         & npm run build:android
+        if ($LASTEXITCODE -ne 0) {
+            throw "Failed to build Android testbed"
+        }
 
     }
     finally {
