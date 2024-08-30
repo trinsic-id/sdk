@@ -19,6 +19,10 @@ jobs:
           submodules: recursive
       - name: Install NPM dependencies
         run: npm ci
+      - name: Where is NPM
+        run: which npm
+      - name: Where is Yarn
+        run: which yarn
       - name: Set up Xcode
         run: sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
       - name: Install Dependencies
@@ -36,4 +40,3 @@ jobs:
         shell: pwsh
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
