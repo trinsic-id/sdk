@@ -27,6 +27,9 @@ jobs:
       - name: Generate ui react native SDK
         run: ./ui-react-native/build-sdk.ps1
         shell: pwsh
+      - name: Build the project
+        run: xcodebuild -project ReactNativeUiExample.xcodeproj -scheme ReactNativeUiExample -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 12,OS=latest' build
+        working-directory: ui-react-native/sdk/example/ios
       - name: Publish ui react native SDK
         if: inputs.publish == true
         run: ./ui-react-native/publish-sdk.ps1
