@@ -9,7 +9,7 @@ $additionalProperties = @{
 
 try {
     Push-Location "$PSScriptRoot/sdk"
-    & npm install
+    & npm ci
     & npm pack --pack-destination "$PSScriptRoot/sdk/publish"
 }
 finally {
