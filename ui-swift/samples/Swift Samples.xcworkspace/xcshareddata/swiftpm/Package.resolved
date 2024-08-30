@@ -1,5 +1,5 @@
 {
-  "originHash" : "585e3c21edabeba9f9ba555a09b0f953e800d83746add7ebc3d7dedeb21e8244",
+  "originHash" : "0805ea3b3c42d63b35d5afec4be94d3b7878ae4118c2f89915578c3e21df1418",
   "pins" : [
     {
       "identity" : "sdk-swift-ui",
@@ -7,7 +7,7 @@
       "location" : "https://github.com/trinsic-id/sdk-swift-ui",
       "state" : {
         "branch" : "main",
-        "revision" : "9cb0c6c8f47f82a264e5a86f7af01daccfa858eb"
+        "revision" : "3a8d5068820fd28100d8d8e612bd44385e31acda"
       }
     }
   ],
