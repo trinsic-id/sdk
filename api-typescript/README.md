@@ -1,9 +1,10 @@
-# Trinsic Web UI Library
+# Trinsic API TypeScript Library
 
-[![Version](https://img.shields.io/npm/v/@trinsic/web-ui.svg)](https://www.npmjs.org/package/@trinsic/web-ui)
-[![Build Status](https://github.com/trinsic-id/sdk/actions/workflows/ui-web-release.yml/badge.svg)](https://github.com/trinsic-id/sdk/actions?query=branch%main)
+[![Version](https://img.shields.io/npm/v/@trinsic/api.svg)](https://www.npmjs.org/package/@trinsic/api)
+[![Build Status](https://github.com/trinsic-id/sdk/actions/workflows/api-typescript-release.yml/badge.svg)](https://github.com/trinsic-id/sdk/actions?query=branch%main)
 
-The Trinsic Web UI Library provides ways to launch verification sessions directly in the browser requiring very little code.
+The Trinsic API TypeScript library provides convenient access to the Trinsic API from
+applications written in server-side JavaScript/TypeScript.
 
 ## Documentation
 
@@ -14,18 +15,28 @@ See the [Trinsic docs](https://connect.docs.trinsic.id/docs/) for more detailed 
 Install the package with:
 
 ```sh
-npm install @trinsic/web-ui
+npm install @trinsic/api
 ```
 
 ## Usage
 
-The library exports three methods: `launchIframe(launchUrl)`, `launchPopup(launchUrl)` and `launchRedirect(launchUrl, redirectUrl)`.
+The package needs to be configured with your app's access token, which is
+available in the [Trinsic Dashboard](https://dashboard.trinsic.id).
 
-Depending on how you would like your user interaction to be, an embedded iFrame, a popup or a redirect flow, choose your start point.
+<!-- prettier-ignore -->
+```ts
+import { AttachmentsApi, Configuration, NetworkApi, SessionsApi } from "@trinsic/api";
 
-You can retrieve the launch url from a trusted backend that can reach out to the Trinsic servers. [See our backend language examples](https://github.com/trinsic-id/sdk/tree/main/api-typescript/samples).
+const config = new Configuration({ accessToken: "your-access-token" });
 
-You can find a full example using this library in the [samples](https://github.com/trinsic-id/sdk/tree/main/ui-web/samples) folder.
+const attachments = new NetworkApi(config);
+const network = new NetworkApi(config);
+const sessions = new SessionsApi(config);
+
+const session = await sessionsApi.createSession();
+```
+
+You can find a full TS server example in the [samples](https://github.com/trinsic-id/sdk/tree/main/api-typescript/samples) folder.
 
 ## SDK Versioning
 
