@@ -4,7 +4,7 @@
 [![Build Status](https://github.com/trinsic-id/sdk/actions/workflows/api-ruby-release.yml/badge.svg)](https://github.com/trinsic-id/sdk/actions?query=branch%main)
 
 The Trinsic API Ruby library provides convenient access to the Trinsic API from
-applications written in server-side JavaScript/TypeScript.
+applications written in Ruby.
 
 ## Documentation
 
@@ -27,14 +27,15 @@ gem 'trinsic_api'
 ## Usage
 
 The package needs to be configured with your app's access token, which is
-available in the [Trinsic Dashboard][dashboard].
+available in the [Trinsic Dashboard](https://dashboard.trinsic.id).
 
 <!-- TODO: add simple usage here -->
-<!-- prettier-ignore -->
+
 ```rb
+
 ```
 
-You can find a full Ruby server example in the [samples](https://github.com/trinsic-id/sdk/tree/main/ruby-typescript/samples) folder.
+You can find a full Ruby server example in the [samples](https://github.com/trinsic-id/sdk/tree/main/api-ruby/samples) folder.
 
 ## SDK Versioning
 

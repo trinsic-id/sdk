@@ -21,7 +21,7 @@ npm install @trinsic/api
 ## Usage
 
 The package needs to be configured with your app's access token, which is
-available in the [Trinsic Dashboard][dashboard].
+available in the [Trinsic Dashboard](https://dashboard.trinsic.id).
 
 <!-- prettier-ignore -->
 ```ts

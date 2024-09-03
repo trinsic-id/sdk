@@ -4,7 +4,7 @@
 [![Build Status](https://github.com/trinsic-id/sdk/actions/workflows/api-python-release.yml/badge.svg)](https://github.com/trinsic-id/sdk/actions?query=branch%main)
 
 The Trinsic API Python library provides convenient access to the Trinsic API from
-applications written in server-side JavaScript/TypeScript.
+applications written in Python
 
 ## Documentation
 
@@ -21,9 +21,8 @@ pip install trinsic-api
 ## Usage
 
 The package needs to be configured with your app's access token, which is
-available in the [Trinsic Dashboard][dashboard].
+available in the [Trinsic Dashboard](https://dashboard.trinsic.id).
 
-<!-- prettier-ignore -->
 ```py
 from trinsic_api.api_client import ApiClient
 from trinsic_api.api.attachments_api import AttachmentsApi
@@ -38,7 +37,7 @@ network_api = NetworkApi(api_client)
 sessions_api = SessionsApi(api_client)
 ```
 
-You can find a full Python server example in the [samples](https://github.com/trinsic-id/sdk/tree/main/python-typescript/samples) folder.
+You can find a full Python server example in the [samples](https://github.com/trinsic-id/sdk/tree/main/api-python/samples) folder.
 
 ## SDK Versioning
 
