@@ -14,9 +14,9 @@ try {
         throw "npm version failed"
     }
 
-    & npm run build
+    & npm run prepare
     if ($LASTEXITCODE -ne 0) {
-        throw "npm run build failed"
+        throw "npm run prepare failed"
     }
 
     if (-not (Test-Path -Path "publish")) {
