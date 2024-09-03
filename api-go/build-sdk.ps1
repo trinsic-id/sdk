@@ -15,6 +15,9 @@ try {
     $goModFileContent | Set-Content -Path $goModFile
 
     &go build
+    if ($LASTEXITCODE -ne 0) {
+        throw "go build failed"
+    }
 }
 finally {
     Pop-Location

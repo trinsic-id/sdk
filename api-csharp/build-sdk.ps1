@@ -46,7 +46,13 @@ try {
 
     dotnet restore
     & dotnet build --configuration Release --no-restore
+    if ($LASTEXITCODE -ne 0) {
+        throw "Dotnet build failed"
+    }
     & dotnet pack --configuration Release --no-build --no-restore --include-source --include-symbols -p:SymbolPackageFormat=snupkg --output "$PSScriptRoot/sdk/publish"
+    if ($LASTEXITCODE -ne 0) {
+        throw "Dotnet pack failed"
+    }
 }
 finally {
     Pop-Location

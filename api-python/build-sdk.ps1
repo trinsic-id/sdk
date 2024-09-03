@@ -26,7 +26,13 @@ try {
 
     # Execute the Python script using the found interpreter
     & $pythonPath setup.py sdist --dist-dir "$PSScriptRoot/sdk/publish" bdist_wheel --dist-dir "$PSScriptRoot/sdk/publish"
+    if ($LASTEXITCODE -ne 0) {
+        throw "Python setup.py failed"
+    }
     & $pipPath install .
+    if ($LASTEXITCODE -ne 0) {
+        throw "Python pip install failed"
+    }
 }
 finally {
     Pop-Location
