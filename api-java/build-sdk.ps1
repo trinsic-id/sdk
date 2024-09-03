@@ -72,7 +72,13 @@ try {
     $buildGradleFileContent | Set-Content -Path $buildGradleFile
 
     & gradle compileJava
+    if ($LASTEXITCODE -ne 0) {
+        throw "gradle compileJava failed"
+    }
     & gradle jar    
+    if ($LASTEXITCODE -ne 0) {
+        throw "gradle jar failed"
+    }
 }
 finally {
     Pop-Location
