@@ -8,6 +8,8 @@ $additionalProperties = @{
 & "$PSScriptRoot/../helpers/generate-client.ps1" -language "typescript-fetch" -outputFolder "$PSScriptRoot/sdk" -versionName "node" -additionalProperties $additionalProperties 
 
 try {
+    Copy-Item "$PSScriptRoot/README.md" "$PSScriptRoot/sdk"
+
     Push-Location "$PSScriptRoot/sdk"
     & npm ci
     & npm pack --pack-destination "$PSScriptRoot/sdk/publish"
