@@ -32,7 +32,7 @@ app.MapGet("/launch/{providerId}", async (HttpContext context, string providerId
 
     var request = new CreateSessionRequest
     {
-        LaunchMethodDirectly = true,
+        LaunchProviderDirectly = true,
         Providers = [providerId]
     };
 

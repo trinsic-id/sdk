@@ -1,11 +1,11 @@
 module go-sample
 
-go 1.21.4
+go 1.23
 
 require (
 	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/joho/godotenv v1.5.1
-	github.com/trinsic-id/sdk-go-api v0.3.5
+	github.com/trinsic-id/sdk-go-api v0.6.1
 )
 
 require (
