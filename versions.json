@@ -1,15 +1,15 @@
 {
   "backendVersion": "0.4",
-  "nodePatchVersion": "2",
-  "csharpPatchVersion": "2",
-  "javaPatchVersion": "2",
-  "goPatchVersion": "2",
-  "pythonPatchVersion": "2",
-  "phpPatchVersion": "2",
-  "rubyPatchVersion": "2",
+  "nodePatchVersion": "3",
+  "csharpPatchVersion": "3",
+  "javaPatchVersion": "3",
+  "goPatchVersion": "3",
+  "pythonPatchVersion": "3",
+  "phpPatchVersion": "3",
+  "rubyPatchVersion": "3",
   "swiftUIVersion": "0.3.14",
   "androidUIVersion": "0.3.3",
   "flutterUIVersion": "0.1.0",
   "reactNativeUIVersion": "0.1.6",
-  "webUIVersion": "0.4.2"
+  "webUIVersion": "0.4.3"
 }
