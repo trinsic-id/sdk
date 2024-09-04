@@ -37,7 +37,7 @@ app.get("/providers", async (req: any, res: any) => {
 
 app.get("/launch/:providerId", async (req: any, res: any) => {
   const request: CreateSessionRequest = {
-    launchProviderDirectly: true,
+    launchMethodDirectly: true,
     providers: [req.params.providerId],
   };
   const result = await createSession(request);
