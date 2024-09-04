@@ -50,7 +50,7 @@ public class Main {
             var providerId = ctx.pathParam("providerId");
 
             var sessionRequest = new CreateSessionRequest();
-            sessionRequest.setLaunchMethodDirectly(true);
+            sessionRequest.setLaunchProviderDirectly(true);
             sessionRequest.setProviders(Arrays.asList(providerId));
 
             var result = session.createSession(sessionRequest);

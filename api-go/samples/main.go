@@ -41,8 +41,8 @@ func main() {
 		launchDirectly := true
 
 		request := trinsic_api.CreateSessionRequest{
-			LaunchMethodDirectly: &launchDirectly,
-			Providers:            []string{providerId},
+			LaunchProviderDirectly: &launchDirectly,
+			Providers:              []string{providerId},
 		}
 
 		data, _, err := api.SessionsAPI.CreateSession(c.Context()).CreateSessionRequest(request).Execute()
