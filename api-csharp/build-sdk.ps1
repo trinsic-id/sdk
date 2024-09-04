@@ -17,20 +17,43 @@ $csprojPath = "$PSScriptRoot/sdk/src/Trinsic.Api/Trinsic.Api.csproj"
 # Load the XML content of the .csproj file
 [xml]$xml = Get-Content $csprojPath
 
-# Create the PackageReadmeFile element
-$packageReadmeFileElement = $xml.CreateElement("PackageReadmeFile")
-$packageReadmeFileElement.InnerText = "README.md"
+$xml.Project.PropertyGroup.Authors = "Trinsic"
+$xml.Project.PropertyGroup.Company = "Trinsic"
+$xml.Project.PropertyGroup.AssemblyTitle = "Trinsic API C# Library"
+$xml.Project.PropertyGroup.Description = "A C# library for the Trinsic API"
+$xml.Project.PropertyGroup.RepositoryUrl = "https://github.com/trinsic-id/sdk"
 
-# Append the PackageReadmeFile element to the first PropertyGroup
-$xml.Project.PropertyGroup.AppendChild($packageReadmeFileElement) | Out-Null
+$element = $xml.CreateElement("PublishRepositoryUrl")
+$element.InnerText = "true"
+$xml.Project.PropertyGroup.AppendChild($element) | Out-Null
+
+$element = $xml.CreateElement("Summary")
+$element.InnerText = "A C# library for the Trinsic API"
+$xml.Project.PropertyGroup.AppendChild($element) | Out-Null
+
+$element = $xml.CreateElement("PackageReadmeFile")
+$element.InnerText = "README.md"
+$xml.Project.PropertyGroup.AppendChild($element) | Out-Null
+
+$element = $xml.CreateElement("PackageLicenseExpression")
+$element.InnerText = "MIT"
+$xml.Project.PropertyGroup.AppendChild($element) | Out-Null
 
 # Create the new ItemGroup element with the README.md inclusion
 $itemGroupElement = $xml.CreateElement("ItemGroup")
-$noneElement = $xml.CreateElement("None")
-$noneElement.SetAttribute("Include", "README.md")
-$noneElement.SetAttribute("Pack", "true")
-$noneElement.SetAttribute("PackagePath", "")
-$itemGroupElement.AppendChild($noneElement) | Out-Null
+
+$licenseElement = $xml.CreateElement("None")
+$licenseElement.SetAttribute("Include", "LICENSE")
+$licenseElement.SetAttribute("Pack", "true")
+$licenseElement.SetAttribute("PackagePath", "")
+
+$readmeElement = $xml.CreateElement("None")
+$readmeElement.SetAttribute("Include", "README.md")
+$readmeElement.SetAttribute("Pack", "true")
+$readmeElement.SetAttribute("PackagePath", "")
+
+$itemGroupElement.AppendChild($licenseElement) | Out-Null
+$itemGroupElement.AppendChild($readmeElement) | Out-Null
 
 # Append the new ItemGroup to the Project element
 $xml.Project.AppendChild($itemGroupElement) | Out-Null
@@ -38,7 +61,6 @@ $xml.Project.AppendChild($itemGroupElement) | Out-Null
 # Save the modified .csproj file
 $xml.Save($csprojPath)
 
-Write-Host "The .csproj file has been successfully modified. Copying now the README.md file to the sdk folder."
 Copy-Item "$PSScriptRoot/README.md" "$PSScriptRoot/sdk/src/Trinsic.Api"
 Copy-Item "$PSScriptRoot/../LICENSE" "$PSScriptRoot/sdk/src/Trinsic.Api"
 
