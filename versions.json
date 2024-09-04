@@ -4,7 +4,7 @@
   "csharpPatchVersion": "2",
   "javaPatchVersion": "2",
   "goPatchVersion": "2",
-  "pythonPatchVersion": "2",
+  "pythonPatchVersion": "3",
   "phpPatchVersion": "2",
   "rubyPatchVersion": "2",
   "swiftUIVersion": "0.3.14",
