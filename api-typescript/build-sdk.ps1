@@ -9,6 +9,7 @@ $additionalProperties = @{
 
 try {
     Copy-Item "$PSScriptRoot/README.md" "$PSScriptRoot/sdk"
+    Copy-Item "$PSScriptRoot/../LICENSE" "$PSScriptRoot/sdk"
 
     Push-Location "$PSScriptRoot/sdk"
     & npm ci

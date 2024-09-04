@@ -39,7 +39,8 @@ $xml.Project.AppendChild($itemGroupElement) | Out-Null
 $xml.Save($csprojPath)
 
 Write-Host "The .csproj file has been successfully modified. Copying now the README.md file to the sdk folder."
-Copy-Item "$PSScriptRoot/README.md" "$PSScriptRoot/sdk/src/Trinsic.Api/"
+Copy-Item "$PSScriptRoot/README.md" "$PSScriptRoot/sdk/src/Trinsic.Api"
+Copy-Item "$PSScriptRoot/../LICENSE" "$PSScriptRoot/sdk/src/Trinsic.Api"
 
 try {
     Push-Location "$PSScriptRoot/sdk"
