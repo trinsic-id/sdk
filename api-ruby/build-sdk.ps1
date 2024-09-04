@@ -10,6 +10,8 @@ $additionalProperties = @{
 }
 & "$PSScriptRoot/../helpers/generate-client.ps1" -language "ruby" -outputFolder "$PSScriptRoot/sdk" -additionalProperties $additionalProperties
 
+Copy-Item "$PSScriptRoot/../LICENSE" "$PSScriptRoot/sdk/"
+
 try {
     Push-Location "$PSScriptRoot/sdk"
     &gem build trinsic_api.gemspec

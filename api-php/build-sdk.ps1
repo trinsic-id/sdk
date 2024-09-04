@@ -9,7 +9,8 @@ $additionalProperties = @{
 }
 & "$PSScriptRoot/../helpers/generate-client.ps1" -language "php" -outputFolder "$PSScriptRoot/sdk-build" -additionalProperties $additionalProperties
 
-Copy-Item "$PSScriptRoot/README.md" "$PSScriptRoot/sdk-build/"
+Copy-Item "$PSScriptRoot/README.md" "$PSScriptRoot/sdk-build"
+Copy-Item "$PSScriptRoot/../LICENSE" "$PSScriptRoot/sdk-build"
 
 # Path to the JSON file
 $jsonFilePath = "$PSScriptRoot/sdk-build/composer.json"

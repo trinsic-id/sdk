@@ -7,7 +7,8 @@ $additionalProperties = @{
 try {
     Push-Location "$PSScriptRoot/sdk-build"
 
-    Copy-Item "$PSScriptRoot/README.md" "$PSScriptRoot/sdk-build/"
+    Copy-Item "$PSScriptRoot/README.md" "$PSScriptRoot/sdk-build"
+    Copy-Item "$PSScriptRoot/../LICENSE" "$PSScriptRoot/sdk-build"
 
     $goModFile = "go.mod"
     $goModFileContent = Get-Content -Path $goModFile

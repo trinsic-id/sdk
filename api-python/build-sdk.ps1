@@ -7,7 +7,8 @@ $additionalProperties = @{
 & "$PSScriptRoot/../helpers/generate-client.ps1" -language "python" -outputFolder "$PSScriptRoot/sdk" -additionalProperties $additionalProperties
 
 try {
-    Copy-Item "$PSScriptRoot/README.md" "$PSScriptRoot/sdk/README.md"
+    Copy-Item "$PSScriptRoot/README.md" "$PSScriptRoot/sdk"
+    Copy-Item "$PSScriptRoot/../LICENSE" "$PSScriptRoot/sdk"
 
     Push-Location "$PSScriptRoot/sdk"
 
