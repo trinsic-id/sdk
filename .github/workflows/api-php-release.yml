@@ -7,6 +7,8 @@ jobs:
   release:
     name: Publish PHP Package
     uses: ./.github/workflows/api-php-action.yml
+    concurrency:
+      group: git-release
     with:
       publish: true
     secrets: inherit

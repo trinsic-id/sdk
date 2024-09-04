@@ -7,6 +7,8 @@ jobs:
   release:
     name: Publish Java Package
     uses: ./.github/workflows/api-java-action.yml
+    concurrency:
+      group: git-release
     with:
       publish: true
     secrets: inherit
