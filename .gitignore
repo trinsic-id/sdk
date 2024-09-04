@@ -616,5 +616,4 @@ api-python/sdk
 api-ruby/sdk
 api-typescript/sdk
 
-dist
 go-sample
