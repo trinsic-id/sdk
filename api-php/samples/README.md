@@ -17,7 +17,7 @@ Alternatively, you can run `npm run build` inside the [`ui-web/samples`](../../u
 
 ### Running the project
 
-Make sure to create a new `.env` file to set your Trinsic Access Token. You can use [`example.env`](./Sample/example.env) as a reference. If you need more information where to find this token, visit our [Getting Started](https://connect.docs.trinsic.id/docs/getting-started-with-trinsic-connect) guide.
+Make sure to create a new `.env` file to set your Trinsic Access Token. You can use [`example.env`](./Sample/example.env) as a reference. If you need more information where to find this token, visit our [Getting Started](https://docs.trinsic.id/docs/getting-started-with-trinsic-connect) guide.
 
 After you created your `.env` file, install the sample's dependencies by running `composer update`. After which you should be good to start the application:
 
@@ -33,7 +33,7 @@ Any issues, inquiries, and feature requests can be sent to [support@trinsic.id](
 
 ## More Information
 
-- [API Reference](https://connect.docs.trinsic.id/reference)
+- [API Reference](https://docs.trinsic.id/reference)
 - [Developer Guide](https://github.com/stripe/stripe-node/wiki/Passing-Options)
 - [Our Blog](https://trinsic.id/blog/)
 - [Schedule a demo](https://trinsic.id/contact/)

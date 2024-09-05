@@ -16,7 +16,7 @@
     "build:ui-web": "cd ui-web/samples && npm run build"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@openapitools/openapi-generator-cli": "2.13.5"
   }

@@ -7,6 +7,7 @@ $additionalProperties = @{
     useDateTimeOffset                        = "true"
     validatable                              = "false"
     disallowAdditionalPropertiesIfNotPresent = "false"
+    licenseId                                = "MIT"        
 }
 & "$PSScriptRoot/../helpers/generate-client.ps1" -language "csharp" -outputFolder "$PSScriptRoot/sdk" -additionalProperties $additionalProperties
 
@@ -33,10 +34,6 @@ $xml.Project.PropertyGroup.AppendChild($element) | Out-Null
 
 $element = $xml.CreateElement("PackageReadmeFile")
 $element.InnerText = "README.md"
-$xml.Project.PropertyGroup.AppendChild($element) | Out-Null
-
-$element = $xml.CreateElement("PackageLicenseExpression")
-$element.InnerText = "MIT"
 $xml.Project.PropertyGroup.AppendChild($element) | Out-Null
 
 # Create the new ItemGroup element with the README.md inclusion

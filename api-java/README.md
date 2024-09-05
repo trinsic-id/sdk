@@ -8,7 +8,7 @@ applications written in Java.
 
 ## Documentation
 
-See the [Trinsic docs](https://connect.docs.trinsic.id/docs/) for more detailed information on how to start integrating with our identity acceptance network.
+See the [Trinsic docs](https://docs.trinsic.id/docs/) for more detailed information on how to start integrating with our identity acceptance network.
 
 ## Installation
 
@@ -72,13 +72,13 @@ Trinsic follows a Semantic Versioning (SemVer) process where all releases will h
 
 ## Support
 
-New features and bug fixes are released on the latest major version of the `sdk-java-api` package. If you are on an older major version, we recommend that you upgrade to the latest in order to use the new features and bug fixes including those for security vulnerabilities. Older major versions of the package will continue to be available for use, but will not be receiving any updates.
+New features and bug fixes are released on the latest major version of the package. If you are on an older major version, we recommend that you upgrade to the latest in order to use the new features and bug fixes including those for security vulnerabilities. Older major versions of the package will continue to be available for use, but will not be receiving any updates.
 
 Any issues, inquiries, and feature requests can be sent to [support@trinsic.id](mailto:support@trinsic.id), or feel free to open a GitHub issue [here](https://github.com/trinsic-id/sdk/issues).
 
 ## More Information
 
-- [API Reference](https://connect.docs.trinsic.id/reference)
+- [API Reference](https://docs.trinsic.id/reference)
 - [Developer Guide](https://github.com/stripe/stripe-node/wiki/Passing-Options)
 - [Our Blog](https://trinsic.id/blog/)
 - [Schedule a demo](https://trinsic.id/contact/)

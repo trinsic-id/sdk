@@ -2,6 +2,8 @@
 
 This repository contains the scripts used to generate SDKs libraries from our OpenAPI spec in every major language. It also contains our UI SDKs to launch verification flows using the Trinsic widget.
 
+You can find the documentation of our platform at [docs.trinsic.id](https://docs.trinsic.id)
+
 ## API Libraries
 
 These are our server-side libraries used to communicate with Trinsic's API directly.
@@ -56,7 +58,7 @@ Any issues, inquiries, and feature requests can be sent to [support@trinsic.id](
 
 ## More Information
 
-- [API Reference](https://connect.docs.trinsic.id/reference)
+- [API Reference](https://docs.trinsic.id/reference)
 - [Developer Guide](https://github.com/stripe/stripe-node/wiki/Passing-Options)
 - [Our Blog](https://trinsic.id/blog/)
 - [Schedule a demo](https://trinsic.id/contact/)
