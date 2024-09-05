@@ -1,12 +1,12 @@
-# Trinsic SDK's
+# Trinsic SDKs
 
-This repository contains the scripts used to generate SDKs libraries from our OpenAPI spec in every major language. It also contains our UI SDKs to launch verification flows using the Trinsic widget.
+This repository is the home of Trinsic's API (backend) and UI (frontend) libraries.
 
-You can find the documentation of our platform at [docs.trinsic.id](https://docs.trinsic.id)
+You can find our platform's documentation at [docs.trinsic.id](https://docs.trinsic.id)
 
 ## API Libraries
 
-These are our server-side libraries used to communicate with Trinsic's API directly.
+Use these libraries in your backend to communicate with the Trinsic API.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/trinsic-id/sdk-go-api)](https://pkg.go.dev/github.com/trinsic-id/sdk-go-api)
 [![C# Version](https://img.shields.io/nuget/v/Trinsic.Api)](https://www.nuget.org/packages/WorkOS.net)
@@ -34,7 +34,7 @@ These are our server-side libraries used to communicate with Trinsic's API direc
 
 ## UI Libraries
 
-These are our server-side libraries used to communicate with Trinsic's API directly.
+Use these libraries in your frontend (web or mobile app) to launch the Trinsic Flow on your user's device after [creating a Session](https://docs.trinsic.id/docs/developer-tools) using an API Library.
 
 [![Version](https://img.shields.io/npm/v/@trinsic/web-ui.svg)](https://www.npmjs.org/package/@trinsic/web-ui)
 
@@ -48,11 +48,13 @@ These are our server-side libraries used to communicate with Trinsic's API direc
 
 ## SDK Versioning
 
-Trinsic follows a Semantic Versioning (SemVer) process where all releases will have a version X.Y.Z (like 1.0.0) pattern wherein Z would be a bug fix (e.g., 1.0.1), Y would be a minor release (1.1.0) and X would be a major release (2.0.0). We permit any breaking changes to only be released in major versions and strongly recommend reading changelogs before making any major version upgrades.
+Our SDKs follow the [Semantic Versioning](https://semver.org) ("SemVer") scheme. 
+
+For example, the version number `1.13.0` has a major version of `1`, a minor version of `13`, and a patch version of `0`.
+
+Breaking changes are only introduced alongside a new major version.
 
 ## Support
-
-New features and bug fixes are released on the latest major version of our packages. If you are on an older major version, we recommend that you upgrade to the latest in order to use the new features and bug fixes including those for security vulnerabilities. Older major versions of the package will continue to be available for use, but will not be receiving any updates.
 
 Any issues, inquiries, and feature requests can be sent to [support@trinsic.id](mailto:support@trinsic.id), or feel free to open a GitHub issue [here](https://github.com/trinsic-id/sdk/issues).
 
