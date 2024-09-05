@@ -14,6 +14,8 @@ $additionalProperties = @{
     developerOrganization    = "Trinsic"
     developerOrganizationUrl = "https://trinsic.id"
     artifactDescription      = "Trinsic"
+    licenseName              = "MIT"
+    licenseUrl               = "https://opensource.org/licenses/MIT"
 }
 & "$PSScriptRoot/../helpers/generate-client.ps1" -language "java" -outputFolder "$PSScriptRoot/sdk-build" -additionalProperties $additionalProperties
 

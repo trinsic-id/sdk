@@ -5,7 +5,7 @@ $additionalProperties = @{
     developerOrganization    = "Trinsic"
     developerOrganizationUrl = "https://trinsic.id"
     composerPackageName      = "trinsic/api"
-
+    licenseName              = "MIT"
 }
 & "$PSScriptRoot/../helpers/generate-client.ps1" -language "php" -outputFolder "$PSScriptRoot/sdk-build" -additionalProperties $additionalProperties
 
@@ -20,7 +20,6 @@ $jsonContent = Get-Content -Path $jsonFilePath -Raw | ConvertFrom-Json
 
 # Modify the description field
 $jsonContent.description = "Trinsic API PHP library."
-$jsonContent.license = "MIT"
 
 # Convert the modified object back to JSON
 $jsonContent | ConvertTo-Json -Depth 10 | Set-Content -Path $jsonFilePath

@@ -17,7 +17,7 @@ You need to run an API sample, so just pick one and follow its intructions. Here
 
 In the `api-typescript/samples` folder, run `npm ci` to install the necessary dependencies.
 
-Create a new `.env` file to set your Trinsic Access Token. You can use [`example.env`](./example.env) as a reference. If you need more information where to find this token, visit our [Getting Started](https://connect.docs.trinsic.id/docs/getting-started-with-trinsic-connect) guide.
+Create a new `.env` file to set your Trinsic Access Token. You can use [`example.env`](./example.env) as a reference. If you need more information where to find this token, visit our [Getting Started](https://docs.trinsic.id/docs/getting-started-with-trinsic-connect) guide.
 
 After you created your `.env` file you are good to run the project.
 
@@ -27,13 +27,11 @@ npm start
 
 ## Support
 
-New features and bug fixes are released on the latest major version of our packages. If you are on an older major version, we recommend that you upgrade to the latest in order to use the new features and bug fixes including those for security vulnerabilities. Older major versions of the package will continue to be available for use, but will not be receiving any updates.
-
 Any issues, inquiries, and feature requests can be sent to [support@trinsic.id](mailto:support@trinsic.id), or feel free to open a GitHub issue [here](https://github.com/trinsic-id/sdk/issues).
 
 ## More Information
 
-- [API Reference](https://connect.docs.trinsic.id/reference)
-- [Developer Guide](https://github.com/stripe/stripe-node/wiki/Passing-Options)
+- [API Reference](https://docs.trinsic.id/reference)
+- [Developer Guide](https://docs.trinsic.id/docs/developer-tools)
 - [Our Blog](https://trinsic.id/blog/)
 - [Schedule a demo](https://trinsic.id/contact/)
