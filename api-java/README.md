@@ -12,7 +12,8 @@ See the [Trinsic docs](https://docs.trinsic.id/docs/) for more detailed informat
 
 ## Installation
 
-If you are using maven add the following to your `pom.xml` file:
+### Maven
+Add the following to your `pom.xml` file:
 
 ```xml
 <repositories>
@@ -31,9 +32,13 @@ If you are using maven add the following to your `pom.xml` file:
 </dependencies>
 ```
 
-If you are using gradle:
+### Gradle
 
-```
+Add the following to your `build.gradle` or `build.gradle.kts` file:
+
+#### `build.gradle` (Groovy)
+
+```groovy
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -44,6 +49,22 @@ dependencyResolutionManagement {
 
 dependencies {
     implementation 'com.github.trinsic-id:sdk-java-api:Tag'
+}
+```
+
+#### `build.gradle.kts` (Kotlin)
+
+```kotlin
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        mavenCentral()
+        maven(url = "https://jitpack.io")
+    }
+}
+
+dependencies {
+    implementation("com.github.trinsic-id:sdk-java-api:Tag")
 }
 ```
 
