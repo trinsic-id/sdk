@@ -30,7 +30,15 @@ The package needs to be configured with your app's access token, which is availa
 <!-- TODO: add simple usage here -->
 
 ```rb
+TrinsicApi.configure do |config|
+  config.access_token = ENV['TRINSIC_ACCESS_TOKEN']
+end
 
+attachments = TrinsicApi::AttachmentsApi.new
+network = TrinsicApi::NetworkApi.new
+sessions = TrinsicApi::SessionsApi.new
+
+sessions.create_session({})
 ```
 
 You can find a full Ruby server example in the [samples](https://github.com/trinsic-id/sdk/tree/main/api-ruby/samples) folder.
