@@ -61,6 +61,10 @@ jobs:
     with:
       publish: false
     secrets: inherit
+  api-ruby-samples:
+    name: Validate API Ruby samples
+    needs: api-ruby
+    uses: ./.github/workflows/api-ruby-samples.yml
   api-typescript:
     name: Validate API Typescript
     uses: ./.github/workflows/api-typescript-action.yml

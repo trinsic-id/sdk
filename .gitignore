@@ -617,3 +617,5 @@ api-ruby/sdk
 api-typescript/sdk
 
 go-sample
+
+ui-web/samples/dist
