@@ -1,4 +1,4 @@
-name: Build API Typescript SDK sample
+name: Build API Ruby SDK sample
 
 on:
   workflow_call:
