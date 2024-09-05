@@ -8,7 +8,7 @@ applications written in Go.
 
 ## Documentation
 
-See the [Trinsic docs](https://connect.docs.trinsic.id/docs/) for more detailed information on how to start integrating with our identity acceptance network.
+See the [Trinsic docs](https://docs.trinsic.id/docs/) for more detailed information on how to start integrating with our identity acceptance network.
 
 ## Installation
 
@@ -52,7 +52,7 @@ Any issues, inquiries, and feature requests can be sent to [support@trinsic.id](
 
 ## More Information
 
-- [API Reference](https://connect.docs.trinsic.id/reference)
+- [API Reference](https://docs.trinsic.id/reference)
 - [Developer Guide](https://github.com/stripe/stripe-node/wiki/Passing-Options)
 - [Our Blog](https://trinsic.id/blog/)
 - [Schedule a demo](https://trinsic.id/contact/)
