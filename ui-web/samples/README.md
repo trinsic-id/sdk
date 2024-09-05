@@ -34,6 +34,6 @@ Any issues, inquiries, and feature requests can be sent to [support@trinsic.id](
 ## More Information
 
 - [API Reference](https://docs.trinsic.id/reference)
-- [Developer Guide](https://github.com/stripe/stripe-node/wiki/Passing-Options)
+- [Developer Guide](https://docs.trinsic.id/docs/developer-tools)
 - [Our Blog](https://trinsic.id/blog/)
 - [Schedule a demo](https://trinsic.id/contact/)
