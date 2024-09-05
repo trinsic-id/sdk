@@ -13,6 +13,7 @@ GEM
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
     mini_mime (1.1.5)
+    minitest (5.25.1)
     multi_json (1.15.0)
     multi_xml (0.7.1)
       bigdecimal (~> 3.1)
@@ -22,6 +23,8 @@ GEM
     rack-protection (3.2.0)
       base64 (>= 0.1.0)
       rack (~> 2.2, >= 2.2.4)
+    rack-test (2.1.0)
+      rack (>= 1.3)
     ruby2_keywords (0.0.5)
     sinatra (3.2.0)
       mustermann (~> 3.0)
@@ -46,7 +49,10 @@ PLATFORMS
 DEPENDENCIES
   dotenv
   httparty
-  sinatra
+  minitest
+  rack (~> 2.2.6)
+  rack-test
+  sinatra (~> 3.2.0)
   sinatra-contrib
   trinsic_api
 
