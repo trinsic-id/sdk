@@ -1,0 +1,8 @@
+# Gemfile
+source 'https://rubygems.org'
+
+gem 'dotenv', groups: [:development, :test]
+gem 'httparty'        # HTTP requests
+gem 'sinatra'
+gem 'sinatra-contrib' # For JSON support, etc.
+gem 'trinsic_api'     # Trinsic API client

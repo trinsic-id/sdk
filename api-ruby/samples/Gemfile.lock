@@ -1,0 +1,54 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    base64 (0.2.0)
+    bigdecimal (3.1.8)
+    csv (3.3.0)
+    dotenv (3.1.2)
+    ethon (0.16.0)
+      ffi (>= 1.15.0)
+    ffi (1.17.0-arm64-darwin)
+    httparty (0.22.0)
+      csv
+      mini_mime (>= 1.0.0)
+      multi_xml (>= 0.5.2)
+    mini_mime (1.1.5)
+    multi_json (1.15.0)
+    multi_xml (0.7.1)
+      bigdecimal (~> 3.1)
+    mustermann (3.0.3)
+      ruby2_keywords (~> 0.0.1)
+    rack (2.2.9)
+    rack-protection (3.2.0)
+      base64 (>= 0.1.0)
+      rack (~> 2.2, >= 2.2.4)
+    ruby2_keywords (0.0.5)
+    sinatra (3.2.0)
+      mustermann (~> 3.0)
+      rack (~> 2.2, >= 2.2.4)
+      rack-protection (= 3.2.0)
+      tilt (~> 2.0)
+    sinatra-contrib (3.2.0)
+      multi_json (>= 0.0.2)
+      mustermann (~> 3.0)
+      rack-protection (= 3.2.0)
+      sinatra (= 3.2.0)
+      tilt (~> 2.0)
+    tilt (2.4.0)
+    trinsic_api (0.6.1)
+      typhoeus (~> 1.0, >= 1.0.1)
+    typhoeus (1.4.1)
+      ethon (>= 0.9.0)
+
+PLATFORMS
+  arm64-darwin
+
+DEPENDENCIES
+  dotenv
+  httparty
+  sinatra
+  sinatra-contrib
+  trinsic_api
+
+BUNDLED WITH
+   2.5.14
