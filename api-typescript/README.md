@@ -29,7 +29,7 @@ import { AttachmentsApi, Configuration, NetworkApi, SessionsApi } from "@trinsic
 
 const config = new Configuration({ accessToken: "your-access-token" });
 
-const attachments = new NetworkApi(config);
+const attachments = new AttachmentsApi(config);
 const network = new NetworkApi(config);
 const sessions = new SessionsApi(config);
 
