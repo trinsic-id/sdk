@@ -1,0 +1,46 @@
+{
+  "extends": ["config:base"],
+  "packageRules": [
+    {
+      "matchPackageNames": ["Trinsic.Api"],
+      "groupName": "C# - Trinsic.Api dependency",
+      "enabled": true
+    },
+    {
+      "matchPackageNames": ["github.com/trinsic-id/sdk-go-api"],
+      "groupName": "Go - github.com/trinsic-id/sdk-go-api dependency",
+      "enabled": true
+    },
+    {
+      "matchPackageNames": ["com.github.trinsic-id:sdk-java-api"],
+      "groupName": "Java - com.github.trinsic-id:sdk-java-api dependency",
+      "registryUrls": ["https://jitpack.io"],
+      "enabled": true
+    },
+    {
+      "matchPackageNames": ["trinsic/api"],
+      "groupName": "PHP - trinsic/api dependency",
+      "enabled": true
+    },
+    {
+      "matchPackageNames": ["trinsic_api"],
+      "groupName": "Python - trinsic_api dependency",
+      "enabled": true
+    },
+    {
+      "matchPackageNames": ["trinsic_api"],
+      "groupName": "Ruby - trinsic_api dependency",
+      "enabled": true
+    },
+    {
+      "matchPackageNames": ["@trinsic/api"],
+      "groupName": "TypeScript - @trinsic/api dependency",
+      "enabled": true
+    },
+    {
+      "matchPackageNames": ["@trinsic/web"],
+      "groupName": "TypeScript Web - @trinsic/web dependency",
+      "enabled": true
+    }
+  ]
+}
