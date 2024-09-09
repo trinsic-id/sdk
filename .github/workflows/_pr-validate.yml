@@ -85,7 +85,7 @@ jobs:
     uses: ./.github/workflows/ui-android-samples.yml
     secrets: inherit
   ui-flutter-local:
-    if: "!contains(github.event.pull_request.changed_files, './ui-flutter/sample/pubspec.yaml')"
+    if: "!contains(github.event.pull_request.changed_files, './ui-flutter/samples/pubspec.yaml')"
     name: Validate UI Flutter SDK & Sample (Local Library)
     uses: ./.github/workflows/ui-flutter-action.yml
     with:
@@ -93,7 +93,7 @@ jobs:
       local: true
     secrets: inherit
   ui-flutter-published:
-    if: "contains(github.event.pull_request.changed_files, './ui-flutter/sample/pubspec.yaml')"
+    if: "contains(github.event.pull_request.changed_files, './ui-flutter/samples/pubspec.yaml')"
     name: Validate UI Flutter SDK & Sample (Published Library)
     uses: ./.github/workflows/ui-flutter-action.yml
     with:
