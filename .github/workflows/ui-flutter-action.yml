@@ -49,12 +49,12 @@ jobs:
         working-directory: ./ui-flutter/sdk
         run: flutter test
       - name: Build Sample Android App (Local Library)
-        if: "steps.changed-files.outputs.sample_pubspec == 'true' || inputs.publish == 'true'"
+        if: steps.changed-files.outputs.sample_pubspec == 'true' || inputs.publish == 'true'
         working-directory: ./ui-flutter
         run: ./build-sample.ps1 -useLocalLibrary
         shell: pwsh
       - name: Build Sample Android App (Published Library)
-        if: "steps.changed-files.outputs.sample_pubspec == 'false' && inputs.publish == 'false'"
+        if: steps.changed-files.outputs.sample_pubspec == 'false' && inputs.publish == 'false'
         working-directory: ./ui-flutter
         run: ./build-sample.ps1
         shell: pwsh
