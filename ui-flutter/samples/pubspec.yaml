@@ -17,13 +17,10 @@ dependencies:
   flutter:
     sdk: flutter
 
-  trinsic_flutter_ui:
-    # When depending on this package from a real application you should use:
-    #   trinsic_flutter_ui: ^x.y.z
-    # See https://dart.dev/tools/pub/dependencies#version-constraints
-    # The example app is bundled with the plugin so we use a path dependency on
-    # the parent directory to use the current plugin's version.
-    path: ../sdk/
+  # We rely on the published version of the library, but during PR validation (and during local development),
+  # we want to build the sample against the local version of the library. 
+  trinsic_flutter_ui: ^0.1.0
+    # path: ../sdk/
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
