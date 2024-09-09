@@ -18,7 +18,7 @@ dependencies:
     sdk: flutter
 
   # We rely on the published version of the library, but during PR validation (and during local development),
-  # we want to build the sample against the local version of the library. 
+  # we want to build the sample against the local version of the library.  
   trinsic_flutter_ui: ^0.1.0
     # path: ../sdk/
 

@@ -5,7 +5,7 @@ class TrinsicFlutter {
     return TrinsicFlutterPlatform.instance.getPlatformVersion();
   }
 
-  static Future<Map?> invoke(String launchUrl, String redirectUrl) {
+  static Future<Map?> invokeBREAK(String launchUrl, String redirectUrl) {
     return TrinsicFlutterPlatform.instance.invoke(launchUrl, redirectUrl);
   }
 }
