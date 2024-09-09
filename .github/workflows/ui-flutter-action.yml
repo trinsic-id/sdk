@@ -8,6 +8,11 @@ on:
         required: false
         default: false
         description: "Publish the package, default is false"
+      local:
+        type: boolean
+        required: false
+        default: true
+        description: "Use local library for sample build, default is true"
 
 jobs:
   build_and_publish:
@@ -41,13 +46,16 @@ jobs:
       - name: Run Flutter SDK Tests
         working-directory: ./ui-flutter/sdk
         run: flutter test
-      - name: Build Sample Android App
-        working-directory: ./ui-flutter/samples
-        run: |
-          sed -i 's/  trinsic_flutter_ui: \^[0-9.]*$/  trinsic_flutter_ui:/' pubspec.yaml
-          sed -i 's|    # path: \.\./sdk/$|    path: ../sdk/|' pubspec.yaml
-          cat pubspec.yaml
-          flutter build apk
+      - name: Build Sample Android App (Local Library)
+        if: inputs.local == true
+        working-directory: ./ui-flutter
+        run: ./build-sample.ps1 -useLocalLibrary
+        shell: pwsh
+      - name: Build Sample Android App (Published Library)
+        if: inputs.local == false
+        working-directory: ./ui-flutter
+        run: ./build-sample.ps1
+        shell: pwsh
       - name: Publish SDK (dry run)
         working-directory: ./
         if: inputs.publish == false
