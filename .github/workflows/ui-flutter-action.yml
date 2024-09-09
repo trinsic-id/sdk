@@ -15,6 +15,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v45
+        with:
+          files_yaml: |
+            sample_pubspec:
+              - ui-flutter/samples/pubspec.yaml
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -41,9 +48,16 @@ jobs:
       - name: Run Flutter SDK Tests
         working-directory: ./ui-flutter/sdk
         run: flutter test
-      - name: Build Sample Android App
-        working-directory: ./ui-flutter/samples
-        run: flutter build apk
+      - name: Build Sample Android App (Local Library)
+        if: steps.changed-files.outputs.sample_pubspec_any_changed == 'true' || inputs.publish == 'true'
+        working-directory: ./ui-flutter
+        run: ./build-sample.ps1 -useLocalLibrary
+        shell: pwsh
+      - name: Build Sample Android App (Published Library)
+        if: steps.changed-files.outputs.sample_pubspec_any_changed == 'false' && inputs.publish == 'false'
+        working-directory: ./ui-flutter
+        run: ./build-sample.ps1
+        shell: pwsh
       - name: Publish SDK (dry run)
         working-directory: ./
         if: inputs.publish == false

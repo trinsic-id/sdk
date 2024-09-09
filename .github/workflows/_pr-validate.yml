@@ -1,7 +1,6 @@
 name: PR Validation
 
 on:
-  workflow_dispatch:
   pull_request:
 
 jobs:
@@ -86,7 +85,7 @@ jobs:
     uses: ./.github/workflows/ui-android-samples.yml
     secrets: inherit
   ui-flutter:
-    name: Validate UI Flutter SDK
+    name: Validate UI Flutter SDK & Sample
     uses: ./.github/workflows/ui-flutter-action.yml
     with:
       publish: false
