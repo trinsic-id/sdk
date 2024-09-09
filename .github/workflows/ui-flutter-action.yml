@@ -24,7 +24,7 @@ jobs:
               - ui-flutter/samples/pubspec.yaml
       - name: List all changed files
         env:
-          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.sample_pubspec_all_changed_files }}
         run: |
           for file in ${ALL_CHANGED_FILES}; do
             echo "$file was changed"
@@ -56,12 +56,12 @@ jobs:
         working-directory: ./ui-flutter/sdk
         run: flutter test
       - name: Build Sample Android App (Local Library)
-        if: steps.changed-files.outputs.sample_pubspec == 'true' || inputs.publish == 'true'
+        if: steps.changed-files.outputs.sample_pubspec_any_changed == 'true' || inputs.publish == 'true'
         working-directory: ./ui-flutter
         run: ./build-sample.ps1 -useLocalLibrary
         shell: pwsh
       - name: Build Sample Android App (Published Library)
-        if: steps.changed-files.outputs.sample_pubspec == 'false' && inputs.publish == 'false'
+        if: steps.changed-files.outputs.sample_pubspec_any_changed == 'false' && inputs.publish == 'false'
         working-directory: ./ui-flutter
         run: ./build-sample.ps1
         shell: pwsh
