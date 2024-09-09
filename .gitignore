@@ -611,5 +611,11 @@ doc/api/
 vendor
 sdk-build
 
-dist
+api-csharp/sdk
+api-python/sdk
+api-ruby/sdk
+api-typescript/sdk
+
 go-sample
+
+ui-web/samples/dist

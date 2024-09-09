@@ -17,7 +17,9 @@ Pod::Spec.new do |s|
   s.source_files = ["ios/**/*.{h,m,mm,cpp}"]
   # Public headers
   s.public_header_files = 'ios/**/*.h'
-  s.dependency 'TrinsicUI', '0.3.13'
+  s.dependency 'TrinsicUI', '0.3.14'
+
+  s.static_framework = true
 
   # Use install_modules_dependencies helper to install the dependencies if React Native version >=0.71.0.
   # See https://github.com/facebook/react-native/blob/febf6b7f33fdb4904669f99d795eba4c0f95d7bf/scripts/cocoapods/new_architecture.rb#L79.
@@ -32,13 +34,20 @@ Pod::Spec.new do |s|
       s.pod_target_xcconfig    = {
           "HEADER_SEARCH_PATHS" => "\"$(PODS_ROOT)/boost\"",
           "OTHER_CPLUSPLUSFLAGS" => "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1",
-          "CLANG_CXX_LANGUAGE_STANDARD" => "c++17"
+          "CLANG_CXX_LANGUAGE_STANDARD" => "c++17",
+          'DEFINES_MODULE' => 'YES',
+          'SWIFT_COMPILATION_MODE' => 'wholemodule'
       }
       s.dependency "React-Codegen"
       s.dependency "RCT-Folly"
       s.dependency "RCTRequired"
       s.dependency "RCTTypeSafety"
       s.dependency "ReactCommon/turbomodule/core"
+    else
+      s.pod_target_xcconfig = {
+        'DEFINES_MODULE' => 'YES',
+        'SWIFT_COMPILATION_MODE' => 'wholemodule'
+      }
     end
   end
 end

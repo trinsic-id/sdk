@@ -42,7 +42,7 @@ async def launch(provider_id: str, redirectUrl: str):
     try:
         request = CreateSessionRequest()
         request.providers = [provider_id]
-        request.launch_method_directly = True
+        request.launch_provider_directly = True
 
         data = sessions_api.create_session(create_session_request=request)
 

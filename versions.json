@@ -1,5 +1,5 @@
 {
-  "backendVersion": "0.4",
+  "backendVersion": "1.0",
   "nodePatchVersion": "0",
   "csharpPatchVersion": "0",
   "javaPatchVersion": "0",
@@ -7,10 +7,9 @@
   "pythonPatchVersion": "0",
   "phpPatchVersion": "0",
   "rubyPatchVersion": "0",
-  "webPatchVersion": "0",
-
-  "swiftUIVersion": "0.3.13",
+  "swiftUIVersion": "0.3.14",
   "androidUIVersion": "0.3.3",
   "flutterUIVersion": "0.1.0",
-  "reactNativeUIVersion": "0.1.5"
+  "reactNativeUIVersion": "0.1.7",
+  "webUIVersion": "1.0.0"
 }

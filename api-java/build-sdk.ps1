@@ -14,12 +14,17 @@ $additionalProperties = @{
     developerOrganization    = "Trinsic"
     developerOrganizationUrl = "https://trinsic.id"
     artifactDescription      = "Trinsic"
+    licenseName              = "MIT"
+    licenseUrl               = "https://opensource.org/licenses/MIT"
 }
 & "$PSScriptRoot/../helpers/generate-client.ps1" -language "java" -outputFolder "$PSScriptRoot/sdk-build" -additionalProperties $additionalProperties
 
 
 try {
     Push-Location "$PSScriptRoot/sdk-build"
+
+    Copy-Item "$PSScriptRoot/README.md" "$PSScriptRoot/sdk-build"
+    Copy-Item "$PSScriptRoot/../LICENSE" "$PSScriptRoot/sdk-build"
 
     # Remove the auto-generated github action; our PAT doesn't let us push it and we don't need it
     Remove-Item -Path ".github/workflows/maven.yml" -Force
@@ -70,7 +75,13 @@ try {
     $buildGradleFileContent | Set-Content -Path $buildGradleFile
 
     & gradle compileJava
+    if ($LASTEXITCODE -ne 0) {
+        throw "gradle compileJava failed"
+    }
     & gradle jar    
+    if ($LASTEXITCODE -ne 0) {
+        throw "gradle jar failed"
+    }
 }
 finally {
     Pop-Location
