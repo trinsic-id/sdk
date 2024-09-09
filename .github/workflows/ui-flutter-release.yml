@@ -9,5 +9,4 @@ jobs:
     uses: ./.github/workflows/ui-flutter-action.yml
     with:
       publish: true
-      local: true
     secrets: inherit

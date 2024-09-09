@@ -84,21 +84,11 @@ jobs:
     name: Validate UI Android Samples
     uses: ./.github/workflows/ui-android-samples.yml
     secrets: inherit
-  ui-flutter-local:
-    if: "!contains(github.event.pull_request.changed_files, './ui-flutter/samples/pubspec.yaml')"
-    name: Validate UI Flutter SDK & Sample (Local Library)
-    uses: ./.github/workflows/ui-flutter-action.yml
-    with:
-      publish: false
-      local: true
-    secrets: inherit
-  ui-flutter-published:
-    if: "contains(github.event.pull_request.changed_files, './ui-flutter/samples/pubspec.yaml')"
+  ui-flutter:
     name: Validate UI Flutter SDK & Sample (Published Library)
     uses: ./.github/workflows/ui-flutter-action.yml
     with:
       publish: false
-      local: false
     secrets: inherit
   ui-react-native:
     name: Validate UI React Native SDK
