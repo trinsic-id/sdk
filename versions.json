@@ -10,6 +10,6 @@
   "swiftUIVersion": "0.3.14",
   "androidUIVersion": "0.3.3",
   "flutterUIVersion": "0.1.0",
-  "reactNativeUIVersion": "0.1.6",
+  "reactNativeUIVersion": "0.1.7",
   "webUIVersion": "1.0.0"
 }
