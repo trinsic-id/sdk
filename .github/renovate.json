@@ -40,5 +40,13 @@
     "github.com/gofiber/fiber/v2",
     "github.com/joho/godotenv",
     "DotNetEnv"
+  ],
+  "packageRules": [
+    {
+      "groupName": "all-dependencies",
+      "groupSlug": "all-dependencies",
+      "separateMinorPatch": false,
+      "matchUpdateTypes": ["minor", "patch", "major"]
+    }
   ]
 }
