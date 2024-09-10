@@ -1,7 +1,6 @@
 {
   "private": true,
   "workspaces": [
-    "api-typescript/sdk",
     "api-typescript/samples",
     "ui-web/samples",
     "ui-react-native/sdk",
