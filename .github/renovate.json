@@ -6,7 +6,7 @@
   "prHourlyLimit": 0,
   "includePaths": [
     ".github/renovate.json",
-    "api-csharp/samples/**",
+    "api-csharp/samples/Sample/**",
     "api-go/samples/**",
     "api-java/samples/**",
     "api-php/samples/**",
@@ -15,5 +15,30 @@
     "api-ruby/samples/**",
     "api-typescript/samples/**",
     "ui-web/samples/**"
+  ],
+  "ignoreDeps": [
+    "vite",
+    "express",
+    "@types/node",
+    "nodemon",
+    "ts-node",
+    "ts-node-dev",
+    "typescript",
+    "dotenv",
+    "httparty",
+    "sinatra",
+    "sinatra-contrib",
+    "rack",
+    "rack-test",
+    "minitest",
+    "slim/slim",
+    "slim/psr7",
+    "vlucas/phpdotenv",
+    "io.javalin:javalin",
+    "org.slf4j:slf4j-simple",
+    "io.github.cdimascio:dotenv-java",
+    "github.com/gofiber/fiber/v2",
+    "github.com/joho/godotenv",
+    "DotNetEnv"
   ]
 }
