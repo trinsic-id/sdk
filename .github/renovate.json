@@ -1,0 +1,42 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "branchPrefix": "mewmba/renovate/",
+  "gitAuthor": "mewmba Renovate Bot <mewmba@trinsic.id>",
+  "repositories": ["trinsic-id/sdk"],
+  "prHourlyLimit": 0,
+  "packageRules": [
+    {
+      "matchPackageNames": ["Trinsic.Api"],
+      "groupName": "C# - Trinsic.Api dependency"
+    },
+    {
+      "matchPackageNames": ["github.com/trinsic-id/sdk-go-api"],
+      "groupName": "Go - github.com/trinsic-id/sdk-go-api dependency"
+    },
+    {
+      "matchPackageNames": ["com.github.trinsic-id:sdk-java-api"],
+      "groupName": "Java - com.github.trinsic-id:sdk-java-api dependency",
+      "registryUrls": ["https://jitpack.io"]
+    },
+    {
+      "matchPackageNames": ["trinsic/api"],
+      "groupName": "PHP - trinsic/api dependency"
+    },
+    {
+      "matchPackageNames": ["trinsic_api"],
+      "groupName": "Python - trinsic_api dependency"
+    },
+    {
+      "matchPackageNames": ["trinsic_api"],
+      "groupName": "Ruby - trinsic_api dependency"
+    },
+    {
+      "matchPackageNames": ["@trinsic/api"],
+      "groupName": "TypeScript - @trinsic/api dependency"
+    },
+    {
+      "matchPackageNames": ["@trinsic/web"],
+      "groupName": "TypeScript Web - @trinsic/web dependency"
+    }
+  ]
+}
