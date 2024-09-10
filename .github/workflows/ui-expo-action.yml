@@ -1,0 +1,28 @@
+name: Build and Publish Expo UI SDK
+
+on:
+  workflow_call:
+    inputs:
+      publish:
+        type: boolean
+        required: false
+        default: false
+        description: "Publish the package, default is false"
+
+jobs:
+  build_and_publish:
+    name: Build and Publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install NPM dependencies
+        run: npm ci
+      - name: Generate ui Expo SDK
+        run: ./ui-expo/build-sdk.ps1
+        shell: pwsh
+      - name: Publish ui Expo SDK
+        if: inputs.publish == true
+        run: ./ui-expo/publish-sdk.ps1
+        shell: pwsh
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
