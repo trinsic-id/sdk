@@ -9,5 +9,13 @@
   "assignees": ["lucasamonrc"],
   "reviewers": ["lucasamonrc"],
   "prHourlyLimit": 0,
-  "recreateWhen": "always"
+  "recreateWhen": "always",
+  "ignorePaths": [
+    "**/sdk/**",
+    "ui-android/**",
+    "ui-flutter/**",
+    "ui-react-native/**",
+    "ui-swift/**",
+    "swift/**"
+  ]
 }
