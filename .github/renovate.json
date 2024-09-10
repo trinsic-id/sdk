@@ -1,5 +1,12 @@
 {
-  "extends": ["config:base"],
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "branchPrefix": "mewmba/renovate/",
+  "gitAuthor": "mewmba Renovate Bot <mewmba@trinsic.id>",
+  "repositories": ["trinsic-id/sdk"],
+  "additionalBranchPrefix": "{{manager}}-",
+  "groupName": "all {{manager}} dependencies",
+  "groupSlug": "all",
+  "prHourlyLimit": 0,
   "packageRules": [
     {
       "matchPackageNames": ["Trinsic.Api"],
