@@ -19,6 +19,7 @@
     "typescript": "5.5.4"
   },
   "dependencies": {
+    "expo-linking": "6.3.1",
     "expo-web-browser": "^13.0.3"
   }
 }
