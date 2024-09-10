@@ -10,6 +10,7 @@ try {
     $remoteOrigin = "https://$githubPAT@github.com/trinsic-id/sdk-swift-ui.git"
     Write-Host "Setting origin to $remoteOrigin"
     git remote set-url origin $remoteOrigin
+    
 
     Write-Host "Checking out main branch"
     # If we don't do this we're in a detached head state
