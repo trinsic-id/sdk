@@ -1,6 +1,6 @@
 {
   "name": "@trinsic/expo-ui",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Helper methods to launch and capture the results of a Trinsic verification",
   "main": "index.js",
   "scripts": {
@@ -19,6 +19,7 @@
     "typescript": "5.5.4"
   },
   "dependencies": {
-    "expo-web-browser": "^13.0.3"
+    "expo-linking": "~6.0.0",
+    "expo-web-browser": "~13.0.0"
   }
 }
