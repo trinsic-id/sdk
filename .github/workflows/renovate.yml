@@ -1,8 +1,6 @@
 name: "Renovate Bot"
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 9 * * 1" # "At 09:00 on Monday."
 
   pull_request:
     paths:
