@@ -1,6 +1,6 @@
 {
   "name": "@trinsic/expo-ui",
-  "version": "0.1.2",
+  "version": "0.0.1",
   "description": "Helper methods to launch and capture the results of a Trinsic verification",
   "main": "index.js",
   "scripts": {
