@@ -7,7 +7,7 @@ appcompat = "1.6.1"
 material = "1.10.0"
 constraintlayout = "2.1.4"
 navigationFragment = "2.6.0"
-navigationUi = "2.6.0"
+navigationUi = "2.8.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
