@@ -5,17 +5,12 @@
   "repositories": ["trinsic-id/sdk"],
   "prHourlyLimit": 0,
   "recreateWhen": "always",
-  "includePaths": [
-    ".github/renovate.json",
-    "api-csharp/samples/Sample/**",
-    "api-go/samples/**",
-    "api-java/samples/**",
-    "api-php/samples/**",
-    "api-python/samples/**",
-    "api-php/samples/**",
-    "api-ruby/samples/**",
-    "api-typescript/samples/**",
-    "ui-web/samples/**"
+  "ignorePaths": [
+    "**/sdk/**",
+    "ui-android/**",
+    "ui-flutter/**",
+    "ui-react-native/**",
+    "ui-swift/**"
   ],
   "ignoreDeps": [
     "vite",
@@ -40,26 +35,7 @@
     "io.github.cdimascio:dotenv-java",
     "github.com/gofiber/fiber/v2",
     "github.com/joho/godotenv",
-    "DotNetEnv"
-  ],
-  "npm": {
-    "enabled": true
-  },
-  "packageRules": [
-    {
-      "description": "Update npm workspace dependencies and lockfile at root",
-      "matchPaths": ["ui-web/samples/**", "api-typescript/samples/**"],
-      "matchManagers": ["npm"],
-      "matchPackagePatterns": ["*"],
-      "updateTypes": ["minor", "patch"],
-      "commitMessage": "chore(deps): update workspace dependencies in ui-web/samples and api-typescript/samples",
-      "depTypeList": ["dependencies", "devDependencies"],
-      "prPriority": 1,
-      "recreateWhen": "always"
-    }
-  ],
-  "lockFileMaintenance": {
-    "enabled": true,
-    "schedule": ["before 6am on the first day of the month"]
-  }
+    "DotNetEnv",
+    "@openapitools/openapi-generator-cli"
+  ]
 }
