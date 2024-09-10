@@ -1,21 +1,13 @@
 {
   "private": true,
   "workspaces": [
-    "api-typescript/sdk",
     "api-typescript/samples",
     "ui-web/samples",
     "ui-react-native/sdk",
-    "ui-react-native/sdk/example",
-    "ui-expo/sdk"
+    "ui-react-native/sdk/example"
   ],
   "name": "trinsic-sdks",
-  "version": "0.3.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "build:ui-web": "cd ui-web/samples && npm run build"
-  },
-  "author": "",
+  "version": "0.0.1",
   "license": "MIT",
   "dependencies": {
     "@openapitools/openapi-generator-cli": "2.13.5"

@@ -1,5 +1,8 @@
 try {
     Push-Location "$PSScriptRoot\sdk"
+
+    & node --version
+    & npm --version
     
     & npm ci
 

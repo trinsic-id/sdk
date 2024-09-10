@@ -1,11 +1,11 @@
 {
   "name": "@trinsic/expo-ui",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "Helper methods to launch and capture the results of a Trinsic verification",
   "main": "index.js",
   "scripts": {
-    "build-js": "esbuild index.ts --bundle --platform=node --format=cjs --outdir=dist --target=es2020 --external:react --external:react-native --external:react/jsx-runtime --external:expo-web-browser --external:expo-modules-core",
-    "build-ts": "tsc index.ts --declaration --emitDeclarationOnly --lib es2020 --outDir dist",
+    "build-js": "esbuild index.ts --bundle --platform=node --format=cjs --outdir=dist --target=es2020 --external:react --external:react-native --external:react/jsx-runtime --external:expo-web-browser --external:expo-modules-core --external:expo-linking",
+    "build-ts": "tsc index.ts --declaration --moduleResolution node --emitDeclarationOnly --lib es6 --types react-native --outDir dist --skipLibCheck",
     "build": "npm run build-js && npm run build-ts"
   },
   "module": "dist/index.js",
@@ -19,6 +19,7 @@
     "typescript": "5.5.4"
   },
   "dependencies": {
+    "expo-linking": "^6.3.1",
     "expo-web-browser": "^13.0.3"
   }
 }

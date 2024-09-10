@@ -27,7 +27,12 @@ try {
     $content | ConvertTo-Json -Depth 10 | Set-Content -Path $packageJson
 
     Push-Location "$PSScriptRoot/sdk"
-    & npm ci
+    & npm install
+
+    if ($LASTEXITCODE -ne 0) {
+        throw "npm install failed"
+    }
+
     & npm pack --pack-destination "$PSScriptRoot/sdk/publish"
 }
 finally {
