@@ -4,8 +4,58 @@ on:
   pull_request:
 
 jobs:
+  pre-check:
+    name: Pre-check
+    runs-on: ubuntu-latest
+    outputs:
+      api-csharp: ${{ steps.changed-files.outputs.api-csharp_any_changed }}
+      api-go: ${{ steps.changed-files.outputs.api-go_any_changed }}
+      api-java: ${{ steps.changed-files.outputs.api-java_any_changed }}
+      api-php: ${{ steps.changed-files.outputs.api-php_any_changed }}
+      api-python: ${{ steps.changed-files.outputs.api-python_any_changed }}
+      api-ruby: ${{ steps.changed-files.outputs.api-ruby_any_changed }}
+      api-typescript: ${{ steps.changed-files.outputs.api-typescript_any_changed }}
+      ui-android: ${{ steps.changed-files.outputs.ui-android_any_changed }}
+      ui-flutter: ${{ steps.changed-files.outputs.ui-flutter_any_changed }}
+      ui-react-native: ${{ steps.changed-files.outputs.ui-react-native_any_changed }}
+      ui-web: ${{ steps.changed-files.outputs.ui-web_any_changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: false
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v45
+        with:
+          files_yaml: |
+            api-csharp:
+              - api-csharp/**
+            api-go:
+              - api-go/**
+            api-java:
+              - api-java/**
+            api-php:
+              - api-php/**
+            api-python:
+              - api-python/**
+            api-ruby:
+              - api-ruby/**
+            api-typescript:
+              - api-typescript/**
+            ui-android:
+              - ui-android/**
+            ui-flutter:
+              - ui-flutter/**
+            ui-react-native:
+              - ui-react-native/**
+            ui-web:
+              - ui-web/**
   api-csharp:
     name: Validate API CSharp SDK
+    needs: pre-check
+    if: ${{ needs.pre-check.outputs.api-csharp == 'true' }}
     uses: ./.github/workflows/api-csharp-action.yml
     with:
       publish: false
@@ -16,6 +66,8 @@ jobs:
     uses: ./.github/workflows/api-csharp-samples.yml
   api-go:
     name: Validate API Go SDK
+    needs: pre-check
+    if: ${{ needs.pre-check.outputs.api-go == 'true' }}
     uses: ./.github/workflows/api-go-action.yml
     with:
       publish: false
@@ -26,6 +78,8 @@ jobs:
     uses: ./.github/workflows/api-go-samples.yml
   api-java:
     name: Validate API Java SDK
+    needs: pre-check
+    if: ${{ needs.pre-check.outputs.api-java == 'true' }}
     uses: ./.github/workflows/api-java-action.yml
     with:
       publish: false
@@ -36,6 +90,8 @@ jobs:
     uses: ./.github/workflows/api-java-samples.yml
   api-php:
     name: Validate API PHP SDK
+    needs: pre-check
+    if: ${{ needs.pre-check.outputs.api-php == 'true' }}
     uses: ./.github/workflows/api-php-action.yml
     with:
       publish: false
@@ -46,6 +102,8 @@ jobs:
     uses: ./.github/workflows/api-php-samples.yml
   api-python:
     name: Validate API Python SDK
+    needs: pre-check
+    if: ${{ needs.pre-check.outputs.api-python == 'true' }}
     uses: ./.github/workflows/api-python-action.yml
     with:
       publish: false
@@ -56,6 +114,8 @@ jobs:
     uses: ./.github/workflows/api-python-samples.yml
   api-ruby:
     name: Validate API Ruby SDK
+    needs: pre-check
+    if: ${{ needs.pre-check.outputs.api-ruby == 'true' }}
     uses: ./.github/workflows/api-ruby-action.yml
     with:
       publish: false
@@ -66,6 +126,8 @@ jobs:
     uses: ./.github/workflows/api-ruby-samples.yml
   api-typescript:
     name: Validate API Typescript
+    needs: pre-check
+    if: ${{ needs.pre-check.outputs.api-typescript == 'true' }}
     uses: ./.github/workflows/api-typescript-action.yml
     with:
       publish: false
@@ -76,28 +138,38 @@ jobs:
     uses: ./.github/workflows/api-typescript-samples.yml
   ui-android:
     name: Validate UI Android SDK
+    needs: pre-check
+    if: ${{ needs.pre-check.outputs.ui-android == 'true' }}
     uses: ./.github/workflows/ui-android-action.yml
     with:
       publish: false
     secrets: inherit
   ui-android-samples:
     name: Validate UI Android Samples
+    needs: pre-check
+    if: ${{ needs.pre-check.outputs.ui-android == 'true' }}
     uses: ./.github/workflows/ui-android-samples.yml
     secrets: inherit
   ui-flutter:
     name: Validate UI Flutter SDK & Sample
+    needs: pre-check
+    if: ${{ needs.pre-check.outputs.ui-flutter == 'true' }}
     uses: ./.github/workflows/ui-flutter-action.yml
     with:
       publish: false
     secrets: inherit
   ui-react-native:
     name: Validate UI React Native SDK
+    needs: pre-check
+    if: ${{ needs.pre-check.outputs.ui-react-native == 'true' }}
     uses: ./.github/workflows/ui-react-native-action.yml
     with:
       publish: false
     secrets: inherit
   ui-web:
     name: Validate UI Web SDK
+    needs: pre-check
+    if: ${{ needs.pre-check.outputs.ui-web == 'true' }}
     uses: ./.github/workflows/ui-web-action.yml
     with:
       publish: false
