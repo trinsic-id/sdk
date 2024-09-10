@@ -3,51 +3,40 @@
   "branchPrefix": "mewmba/renovate/",
   "gitAuthor": "mewmba Renovate Bot <mewmba@trinsic.id>",
   "repositories": ["trinsic-id/sdk"],
-  "additionalBranchPrefix": "{{manager}}-",
-  "groupName": "all {{manager}} dependencies",
-  "groupSlug": "all",
   "prHourlyLimit": 0,
   "packageRules": [
     {
       "matchPackageNames": ["Trinsic.Api"],
-      "groupName": "C# - Trinsic.Api dependency",
-      "enabled": true
+      "groupName": "C# - Trinsic.Api dependency"
     },
     {
       "matchPackageNames": ["github.com/trinsic-id/sdk-go-api"],
-      "groupName": "Go - github.com/trinsic-id/sdk-go-api dependency",
-      "enabled": true
+      "groupName": "Go - github.com/trinsic-id/sdk-go-api dependency"
     },
     {
       "matchPackageNames": ["com.github.trinsic-id:sdk-java-api"],
       "groupName": "Java - com.github.trinsic-id:sdk-java-api dependency",
-      "registryUrls": ["https://jitpack.io"],
-      "enabled": true
+      "registryUrls": ["https://jitpack.io"]
     },
     {
       "matchPackageNames": ["trinsic/api"],
-      "groupName": "PHP - trinsic/api dependency",
-      "enabled": true
+      "groupName": "PHP - trinsic/api dependency"
     },
     {
       "matchPackageNames": ["trinsic_api"],
-      "groupName": "Python - trinsic_api dependency",
-      "enabled": true
+      "groupName": "Python - trinsic_api dependency"
     },
     {
       "matchPackageNames": ["trinsic_api"],
-      "groupName": "Ruby - trinsic_api dependency",
-      "enabled": true
+      "groupName": "Ruby - trinsic_api dependency"
     },
     {
       "matchPackageNames": ["@trinsic/api"],
-      "groupName": "TypeScript - @trinsic/api dependency",
-      "enabled": true
+      "groupName": "TypeScript - @trinsic/api dependency"
     },
     {
       "matchPackageNames": ["@trinsic/web"],
-      "groupName": "TypeScript Web - @trinsic/web dependency",
-      "enabled": true
+      "groupName": "TypeScript Web - @trinsic/web dependency"
     }
   ]
 }
