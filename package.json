@@ -7,7 +7,6 @@
     "ui-web/samples",
     "ui-react-native/sdk",
     "ui-react-native/sdk/example",
-    "ui-expo/sdk",
     "ui-expo/samples/expo-sample"
   ],
   "name": "trinsic-sdks",
