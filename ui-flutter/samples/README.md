@@ -1,16 +1,8 @@
 # trinsic_flutter_ui_example
 
-Demonstrates how to use the trinsic_flutter_ui plugin.
+A sample app for the `trinsic_flutter_ui` library.
 
-## Getting Started
+## Setup
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1. Run `flutter pub get` in the same directory as this `README.md` file
+   1. Besides just fetching dependencies, this will also configure a few build files necessary for Flutter to build the Android/iOS apps. 
