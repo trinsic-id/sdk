@@ -19,14 +19,14 @@ jobs:
           submodules: recursive
           token: ${{ secrets.GITHUB_TOKEN }}
           persist-credentials: false
-      - uses: actions/setup-java@v4
-        with:
-          distribution: "temurin"
-          java-version: "21"
       - name: Build library
         run: |
           cd ./ui-android/sdk
           ./gradlew :library:build
+      - name: Build sample
+        run: |
+          cd ./ui-android/samples
+          ./gradlew build
       - name: Publish SDK
         if: inputs.publish == true
         run: ./ui-android/publish-sdk.ps1
