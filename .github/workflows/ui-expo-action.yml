@@ -1,4 +1,4 @@
-name: Build and Publish Web UI SDK
+name: Build and Publish Expo UI SDK
 
 on:
   workflow_call:
@@ -17,18 +17,12 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install NPM dependencies
         run: npm ci
-      - name: Generate api typescript SDK
-        run: ./api-typescript/build-sdk.ps1
+      - name: Generate ui Expo SDK
+        run: ./ui-expo/build-sdk.ps1
         shell: pwsh
-      - name: Generate ui web SDK
-        run: ./ui-web/build-sdk.ps1
-        shell: pwsh
-      - name: Build sample
-        run: ./ui-web/build-sample.ps1
-        shell: pwsh
-      - name: Publish ui web SDK
+      - name: Publish ui Expo SDK
         if: inputs.publish == true
-        run: ./ui-web/publish-sdk.ps1
+        run: ./ui-expo/publish-sdk.ps1
         shell: pwsh
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

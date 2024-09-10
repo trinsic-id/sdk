@@ -84,6 +84,12 @@ jobs:
     name: Validate UI Android Samples
     uses: ./.github/workflows/ui-android-samples.yml
     secrets: inherit
+  ui-expo:
+    name: Validate UI Expo SDK
+    uses: ./.github/workflows/ui-expo-action.yml
+    with:
+      publish: false
+    secrets: inherit
   ui-flutter:
     name: Validate UI Flutter SDK & Sample
     uses: ./.github/workflows/ui-flutter-action.yml
@@ -102,7 +108,3 @@ jobs:
     with:
       publish: false
     secrets: inherit
-  ui-web-sample:
-    name: Validate UI Web sample
-    needs: ui-web
-    uses: ./.github/workflows/ui-web-samples.yml
