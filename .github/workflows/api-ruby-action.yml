@@ -17,8 +17,15 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install NPM dependencies
         run: npm ci
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
       - name: Generate SDK
         run: ./api-ruby/build-sdk.ps1
+        shell: pwsh
+      - name: Build sample
+        run: ./api-ruby/build-sample.ps1
         shell: pwsh
       - name: Publish SDK
         if: inputs.publish == true

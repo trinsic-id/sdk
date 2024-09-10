@@ -10,79 +10,47 @@ jobs:
     with:
       publish: false
     secrets: inherit
-  api-csharp-samples:
-    name: Validate API CSharp samples
-    needs: api-csharp
-    uses: ./.github/workflows/api-csharp-samples.yml
   api-go:
     name: Validate API Go SDK
     uses: ./.github/workflows/api-go-action.yml
     with:
       publish: false
     secrets: inherit
-  api-go-samples:
-    name: Validate API Go samples
-    needs: api-go
-    uses: ./.github/workflows/api-go-samples.yml
   api-java:
     name: Validate API Java SDK
     uses: ./.github/workflows/api-java-action.yml
     with:
       publish: false
     secrets: inherit
-  api-java-samples:
-    name: Validate API Java samples
-    needs: api-java
-    uses: ./.github/workflows/api-java-samples.yml
   api-php:
     name: Validate API PHP SDK
     uses: ./.github/workflows/api-php-action.yml
     with:
       publish: false
     secrets: inherit
-  api-php-samples:
-    name: Validate API PHP samples
-    needs: api-php
-    uses: ./.github/workflows/api-php-samples.yml
   api-python:
     name: Validate API Python SDK
     uses: ./.github/workflows/api-python-action.yml
     with:
       publish: false
     secrets: inherit
-  api-python-samples:
-    name: Validate API Python sample
-    needs: api-python
-    uses: ./.github/workflows/api-python-samples.yml
   api-ruby:
     name: Validate API Ruby SDK
     uses: ./.github/workflows/api-ruby-action.yml
     with:
       publish: false
     secrets: inherit
-  api-ruby-samples:
-    name: Validate API Ruby samples
-    needs: api-ruby
-    uses: ./.github/workflows/api-ruby-samples.yml
   api-typescript:
     name: Validate API Typescript
     uses: ./.github/workflows/api-typescript-action.yml
     with:
       publish: false
     secrets: inherit
-  api-typescript-samples:
-    name: Validate API Typescript samples
-    needs: api-typescript
-    uses: ./.github/workflows/api-typescript-samples.yml
   ui-android:
     name: Validate UI Android SDK
     uses: ./.github/workflows/ui-android-action.yml
     with:
       publish: false
-    secrets: inherit
-  ui-android-samples:
-    name: Validate UI Android Samples
-    uses: ./.github/workflows/ui-android-samples.yml
     secrets: inherit
   ui-expo:
     name: Validate UI Expo SDK
@@ -91,7 +59,7 @@ jobs:
       publish: false
     secrets: inherit
   ui-flutter:
-    name: Validate UI Flutter SDK & Sample
+    name: Validate UI Flutter SDK
     uses: ./.github/workflows/ui-flutter-action.yml
     with:
       publish: false
