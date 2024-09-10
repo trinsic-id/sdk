@@ -1,6 +1,7 @@
 name: Build UI Swift SDK samples
 
 on:
+  pull_request:
   workflow_dispatch:
 
 jobs:
