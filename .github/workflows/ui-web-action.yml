@@ -23,6 +23,9 @@ jobs:
       - name: Generate ui web SDK
         run: ./ui-web/build-sdk.ps1
         shell: pwsh
+      - name: Build sample
+        run: ./ui-web/build-sample.ps1
+        shell: pwsh
       - name: Publish ui web SDK
         if: inputs.publish == true
         run: ./ui-web/publish-sdk.ps1
