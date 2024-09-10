@@ -4,6 +4,7 @@
   "gitAuthor": "mewmba Renovate Bot <mewmba@trinsic.id>",
   "repositories": ["trinsic-id/sdk"],
   "prHourlyLimit": 0,
+  "recreateWhen": "always",
   "includePaths": [
     ".github/renovate.json",
     "api-csharp/samples/Sample/**",
