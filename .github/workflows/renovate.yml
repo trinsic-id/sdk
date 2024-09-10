@@ -2,10 +2,10 @@ name: "Renovate Bot"
 on:
   workflow_dispatch:
 
-  pull_request:
-    paths:
-      - ".github/workflows/renovate.yaml"
-      - ".github/renovate.json"
+  # pull_request:
+  #   paths:
+  #     - ".github/workflows/renovate.yaml"
+  #     - ".github/renovate.json"
 
 jobs:
   renovate_runner:
@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Self-hosted Renovate
-        uses: renovatebot/github-action@v40.2.7
+        uses: renovatebot/github-action@v40.2.8
         env:
           LOG_LEVEL: debug
         with:

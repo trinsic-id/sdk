@@ -1,6 +1,10 @@
 $WEB_SAMPLES_DIR = "$PSScriptRoot/samples"
 
 try {
+    Push-Location "$PSScriptRoot/.."
+
+    npm ci
+    
     Write-Host "Building ui-web sample project..."
     Push-Location $WEB_SAMPLES_DIR
 

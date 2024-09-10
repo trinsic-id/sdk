@@ -20,6 +20,9 @@ jobs:
       - name: Generate backend SDK
         run: ./api-typescript/build-sdk.ps1
         shell: pwsh
+      - name: Build sample
+        run: ./api-typescript/build-sample.ps1
+        shell: pwsh
       - name: Publish SDK
         if: inputs.publish == true
         run: ./api-typescript/publish-sdk.ps1

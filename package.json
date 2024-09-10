@@ -3,7 +3,6 @@
   "workspaces": [
     "api-typescript/sdk",
     "api-typescript/samples",
-    "ui-web/sdk",
     "ui-web/samples",
     "ui-react-native/sdk",
     "ui-react-native/sdk/example",
