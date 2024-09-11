@@ -19,11 +19,26 @@ npm install @trinsic/expo-ui
 
 ## Usage
 
-The library exports one method: `launchSession`.
+### 1. Configure your application
 
-You can retrieve the launch url from a trusted backend that can reach out to the Trinsic servers. [See our backend language examples](https://github.com/trinsic-id/sdk/tree/main/api-typescript/samples).
+Inside your `app.json` configuration file, configure the [`scheme`](https://docs.expo.dev/versions/latest/config/app/#scheme) property, as well as the [`ios.bundleIdentifier`](https://docs.expo.dev/versions/latest/config/app/#bundleidentifier) and [`android.package`](https://docs.expo.dev/versions/latest/config/app/#package) properties.
 
-You can find a full example using this library in the [samples](https://github.com/trinsic-id/sdk/tree/main/ui-expo/samples) folder.
+### 2. Launch the session and receive the results.
+
+Import the Trinsic `launchSession` method:
+
+```tsx
+import { launchSession, LaunchSessionResult } from '@trinsic/expo-ui
+```
+
+Call this method with the launch url you've retrieved from a trusted backend that can securely reach out to Trinsic's servers. [See our backend language examples](https://github.com/trinsic-id/sdk/tree/main/api-typescript/samples).
+
+```tsx
+const result: LaunchSessionResult = await launchSession(launchUrl, {
+  callbackPath: "/",
+});
+console.log(result);
+```
 
 ## SDK Versioning
 
