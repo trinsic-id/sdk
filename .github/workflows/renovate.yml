@@ -1,11 +1,8 @@
 name: "Renovate Bot"
 on:
   workflow_dispatch:
-
-  # pull_request:
-  #   paths:
-  #     - ".github/workflows/renovate.yaml"
-  #     - ".github/renovate.json"
+  schedule:
+    - cron: "0 9 * * 1" # "At 09:00 on Monday."
 
 jobs:
   renovate_runner:

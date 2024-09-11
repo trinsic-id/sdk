@@ -9,7 +9,6 @@
   "assignees": ["lucasamonrc"],
   "reviewers": ["lucasamonrc"],
   "prHourlyLimit": 0,
-  "recreateWhen": "always",
   "ignorePaths": [
     "ui-android/**",
     "ui-flutter/**",
@@ -32,7 +31,6 @@
     "httparty",
     "sinatra",
     "sinatra-contrib",
-    "trinsic_api",
     "rack",
     "minitest",
     "rack-test",
@@ -43,7 +41,6 @@
     "slim/slim",
     "slim/psr7",
     "vlucas/phpdotenv",
-    "trinsic/api",
     "io.javalin:javalin",
     "org.slf4j:slf4j-simple",
     "io.github.cdimascio:dotenv-java",
