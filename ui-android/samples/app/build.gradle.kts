@@ -43,5 +43,5 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    implementation("com.github.trinsic-id:sdk-android-ui:0.3.4")
+    implementation("com.github.trinsic-id:sdk-android-ui:0.3.6")
 }

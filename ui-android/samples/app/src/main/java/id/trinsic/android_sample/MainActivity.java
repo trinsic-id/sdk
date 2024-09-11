@@ -5,14 +5,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
+
+import id.trinsic.android.ui.TrinsicUI;
 import id.trinsic.android_sample.databinding.ActivityMainBinding;
 import android.widget.Toast;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
-import id.trinsic.android.ui.TrinsicClient;
 
 public class MainActivity extends AppCompatActivity {
     // Replace the below with a URL that, when called with a GET request, will return a session launch URL as the only text content of the response.
@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private static String CALLBACK_REDIRECT_URL = "trinsic-android-ui-sample-redirect-scheme:///callback";
 
     private ActivityMainBinding binding;
-    private TrinsicClient trinsicClient;
+    private TrinsicUI trinsicUI;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        trinsicClient = new TrinsicClient(this, (result) -> {
+        trinsicUI = new TrinsicUI(this, (result) -> {
             if (result.getCanceled()) {
                 // This happens if the user closed the Android Custom Tabs activity by hitting the "X" button or by hitting Back
                 Toast.makeText(MainActivity.this, "User canceled", Toast.LENGTH_SHORT).show();
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
                     throw new RuntimeException(e);
                 }
 
-                trinsicClient.Invoke(launchUrl, CALLBACK_REDIRECT_URL);
+                trinsicUI.Invoke(launchUrl, CALLBACK_REDIRECT_URL);
             }
         });
     }
