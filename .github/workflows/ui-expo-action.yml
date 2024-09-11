@@ -17,8 +17,11 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install NPM dependencies
         run: npm ci
-      - name: Generate ui Expo SDK
+      - name: Build UI Expo SDK
         run: ./ui-expo/build-sdk.ps1
+        shell: pwsh
+      - name: Build UI Expo Sample
+        run: ./ui-expo/build-sample.ps1
         shell: pwsh
       - name: Publish ui Expo SDK
         if: inputs.publish == true
