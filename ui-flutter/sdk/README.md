@@ -37,7 +37,7 @@ An example of a good custom scheme might be `acme-corp-shopping-app-trinsic`.
 ### 1. Minimum SDK Version & Default `taskAffinity`
 > [!NOTE]
 > Although increasing your app's minimum SDK version to `28` or higher is technically optional, it is the only way to remove the Flutter-generated `android:taskAffinity=""` property
-> without reducing your application's resistant to [StrandHogg]()
+> without reducing your application's resistance to [StrandHogg](https://developer.android.com/privacy-and-security/risks/strandhogg).
 >
 > It is worth considering that the `taskAffinity` mitigation is _only partial_ -- the only way to fully protect your app from this vulnerability is to set a minimum SDK version of `28` or higher, 
 > as Google recommends.
