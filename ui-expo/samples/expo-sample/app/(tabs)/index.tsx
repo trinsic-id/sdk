@@ -5,8 +5,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useState } from "react";
 import { launchSession, LaunchSessionResult } from "@trinsic/expo-ui";
-const SESSION_CREATE_URL =
-  "https://api.trinsic-development.com/connect/launch-test?authToken=CiVodHRwczovL3RyaW5zaWMuaWQvc2VjdXJpdHkvdjEvb2Jlcm9uEkkKK3Vybjp0cmluc2ljOndhbGxldHM6eldWcFpVdWJVV1ZaTHJZcXBUM1pTa3ciGnVybjp0cmluc2ljOmVjb3N5c3RlbXM6aWR2GjCV/9d67y0X9vdWRbL62YswBC8drOGXO/KQqBlZGRa0OUZ307fltCgpmOKWrP2UyqwiAA%3D%3D&idvProviderSelection=trinsicfake&noRedirect=true";
+const SESSION_CREATE_URL = "[REPLACE_ME]";
 
 export default function HomeScreen() {
   const [result, setResult] = useState<LaunchSessionResult | null>();
@@ -14,7 +13,6 @@ export default function HomeScreen() {
   const handleButtonPress = async () => {
     const getSessionUrlResult = await fetch(SESSION_CREATE_URL);
     const launchUrl = await getSessionUrlResult.text();
-    const callbackUrl = "trinsic-expo-go-sample://callback";
     const result = await launchSession(launchUrl, {
       callbackPath: "/",
     });
