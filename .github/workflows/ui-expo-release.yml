@@ -1,0 +1,12 @@
+name: Release UI Expo SDK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    name: Publish
+    uses: ./.github/workflows/ui-expo-action.yml
+    with:
+      publish: true
+    secrets: inherit
