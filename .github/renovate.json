@@ -13,6 +13,7 @@
     "ui-android/**",
     "ui-flutter/**",
     "ui-react-native/**",
+    "ui-expo/**",
     "ui-swift/**",
     "swift/**"
   ],
