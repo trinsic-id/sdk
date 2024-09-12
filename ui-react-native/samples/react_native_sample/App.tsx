@@ -61,7 +61,6 @@ function App(): React.JSX.Element {
   };
 
   const [result, setResult] = useState<LaunchSessionResult | null>();
-  const [error, setError] = useState<string | null>();
   const handleButtonPress = async () => {
     const getSessionUrlResult = await fetch(SESSION_CREATE_URL);
     const launchUrl = await getSessionUrlResult.text();
@@ -87,7 +86,6 @@ function App(): React.JSX.Element {
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
           <Button title="Launch Session" onPress={handleButtonPress} />
-          {!!error && <Text>{error}</Text>}
           {!!result && (
             <>
               <Text>Session ID: {result.sessionId}</Text>
