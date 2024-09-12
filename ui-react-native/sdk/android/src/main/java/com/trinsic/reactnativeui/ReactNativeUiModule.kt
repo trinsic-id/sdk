@@ -78,7 +78,7 @@ class ReactNativeUiModule internal constructor(context: ReactApplicationContext)
 
     Callbacks[sessionId] = promise;
 
-    val launchParams : AcceptanceSessionLaunchParams = AcceptanceSessionLaunchParams(sessionId, newLaunchUrl, "trinsic-ui-example-redirect-scheme-react-native");
+    val launchParams : AcceptanceSessionLaunchParams = AcceptanceSessionLaunchParams(sessionId, newLaunchUrl, callbackUrl);
     currentActivity?.startActivityForResult(currentActivity?.let { invokeContract.createIntent(it, launchParams) }, 1)
   }
 
