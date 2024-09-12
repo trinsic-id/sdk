@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, View, Text, Button } from 'react-native';
 import { launchSession } from '@trinsic/react-native-ui';
-import type { LaunchSessionResult } from '../../src/ReactNativeUi';
+import type { LaunchSessionResult } from '@trinsic/react-native-ui';
 
 const SESSION_CREATE_URL = "[REPLACE_ME]";
 
