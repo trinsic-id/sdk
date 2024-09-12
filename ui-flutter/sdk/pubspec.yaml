@@ -1,6 +1,6 @@
 name: trinsic_flutter_ui
 description: "Library to invoke the Trinsic Identity Acceptance flow on Android and iOS"
-version: 0.1.1
+version: 0.1.2
 homepage: https://trinsic.id
 repository: https://github.com/trinsic-id/sdk
 
