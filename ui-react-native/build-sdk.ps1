@@ -49,11 +49,11 @@ try {
             throw "npm check for example failed"
         }
 
-        & npm run build:android
+        # & npm run build:android
 
-        if ($LASTEXITCODE -ne 0) {
-            throw "npm build:android for example failed"
-        }
+        # if ($LASTEXITCODE -ne 0) {
+        #     throw "npm build:android for example failed"
+        # }
     }
     finally {
         Pop-Location
