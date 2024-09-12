@@ -67,7 +67,7 @@ class _MyAppState extends State<MyApp> {
     setStateText("Launching...");
     Map? result;
     try {
-      result = await TrinsicFlutter.launchSession(launchUrl, CALLBACK_REDIRECT_URL);
+      result = await TrinsicFlutter.invoke(launchUrl, CALLBACK_REDIRECT_URL);
     } on PlatformException {
       setStateText("Failed to launch");
       result = null;
