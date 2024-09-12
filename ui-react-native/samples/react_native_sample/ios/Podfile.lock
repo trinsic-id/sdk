@@ -1498,7 +1498,7 @@ PODS:
     - React-perflogger (= 0.75.3)
     - React-utils (= 0.75.3)
   - SocketRocket (0.7.0)
-  - trinsic-react-native-ui (0.1.7):
+  - trinsic-react-native-ui (0.1.8):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1787,7 +1787,7 @@ SPEC CHECKSUMS:
   ReactCodegen: 4291c041b116b97f7203d961a3cc95adf2347064
   ReactCommon: d5e70af52fb05bd546fd7f002c549f57116c59e4
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
-  trinsic-react-native-ui: d56395619ea54f0203cb4c100d48203382a036bd
+  trinsic-react-native-ui: 170a6f15ee6f2871eb3e408af7e60e14aaf817ba
   TrinsicUI: 5cc815d541e755a45a084a17fbe494443b78a1b0
   Yoga: 33604ac44957ebe3f30f15b4cd0a3f96634e624a
 
