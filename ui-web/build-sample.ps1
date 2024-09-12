@@ -1,14 +1,22 @@
 $WEB_SAMPLES_DIR = "$PSScriptRoot/samples"
 
 try {
-    Push-Location "$PSScriptRoot/.."
+    Push-Location "$PSScriptRoot/samples"
 
-    npm ci
+    & npm ci
+
+    if ($LASTEXITCODE -ne 0) {
+        throw "npm ci failed"
+    }
     
     Write-Host "Building ui-web sample project..."
     Push-Location $WEB_SAMPLES_DIR
 
-    npm run build
+    &npm run build
+
+    if ($LASTEXITCODE -ne 0) {
+        throw "npm build failed"
+    }
     $exitCode = $LASTEXITCODE
 
     Pop-Location
@@ -17,7 +25,8 @@ try {
         throw "The npm build command failed with exit code $exitCode"
     }
 
-} catch {
+}
+catch {
     Write-Host "An error occurred: $_" -ForegroundColor Red
     Exit 1
 }
