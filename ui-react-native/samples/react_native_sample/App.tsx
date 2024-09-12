@@ -21,8 +21,7 @@ import {
 import {Colors, Header} from 'react-native/Libraries/NewAppScreen';
 
 import {launchSession, LaunchSessionResult} from '@trinsic/react-native-ui';
-const SESSION_CREATE_URL =
-  'https://api.trinsic-development.com/connect/launch-test?redirectSchemeTest=true&noRedirect=true';
+const SESSION_CREATE_URL = '[REPLACE_ME]';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -68,7 +67,7 @@ function App(): React.JSX.Element {
     const launchUrl = await getSessionUrlResult.text();
     const result = await launchSession(
       launchUrl,
-      'id.trinsic.react-native-sample://callback',
+      'trinsic-ui-example-redirect-scheme-react-native://callback',
     );
     setResult(result);
   };
