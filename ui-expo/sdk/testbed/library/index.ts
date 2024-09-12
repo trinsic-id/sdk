@@ -46,7 +46,6 @@ export async function launchSession(
   if (!url.searchParams.has("redirectUrl")) {
     url.searchParams.append("redirectUrl", callbackUrl);
   }
-  console.log(callbackUrl);
 
   try {
     let result = await WebBrowser.openAuthSessionAsync(

@@ -10,7 +10,8 @@
     "ios": "npm run-script copy-library && expo start --ios",
     "web": "npm run-script copy-library && expo start --web",
     "test": "jest --watchAll",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "check": "npm run-script copy-library && tsc --noEmit --skipLibCheck"
   },
   "jest": {
     "preset": "jest-expo"

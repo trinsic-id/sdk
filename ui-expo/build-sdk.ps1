@@ -1,8 +1,5 @@
 try {
     Push-Location "$PSScriptRoot\sdk"
-
-    & node --version
-    & npm --version
     
     & npm ci
 
@@ -29,6 +26,25 @@ try {
     & npm pack --pack-destination "$PSScriptRoot/sdk/publish"
     if ($LASTEXITCODE -ne 0) {
         throw "npm pack failed"
+    }
+
+    try {
+        Push-Location "$PSScriptRoot\sdk\testbed"
+        
+        & npm ci
+    
+        if ($LASTEXITCODE -ne 0) {
+            throw "npm ci for testbed failed"
+        }
+
+        & npm run check
+
+        if ($LASTEXITCODE -ne 0) {
+            throw "npm ci for testbed failed"
+        }
+    }
+    finally {
+        Pop-Location
     }
 }
 finally {
