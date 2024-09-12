@@ -12,7 +12,7 @@ class MockTrinsicFlutterPlatform
 
   @override
   Future<Map?> launchSession(String launchUrl, String redirectUrl) {
-    throw UnimplementedError("invoke() has not been implemented.");
+    throw UnimplementedError("launchSession() has not been implemented.");
   }
 }
 
