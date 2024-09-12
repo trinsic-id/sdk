@@ -1,11 +1,5 @@
 {
   "private": true,
-  "workspaces": [
-    "api-typescript/samples",
-    "ui-web/samples",
-    "ui-react-native/sdk",
-    "ui-react-native/sdk/example"
-  ],
   "name": "trinsic-sdks",
   "version": "0.0.1",
   "license": "MIT",
