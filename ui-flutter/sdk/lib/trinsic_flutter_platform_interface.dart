@@ -27,7 +27,7 @@ abstract class TrinsicFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 
-  Future<Map?> invoke(String launchUrl, String redirectUrl) {
-    throw UnimplementedError("invoke() has not been implemented.");
+  Future<Map?> launchSession(String launchUrl, String redirectUrl) {
+    throw UnimplementedError("launchSession() has not been implemented.");
   }
 }

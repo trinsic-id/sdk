@@ -11,7 +11,7 @@ class MockTrinsicFlutterPlatform
   Future<String?> getPlatformVersion() => Future.value('42');
 
   @override
-  Future<Map?> invoke(String launchUrl, String redirectUrl) {
+  Future<Map?> launchSession(String launchUrl, String redirectUrl) {
     throw UnimplementedError("invoke() has not been implemented.");
   }
 }
