@@ -13,14 +13,14 @@ public class TrinsicFlutterUIPlugin: NSObject, FlutterPlugin {
     switch call.method {
     case "getPlatformVersion":
       result("iOS " + UIDevice.current.systemVersion)
-    case "invoke":
-        handleInvoke(call, result: result)
+    case "launchSession":
+        handleLaunchSession(call, result: result)
     default:
       result(FlutterMethodNotImplemented)
     }
   }
 
-  private func handleInvoke(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+  private func handleLaunchSession(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
       // Safely access arguments
       guard let args = call.arguments as? [String: Any],
             let redirectUrl = args["redirectUrl"] as? String,
