@@ -17,9 +17,9 @@ class MethodChannelTrinsicFlutter extends TrinsicFlutterPlatform {
   }
 
   @override
-  Future<Map?> invoke(String launchUrl, String redirectUrl) async {
+  Future<Map?> launchSession(String launchUrl, String redirectUrl) async {
     final version = await methodChannel.invokeMethod<Map>(
-        'invoke', {'launchUrl': launchUrl, 'redirectUrl': redirectUrl});
+        'launchSession', {'launchUrl': launchUrl, 'redirectUrl': redirectUrl});
     return version;
   }
 }

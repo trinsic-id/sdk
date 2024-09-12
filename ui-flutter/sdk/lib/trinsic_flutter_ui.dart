@@ -5,7 +5,8 @@ class TrinsicFlutter {
     return TrinsicFlutterPlatform.instance.getPlatformVersion();
   }
 
-  static Future<Map?> invoke(String launchUrl, String redirectUrl) {
-    return TrinsicFlutterPlatform.instance.invoke(launchUrl, redirectUrl);
+  static Future<Map?> launchSession(String launchUrl, String redirectUrl) {
+    return TrinsicFlutterPlatform.instance
+        .launchSession(launchUrl, redirectUrl);
   }
 }

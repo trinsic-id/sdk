@@ -1,9 +1,9 @@
-$TY_SAMPLES_DIR = "$PSScriptRoot/samples"
+$TS_SAMPLES_DIR = "$PSScriptRoot/samples"
 
 try {
     Write-Host "Building api-typescript sample project..."
-    Push-Location $TY_SAMPLES_DIR
-
+    Push-Location $TS_SAMPLES_DIR
+    npm ci
     npm run build
     $exitCode = $LASTEXITCODE
 
