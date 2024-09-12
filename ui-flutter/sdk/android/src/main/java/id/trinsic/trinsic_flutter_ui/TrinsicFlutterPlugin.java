@@ -62,10 +62,6 @@ public class TrinsicFlutterPlugin implements FlutterPlugin, ActivityAware, Metho
         this.activityPluginBinding.addActivityResultListener(new PluginRegistry.ActivityResultListener() {
             @Override
             public boolean onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-                for(String intentKey : data.getExtras().keySet()) {
-
-                }
-
                 AcceptanceSessionResult result = invokeContract.parseResult(resultCode, data);
                 if(result != null && result.getSessionId() != null && callbacks.containsKey(result.getSessionId())) {
                     Map<String, Object> returnVal = new HashMap<>();
@@ -100,7 +96,7 @@ public class TrinsicFlutterPlugin implements FlutterPlugin, ActivityAware, Metho
             return;
         }
 
-        if (call.method.equals("invoke") && call.hasArgument("launchUrl")) {
+        if (call.method.equals("launchSession") && call.hasArgument("launchUrl")) {
             String launchUrl = call.argument("launchUrl");
             String redirectUrl = call.argument("redirectUrl");
 
