@@ -7,6 +7,12 @@ try {
         throw "npm ci failed"
     }
 
+    & npm run check
+
+    if ($LASTEXITCODE -ne 0) {
+        throw "npm check failed"
+    }
+
     $version = &"$PSScriptRoot\..\get-version.ps1" -versionName "reactNativeUIVersion";
 
     & npm version "$version" --no-git-tag-version
@@ -27,6 +33,33 @@ try {
     if ($LASTEXITCODE -ne 0) {
         throw "npm pack failed"
     }
+
+    try {
+        Push-Location "$PSScriptRoot\sdk\example"
+        
+        & npm ci
+    
+        if ($LASTEXITCODE -ne 0) {
+            throw "npm ci for example failed"
+        }
+
+        & npm run check
+
+        if ($LASTEXITCODE -ne 0) {
+            throw "npm check for example failed"
+        }
+
+        & npm run build:android
+
+        if ($LASTEXITCODE -ne 0) {
+            throw "npm build:android for example failed"
+        }
+    }
+    finally {
+        Pop-Location
+    }
+
+
 }
 finally {
     Pop-Location
