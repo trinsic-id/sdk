@@ -4,6 +4,7 @@ $PHP_SAMPLES_DIR = "$PSScriptRoot/samples"
 try {
     Write-Host "Building ui-web project..."
     Push-Location $WEB_SAMPLES_DIR
+    npm ci
     npm run build
     $exitCode = $LASTEXITCODE
 
