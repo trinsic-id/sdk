@@ -23,14 +23,12 @@ jobs:
         with:
           distribution: "temurin"
           java-version: "21"
-      - name: Build library
-        run: |
-          cd ./ui-android/sdk
-          ./gradlew :library:build
+      - name: Build SDK
+        run: ./ui-android/build-sdk.ps1
+        shell: pwsh
       - name: Build sample
-        run: |
-          cd ./ui-android/samples
-          ./gradlew build
+        run: ./ui-android/build-samples.ps1
+        shell: pwsh
       - name: Publish SDK
         if: inputs.publish == true
         run: ./ui-android/publish-sdk.ps1

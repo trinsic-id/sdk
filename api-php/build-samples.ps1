@@ -1,5 +1,5 @@
 $WEB_SAMPLES_DIR = "$PSScriptRoot/../ui-web/samples"
-$PHP_SAMPLES_DIR = "$PSScriptRoot/samples"
+$PHP_SAMPLES_DIR = "$PSScriptRoot/samples/server"
 
 try {
     Write-Host "Building ui-web project..."
@@ -36,7 +36,8 @@ try {
     if ($exitCode -ne 0) {
         throw "The php public/index.php command failed with exit code $exitCode"
     }
-} catch {
+}
+catch {
     Write-Host "An error occurred: $_" -ForegroundColor Red
     Exit 1
 }

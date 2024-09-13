@@ -1,4 +1,4 @@
-$FLUTTER_SAMPLES_DIR = "$PSScriptRoot/samples"
+$FLUTTER_SAMPLES_DIR = "$PSScriptRoot/samples/flutter_sample"
 
 try {
     Write-Host "Building ui-flitter sample project..."
