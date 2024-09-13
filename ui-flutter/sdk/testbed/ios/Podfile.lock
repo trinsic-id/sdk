@@ -1,34 +1,35 @@
 PODS:
-  - connect_flutter (0.0.1):
-    - Flutter
-    - TrinsicUI
   - Flutter (1.0.0)
   - integration_test (0.0.1):
     - Flutter
-  - TrinsicUI (0.0.1)
+  - trinsic_flutter_ui (0.0.1):
+    - Flutter
+    - TrinsicUI (~> 0.4.3)
+  - TrinsicUI (0.4.3)
 
 DEPENDENCIES:
-  - connect_flutter (from `.symlinks/plugins/connect_flutter/ios`)
   - Flutter (from `Flutter`)
   - integration_test (from `.symlinks/plugins/integration_test/ios`)
-  - TrinsicUI (from `../../../../../swift/ui`)
+  - trinsic_flutter_ui (from `.symlinks/plugins/trinsic_flutter_ui/ios`)
+
+SPEC REPOS:
+  trunk:
+    - TrinsicUI
 
 EXTERNAL SOURCES:
-  connect_flutter:
-    :path: ".symlinks/plugins/connect_flutter/ios"
   Flutter:
     :path: Flutter
   integration_test:
     :path: ".symlinks/plugins/integration_test/ios"
-  TrinsicUI:
-    :path: "../../../../../swift/ui"
+  trinsic_flutter_ui:
+    :path: ".symlinks/plugins/trinsic_flutter_ui/ios"
 
 SPEC CHECKSUMS:
-  connect_flutter: 141591db8a9f8a8cf126d0e045075f3940e03b42
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   integration_test: 252f60fa39af5e17c3aa9899d35d908a0721b573
-  TrinsicUI: a63561468da5de165485bd5aae19bd4a8612a046
+  trinsic_flutter_ui: 3f43e9cfaa64e1670036dd79b165f5f67975ef13
+  TrinsicUI: 5046343ea4a11df2d79470848a4b7219fabbaf7a
 
-PODFILE CHECKSUM: fb41f4b39f7ce6b183cb82294af5a11bc0b71c22
+PODFILE CHECKSUM: 953c0aba6be5ff8339b0d0e8e5924e98fc9651a9
 
 COCOAPODS: 1.15.2

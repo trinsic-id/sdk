@@ -14,7 +14,7 @@ const String BACKEND_CREATE_SESSION_ENDPOINT = '';
 // Replace the below with a URL that uses a custom scheme that you've properly registered in your app's AndroidManifest.xml
 // The path (in this case "/callback") can be anything.
 const String CALLBACK_REDIRECT_URL =
-    "trinsic-flutter-ui-testbed-redirect-scheme:///callback";
+    "trinsic-flutter-ui-testbed-redirect-scheme://callback";
 
 //----------- No need to modify anything below here -----------
 void main() {
@@ -69,7 +69,8 @@ class _MyAppState extends State<MyApp> {
     try {
       result =
           await TrinsicFlutter.launchSession(launchUrl, CALLBACK_REDIRECT_URL);
-    } on PlatformException {
+    } on PlatformException catch (e) {
+      print("Error: $e");
       setStateText("Failed to launch");
       result = null;
       return;

@@ -9,9 +9,6 @@ let package = Package(
             targets: ["TrinsicFlutterUI"]),
     ],
     dependencies: [
-        // Here you add your dependencies
-        .package(path: "../../../../../swift/ui"),
-        // You can add multiple dependencies in this array
     ],
     targets: [
         .target(

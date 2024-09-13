@@ -3,7 +3,7 @@
 # Run `pod lib lint connect_flutter.podspec` to validate before publishing.
 #
 Pod::Spec.new do |s|
-  s.name             = 'connect_flutter'
+  s.name             = 'trinsic_flutter_ui'
   s.version          = '0.0.1'
   s.summary          = 'A new Flutter plugin project.'
   s.description      = <<-DESC
@@ -15,8 +15,8 @@ A new Flutter plugin project.
   s.source           = { :path => '.' }
   s.source_files = 'TrinsicFlutterUI/Sources/TrinsicFlutterUI/**/*'
   s.dependency 'Flutter'
-  s.dependency 'TrinsicUI'
-  s.platform = :ios, '12.0'
+  s.dependency 'TrinsicUI', '~> 0.4.3'
+  s.platform = :ios, '13.4'
   
 
   # Flutter.framework does not contain a i386 slice.
