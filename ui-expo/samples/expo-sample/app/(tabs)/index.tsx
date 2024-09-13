@@ -5,7 +5,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useState } from "react";
 import { launchSession, LaunchSessionResult } from "@trinsic/expo-ui";
-const SESSION_CREATE_URL = "[REPLACE_ME]";
+const SESSION_CREATE_URL = "https://api.trinsic.id/api/mobiletest/create-session";
 
 export default function HomeScreen() {
   const [result, setResult] = useState<LaunchSessionResult | null>();
