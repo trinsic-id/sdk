@@ -16,7 +16,7 @@ class MyApp < Sinatra::Base
   sessions = TrinsicApi::SessionsApi.new
 
   # Set the public folder to serve static assets
-  set :public_folder, File.expand_path('../../../ui-web/samples/dist', __FILE__)
+  set :public_folder, File.expand_path('../../../../ui-web/samples/dist', __FILE__)
 
   # Serve static files from the custom directory
   get '/' do

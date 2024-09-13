@@ -3,7 +3,7 @@ param (
 )
 
 $WEB_SAMPLES_DIR = "$PSScriptRoot/../ui-web/samples"
-$PY_SAMPLES_DIR = "$PSScriptRoot/samples"
+$PY_SAMPLES_DIR = "$PSScriptRoot/samples/server"
 
 try {
     Write-Host "Building ui-web project..."
@@ -23,7 +23,8 @@ try {
     
     if ($forceInstall.IsPresent) {
         pip3 install --break-system-packages -r requirements.txt
-    } else {
+    }
+    else {
         pip3 install -r requirements.txt
     }
 
@@ -37,7 +38,8 @@ try {
     python3 validate.py
 
     Pop-Location
-} catch {
+}
+catch {
     Write-Host "An error occurred: $_" -ForegroundColor Red
     Exit 1
 }

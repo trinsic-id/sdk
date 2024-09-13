@@ -18,16 +18,16 @@ const networkApi = new NetworkApi(newConfiguration);
 
 app.use(express.json());
 
-app.get("/", express.static(path.join("../../ui-web/samples/dist")));
+app.get("/", express.static(path.join("../../../ui-web/samples/dist")));
 app.get("/redirect", (req: any, res: any) => {
   res.sendFile(
-    path.join(__dirname, "../../../ui-web/samples/dist/redirect.html")
+    path.join(__dirname, "../../../../ui-web/samples/dist/redirect.html")
   );
 });
 
 app.use(
   "/assets",
-  express.static(path.join("../../ui-web/samples/dist/assets"))
+  express.static(path.join("../../../ui-web/samples/dist/assets"))
 );
 
 app.get("/providers", async (req: any, res: any) => {

@@ -1,4 +1,4 @@
-$JAVA_SAMPLES_DIR = "$PSScriptRoot/samples"
+$JAVA_SAMPLES_DIR = "$PSScriptRoot/samples/server"
 
 try {
     Write-Host "Building api-java sample project..."
@@ -13,7 +13,8 @@ try {
         throw "The mvn compile command failed with exit code $exitCode"
     }
 
-} catch {
+}
+catch {
     Write-Host "An error occurred: $_" -ForegroundColor Red
     Exit 1
 }

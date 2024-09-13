@@ -1,4 +1,4 @@
-$RB_SAMPLES_DIR = "$PSScriptRoot/samples"
+$RB_SAMPLES_DIR = "$PSScriptRoot/samples/server"
 
 try {
     Write-Host "Building api-ruby sample project..."
@@ -14,7 +14,8 @@ try {
         throw "The ruby validator.rb command failed with exit code $exitCode"
     }
 
-} catch {
+}
+catch {
     Write-Host "An error occurred: $_" -ForegroundColor Red
     Exit 1
 }
