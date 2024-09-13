@@ -74,6 +74,7 @@ class ReactNativeUiModule internal constructor(private val context: ReactApplica
       );
     } catch (e: IllegalArgumentException) {
       promise.reject("E_ILLEGAL_ARGUMENT", e.message);
+      return;
     }
 
     val sessionId = parsedUrl.getQueryParameter("sessionId")!!
