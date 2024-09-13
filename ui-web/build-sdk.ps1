@@ -8,7 +8,7 @@ try {
     if ($LASTEXITCODE -ne 0) {
         throw "npm ci failed"
     }
-
+    
     & npm run build
     if ($LASTEXITCODE -ne 0) {
         throw "npm run build failed"

@@ -3,7 +3,9 @@
 [![Version](https://img.shields.io/npm/v/@trinsic/web-ui.svg)](https://www.npmjs.org/package/@trinsic/web-ui)
 [![Build Status](https://github.com/trinsic-id/sdk/actions/workflows/ui-web-release.yml/badge.svg)](https://github.com/trinsic-id/sdk/actions?query=branch%main)
 
-The Trinsic Web UI Library provides ways to launch verification sessions directly in the browser, requiring very little code.
+The Trinsic React Native UI Library provides ways to launch verification sessions directly from your web frontend in the browser.
+
+This library must be paired with a [api library](https://github.com/trinsic-id/sdk#api-libraries) as part of a full integration.
 
 ## Documentation
 
@@ -23,7 +25,7 @@ The library exports three methods: `launchIframe(launchUrl)`, `launchPopup(launc
 
 Depending on how you would like your user interaction to be, an embedded iFrame, a popup or a redirect flow, choose your start point.
 
-You can retrieve the launch url from a trusted backend that can reach out to the Trinsic servers. [See our backend language examples](https://github.com/trinsic-id/sdk/tree/main/api-typescript/samples).
+You can retrieve the launch url from a trusted backend that can reach out to the Trinsic servers. [See our API libraries.](https://github.com/trinsic-id/sdk#api-libraries)
 
 You can find a full example using this library in the [samples](https://github.com/trinsic-id/sdk/tree/main/ui-web/samples) folder.
 
