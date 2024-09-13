@@ -21,14 +21,6 @@ try {
         throw "flutter test failed"
     }
 
-
-    Write-Host "Building Flutter iOS..."
-    &flutter build ios
-
-    if ($LASTEXITCODE -ne 0) {
-        throw "The flutter build ios command failed with exit code $LASTEXITCODE"
-    }    
-
     Write-Host "Building Flutter Android APK..."
     &flutter build apk
 
