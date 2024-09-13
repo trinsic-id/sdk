@@ -1,7 +1,7 @@
 try {
     Push-Location "$PSScriptRoot\sdk"
     
-    & gradlew :library:build
+    &./gradlew :library:build
 
     if ($LASTEXITCODE -ne 0) {
         throw "gradlew library build failed"
