@@ -3,7 +3,11 @@
 [![Version](https://img.shields.io/npm/v/@trinsic/expo-ui.svg)](https://www.npmjs.org/package/@trinsic/expo-ui)
 [![Build Status](https://github.com/trinsic-id/sdk/actions/workflows/ui-expo-release.yml/badge.svg)](https://github.com/trinsic-id/sdk/actions?query=branch%main)
 
-The Trinsic Expo UI Library provides ways to launch verification sessions directly from your Expo application requiring very little code.
+The Trinsic Expo UI Library provides ways to launch verification sessions directly from your Expo application.
+
+This library must be paired with a [api library](https://github.com/trinsic-id/sdk#api-libraries) as part of a full integration.
+
+Currently, only iOS and Android are supported.
 
 ## Documentation
 
@@ -31,7 +35,7 @@ Import the Trinsic `launchSession` method:
 import { launchSession, LaunchSessionResult } from '@trinsic/expo-ui
 ```
 
-Call this method with the launch url you've retrieved from a trusted backend that can securely reach out to Trinsic's servers. [See our backend language examples](https://github.com/trinsic-id/sdk/tree/main/api-typescript/samples).
+Call this method with the launch url you've retrieved from a trusted backend that can securely reach out to Trinsic's servers. [See our API libraries.](https://github.com/trinsic-id/sdk#api-libraries).
 
 ```tsx
 const result: LaunchSessionResult = await launchSession(launchUrl, {

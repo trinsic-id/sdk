@@ -1,12 +1,14 @@
-# trinsic_flutter_ui
+# Trinsic Flutter UI Library
 
-Enables invocation of the Trinsic identity verification flow in a Flutter app.
+[![Flutter Version](https://img.shields.io/pub/v/trinsic_flutter_ui.svg)](https://pub.dev/packages/trinsic_flutter_ui) [![Flutter Build Status](https://github.com/trinsic-id/sdk/actions/workflows/ui-flutter-release.yml/badge.svg)](https://github.com/trinsic-id/sdk/actions?query=branch%main)
 
-This library must be paired with a [backend library](https://github.com/trinsic-id/sdk#api-libraries) as part of a full integration.
+The Trinsic Flutter UI Library provides ways to launch verification sessions directly from your Flutter application requiring very little code.
+
+This library must be paired with a [api library](https://github.com/trinsic-id/sdk#api-libraries) as part of a full integration.
 
 Currently, only iOS and Android are supported.
 
-# Installation
+## Installation
 
 Simply add this library to your Flutter project:
 
@@ -20,9 +22,9 @@ Then import it in your code:
 import 'package:trinsic_flutter_ui/trinsic_flutter_ui.dart';
 ```
 
-# Setup
+## Setup
 
-## Choose a Custom Scheme
+### Choose a Custom Scheme
 
 This library makes use of `Android Custom Tabs` on Android and `ASWebAuthenticationSession` on iOS.
 
@@ -32,17 +34,36 @@ This custom scheme can be the same between iOS and Android, but **should be glob
 
 An example of a good custom scheme might be `acme-corp-shopping-app-trinsic`.
 
-## Android
+### iOS
 
-### 1. Minimum SDK Version & Default `taskAffinity`
+#### Minimum version
+
+The iOS SDK supports iOS from version 13.4 for securely launching authentication sessions. Make sure to upgrade your Podfile dependency and XCode minimum target.
+
+#### Configure your iOS Podfile to use static libraries
+
+If you're not already using static libraries, add the following line to your podfile to be able to use our Swift module:
+
+```
+use_frameworks! :linkage => :static
+```
+
+#### Add the scheme to your app's URLs
+
+Select your app's target and on the info tab in XCode add the scheme you selected.
+
+### Android
+
+#### Minimum SDK Version & Default `taskAffinity`
+
 > [!NOTE]
 > Although increasing your app's minimum SDK version to `28` or higher is technically optional, it is the only way to remove the Flutter-generated `android:taskAffinity=""` property
 > without reducing your application's resistance to [StrandHogg](https://developer.android.com/privacy-and-security/risks/strandhogg).
 >
-> It is worth considering that the `taskAffinity` mitigation is _only partial_ -- the only way to fully protect your app from this vulnerability is to set a minimum SDK version of `28` or higher, 
+> It is worth considering that the `taskAffinity` mitigation is _only partial_ -- the only way to fully protect your app from this vulnerability is to set a minimum SDK version of `28` or higher,
 > as Google recommends.
 >
-> Finally, note that this library has no bearing on your application's security -- this vulnerability is present regardless of whether this library is in use or not, as it is inherent to Android. 
+> Finally, note that this library has no bearing on your application's security -- this vulnerability is present regardless of whether this library is in use or not, as it is inherent to Android.
 > It is only relevant to this library because it cannot function if your app specifies an empty `taskAffinity`.
 
 You will need to make two changes to the Android scaffolding which Flutter auto-generated for your app.
@@ -61,7 +82,8 @@ which use Android Custom Tabs in the way we do, as it changes Android's task man
 This security issue is entirely mitigated on Android SDK versions 28 and up. Therefore, both changes (removing the empty task affinity and increasing the minimum android SDK version of your app) are necessary
 to ensure functionality without reducing security.
 
-### 2. Register Library in `AndroidManifest.xml`
+#### Register Library in `AndroidManifest.xml`
+
 Place the following snippet in your app's `AndroidManifest.xml`, replacing `[YOURCUSTOMSCHEME]` with the scheme you chose in step 1
 
 ```xml
@@ -78,12 +100,12 @@ Place the following snippet in your app's `AndroidManifest.xml`, replacing `[YOU
 </activity>
 ```
 
-## iOS
-
-iOS instructions coming soon
-
-# Usage
+## Usage
 
 Once your backend has created a Session and passed the `launchUrl` to your app, simply invoke the plugin, passing a redirect URL containing the custom scheme you registered above.
 
 The redirect URL can have any path, as long as its scheme is correct. EG, both `acme-corp-shopping-app-trinsic:///callback` and `acme-corp-shopping-app-trinsic:///callback-2` are valid redirect URLs.
+
+## License
+
+MIT

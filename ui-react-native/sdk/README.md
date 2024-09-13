@@ -3,7 +3,11 @@
 [![Version](https://img.shields.io/npm/v/@trinsic/react-native-ui.svg)](https://www.npmjs.org/package/@trinsic/react-native-ui)
 [![Build Status](https://github.com/trinsic-id/sdk/actions/workflows/ui-react-native-release.yml/badge.svg)](https://github.com/trinsic-id/sdk/actions?query=branch%main)
 
-The Trinsic React Native UI Library provides ways to launch verification sessions directly from your React Native application requiring very little code. If you're using Expo we recommend you use [our Expo library](https://github.com/trinsic-id/sdk/ui-expo).
+The Trinsic React Native UI Library provides ways to launch verification sessions directly from your React Native application. If you're using Expo we recommend you use [our Expo library](https://github.com/trinsic-id/sdk/ui-expo).
+
+This library must be paired with a [api library](https://github.com/trinsic-id/sdk#api-libraries) as part of a full integration.
+
+Currently, only iOS and Android are supported.
 
 ## Installation
 
@@ -77,10 +81,6 @@ const result = await launchSession(
   'yourAppsScheme://your-callback-url'
 );
 ```
-
-## Contributing
-
-See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
 
 ## License
 
