@@ -17,10 +17,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # We rely on the published version of the library, but during PR validation (and during local development),
-  # we want to build the sample against the local version of the library. 
   trinsic_flutter_ui: ^0.1.2
-    # path: ../sdk/
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

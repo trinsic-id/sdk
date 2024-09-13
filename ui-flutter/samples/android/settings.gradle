@@ -8,7 +8,6 @@ pluginManagement {
     }()
 
     includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
-    includeBuild("../../sdk/android/src")
 
     repositories {
         google()
