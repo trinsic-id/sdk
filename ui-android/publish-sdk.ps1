@@ -21,6 +21,8 @@ try {
     Write-Host "Adding files to git"
     git add .
 
+    $packageVersion = &"$PSScriptRoot\..\get-version.ps1" -versionName "androidUIVersion";
+
     Write-Host "Committing files"
     git commit -m "Publishing latest ui-android package for version $packageVersion"
     
