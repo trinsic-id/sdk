@@ -12,7 +12,7 @@ on:
 jobs:
   build_and_publish:
     name: Build and Publish
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - name: Get changed files
