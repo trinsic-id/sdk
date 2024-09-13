@@ -9,7 +9,6 @@ const SESSION_CREATE_URL = "[REPLACE_ME]";
 
 export default function HomeScreen() {
   const [result, setResult] = useState<LaunchSessionResult | null>();
-  const [error, setError] = useState<string | null>();
   const handleButtonPress = async () => {
     const getSessionUrlResult = await fetch(SESSION_CREATE_URL);
     const launchUrl = await getSessionUrlResult.text();
@@ -34,7 +33,6 @@ export default function HomeScreen() {
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
         <Button title="Launch Session" onPress={handleButtonPress} />
-        {!!error && <ThemedText>{error}</ThemedText>}
         {!!result && (
           <>
             <ThemedText>Session ID: {result.sessionId}</ThemedText>

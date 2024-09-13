@@ -1518,9 +1518,9 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - TrinsicUI (= 0.3.11)
+    - TrinsicUI (= 0.3.14)
     - Yoga
-  - TrinsicUI (0.3.11)
+  - TrinsicUI (0.3.14)
   - Yoga (0.0.0)
 
 DEPENDENCIES:
@@ -1787,8 +1787,8 @@ SPEC CHECKSUMS:
   ReactCodegen: de94475c4712a61ba0b1e1c25eb54db32f56836d
   ReactCommon: 8da2bad9c1e5901f7b5484e42e59578edeece142
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
-  trinsic-react-native-ui: de5fd478ab48e2c9ca614a887caf14be2687106e
-  TrinsicUI: 9e1f533ffda9083e47c79486bb47742b85d8b69a
+  trinsic-react-native-ui: 20dbd1caef1531a8ff847a0c593e6ecabb3927c1
+  TrinsicUI: 5cc815d541e755a45a084a17fbe494443b78a1b0
   Yoga: 36d44f1d31d7c11be1067e5c7a70a12c2eed355c
 
 PODFILE CHECKSUM: da6058e3073bcd394c6dc8c162d4205dc77c134f
