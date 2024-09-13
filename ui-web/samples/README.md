@@ -22,7 +22,7 @@ Create a new `.env` file to set your Trinsic Access Token. You can use [`example
 After you created your `.env` file you are good to run the project.
 
 ```sh
-npm start
+npm run dev
 ```
 
 ## Support
