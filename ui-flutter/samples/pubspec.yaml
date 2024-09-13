@@ -2,7 +2,7 @@ name: trinsic_flutter_ui_example
 description: "Demonstrates how to use the trinsic_flutter_ui plugin."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 environment:
   sdk: ^3.5.0
@@ -17,7 +17,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  trinsic_flutter_ui: ^0.1.2
+  trinsic_flutter_ui: ^0.4.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -42,7 +42,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
