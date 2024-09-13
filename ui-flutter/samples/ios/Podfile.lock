@@ -1,0 +1,35 @@
+PODS:
+  - Flutter (1.0.0)
+  - integration_test (0.0.1):
+    - Flutter
+  - trinsic_flutter_ui (0.0.1):
+    - Flutter
+    - TrinsicUI (~> 0.4.3)
+  - TrinsicUI (0.4.3)
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - integration_test (from `.symlinks/plugins/integration_test/ios`)
+  - trinsic_flutter_ui (from `.symlinks/plugins/trinsic_flutter_ui/ios`)
+
+SPEC REPOS:
+  trunk:
+    - TrinsicUI
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  integration_test:
+    :path: ".symlinks/plugins/integration_test/ios"
+  trinsic_flutter_ui:
+    :path: ".symlinks/plugins/trinsic_flutter_ui/ios"
+
+SPEC CHECKSUMS:
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  integration_test: 252f60fa39af5e17c3aa9899d35d908a0721b573
+  trinsic_flutter_ui: 3f43e9cfaa64e1670036dd79b165f5f67975ef13
+  TrinsicUI: 5046343ea4a11df2d79470848a4b7219fabbaf7a
+
+PODFILE CHECKSUM: 4297d09348217d98055efbfe54df1c0279324d80
+
+COCOAPODS: 1.15.2
