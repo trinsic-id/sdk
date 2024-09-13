@@ -11,8 +11,9 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactMethod
 import id.trinsic.android.ui.InvokeContract
 import id.trinsic.android.ui.models.AcceptanceSessionLaunchParams
+import id.trinsic.android.ui.PlatformUtil
 
-class ReactNativeUiModule internal constructor(context: ReactApplicationContext) :
+class ReactNativeUiModule internal constructor(private val context: ReactApplicationContext) :
   ReactNativeUiSpec(context) {
 
   private val invokeContract = InvokeContract();
@@ -64,6 +65,15 @@ class ReactNativeUiModule internal constructor(context: ReactApplicationContext)
     if(!parsedUrl.queryParameterNames.contains("sessionId")) {
       promise.reject("E_NO_SESSION_ID", "Launch URL has no session ID");
       return;
+    }
+
+    try {
+      PlatformUtil.ValidateRedirectUrl(
+        context.applicationContext,
+        callbackUrl
+      );
+    } catch (e: IllegalArgumentException) {
+      promise.reject("E_ILLEGAL_ARGUMENT", e.message);
     }
 
     val sessionId = parsedUrl.getQueryParameter("sessionId")!!
