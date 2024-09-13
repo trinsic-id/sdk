@@ -59,10 +59,10 @@ export async function launchPopup(
     userAgents.isDesktop
       ? "width=600,height=900"
       : "width=" +
-      window.innerWidth +
-      ",height=" +
-      window.innerHeight +
-      ",top=0,left=0"
+          window.innerWidth +
+          ",height=" +
+          window.innerHeight +
+          ",top=0,left=0"
   );
 
   if (!popup) {
@@ -123,6 +123,18 @@ function showModal(launchUrl: string) {
   modalContainer.append(iframe);
   bgOverlay.append(modalContainer);
   modal.append(bgOverlay);
+  if (
+    document === null ||
+    document === undefined ||
+    document.body === null ||
+    document.body === undefined ||
+    document.body.classList === null ||
+    document.body.classList === undefined
+  ) {
+    throw new Error(
+      "document.body.classList is null or undefined. Make sure you run this code after your DOM has loaded. You can use the event listener 'DOMContentLoaded' to ensure this."
+    );
+  }
   document.body.classList.add("lock-bg");
   document.body.append(modal);
   MicroModal.show("trinsic-ui");
@@ -131,7 +143,7 @@ function showModal(launchUrl: string) {
 function hideModal() {
   try {
     MicroModal.close("trinsic-ui");
-  } catch (err) { }
+  } catch (err) {}
   document.body.classList.remove("lock-bg");
   removeModal();
 }
