@@ -1,11 +1,15 @@
 try {
     Push-Location "$PSScriptRoot\sdk"
+
+
+    Copy-Item "$PSScriptRoot/README.md" "$PSScriptRoot/sdk"
     
     & npm ci
 
     if ($LASTEXITCODE -ne 0) {
         throw "npm ci failed"
     }
+
 
     $version = &"$PSScriptRoot\..\get-version.ps1" -versionName "webUIVersion";
 
