@@ -19,11 +19,27 @@ Install the package with:
 npm install @trinsic/web-ui
 ```
 
+If you're using a CDN, for example unpkg, you can use the below source.
+
+```html
+<script src="http://unpkg.com/@trinsic/web-ui"><script>
+```
+
 ## Usage
 
 The library exports three methods: `launchIframe(launchUrl)`, `launchPopup(launchUrl)` and `launchRedirect(launchUrl, redirectUrl)`.
 
-Depending on how you would like your user interaction to be, an embedded iFrame, a popup or a redirect flow, choose your start point.
+When using a module bundler import the functions as follows:
+
+```js
+import { launchIframe, launchRedirect, launchPopup } from "@trinsic/web-ui";
+```
+
+When using a direct script tag, you can access the methods via the global `TrinsicUI` variable:
+
+```js
+TrinsicUI.launchIframe();
+```
 
 You can retrieve the launch url from a trusted backend that can reach out to the Trinsic servers. [See our API libraries.](https://github.com/trinsic-id/sdk#api-libraries)
 
@@ -31,11 +47,7 @@ You can find a full example using this library in the [samples](https://github.c
 
 ## SDK Versioning
 
-var configuration = new Configuration { AccessToken = "your-access-token" };
-
-var attachments = new AttachmentsApi(configuration);
-var network = new NetworkApi(configuration);
-var sessions = new SessionsApi(configuration);
+Trinsic follows a Semantic Versioning (SemVer) process where all releases will have a version X.Y.Z (like 1.0.0) pattern wherein Z would be a bug fix (e.g., 1.0.1), Y would be a minor release (1.1.0) and X would be a major release (2.0.0). We permit any breaking changes to only be released in major versions and strongly recommend reading changelogs before making any major version upgrades.
 
 ## Support
 
