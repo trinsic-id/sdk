@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, Button } from 'react-native';
 import { launchSession } from '@trinsic/react-native-ui';
 import type { LaunchSessionResult } from '@trinsic/react-native-ui';
 
-const SESSION_CREATE_URL = "[REPLACE_ME]";
+const SESSION_CREATE_URL = "https://api.trinsic.id/api/mobiletest/create-session";
 
 export default function App() {
   const [result, setResult] = useState<LaunchSessionResult | null>();

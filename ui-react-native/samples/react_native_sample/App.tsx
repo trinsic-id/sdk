@@ -21,7 +21,7 @@ import {
 import {Colors, Header} from 'react-native/Libraries/NewAppScreen';
 
 import {launchSession, LaunchSessionResult} from '@trinsic/react-native-ui';
-const SESSION_CREATE_URL = '[REPLACE_ME]';
+const SESSION_CREATE_URL = 'https://api.trinsic.id/api/mobiletest/create-session';
 
 type SectionProps = PropsWithChildren<{
   title: string;
