@@ -17,7 +17,8 @@ Pod::Spec.new do |s|
   s.source_files = ["ios/**/*.{h,m,mm,cpp}"]
   # Public headers
   s.public_header_files = 'ios/**/*.h'
-  s.dependency 'TrinsicUI', '0.3.14'
+  
+  s.dependency 'TrinsicUI'
 
   s.static_framework = true
 
