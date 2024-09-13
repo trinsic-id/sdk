@@ -7,11 +7,13 @@
     "type": "git",
     "url": "https://github.com/trinsic-id/sdk"
   },
-  "module": "dist/index.js",
+  "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
-  "browser": "dist/index.js",
+  "browser": "dist/index.iife.js",
   "scripts": {
-    "build": "esbuild src/index.ts --bundle --minify --sourcemap --format=esm --outdir=dist --target=chrome58,firefox57,safari11,edge16",
+    "build:esm": "esbuild src/index.ts --bundle --minify --sourcemap --format=esm --outfile=dist/index.esm.js --target=chrome58,firefox57,safari11,edge16",
+    "build:iife": "esbuild src/index.ts --bundle --minify --sourcemap --format=iife --outfile=dist/index.iife.js --target=chrome58,firefox57,safari11,edge16",
+    "build": "npm run build:esm && npm run build:iife",
     "postbuild": "tsc src/index.ts --declaration --emitDeclarationOnly --lib es2015,dom --outDir dist"
   },
   "devDependencies": {
