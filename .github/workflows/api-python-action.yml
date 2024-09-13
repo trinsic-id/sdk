@@ -21,7 +21,7 @@ jobs:
         run: ./api-python/build-sdk.ps1
         shell: pwsh
       - name: Build sample
-        run: ./api-python/build-sample.ps1
+        run: ./api-python/build-samples.ps1
         shell: pwsh
       - name: Publish SDK
         if: inputs.publish == true
