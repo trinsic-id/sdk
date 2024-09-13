@@ -77,7 +77,7 @@ function getProviders() {
 
 async function launchPopupMethod(provider) {
   return launchPopup(
-    `launch/${provider}?redirectUrl=${window.location.origin}/redirect`
+    async () => `launch/${provider}?redirectUrl=${window.location.origin}/redirect`
   );
 }
 
