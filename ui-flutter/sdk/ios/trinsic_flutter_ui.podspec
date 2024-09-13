@@ -15,7 +15,7 @@ A new Flutter plugin project.
   s.source           = { :path => '.' }
   s.source_files = 'TrinsicFlutterUI/Sources/TrinsicFlutterUI/**/*'
   s.dependency 'Flutter'
-  s.dependency 'TrinsicUI', '~> 0.4.3'
+  s.dependency 'TrinsicUI'
   s.platform = :ios, '13.4'
   
 
