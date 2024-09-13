@@ -28,7 +28,7 @@ try {
 
     # Update the version and tag in the podspec content
     $updatedContent = $podspecContent -replace "s.version\s*=\s*'[\d\.]+'", "s.version          = '$packageVersion'"
-    $updatedContent = $updatedContent -replace "s.source\s*=\s*{ :git => '[^']+', :tag => 'v[\d\.]+' }", "s.source       = { :git => 'https://github.com/trinsic-id/sdk-swift-ui.git', :tag => 'v$packageVersion' }"
+    $updatedContent = $updatedContent -replace "s.source\s*=\s*{ :git => '[^']+', :tag => '[\d\.]+' }", "s.source       = { :git => 'https://github.com/trinsic-id/sdk-swift-ui.git', :tag => '$packageVersion' }"
 
     # Write the updated content back to the podspec file
     $updatedContent | Set-Content $podspecPath
@@ -48,7 +48,7 @@ try {
         throw "Failed to push to submodule main"
     }
 
-    $tagName = "v$packageVersion"
+    $tagName = "$packageVersion"
     git tag $tagName
     git push origin $tagName
 
