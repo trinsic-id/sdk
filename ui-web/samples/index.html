@@ -31,7 +31,7 @@
         <button
           class="launch-button"
           disabled="true"
-          onclick="launchPopup(window.launchUrl).then(r => exchangeResult(r))"
+          onclick="launchPopup(async () => window.launchUrl).then(r => exchangeResult(r))"
         >
           <img src="https://cdn.trinsic.id/assets/logo/192x192.png" />
           <div class="launch-name">Launch popup</div>
