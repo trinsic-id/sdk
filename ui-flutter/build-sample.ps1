@@ -4,6 +4,23 @@ try {
     Write-Host "Building ui-flitter sample project..."
     Push-Location $FLUTTER_SAMPLES_DIR
 
+    & flutter pub get
+    if ($LASTEXITCODE -ne 0) {
+        throw "flutter pub failed"
+    }
+
+    & flutter analyze
+
+    if ($LASTEXITCODE -ne 0) {
+        throw "flutter analyze failed"
+    }
+
+    & flutter test
+
+    if ($LASTEXITCODE -ne 0) {
+        throw "flutter test failed"
+    }
+
 
     Write-Host "Building Flutter iOS..."
     &flutter build ios

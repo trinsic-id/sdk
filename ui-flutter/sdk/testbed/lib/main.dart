@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
@@ -9,11 +8,11 @@ import 'package:trinsic_flutter_ui/trinsic_flutter_ui.dart';
 
 // Replace the below with a URL that, when called with a GET request, will return a session launch URL as the only text content of the response.
 // It will likely do so by using the Trinsic backend API SDK to create a session and return the launch URL.
-const String BACKEND_CREATE_SESSION_ENDPOINT = '';
+const String backendCreateSessionEndpoint = '';
 
 // Replace the below with a URL that uses a custom scheme that you've properly registered in your app's AndroidManifest.xml
 // The path (in this case "/callback") can be anything.
-const String CALLBACK_REDIRECT_URL =
+const String callbackRedirectUrl =
     "trinsic-flutter-ui-testbed-redirect-scheme://callback";
 
 //----------- No need to modify anything below here -----------
@@ -58,7 +57,7 @@ class _MyAppState extends State<MyApp> {
 
   Future<String> getLaunchUrl() async {
     setStateText("Getting launch URL...");
-    return await http.read(Uri.parse(BACKEND_CREATE_SESSION_ENDPOINT));
+    return await http.read(Uri.parse(backendCreateSessionEndpoint));
   }
 
   Future<void> launchSession() async {
@@ -68,9 +67,9 @@ class _MyAppState extends State<MyApp> {
     Map? result;
     try {
       result =
-          await TrinsicFlutter.launchSession(launchUrl, CALLBACK_REDIRECT_URL);
+          await TrinsicFlutter.launchSession(launchUrl, callbackRedirectUrl);
     } on PlatformException catch (e) {
-      print("Error: $e");
+      debugPrint("Error: $e");
       setStateText("Failed to launch");
       result = null;
       return;
@@ -84,7 +83,7 @@ class _MyAppState extends State<MyApp> {
     if (result.containsKey("resultsAccessKey") &&
         result["resultsAccessKey"] != null &&
         result["resultsAccessKey"]!.toString().isNotEmpty) {
-      setStateText("Got ResultAccessKey: ${result!["resultsAccessKey"]}");
+      setStateText("Got ResultAccessKey: ${result["resultsAccessKey"]}");
       return;
     }
 

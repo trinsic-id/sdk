@@ -45,17 +45,11 @@ jobs:
           EOF
       - name: Verify credentials
         run: cat $XDG_CONFIG_HOME/dart/pub-credentials.json
-      - name: Run Flutter SDK Tests
-        working-directory: ./ui-flutter/sdk
-        run: flutter test
-      - name: Build Sample Android App
-        working-directory: ./ui-flutter
-        run: ./build-sample.ps1
+      - name: Build SDK
+        run: ./ui-flutter/build-sdk.ps1
         shell: pwsh
-      - name: Publish SDK (dry run)
-        working-directory: ./
-        if: inputs.publish == false
-        run: ./ui-flutter/publish-sdk.ps1 -dryRun
+      - name: Build Samples
+        run: ./ui-flutter/build-samples.ps1
         shell: pwsh
       - name: Publish SDK
         working-directory: ./
