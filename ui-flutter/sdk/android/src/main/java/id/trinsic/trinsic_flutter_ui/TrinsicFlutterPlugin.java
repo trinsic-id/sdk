@@ -107,6 +107,13 @@ public class TrinsicFlutterPlugin implements FlutterPlugin, ActivityAware, Metho
             }
             String sessionId = parsedUrl.getQueryParameter("sessionId");
 
+            try {
+                id.trinsic.android.ui.PlatformUtil.ValidateRedirectUrl(context, redirectUrl);
+            } catch (IllegalArgumentException e) {
+                result.error("illegal_argument", e.getMessage(), null);
+                return;
+            }
+
             // TODO: race condition prevention on `callbacks`?
             callbacks.put(sessionId, result);
 
