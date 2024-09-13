@@ -50,20 +50,27 @@ export async function launchRedirect(launchUrl: string, redirectUrl: string) {
 }
 
 export async function launchPopup(
-  launchUrl: string
+  getLaunchUrl: () => Promise<string>
 ): Promise<TrinsicSessionResult> {
   const userAgents = detectUserAgents();
   const popup = window.open(
-    launchUrl,
+    "about:blank",
     "Trinsic",
     userAgents.isDesktop
       ? "width=600,height=900"
       : "width=" +
-          window.innerWidth +
-          ",height=" +
-          window.innerHeight +
-          ",top=0,left=0"
+      window.innerWidth +
+      ",height=" +
+      window.innerHeight +
+      ",top=0,left=0"
   );
+
+  if (!popup) {
+    throw new Error("Failed to open popup window");
+  }
+
+  popup.location.href = await getLaunchUrl();
+
   var result = new Promise<TrinsicSessionResult>((resolve, reject) => {
     window?.addEventListener(
       "message",
@@ -124,7 +131,7 @@ function showModal(launchUrl: string) {
 function hideModal() {
   try {
     MicroModal.close("trinsic-ui");
-  } catch (err) {}
+  } catch (err) { }
   document.body.classList.remove("lock-bg");
   removeModal();
 }
