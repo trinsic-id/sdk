@@ -7,10 +7,10 @@
   "pythonPatchVersion": "0",
   "phpPatchVersion": "0",
   "rubyPatchVersion": "0",
-  "swiftUIVersion": "0.4.4",
+  "swiftUIVersion": "0.4.5",
   "androidUIVersion": "0.9.0",
-  "flutterUIVersion": "0.4.1",
-  "expoUIVersion": "0.1.3",
-  "reactNativeUIVersion": "0.1.9",
+  "flutterUIVersion": "0.4.2",
+  "expoUIVersion": "0.4.0",
+  "reactNativeUIVersion": "0.4.0",
   "webUIVersion": "1.2.3"
 }
