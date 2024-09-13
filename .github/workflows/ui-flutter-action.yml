@@ -49,7 +49,7 @@ jobs:
         run: ./ui-flutter/build-sdk.ps1
         shell: pwsh
       - name: Build Samples
-        run: ./ui-flutter/build-sample.ps1
+        run: ./ui-flutter/build-samples.ps1
         shell: pwsh
       - name: Publish SDK
         working-directory: ./

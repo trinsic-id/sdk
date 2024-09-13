@@ -26,7 +26,7 @@ jobs:
         run: ./api-go/build-sdk.ps1
         shell: pwsh
       - name: Build sample
-        run: ./api-go/build-sample.ps1
+        run: ./api-go/build-samples.ps1
         shell: pwsh
       - name: Publish SDK
         if: inputs.publish == true

@@ -21,7 +21,7 @@ jobs:
         run: ./ui-expo/build-sdk.ps1
         shell: pwsh
       - name: Build UI Expo Sample
-        run: ./ui-expo/build-sample.ps1
+        run: ./ui-expo/build-samples.ps1
         shell: pwsh
       - name: Publish ui Expo SDK
         if: inputs.publish == true
