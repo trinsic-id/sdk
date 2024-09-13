@@ -31,6 +31,8 @@ jobs:
         with:
           distribution: "temurin"
           java-version: "21"
+      - name: Set up environment variables
+        run: echo "XDG_CONFIG_HOME=$HOME/.config" >> $GITHUB_ENV
       - name: Setup credentials (todo investigate expiration)
         run: |
           mkdir -p $XDG_CONFIG_HOME/dart
