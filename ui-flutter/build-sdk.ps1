@@ -4,7 +4,18 @@ try {
     & flutter pub get
 
     if ($LASTEXITCODE -ne 0) {
-        throw "flutter pub failed"
+        throw "flutter pub get sdk failed"
+    }
+    try {
+        Push-Location "$PSScriptRoot\sdk\testbed"
+        & flutter pub get
+
+        if ($LASTEXITCODE -ne 0) {
+            throw "flutter pub get testbed failed"
+        }
+    }
+    finally {
+        Pop-Location
     }
 
     $version = &"$PSScriptRoot\..\get-version.ps1" -versionName "flutterUIVersion"
