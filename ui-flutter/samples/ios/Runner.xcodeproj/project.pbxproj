@@ -239,9 +239,6 @@
 				Base,
 			);
 			mainGroup = 97C146E51CF9000F007C117D;
-			packageReferences = (
-				911DC5372C77768700235F0C /* XCLocalSwiftPackageReference "../../../../../swift/ui" */,
-			);
 			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -740,12 +737,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		911DC5372C77768700235F0C /* XCLocalSwiftPackageReference "../../../../../swift/ui" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../../../../../swift/ui;
-		};
-/* End XCLocalSwiftPackageReference section */
 	};
 	rootObject = 97C146E61CF9000F007C117D /* Project object */;
 }
