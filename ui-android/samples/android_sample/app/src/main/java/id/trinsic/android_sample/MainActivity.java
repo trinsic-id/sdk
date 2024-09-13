@@ -17,7 +17,7 @@ import java.net.URL;
 public class MainActivity extends AppCompatActivity {
     // Replace the below with a URL that, when called with a GET request, will return a session launch URL as the only text content of the response.
     // It will likely do so by using the Trinsic backend API SDK to create a session and return the launch URL.
-    private static String BACKEND_CREATE_SESSION_ENDPOINT = "[REPLACEME]";
+    private static String BACKEND_CREATE_SESSION_ENDPOINT = "https://api.trinsic.id/api/mobiletest/create-session";
 
     // Replace the below with a URL that uses a custom scheme that you've properly registered in your app's AndroidManifest.xml
     // The path (in this case "/callback") can be anything.

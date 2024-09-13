@@ -15,7 +15,7 @@ struct ContentView: View {
     let trinsicUI = TrinsicUI()
     // Or a customized one that you can provide yourself
     //let trinsicUI = TrinsicUI(presentationContextProvider: CustomContextProvider.init())
-    let startUrl =  ""
+    let startUrl =  "https://api.trinsic.id/api/mobiletest/create-session"
 
 
     var body: some View {
