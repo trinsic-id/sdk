@@ -34,6 +34,9 @@ try {
         $changelogContent | Set-Content -Path "CHANGELOG.md"
     }
 
+    Write-Host "Copying README.md to sdk folder so publish command works"
+    Copy-Item -Path "..\README.md" -Destination "README.md"
+
     & flutter analyze
 
     if ($LASTEXITCODE -ne 0) {
