@@ -5,7 +5,7 @@
 
 The Trinsic Expo UI Library provides ways to launch verification sessions directly from your Expo application.
 
-This library must be paired with a [api library](https://github.com/trinsic-id/sdk#api-libraries) as part of a full integration.
+This library must be paired with an [api library](https://github.com/trinsic-id/sdk#api-libraries) as part of a full integration.
 
 Currently, only iOS and Android are supported.
 
