@@ -53,12 +53,12 @@ public class MainActivity extends AppCompatActivity {
                 String launchUrl;
                 try {
                     launchUrl = createLaunchUrl();
+                    trinsicUI.LaunchSession(MainActivity.this, launchUrl, CALLBACK_REDIRECT_URL);
                 } catch (Exception e) {
                     Toast.makeText(MainActivity.this, "Failed to create launch URL: " + e.getMessage(), Toast.LENGTH_LONG);
                     throw new RuntimeException(e);
                 }
 
-                trinsicUI.LaunchSession(launchUrl, CALLBACK_REDIRECT_URL);
             }
         });
     }
