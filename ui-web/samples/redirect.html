@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -6,20 +6,27 @@
     <title>Trinsic redirect</title>
   </head>
   <body>
+    <script type="module" src="./main.js"></script>
     <script type="module">
       const params = new URLSearchParams(window.location.search);
       const data = {
         success: params.get("success") === "true" ? true : false,
         resultsAccessKey: params.get("resultsAccessKey"),
+        sessionId: params.get("sessionId"),
       };
 
       console.debug("Sending message to opener", data, window.opener);
 
-      window.opener?.postMessage(data, "*");
+      if (window.opener) {
+        window.opener?.postMessage(data, "*");
+      } else {
+        exchangeResult(data);
+      }
     </script>
     <noscript>
       <p>This page requires JavaScript to work properly.</p>
     </noscript>
     <div>Completing the flow</div>
+    <pre id="results"></pre>
   </body>
 </html>
