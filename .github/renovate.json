@@ -10,6 +10,13 @@
 	"reviewers": ["lucasamonrc"],
 	"prHourlyLimit": 0,
 	"ignorePaths": ["swift/**"],
+	"swift": {
+		"enabled": true
+	},
+	"fileMatch": [
+		"Package.swift",
+		"Package.resolved"
+	],
 	"packageRules": [
 		{
 			"matchPackagePatterns": ["*"],
