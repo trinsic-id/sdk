@@ -68,18 +68,26 @@ function getProviders() {
   })
     .then((response) => response.json())
     .then((r) => {
-      for (let i = 0; i < r.providers.length; i++) {
-        document.getElementById("listOptions").innerHTML +=
-          `<li><button class="launch-button" style="padding: 10px; background-color: transparent;" onclick="launchPopupMethod('${r.providers[i].id}').then(r => exchangeResult(r))"> <img src="${r.providers[i].logoUrl}" /> <div class="launch-name"> Launch ${r.providers[i].name}</div>  <div class="chevron"></div></button></li>`;
+      const providers = r.providers.filter(
+        (provider) => provider.id !== "document-scan"
+      );
+
+      for (let i = 0; i < providers.length; i++) {
+        document.getElementById(
+          "listOptions"
+        ).innerHTML += `<li><button class="launch-button" style="padding: 10px; background-color: transparent;" onclick="launchPopupMethod('${providers[i].id}').then(r => exchangeResult(r))"> <img src="${providers[i].logoUrl}" /> <div class="launch-name"> Launch ${providers[i].name}</div>  <div class="chevron"></div></button></li>`;
       }
     });
 }
 
 async function launchPopupMethod(provider) {
   return launchPopup(
-    async () => `launch/${provider}?redirectUrl=${window.location.origin}/redirect`
+    async () =>
+      `launch/${provider}?redirectUrl=${window.location.origin}/redirect`
   );
 }
 
-createUrl();
-getProviders();
+if (window.location.pathname !== "/redirect") {
+  createUrl();
+  getProviders();
+}
