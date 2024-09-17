@@ -11,12 +11,12 @@
 	"prHourlyLimit": 0,
 	"ignorePaths": ["swift/**"],
 	"swift": {
-		"enabled": true
+		"enabled": true,
+		"fileMatch": [
+			"Package.swift",
+			"Package.resolved"
+		],
 	},
-	"fileMatch": [
-		"Package.swift",
-		"Package.resolved"
-	],
 	"packageRules": [
 		{
 			"matchPackagePatterns": ["*"],
