@@ -29,6 +29,7 @@
 				"trinsic_flutter_ui",
 				"@trinsic/react-native-ui",
 				"trinsic-ui-ios",
+				"sdk-swift-ui",
 				"@trinsic/web-ui"
 			],
 			"enabled": true
