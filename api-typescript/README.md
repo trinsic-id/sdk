@@ -39,11 +39,11 @@ You can find a full TypeScript server example in the [samples](https://github.co
 
 ## SDK Versioning
 
-var configuration = new Configuration { AccessToken = "your-access-token" };
+Our SDKs follow the [Semantic Versioning](https://semver.org) ("SemVer") scheme.
 
-var attachments = new AttachmentsApi(configuration);
-var network = new NetworkApi(configuration);
-var sessions = new SessionsApi(configuration);
+For example, the version number `1.13.0` has a major version of `1`, a minor version of `13`, and a patch version of `0`.
+
+Breaking changes are only introduced alongside a new major version.
 
 ## Support
 
