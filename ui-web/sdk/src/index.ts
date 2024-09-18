@@ -104,7 +104,7 @@ function showModal(launchUrl: string) {
   const bgOverlay = document.createElement("div");
   bgOverlay.tabIndex = -1;
   // bgOverlay.setAttribute("data-micromodal-close", "true");
-  bgOverlay.className = "fixed inset-0 flex items-center justify-center bg-black/50";
+  bgOverlay.className = "fixed inset-0 flex items-center justify-center modal__overlay";
 
   const modalContainer = document.createElement("div");
   //modalContainer.role = "dialog";
