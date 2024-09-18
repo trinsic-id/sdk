@@ -47,7 +47,11 @@ You can find a full example using this library in the [samples](https://github.c
 
 ## SDK Versioning
 
-Trinsic follows a Semantic Versioning (SemVer) process where all releases will have a version X.Y.Z (like 1.0.0) pattern wherein Z would be a bug fix (e.g., 1.0.1), Y would be a minor release (1.1.0) and X would be a major release (2.0.0). We permit any breaking changes to only be released in major versions and strongly recommend reading changelogs before making any major version upgrades.
+Our SDKs follow the [Semantic Versioning](https://semver.org) ("SemVer") scheme.
+
+For example, the version number `1.13.0` has a major version of `1`, a minor version of `13`, and a patch version of `0`.
+
+Breaking changes are only introduced alongside a new major version.
 
 ## Support
 
