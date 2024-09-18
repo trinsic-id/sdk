@@ -104,14 +104,14 @@ function showModal(launchUrl: string) {
   const bgOverlay = document.createElement("div");
   bgOverlay.tabIndex = -1;
   // bgOverlay.setAttribute("data-micromodal-close", "true");
-  bgOverlay.className = "fixed inset-0 flex items-center justify-center";
+  bgOverlay.className = "fixed inset-0 flex items-center justify-center bg-black/50";
 
   const modalContainer = document.createElement("div");
   //modalContainer.role = "dialog";
   modalContainer.ariaModal = "true";
 
   modalContainer.className = userAgents.isDesktop
-    ? "modal__container h-600px w-400px lock-bg"
+    ? "modal__container h-600px w-400px lock-bg shadow-lg"
     : "modal__container h-full min-h-600px w-full";
 
   const iframe = document.createElement("iframe");
