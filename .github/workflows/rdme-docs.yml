@@ -5,6 +5,21 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "api-csharp/README.md"
+      - "api-go/README.md"
+      - "api-java/README.md"
+      - "api-php/README.md"
+      - "api-python/README.md"
+      - "api-ruby/README.md"
+      - "api-typescript/README.md"
+      - "ui-android/README.md"
+      - "ui-expo/README.md"
+      - "ui-flutter/README.md"
+      - "ui-react-native/README.md"
+      - "ui-swift/README.md"
+      - "ui-web/README.md"
+      - ".readme/**"
 
 jobs:
   api-csharp:
