@@ -9,7 +9,7 @@
   },
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
-  "browser": "dist/index.iife.js",
+  "main": "dist/index.iife.js",
   "source": "./dist/index.esm.js",
   "exports": {
     "import": "./dist/index.esm.js",
