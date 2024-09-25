@@ -1,7 +1,7 @@
 try {
     Push-Location "$PSScriptRoot/samples"
 
-    & npm ci
+    & npm install
 
     if ($LASTEXITCODE -ne 0) {
         throw "npm ci failed"
