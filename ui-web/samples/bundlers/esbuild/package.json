@@ -3,15 +3,17 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "node build.js"
+    "build": "node build.js",
+    "start": "npm run build && http-server ."
   },
   "author": "",
   "license": "MIT",
   "description": "",
   "devDependencies": {
-    "esbuild": "^0.24.0"
+    "esbuild": "^0.24.0",
+    "http-server": "^14.1.1"
   },
   "dependencies": {
-    "@trinsic/web-ui": "1.2.8-alpha2"
+    "@trinsic/web-ui": "1.2.8-alpha3"
   }
 }
