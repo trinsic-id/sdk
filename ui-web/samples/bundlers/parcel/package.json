@@ -1,0 +1,24 @@
+{
+  "name": "@trinsic/web-ui-parcel-sample",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "parcel serve index.html",
+    "build": "parcel build index.html"
+  },
+  "author": "",
+  "license": "MIT",
+  "description": "",
+  "targets": {
+    "default": {
+      "engines": {
+        "browsers": "> 5%, not dead"
+      }
+    }
+  },
+  "devDependencies": {
+    "parcel": "^2.12.0"
+  },
+  "dependencies": {
+    "@trinsic/web-ui": "1.2.8-alpha3"
+  }
+}
