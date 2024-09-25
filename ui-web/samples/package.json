@@ -9,10 +9,9 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "parcel": "^2.12.0",
-    "vite": "^5.4.1"
+    "vite": "5.4.1"
   },
   "dependencies": {
-    "@trinsic/web-ui": "^1.1.0"
+    "@trinsic/web-ui": "1.1.0"
   }
 }
