@@ -1,0 +1,17 @@
+{
+  "name": "@trinsic/web-ui-esbuild-sample",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "description": "",
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  },
+  "dependencies": {
+    "@trinsic/web-ui": "^1.2.6"
+  }
+}
