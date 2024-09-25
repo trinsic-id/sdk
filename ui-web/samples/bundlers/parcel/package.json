@@ -20,6 +20,6 @@
     "parcel": "^2.12.0"
   },
   "dependencies": {
-    "@trinsic/web-ui": "1.2.8-alpha2"
+    "@trinsic/web-ui": "1.2.8-alpha3"
   }
 }
