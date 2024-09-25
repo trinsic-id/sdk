@@ -10,6 +10,10 @@
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
   "browser": "dist/index.iife.js",
+  "exports": {
+    "import": "./dist/library.esm.js",
+    "require": "./dist/library.iife.js"
+  },
   "scripts": {
     "build:esm": "esbuild src/index.ts --bundle --minify --sourcemap --format=esm --outfile=dist/index.esm.js --target=chrome58,firefox57,safari11,edge16",
     "build:iife": "esbuild src/index.ts --bundle --minify --sourcemap --format=iife --global-name=TrinsicUI --outfile=dist/index.iife.js --target=chrome58,firefox57,safari11,edge16",
