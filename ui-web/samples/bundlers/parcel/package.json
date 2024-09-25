@@ -1,7 +1,6 @@
 {
   "name": "@trinsic/web-ui-parcel-sample",
   "version": "1.0.0",
-  "main": "index.js",
   "scripts": {
     "start": "parcel serve index.html",
     "build": "parcel build index.html"

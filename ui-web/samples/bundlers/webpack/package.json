@@ -12,7 +12,8 @@
   "devDependencies": {
     "webpack": "^5.94.0",
     "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^5.1.0"
+    "webpack-dev-server": "^5.1.0",
+    "webpack-fail-plugin": "^2.0.0"
   },
   "dependencies": {
     "@trinsic/web-ui": "1.2.8-alpha3"
