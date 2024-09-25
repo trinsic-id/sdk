@@ -1,6 +1,9 @@
 try {
     Push-Location "$PSScriptRoot/samples"
 
+    & node -v
+    & npm -v
+
     & npm install
 
     if ($LASTEXITCODE -ne 0) {
