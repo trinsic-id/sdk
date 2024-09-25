@@ -1,2 +1,3 @@
 import { launchPopup } from "@trinsic/web-ui";
-console.log("Hello, Webpack!", launchPopup());
+
+launchPopup(() => Promise.resolve("https://google.com"));

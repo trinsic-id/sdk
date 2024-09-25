@@ -8,7 +8,7 @@ module.exports = {
   },
   devServer: {
     static: {
-      directory: path.join(__dirname, "dist"), // Serve from dist folder
+      directory: path.join(__dirname),
     },
     compress: true,
     port: 9000, // Dev server port
