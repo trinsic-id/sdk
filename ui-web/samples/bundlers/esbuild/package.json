@@ -12,6 +12,6 @@
     "esbuild": "^0.24.0"
   },
   "dependencies": {
-    "@trinsic/web-ui": "^1.2.6"
+    "@trinsic/web-ui": "1.2.7"
   }
 }
