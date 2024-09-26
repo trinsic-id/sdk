@@ -14,6 +14,6 @@
     "http-server": "^14.1.1"
   },
   "dependencies": {
-    "@trinsic/web-ui": "1.2.8-alpha3"
+    "@trinsic/web-ui": "1.2.8"
   }
 }
