@@ -18,7 +18,8 @@
       "import": "./dist/index.esm.js",
       "require": "./dist/index.iife.js"
     },
-    "default": "./dist/index.iife.js"
+    "default": "./dist/index.iife.js",
+    "types": "./dist/index.d.ts"
   },
   "scripts": {
     "build:esm": "esbuild src/index.ts --bundle --minify --sourcemap --format=esm --outfile=dist/index.esm.js --target=chrome58,firefox57,safari11,edge16",
