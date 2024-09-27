@@ -1,6 +1,9 @@
 try {
     Push-Location "$PSScriptRoot/samples"
 
+    & node --version
+    & npm --version
+
     & npm ci
 
     if ($LASTEXITCODE -ne 0) {
