@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3048ce958741001a48972bfb12d515b3",
+    "content-hash": "abb53489d1df2d073d9b92242a336abe",
     "packages": [
         {
             "name": "fig/http-message-util",
@@ -1500,16 +1500,16 @@
         },
         {
             "name": "trinsic/api",
-            "version": "1.1.1",
+            "version": "1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/trinsic-id/sdk-php-api.git",
-                "reference": "f3a4797a8ed95f1702d8b64b51f6f6bb55f8f4a1"
+                "reference": "c1eca88e50d32c230c0af589f4b3f2dc979e7d60"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/trinsic-id/sdk-php-api/zipball/f3a4797a8ed95f1702d8b64b51f6f6bb55f8f4a1",
-                "reference": "f3a4797a8ed95f1702d8b64b51f6f6bb55f8f4a1",
+                "url": "https://api.github.com/repos/trinsic-id/sdk-php-api/zipball/c1eca88e50d32c230c0af589f4b3f2dc979e7d60",
+                "reference": "c1eca88e50d32c230c0af589f4b3f2dc979e7d60",
                 "shasum": ""
             },
             "require": {
@@ -1553,9 +1553,9 @@
             ],
             "support": {
                 "issues": "https://github.com/trinsic-id/sdk-php-api/issues",
-                "source": "https://github.com/trinsic-id/sdk-php-api/tree/v1.1.1"
+                "source": "https://github.com/trinsic-id/sdk-php-api/tree/v1.1.2"
             },
-            "time": "2024-09-18T20:55:19+00:00"
+            "time": "2024-10-10T20:06:21+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
@@ -1645,10 +1645,10 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
-    "platform-dev": [],
+    "platform": {},
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }
