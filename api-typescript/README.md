@@ -30,7 +30,7 @@ const config = new Configuration({ accessToken: "your-access-token" });
 
 const attachments = new AttachmentsApi(config);
 const network = new NetworkApi(config);
-const sessions = new SessionsApi(config);
+const sessionsApi = new SessionsApi(config);
 
 const session = await sessionsApi.createSession();
 ```

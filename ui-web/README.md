@@ -38,10 +38,23 @@ import { launchIframe, launchRedirect, launchPopup } from "@trinsic/web-ui";
 When using a direct script tag, you can access the methods via the global `TrinsicUI` variable:
 
 ```js
-TrinsicUI.launchIframe();
+launchIframe(LAUNCH_URL);
 ```
 
-You can retrieve the launch url from a trusted backend that can reach out to the Trinsic servers. [See our API libraries.](https://github.com/trinsic-id/sdk#api-libraries)
+You can retrieve the launch URL from a trusted backend that can reach out to the Trinsic servers and create sessions. [See our API libraries.](https://github.com/trinsic-id/sdk#api-libraries).
+
+if you want to do it in a sense like OAUTH flow, you can use secure redirect way. After receiving launch URL from backend just:
+
+```js
+launchRedirect(LAUNCH_URL, REDIRECT_URL);
+```
+Then the page will browse to Trinsic launch session UI and user does the identification and upon success or error the callback URL will be called back on redirect URL.
+The format of callback redirect call (you need to handle it in your web application to be ready for these redirected callbacks):
+
+```
+[YOUR_CALLBACK_URL]?success=true&resultsAccessKey=[RESULTS_ACCESS_KEY]&sessionId=[SESSION_UUID]
+```
+
 
 You can find a full example using this library in the [samples](https://github.com/trinsic-id/sdk/tree/main/ui-web/samples) folder.
 
