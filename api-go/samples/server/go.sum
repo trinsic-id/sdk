@@ -30,6 +30,8 @@ github.com/trinsic-id/sdk-go-api v1.1.1 h1:XWueUCcIsUgfFjfH01FW+lC/8VL4z7BPaEQ8W
 github.com/trinsic-id/sdk-go-api v1.1.1/go.mod h1:/65EnBDa7gyQujlK085Gu0vU4brNuY7ehWcHUNKd1Pk=
 github.com/trinsic-id/sdk-go-api v1.1.2 h1:SLSh/7cPOkfoR9zThuKneAIrkdfPTEuA+mK5JoJShGI=
 github.com/trinsic-id/sdk-go-api v1.1.2/go.mod h1:/65EnBDa7gyQujlK085Gu0vU4brNuY7ehWcHUNKd1Pk=
+github.com/trinsic-id/sdk-go-api v1.2.0 h1:c2vyj7WgXtipF6YOBZXIZaDZcG74FWa9c8lnXIrW4QA=
+github.com/trinsic-id/sdk-go-api v1.2.0/go.mod h1:/65EnBDa7gyQujlK085Gu0vU4brNuY7ehWcHUNKd1Pk=
 github.com/valyala/bytebufferpool v1.0.0 h1:GqA5TC/0021Y/b9FG4Oi9Mr3q7XYx6KllzawFIhcdPw=
 github.com/valyala/bytebufferpool v1.0.0/go.mod h1:6bBcMArwyJ5K/AmCkWv1jt77kVWyCJ6HpOuEn7z0Csc=
 github.com/valyala/fasthttp v1.55.0 h1:Zkefzgt6a7+bVKHnu/YaYSOPfNYNisSVBo/unVCf8k8=
