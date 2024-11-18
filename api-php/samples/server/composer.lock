@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "abb53489d1df2d073d9b92242a336abe",
+    "content-hash": "7dfcc5565c53f6c4b4be95807b41f452",
     "packages": [
         {
             "name": "fig/http-message-util",
@@ -252,16 +252,16 @@
         },
         {
             "name": "guzzlehttp/promises",
-            "version": "2.0.3",
+            "version": "2.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/promises.git",
-                "reference": "6ea8dd08867a2a42619d65c3deb2c0fcbf81c8f8"
+                "reference": "f9c436286ab2892c7db7be8c8da4ef61ccf7b455"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/promises/zipball/6ea8dd08867a2a42619d65c3deb2c0fcbf81c8f8",
-                "reference": "6ea8dd08867a2a42619d65c3deb2c0fcbf81c8f8",
+                "url": "https://api.github.com/repos/guzzle/promises/zipball/f9c436286ab2892c7db7be8c8da4ef61ccf7b455",
+                "reference": "f9c436286ab2892c7db7be8c8da4ef61ccf7b455",
                 "shasum": ""
             },
             "require": {
@@ -315,7 +315,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/promises/issues",
-                "source": "https://github.com/guzzle/promises/tree/2.0.3"
+                "source": "https://github.com/guzzle/promises/tree/2.0.4"
             },
             "funding": [
                 {
@@ -331,7 +331,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-07-18T10:29:17+00:00"
+            "time": "2024-10-17T10:06:22+00:00"
         },
         {
             "name": "guzzlehttp/psr7",
@@ -1500,16 +1500,16 @@
         },
         {
             "name": "trinsic/api",
-            "version": "1.1.2",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/trinsic-id/sdk-php-api.git",
-                "reference": "c1eca88e50d32c230c0af589f4b3f2dc979e7d60"
+                "reference": "5a65912dd5833f54efbdaa6a84fc13c4cce3bacf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/trinsic-id/sdk-php-api/zipball/c1eca88e50d32c230c0af589f4b3f2dc979e7d60",
-                "reference": "c1eca88e50d32c230c0af589f4b3f2dc979e7d60",
+                "url": "https://api.github.com/repos/trinsic-id/sdk-php-api/zipball/5a65912dd5833f54efbdaa6a84fc13c4cce3bacf",
+                "reference": "5a65912dd5833f54efbdaa6a84fc13c4cce3bacf",
                 "shasum": ""
             },
             "require": {
@@ -1553,9 +1553,9 @@
             ],
             "support": {
                 "issues": "https://github.com/trinsic-id/sdk-php-api/issues",
-                "source": "https://github.com/trinsic-id/sdk-php-api/tree/v1.1.2"
+                "source": "https://github.com/trinsic-id/sdk-php-api/tree/v1.2.0"
             },
-            "time": "2024-10-10T20:06:21+00:00"
+            "time": "2024-11-16T14:55:02+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
