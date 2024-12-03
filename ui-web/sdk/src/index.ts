@@ -57,7 +57,7 @@ export async function launchPopup(
 ): Promise<TrinsicSessionResult> {
   const userAgents = detectUserAgents();
   const popup = window.open(
-    "about:blank",
+    "https://api.trinsic.id/loading",
     "Trinsic",
     userAgents.isDesktop
       ? "width=600,height=900"
