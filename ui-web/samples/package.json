@@ -12,7 +12,7 @@
     "vite": "5.4.1"
   },
   "dependencies": {
-    "@trinsic/web-ui": "1.2.10"
+    "@trinsic/web-ui": "1.2.11"
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "^4.22.4"
