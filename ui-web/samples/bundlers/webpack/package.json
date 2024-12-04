@@ -15,6 +15,6 @@
     "webpack-dev-server": "^5.1.0"
   },
   "dependencies": {
-    "@trinsic/web-ui": "1.2.10"
+    "@trinsic/web-ui": "1.2.11"
   }
 }
