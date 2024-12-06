@@ -72,7 +72,12 @@ export async function launchPopup(
     throw new Error("Failed to open popup window");
   }
 
-  popup.location.href = await getLaunchUrl();
+  const launchUrl = await getLaunchUrl();
+  if(!launchUrl) {
+    throw new Error("Invalid launch URL " + launchUrl);
+  }
+
+  popup.location.href = launchUrl;
 
   var result = new Promise<TrinsicSessionResult>((resolve, reject) => {
     window?.addEventListener(
