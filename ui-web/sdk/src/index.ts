@@ -1,6 +1,5 @@
 import { detectUserAgents } from "./detectUserAgents";
 import MicroModal from "micromodal";
-import { CSSString } from "./iframeCss";
 
 export interface TrinsicSessionResult {
   success: boolean;
@@ -15,10 +14,11 @@ export async function launchIframe(
   launchUrl: string
 ): Promise<TrinsicSessionResult> {
   launchUrl += "&embed=iframe";
-  const style = document.createElement("style");
-  style.id = "trinsic-ui-style";
-  style.textContent = CSSString;
-  document.head.appendChild(style);
+  const cssLink = document.createElement("link");
+  cssLink.href = "https://content.trinsic.id/connect/assets/widget-iframe.css";
+  cssLink.rel = "stylesheet";
+
+  document.head.appendChild(cssLink);
 
   if (!launchUrl) {
     throw new Error(
@@ -73,7 +73,7 @@ export async function launchPopup(
   }
 
   const launchUrl = await getLaunchUrl();
-  if(!launchUrl) {
+  if (!launchUrl) {
     throw new Error("Invalid launch URL " + launchUrl);
   }
 
