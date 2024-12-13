@@ -17,6 +17,7 @@ export async function launchIframe(
   const cssLink = document.createElement("link");
   cssLink.href = "https://content.trinsic.id/connect/assets/widget-iframe.css";
   cssLink.rel = "stylesheet";
+  cssLink.id = "trinsic-ui-css";
 
   document.head.appendChild(cssLink);
 
