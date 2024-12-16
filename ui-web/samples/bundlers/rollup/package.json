@@ -11,7 +11,7 @@
   "license": "MIT",
   "description": "",
   "dependencies": {
-    "@trinsic/web-ui": "^1.2.8-alpha3"
+    "@trinsic/web-ui": "^2.0.0"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.3.0",
