@@ -13,6 +13,6 @@
     "vite": "^5.4.1"
   },
   "dependencies": {
-    "@trinsic/web-ui": "^1.2.10"
+    "@trinsic/web-ui": "^2.0.0"
   }
 }
