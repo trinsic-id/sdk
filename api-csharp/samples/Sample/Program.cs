@@ -30,20 +30,16 @@ app.MapGet("/launch/{providerId}", async (HttpContext context, string providerId
 {
     var redirectUrl = context.Request.Query["redirectUrl"].ToString();
 
-    var request = new CreateSessionRequest
-    {
-        LaunchProviderDirectly = true,
-        Providers = [providerId]
-    };
+    var request = new CreateHostedProviderSessionRequest(providerId, null, redirectUrl);
 
-    var result = await sessionApi.CreateSessionAsync(request);
+    var result = await sessionApi.CreateHostedProviderSessionAsync(request);
 
-    context.Response.Redirect(result.LaunchUrl + "&redirectUrl=" + redirectUrl + "&sessionId=" + result.Session.Id);
+    context.Response.Redirect(result.LaunchUrl);
 });
 
 app.MapPost("/create-session", async context =>
 {
-    var result = await sessionApi.CreateSessionAsync(new CreateSessionRequest());
+    var result = await sessionApi.CreateWidgetSessionAsync(new CreateWidgetSessionRequest());
     await context.Response.WriteAsJsonAsync(result);
 });
 

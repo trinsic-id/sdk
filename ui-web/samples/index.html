@@ -1,62 +1,123 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./style.css" />
-    <link rel="icon" href="https://cdn.trinsic.id/assets/logo/favicon.ico" />
-    <script type="module" src="./main.js"></script>
-    <title>Trinsic UI sample</title>
-  </head>
-  <body class="friendly-text">
-    <h1>Trinsic Frontend Client Sample</h1>
 
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="icon" href="https://cdn.trinsic.id/assets/logo/favicon.ico" />
+  <script type="module" src="./main.js"></script>
+  <title>Trinsic UI sample</title>
+</head>
+
+<body class="friendly-text">
+  <h1>Trinsic Frontend Client Sample</h1>
+  <p><a href="https://docs.trinsic.id/docs/integration-guide">Read more</a> in our integration guide about the different
+    session launch modes.</p>
+
+
+  <div style="border: 1px solid black;padding: 5px; margin: 5px;">
+    <h3>Widget session</h3>
     <p>
-      You can launch the Trinsic Widget through 3 different modes, an embedded
-      iFrame, a popup or a redirect flow.
+      <b>Select launch method:</b>
+      <label>
+        <input type="radio" name="widgetLaunch" value="popup" checked>
+        Use a popup
+      </label>
+      
+      <label>
+        <input type="radio" name="widgetLaunch" value="redirect">
+        Use a redirect
+      </label>
+      <label>
+        <input type="radio" name="widgetLaunch" value="iframe">
+        Use an iFrame
+      </label>
     </p>
-    <ul>
-      <li>
-        <button
-          class="launch-button"
-          disabled="true"
-          onclick="launchIframe(window.launchUrl).then(r => exchangeResult(r))"
-        >
-          <img src="https://cdn.trinsic.id/assets/logo/192x192.png" />
-          <div class="launch-name">Launch an iFrame</div>
-          <div class="chevron"></div>
-        </button>
-      </li>
-      <li>
-        <button
-          class="launch-button"
-          disabled="true"
-          onclick="launchPopup(async () => window.launchUrl).then(r => exchangeResult(r))"
-        >
-          <img src="https://cdn.trinsic.id/assets/logo/192x192.png" />
-          <div class="launch-name">Launch popup</div>
-          <div class="chevron"></div>
-        </button>
-      </li>
-      <li>
-        <button
-          class="launch-button"
-          disabled="true"
-          onclick="launchRedirect(window.launchUrl, window.location.origin + '/redirect')"
-        >
-          <img src="https://cdn.trinsic.id/assets/logo/192x192.png" />
-          <div class="launch-name">Launch redirect flow</div>
-          <div class="chevron"></div>
-        </button>
-      </li>
-    </ul>
+    <ul class="listOptions">
+      <li><button class="launch-widget" disabled="true" onclick="launchWidget()">
+        <img src="https://cdn.trinsic.id/assets/logo/192x192.png" />
+
+        <div class="launch-name">Start widget verification</div>
+        <div class="chevron"></div>
+      </button></li>
+    </ul>  
+  </div>
+
+  <div style="border: 1px solid black;padding: 5px; margin: 5px;">
+    <h3>Hosted Provider Session</h3>
     <p>
-      Provider specific methods - this shows how to embed individual methods
-      directly into your website instead of using the full Trinsic Widget. You
-      can easily add only a couple of the methods you want to support right next
-      to your existing identity verification provider.
+      <b>Select launch method:</b>
+      <label>
+        <input type="radio" name="hostedLaunch" value="popup" checked>
+        Use a popup
+      </label>
+      
+      <label>
+        <input type="radio" name="hostedLaunch" value="redirect">
+        Use a redirect
+      </label>
     </p>
-    <ul id="listOptions"></ul>
-    <pre id="results"></pre>
-  </body>
+    
+    <ul id="hostedProviderOptions" class="listOptions"></ul>  
+  </div>
+
+  <div style="border: 1px solid black;padding: 5px; margin: 5px;">
+    <h3>Advanced Provider Session</h3>
+    <p>
+      <b>Select launch method:</b>
+      <label>
+        <input type="radio" name="advancedLaunch" value="popup" checked>
+        Use a popup
+      </label>
+      
+      <label>
+        <input type="radio" name="advancedLaunch" value="redirect">
+        Use a redirect
+      </label>
+    </p>
+    <p>
+      <b>Fallback to Trinsic Hosted UI:</b>
+      <label>
+        <input type="radio" name="fallbackToTrinsicUI" value="false" checked>
+        True
+      </label>
+      
+      <label>
+        <input type="radio" name="fallbackToTrinsicUI" value="false">
+        False
+      </label>
+    </p>
+    <p>
+      <b>Enabled capabilities:</b>
+      <label>
+        <input type="checkbox" name="LaunchBrowser" value="LaunchBrowser" checked="true">
+        LaunchBrowser
+      </label>
+
+      <label>
+        <input type="checkbox" name="DeeplinkToMobile" value="DeeplinkToMobile" checked="true">
+        DeeplinkToMobile
+      </label>
+      <label>
+        <input type="checkbox" name="RefreshContent" value="RefreshContent"  checked="true">
+        RefreshContent
+      </label>
+      <label>
+        <input type="checkbox" name="CaptureRedirect" value="CaptureRedirect"  checked="true">
+        CaptureRedirect
+      </label>
+      <label>
+        <input type="checkbox" name="PollResult" value="PollResult"  checked="true">
+        PollResult
+      </label>
+    </p>
+    <ul id="advancedProviderOptions" class="listOptions"></ul>  
+  </div>
+
+  
+  
+  <pre id="results"></pre>
+</body>
+
 </html>

@@ -1,20 +1,18 @@
 import { launchIframe, launchRedirect, launchPopup } from "@trinsic/web-ui";
 
-window.launchIframe = launchIframe;
-window.launchRedirect = launchRedirect;
-window.launchPopup = launchPopup;
-window.launchPopupMethod = launchPopupMethod;
 window.exchangeResult = exchangeResult;
+window.launchWidget = launchWidget;
+window.launchHostedProvider = launchHostedProvider;
 
 function enableButtons() {
-  const elements = document.getElementsByClassName("launch-button");
+  const elements = document.getElementsByClassName("launch-widget");
   for (let i = 0; i < elements.length; i++) {
     elements[i].disabled = false;
   }
 }
 
 function disableButtons() {
-  const elements = document.getElementsByClassName("launch-button");
+  const elements = document.getElementsByClassName("launch-widget");
   for (let i = 0; i < elements.length; i++) {
     elements[i].disabled = true;
   }
@@ -73,18 +71,46 @@ function getProviders() {
       );
 
       for (let i = 0; i < providers.length; i++) {
+        
         document.getElementById(
-          "listOptions"
-        ).innerHTML += `<li><button class="launch-button" style="padding: 10px; background-color: transparent;" onclick="launchPopupMethod('${providers[i].id}').then(r => exchangeResult(r))"> <img src="${providers[i].logoUrl}" /> <div class="launch-name"> Launch ${providers[i].name}</div>  <div class="chevron"></div></button></li>`;
+          "hostedProviderOptions"
+        ).innerHTML += `<li><button class="launch-button" style="padding: 10px; background-color: transparent;" onclick="launchHostedProvider('${providers[i].id}')"> <img src="${providers[i].logoUrl}" /> <div class="launch-name"> Launch ${providers[i].name}</div>  <div class="chevron"></div></button></li>`;
+        document.getElementById(
+          "advancedProviderOptions"
+        ).innerHTML += `<li><button class="launch-button" style="padding: 10px; background-color: transparent;" onclick="launchAdvancedProvider('${providers[i].id}')"> <img src="${providers[i].logoUrl}" /> <div class="launch-name"> Launch ${providers[i].name}</div>  <div class="chevron"></div></button></li>`;
       }
     });
 }
 
-async function launchPopupMethod(provider) {
-  return launchPopup(
-    async () =>
-      `launch/${provider}?redirectUrl=${window.location.origin}/redirect`
-  );
+async function launchWidget() {
+  const launchUrl = window.launchUrl;
+  let launchMode = document.querySelector('input[name="widgetLaunch"]:checked').value;
+  await launch(launchUrl, launchMode)
+}
+
+async function launchHostedProvider(providerId) {
+  const launchUrl = `launch/${providerId}?1=1`
+  let launchMode = document.querySelector('input[name="hostedLaunch"]:checked').value;
+  await launch(launchUrl, launchMode)
+}
+
+async function launch(launchUrl, launchMode){
+  let result = null;
+  switch(launchMode){
+    case 'popup':
+      result = await launchPopup(() => launchUrl + '&redirectUrl=' + window.location.origin + '/redirect');
+      await exchangeResult(result);
+      break;
+    case 'iframe':
+      console.log("launching iframe ", launchUrl);
+      result = await launchIframe(launchUrl);
+      await exchangeResult(result);
+      break;
+    case 'redirect':
+      //Result is exchanged through the redirect capture, see redirect.html
+      await launchRedirect(launchUrl, window.location.origin + '/redirect');
+      break;
+  }
 }
 
 if (window.location.pathname !== "/redirect") {

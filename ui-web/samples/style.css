@@ -9,26 +9,32 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-button {
+button{
   all: unset;
   display: inline-block;
   cursor: pointer;
 }
 
-ul {
-  width: 320px;
+ul.listOptions {
+  width: 100%;
+  column-width: 250px; /* Adjust this number to set the width of each column */
+  column-gap: 5px; /* Adjust the gap between columns */
+  padding: 5px;
   list-style: none;
-}
-
-ul#listOptions {
-  width: 960px;
-  column-count: 3; /* Adjust this number to set the number of columns */
-  column-gap: 20px; /* Adjust the gap between columns */
-  padding: 20px;
+  min-height: 50px;
+  display: flex; /* Or use grid instead */
+  flex-wrap: wrap; /* Ensures proper wrapping */
+  align-items: center; /* Aligns elements properly */
+  justify-content: flex-start; /* Keeps items aligned */
 }
 
 ul li {
   border-bottom: 1px solid #f3f4f6; /* Adds a bottom border to each li item */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  width: 300px;
 }
 
 ul li:last-child {
