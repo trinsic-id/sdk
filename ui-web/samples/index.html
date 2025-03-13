@@ -79,7 +79,7 @@
     <p>
       <b>Fallback to Trinsic Hosted UI:</b>
       <label>
-        <input type="radio" name="fallbackToTrinsicUI" value="false" checked>
+        <input type="radio" name="fallbackToTrinsicUI" value="true" checked>
         True
       </label>
       
@@ -88,30 +88,30 @@
         False
       </label>
     </p>
-    <p>
+    <div>
       <b>Enabled capabilities:</b>
       <label>
-        <input type="checkbox" name="LaunchBrowser" value="LaunchBrowser" checked="true">
+        <input type="checkbox" name="TrinsicCapabilities" value="LaunchBrowser" checked="true">
         LaunchBrowser
       </label>
-
       <label>
-        <input type="checkbox" name="DeeplinkToMobile" value="DeeplinkToMobile" checked="true">
+        <input type="checkbox" name="TrinsicCapabilities" value="DeeplinkToMobile" checked="true">
         DeeplinkToMobile
       </label>
       <label>
-        <input type="checkbox" name="RefreshContent" value="RefreshContent"  checked="true">
-        RefreshContent
+        <input type="checkbox" name="TrinsicCapabilities" value="RefreshStepContent"  checked="true">
+        RefreshStepContent
       </label>
       <label>
-        <input type="checkbox" name="CaptureRedirect" value="CaptureRedirect"  checked="true">
+        <input type="checkbox" name="TrinsicCapabilities" value="CaptureRedirect"  checked="true">
         CaptureRedirect
       </label>
       <label>
-        <input type="checkbox" name="PollResult" value="PollResult"  checked="true">
+        <input type="checkbox" name="TrinsicCapabilities" value="PollResult"  checked="true">
         PollResult
       </label>
-    </p>
+      <p style="margin-left: 20px; margin-top: 0px;"><small>Signal to our API what capabilities your frontend supports. <br/> Our sample frontend supports all capabilities but you can disable them so that you can test the API surface.</small></p>
+    </div>
     <ul id="advancedProviderOptions" class="listOptions"></ul>  
   </div>
 

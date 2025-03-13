@@ -26,7 +26,7 @@ app.MapGet("/providers", async context =>
     await context.Response.WriteAsJsonAsync(providers);
 });
 
-app.MapGet("/launch/{providerId}", async (HttpContext context, string providerId) =>
+app.MapGet("/hosted-launch/{providerId}", async (HttpContext context, string providerId) =>
 {
     var redirectUrl = context.Request.Query["redirectUrl"].ToString();
 
@@ -35,6 +35,34 @@ app.MapGet("/launch/{providerId}", async (HttpContext context, string providerId
     var result = await sessionApi.CreateHostedProviderSessionAsync(request);
 
     context.Response.Redirect(result.LaunchUrl);
+});
+
+app.MapPost("/advanced-launch/{providerId}", async (HttpContext context, string providerId) =>
+{
+    var fallbackToTrinsicUI = bool.Parse(context.Request.Query["fallbackToTrinsicUI"].ToString());
+    var redirectUrl = context.Request.Query["redirectUrl"].ToString();
+    var capabilities = context.Request.Query["capabilities"].SelectMany(x => x.Split(','))
+        .Select(x => (IntegrationCapability)Enum.Parse(typeof(IntegrationCapability), x)).ToList();
+
+    var request = new CreateAdvancedProviderSessionRequest(capabilities, fallbackToTrinsicUI, providerId, null, redirectUrl);
+
+    try
+    {
+        var result = await sessionApi.CreateAdvancedProviderSessionAsync(request);
+        await context.Response.WriteAsJsonAsync(result, new JsonSerializerOptions()
+        {
+            Converters = { new JsonStringEnumConverter() }
+        });
+    }
+    catch (ApiException exception)
+    {
+        var content = (string)exception.ErrorContent;
+        context.Response.StatusCode = (int) HttpStatusCode.BadRequest;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsync(content);
+        
+            
+    }    
 });
 
 app.MapPost("/create-session", async context =>
