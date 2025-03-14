@@ -1,3 +1,6 @@
+using System.Net;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.Extensions.FileProviders;
 using Trinsic.Api.Api;
 using Trinsic.Api.Client;
@@ -19,8 +22,12 @@ var sessionApi = new SessionsApi(configuration);
 
 app.MapGet("/", context => ServeFile(context, "../../../ui-web/samples/dist/index.html"));
 app.MapGet("/redirect", context => ServeFile(context, "../../../ui-web/samples/dist/redirect.html"));
+app.MapGet("/widget", context => ServeFile(context, "../../../ui-web/samples/dist/widget.html"));
+app.MapGet("/simple", context => ServeFile(context, "../../../ui-web/samples/dist/simple.html"));
+app.MapGet("/advanced", context => ServeFile(context, "../../../ui-web/samples/dist/advanced.html"));
+app.MapGet("/advanced-popup", context => ServeFile(context, "../../../ui-web/samples/dist/advanced-popup.html"));
 
-app.MapGet("/providers", async context =>
+app.MapGet("/providers", async context =>   
 {
     var providers = await networkApi.ListProvidersAsync();
     await context.Response.WriteAsJsonAsync(providers);
@@ -37,7 +44,17 @@ app.MapGet("/hosted-launch/{providerId}", async (HttpContext context, string pro
     context.Response.Redirect(result.LaunchUrl);
 });
 
-app.MapPost("/advanced-launch/{providerId}", async (HttpContext context, string providerId) =>
+app.MapPost("/refresh-content/{sessionId}", async (HttpContext context, string sessionId) =>
+{
+    var request = await context.Request.ReadFromJsonAsync<ResultsAccessKeyBody>();
+    var result = await sessionApi.RefreshStepContentAsync(Guid.Parse(sessionId), new RefreshStepContentRequest()
+    {
+        ResultsAccessKey = request.ResultsAccessKey
+    });
+    await context.Response.WriteAsJsonAsync(result);
+});
+
+app.MapGet("/advanced-launch/{providerId}", async (HttpContext context, string providerId) =>
 {
     var fallbackToTrinsicUI = bool.Parse(context.Request.Query["fallbackToTrinsicUI"].ToString());
     var redirectUrl = context.Request.Query["redirectUrl"].ToString();
@@ -49,25 +66,43 @@ app.MapPost("/advanced-launch/{providerId}", async (HttpContext context, string 
     try
     {
         var result = await sessionApi.CreateAdvancedProviderSessionAsync(request);
-        await context.Response.WriteAsJsonAsync(result, new JsonSerializerOptions()
+        if (result.NextStep.Method == IntegrationLaunchMethod.LaunchBrowser)
         {
-            Converters = { new JsonStringEnumConverter() }
-        });
+            context.Response.Redirect(result.NextStep.Content);
+        }
+        else
+        {
+            var shouldRefresh = result.NextStep.Refresh != null;
+            var refreshAfter = shouldRefresh ? result.NextStep.Refresh.RefreshAfter : DateTimeOffset.MaxValue;
+            context.Response.Redirect(
+                $"/advanced-popup?sessionId={result.SessionId}&resultsAccessKey={result.ResultCollection.ResultsAccessKey}&nextStep={result.NextStep.Method}&content={System.Web.HttpUtility.UrlEncode(result.NextStep.Content)}&shouldRefresh={shouldRefresh}&refreshAfter={System.Web.HttpUtility.UrlEncode(refreshAfter.ToString("O"))}");
+        }
     }
     catch (ApiException exception)
     {
         var content = (string)exception.ErrorContent;
-        context.Response.StatusCode = (int) HttpStatusCode.BadRequest;
-        context.Response.ContentType = "application/json";
-        await context.Response.WriteAsync(content);
-        
-            
+        context.Response.Redirect(
+            $"/advanced-popup?error={System.Web.HttpUtility.UrlEncode(content)}");
     }    
+});
+
+app.MapPost("/poll-results/{sessionId}", async (HttpContext context, string sessionId) =>
+{
+    var request = await context.Request.ReadFromJsonAsync<ResultsAccessKeyBody>();
+    var result = await sessionApi.GetSessionResultAsync(sessionId, new GetSessionResultRequest(request.ResultsAccessKey));
+    await context.Response.WriteAsJsonAsync(result, new JsonSerializerOptions()
+    {
+        Converters = { new JsonStringEnumConverter() }
+    });
 });
 
 app.MapPost("/create-session", async context =>
 {
-    var result = await sessionApi.CreateWidgetSessionAsync(new CreateWidgetSessionRequest());
+    var redirectUrl = context.Request.Query["redirectUrl"].ToString();
+    var result = await sessionApi.CreateWidgetSessionAsync(new CreateWidgetSessionRequest()
+    {
+        RedirectUrl = redirectUrl
+    });
     await context.Response.WriteAsJsonAsync(result);
 });
 
@@ -104,7 +139,6 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 app.Run();
-
 
 async Task ServeFile(HttpContext context, string file)
 {
