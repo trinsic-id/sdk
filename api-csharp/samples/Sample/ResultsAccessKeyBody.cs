@@ -1,0 +1,1 @@
+public record ResultsAccessKeyBody(string ResultsAccessKey);

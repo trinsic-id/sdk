@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="icon" href="https://cdn.trinsic.id/assets/logo/favicon.ico" />
+  <script type="module" src="./shared.js"></script>
+  <script type="module" src="./advanced-popup.js"></script>
+  <title>Trinsic UI sample</title>
+</head>
+
+<body class="friendly-text">
+  <div class="modal micromodal-slide is-open" id="advanced-modal">
+    <div class="modal__overlay">
+      <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
+        <header class="modal__header">
+          <h2 class="modal__title" id="modal-1-title">
+            Advanced Provider Session
+          </h2>
+        </header>
+        <main class="modal__content" id="advanced-modal-content">
+          <p>
+            We've launched an advanced provider session. We'll update this modal with the status of the session. <br/>
+            <b>Session ID:</b> <code id="session-id"></code> <br/>
+            <b>Content should be refreshed:</b> <code id="content-refresh"></code> <br/>
+            <b>Next step:</b> <code id="next-step"></code> <br/>
+            <b>Polling for result:</b> <code id="polling"></code> <br/>
+            <b>Success:</b> <code id="success"></code> <br/>
+            <b>Done:</b> <code id="done"></code> <br/>
+            <b>Error code:</b> <code id="error-code"></code> <br/>
+            
+            <canvas id="qrcode-canvas" style="max-width: 400px;max-height:400px;"></canvas>
+          </p>
+        </main>
+        <footer class="modal__footer">
+        </footer>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

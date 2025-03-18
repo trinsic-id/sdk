@@ -48,8 +48,7 @@ export async function launchIframe(
   });
 }
 
-export async function launchRedirect(launchUrl: string, redirectUrl: string) {
-  launchUrl += "&redirectUrl=" + redirectUrl;
+export async function launchRedirect(launchUrl: string) {
   window.location.href = launchUrl;
 }
 

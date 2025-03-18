@@ -1,62 +1,24 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./style.css" />
-    <link rel="icon" href="https://cdn.trinsic.id/assets/logo/favicon.ico" />
-    <script type="module" src="./main.js"></script>
-    <title>Trinsic UI sample</title>
-  </head>
-  <body class="friendly-text">
-    <h1>Trinsic Frontend Client Sample</h1>
 
-    <p>
-      You can launch the Trinsic Widget through 3 different modes, an embedded
-      iFrame, a popup or a redirect flow.
-    </p>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="icon" href="https://cdn.trinsic.id/assets/logo/favicon.ico" />
+  <title>Trinsic UI sample</title>
+</head>
+
+<body class="friendly-text">
+  <h1>Trinsic Frontend Client Sample</h1>
+  <p><a href="https://docs.trinsic.id/docs/integration-guide">Read more</a> in our integration guide about the different
+    session launch modes.</p>
+
     <ul>
-      <li>
-        <button
-          class="launch-button"
-          disabled="true"
-          onclick="launchIframe(window.launchUrl).then(r => exchangeResult(r))"
-        >
-          <img src="https://cdn.trinsic.id/assets/logo/192x192.png" />
-          <div class="launch-name">Launch an iFrame</div>
-          <div class="chevron"></div>
-        </button>
-      </li>
-      <li>
-        <button
-          class="launch-button"
-          disabled="true"
-          onclick="launchPopup(async () => window.launchUrl).then(r => exchangeResult(r))"
-        >
-          <img src="https://cdn.trinsic.id/assets/logo/192x192.png" />
-          <div class="launch-name">Launch popup</div>
-          <div class="chevron"></div>
-        </button>
-      </li>
-      <li>
-        <button
-          class="launch-button"
-          disabled="true"
-          onclick="launchRedirect(window.launchUrl, window.location.origin + '/redirect')"
-        >
-          <img src="https://cdn.trinsic.id/assets/logo/192x192.png" />
-          <div class="launch-name">Launch redirect flow</div>
-          <div class="chevron"></div>
-        </button>
-      </li>
+      <li><a href="/widget">Widget</a></li>
+      <li><a href="/hosted">Hosted Provider Session</a></li>
+      <li><a href="/advanced">Advanced Provider Session</a></li>
     </ul>
-    <p>
-      Provider specific methods - this shows how to embed individual methods
-      directly into your website instead of using the full Trinsic Widget. You
-      can easily add only a couple of the methods you want to support right next
-      to your existing identity verification provider.
-    </p>
-    <ul id="listOptions"></ul>
-    <pre id="results"></pre>
-  </body>
+</body>
+
 </html>
