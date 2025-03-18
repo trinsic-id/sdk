@@ -4,36 +4,11 @@ MicroModal.init();
 
 window.launchHostedProvider = launchHostedProvider;
 
-function getProviders() {
-  fetch("/providers", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-    .then((response) => response.json())
-    .then((r) => {
-      const providers = r.providers.filter(
-        (provider) => provider.id !== "document-scan"
-      );
-
-      for (let i = 0; i < providers.length; i++) {
-
-        document.getElementById(
-          "hostedProviderOptions"
-        ).innerHTML += `<li><button class="launch-button" style="padding: 10px; background-color: transparent;" onclick="launchHostedProvider('${providers[i].id}')"> <img src="${providers[i].logoUrl}" /> <div class="launch-name"> Launch ${providers[i].name}</div>  <div class="chevron"></div></button></li>`;
-       
-      }
-    });
-}
-
 async function launchHostedProvider(providerId) {
   const launchUrl = `hosted-launch/${providerId}?1=1`
   let launchMode = document.querySelector('input[name="hostedLaunch"]:checked').value;
   await launch(launchUrl, launchMode)
 }
-
-
 
 async function launch(launchUrl, launchMode) {
   let result = null;
@@ -54,4 +29,4 @@ async function launch(launchUrl, launchMode) {
   }
 }
 
-getProviders();
+getProviders('launchHostedProvider');

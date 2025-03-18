@@ -3,9 +3,9 @@ using Trinsic.Api.Model;
 
 namespace Sample;
 
-public static class Widget
+public static class WidgetSession
 {
-    public static void MapWidgetRoutes(this WebApplication app, SessionsApi sessionApi)
+    public static void MapWidgetSessionRoutes(this WebApplication app, SessionsApi sessionApi)
     {
         app.MapGet("/widget", context => Shared.ServeFile(context, "../../../ui-web/samples/dist/widget.html"));
         app.MapPost("/create-session", async context =>

@@ -3,11 +3,11 @@ using Trinsic.Api.Model;
 
 namespace Sample;
 
-public static class SimpleProvider
+public static class HostedProviderSession
 {
-    public static void MapSimpleProviderRoutes(this WebApplication app, SessionsApi sessionApi)
+    public static void MapHostedProviderSessionRoutes(this WebApplication app, SessionsApi sessionApi)
     {
-        app.MapGet("/simple", context => Shared.ServeFile(context, "../../../ui-web/samples/dist/simple.html"));
+        app.MapGet("/hosted", context => Shared.ServeFile(context, "../../../ui-web/samples/dist/hosted.html"));
         app.MapGet("/hosted-launch/{providerId}", async (HttpContext context, string providerId) =>
         {
             var redirectUrl = context.Request.Query["redirectUrl"].ToString();

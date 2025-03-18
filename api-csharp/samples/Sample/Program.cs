@@ -18,9 +18,9 @@ var networkApi = new NetworkApi(configuration);
 var sessionApi = new SessionsApi(configuration);
 
 app.MapSharedRoutes(sessionApi, networkApi);
-app.MapWidgetRoutes(sessionApi);
-app.MapSimpleProviderRoutes(sessionApi);
-app.MapAdvancedProviderRoutes(sessionApi);
+app.MapWidgetSessionRoutes(sessionApi);
+app.MapHostedProviderSessionRoutes(sessionApi);
+app.MapAdvancedProviderSessionRoutes(sessionApi);
 
 //Serve web sdk
 app.UseStaticFiles(new StaticFileOptions

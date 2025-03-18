@@ -12,7 +12,11 @@ public static class Shared
 
         app.MapGet("/providers", async context =>   
         {
-            var providers = await networkApi.ListProvidersAsync();
+            var ipAddress = context.Request.Query["ipAddress"].ToString();
+            var providers = await networkApi.RecommendProvidersAsync(new()
+            {
+                IpAddresses = [ipAddress]
+            });
             await context.Response.WriteAsJsonAsync(providers);
         });
 

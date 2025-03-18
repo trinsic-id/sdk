@@ -6,9 +6,9 @@ using Trinsic.Api.Model;
 
 namespace Sample;
 
-public static class AdvancedProvider
+public static class AdvancedProviderSession
 {
-    public static void MapAdvancedProviderRoutes(this WebApplication app, SessionsApi sessionApi)
+    public static void MapAdvancedProviderSessionRoutes(this WebApplication app, SessionsApi sessionApi)
     {
         app.MapGet("/advanced", context => Shared.ServeFile(context, "../../../ui-web/samples/dist/advanced.html"));
         app.MapGet("/advanced-popup",
