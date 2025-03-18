@@ -38,8 +38,9 @@ async function launch(launchMode) {
             break;
         case 'redirect':
             const redirectLaunchUrl = await createSession();
-            console.log("Launchign", redirectLaunchUrl);
             await launchRedirect(redirectLaunchUrl, '');
             break;
+        default:
+            console.error("Invalid launch mode:", launchMode);
     }
 }
