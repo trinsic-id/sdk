@@ -1,4 +1,3 @@
-import { launchIframe, launchRedirect, launchPopup } from "@trinsic/web-ui";
 import QRCode from 'qrcode'
 import MicroModal from "micromodal";
 MicroModal.init();
@@ -75,7 +74,10 @@ async function initializeAdvancedPopup() {
   if(nextStep === "DeeplinkToMobile") {
     showDeeplink(content);
   }
+  // Since we are not redirected elsewhere, the only other method of getting the results is via polling.
   startResultsPolling(sessionId, resultsAccessKey);
+
+  // Some integrations require their content to be refreshed.
   if(shouldRefresh) {
     startRefreshing(sessionId, resultsAccessKey, refreshAfter);
   }
@@ -101,10 +103,6 @@ async function startRefreshing(sessionId, resultsAccessKey, refreshAfter) {
     document.getElementById("content-refresh").innerText = "Yes, refreshing at " + result.nextStep.refresh.refreshAfter;
     startRefreshing(sessionId, resultsAccessKey, result.nextStep.refresh.refreshAfter);
   }, timeout);
-}
-function showResult(resultJson) {
-  document.getElementById("results").innerText = JSON.stringify(resultJson, null, 2);
-  MicroModal.show('results-modal');
 }
 
 initializeAdvancedPopup();
