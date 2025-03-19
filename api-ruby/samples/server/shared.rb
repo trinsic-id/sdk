@@ -7,7 +7,13 @@ module SharedRoutes
     end
 
     app.get '/providers' do
-      result = TrinsicServices::NETWORK.list_providers
+      ipAddress = params[:ipAddress]
+      
+      req = TrinsicApi::RecommendRequest.new({
+        ip_addresses: [ipAddress]
+      })
+
+      result = TrinsicServices::NETWORK.recommend_providers({recommend_request: req})
       json result.to_body
     end
 
