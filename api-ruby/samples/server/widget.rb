@@ -11,11 +11,9 @@ module WidgetRoutes
       req = TrinsicApi::CreateWidgetSessionRequest.new
       req.redirect_url = redirectUrl
 
-      opts = {
+      result = TrinsicServices::SESSIONS.create_widget_session({
         create_widget_session_request: req
-      }
-      puts opts
-      result = TrinsicServices::SESSIONS.create_widget_session(opts)
+      })
       json result.to_body
     end
 
