@@ -47,7 +47,7 @@ public static class AdvancedProviderSession
                     var shouldRefresh = result.NextStep.Refresh != null;
                     var refreshAfter = shouldRefresh ? result.NextStep.Refresh.RefreshAfter : DateTimeOffset.MaxValue;
                     context.Response.Redirect(
-                        $"/advanced-popup?sessionId={result.SessionId}&resultsAccessKey={result.ResultCollection.ResultsAccessKey}&nextStep={result.NextStep.Method}&content={System.Web.HttpUtility.UrlEncode(result.NextStep.Content)}&shouldRefresh={shouldRefresh}&refreshAfter={System.Web.HttpUtility.UrlEncode(refreshAfter.ToString("O"))}");
+                        $"/advanced-popup?sessionId={result.SessionId}&resultsAccessKey={result.ResultCollection.ResultsAccessKey}&nextStep={result.NextStep.Method}&content={System.Web.HttpUtility.UrlEncode(result.NextStep.Content)}&shouldRefresh={shouldRefresh.ToString().ToLowerInvariant()}&refreshAfter={System.Web.HttpUtility.UrlEncode(refreshAfter.ToString("O"))}");
                 }
             }
             catch (ApiException exception)
@@ -66,7 +66,8 @@ public static class AdvancedProviderSession
                     new GetSessionResultRequest(request.ResultsAccessKey));
             await context.Response.WriteAsJsonAsync(result, new JsonSerializerOptions()
             {
-                Converters = { new JsonStringEnumConverter() }
+                Converters = { new JsonStringEnumConverter() },
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             });
         });
     }

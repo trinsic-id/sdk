@@ -23,14 +23,14 @@ async function startResultsPolling(sessionId, resultsAccessKey){
     })
       .then((response) => response.json())
       .then((r) => r);
-    document.getElementById("done").innerText = result.Session.Done;
-    document.getElementById("success").innerText = result.Session.Success;
-    document.getElementById("error-code").innerText = result.Session.ErrorCode || "N/A";
+    document.getElementById("done").innerText = result.session.done;
+    document.getElementById("success").innerText = result.session.success;
+    document.getElementById("error-code").innerText = result.session.errorCode || "N/A";
 
-    if(result.Session.Done === true){
+    if(result.session.done === true){
       clearInterval(resultPollingInterval);
       const data = {
-        success: result.Session.Success,
+        success: result.session.success,
         resultsAccessKey: resultsAccessKey,
         sessionId: sessionId,
       };
@@ -47,7 +47,7 @@ async function initializeAdvancedPopup() {
   const resultsAccessKey = urlSearchParams.get('resultsAccessKey');
   const nextStep = urlSearchParams.get('nextStep');
   const content = urlSearchParams.get('content');
-  const shouldRefresh = urlSearchParams.get('shouldRefresh') === 'True';
+  const shouldRefresh = urlSearchParams.get('shouldRefresh') === 'true';
   const refreshAfter = urlSearchParams.get('refreshAfter');
   const error = urlSearchParams.get('error');
   if(error) {

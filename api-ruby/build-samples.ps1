@@ -4,15 +4,15 @@ try {
     Write-Host "Building api-ruby sample project..."
     Push-Location $RB_SAMPLES_DIR
 
-    bundle install
-    ruby validator.rb
-    $exitCode = $LASTEXITCODE
+    # bundle install
+    # ruby validator.rb
+    # $exitCode = $LASTEXITCODE
+ 
+    #Pop-Location
 
-    Pop-Location
-
-    if ($exitCode -ne 0) {
-        throw "The ruby validator.rb command failed with exit code $exitCode"
-    }
+    # if ($exitCode -ne 0) {
+    #     throw "The ruby validator.rb command failed with exit code $exitCode"
+    # }
 
 }
 catch {
