@@ -2,7 +2,7 @@ import { SessionsApi } from "@trinsic/api";
 import path from "path";
 import {Express} from "express"
 
-export default function hostedRoutes(app: Express, sessionsApi: SessionsApi) {
+export function hostedRoutes(app: Express, sessionsApi: SessionsApi) {
     app.get("/hosted", (req: any, res: any) => {
         res.sendFile(
             path.join(__dirname, "../../../../ui-web/samples/dist/hosted.html")

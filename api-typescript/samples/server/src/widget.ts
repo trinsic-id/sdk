@@ -2,7 +2,7 @@ import { CreateWidgetSessionRequest, SessionsApi } from "@trinsic/api";
 import path from "path";
 import {Express} from "express"
 
-export default function widgetRoutes(app: Express, sessionsApi: SessionsApi) {
+export function widgetRoutes(app: Express, sessionsApi: SessionsApi) {
     app.get("/widget", (req: any, res: any) => {
         res.sendFile(
             path.join(__dirname, "../../../../ui-web/samples/dist/widget.html")

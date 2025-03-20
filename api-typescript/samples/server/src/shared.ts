@@ -3,7 +3,7 @@ const path = require("path");
 import {Express} from "express"
 import express from "express";
 
-export default function sharedRoutes(app: Express, networkApi: NetworkApi, sessionsApi: SessionsApi) {
+export function sharedRoutes(app: Express, networkApi: NetworkApi, sessionsApi: SessionsApi) {
     app.get("/", express.static(path.join("../../../ui-web/samples/dist")));
     app.get("/redirect", (req: any, res: any) => {
         res.sendFile(

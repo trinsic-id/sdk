@@ -4,11 +4,12 @@ import {
   NetworkApi,
   CreateWidgetSessionRequest,
 } from "@trinsic/api";
-import sharedRoutes from "./shared";
-import widgetRoutes from "./widget";
-import hostedRoutes from "./hosted";
+import { sharedRoutes } from "./shared";
+import { widgetRoutes } from "./widget";
+import { hostedRoutes } from "./hosted";
 import path from "path";
 import express from "express";
+import { advancedRoutes } from "./advanced";
 
 const app = express();
 const PORT = 3000;
@@ -25,6 +26,7 @@ app.use(express.json());
 sharedRoutes(app, networkApi, sessionsApi)
 widgetRoutes(app, sessionsApi);
 hostedRoutes(app, sessionsApi);
+advancedRoutes(app, sessionsApi);
 
 // Serve web SDK
 app.use(
