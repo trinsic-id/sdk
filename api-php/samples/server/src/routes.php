@@ -8,7 +8,7 @@ use Trinsic\Api\Api\SessionsApi as SessionsApi;
 use Trinsic\Api\Configuration as Configuration;
 use Trinsic\Api\Model\CreateSessionRequest as CreateSessionRequest;
 use Trinsic\Api\Model\CreateSessionResponse as CreateSessionResponse;
-use Trinsic\Api\Model\GetSessionResultRequest as GetSessionResultRequest;
+
 
 $config = new Configuration();
 $config->setAccessToken($_ENV['TRINSIC_ACCESS_TOKEN']);
@@ -21,6 +21,9 @@ $sharedRoutes($app, $network, $sessions);
 
 $widgetRoutes = require 'widget.php';
 $widgetRoutes($app, $sessions);
+
+$hostedRoutes = require 'hosted.php';
+$hostedRoutes($app, $sessions);
 
 $app->get("/launch/{providerId}", function (Request $request, Response $response, $args) use ($sessions) {
     $providerId = $args['providerId'];

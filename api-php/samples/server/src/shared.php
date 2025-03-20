@@ -3,6 +3,8 @@
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Trinsic\Api\Model\GetSessionResultRequest as GetSessionResultRequest;
+use Trinsic\Api\Model\RecommendRequest as RecommendRequest;
+use Trinsic\Api\Model\RecommendResponse as RecommendResponse;
 
 return function ($app, $network, $sessions) {
     
@@ -25,8 +27,14 @@ return function ($app, $network, $sessions) {
     });
 
     $app->get("/providers", function (Request $request, Response $response, $args) use ($network) {
-        $result = $network->listProviders();
-        $response->getBody()->write(json_encode($result));
+        $ipAddress = $request->getQueryParams()['ipAddress'];
+
+        $req = new RecommendRequest();
+        $req->setIpAddresses([$ipAddress]);
+
+        $result = $network->recommendProviders($req);
+    
+        $response->getBody()->write(json_encode($result->jsonSerialize()));
         return $response->withHeader('Content-Type', 'application/json');
     });
 
