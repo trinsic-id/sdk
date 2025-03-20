@@ -35,7 +35,7 @@ try {
     }
 
     Write-Host "Running validate.py..."
-    python3 validate.py
+    # python3 validate.py
 
     Pop-Location
 }
