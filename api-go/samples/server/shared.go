@@ -14,7 +14,13 @@ func SharedRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 	})
 
 	app.Get("/providers", func(c *fiber.Ctx) error {
-		data, _, err := api.NetworkAPI.ListProviders(c.Context()).Execute()
+		ipAddress := c.Query("ipAddress")
+		request := trinsic_api.RecommendRequest{
+			IpAddresses: []string{ipAddress},
+		}
+		req := api.NetworkAPI.RecommendProviders(c.Context()).RecommendRequest(request)
+
+		data, _, err := req.Execute()
 
 		if err != nil {
 			return c.Status(500).JSON(fiber.Map{

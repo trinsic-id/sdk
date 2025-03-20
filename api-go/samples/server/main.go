@@ -20,26 +20,7 @@ func main() {
 
 	SharedRoutes(app, api)
 	WidgetRoutes(app, api)
-
-	// app.Get("/launch/:providerId", func(c *fiber.Ctx) error {
-	// 	providerId := c.Params("providerId")
-	// 	launchDirectly := true
-
-	// 	request := trinsic_api.CreateSessionRequest{
-	// 		LaunchProviderDirectly: &launchDirectly,
-	// 		Providers:              []string{providerId},
-	// 	}
-
-	// 	data, _, err := api.SessionsAPI.CreateSession(c.Context()).CreateSessionRequest(request).Execute()
-
-	// 	if err != nil {
-	// 		return c.Status(500).JSON(fiber.Map{
-	// 			"error": err.Error(),
-	// 		})
-	// 	}
-
-	// 	return c.Redirect(*data.LaunchUrl + "&redirectUrl=" + c.Query("redirectUrl"))
-	// })
+	HostedRoutes(app, api)
 
 	app.Listen(":3000")
 }
