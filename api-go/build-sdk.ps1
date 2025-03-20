@@ -2,6 +2,7 @@ $additionalProperties = @{
     packageName                              = "trinsic_api"
     packageVersion                           = "[VERSION]"
     disallowAdditionalPropertiesIfNotPresent = "false"
+    enumClassPrefix                          = "true"
 }
 & "$PSScriptRoot/../helpers/generate-client.ps1" -language "go" -outputFolder "$PSScriptRoot/sdk-build" -additionalProperties $additionalProperties
 try {
