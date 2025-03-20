@@ -37,6 +37,7 @@ setup(
     install_requires=REQUIRES,
     packages=find_packages(exclude=["test", "tests"]),
     include_package_data=True,
+    license_file="LICENSE"
     long_description_content_type='text/markdown',
     long_description=long_description,
     package_data={"trinsic_api": ["py.typed"]},
