@@ -23,7 +23,7 @@ try {
 
     $goModFile = "go.mod"
     $goModFileContent = Get-Content -Path $goModFile
-    $goModFileContent = $goModFileContent -replace "/GIT_USER_ID/GIT_REPO_ID", "/trinsic-id/sdk-go-api" + $mainVersion
+    $goModFileContent = $goModFileContent -replace "/GIT_USER_ID/GIT_REPO_ID", "/trinsic-id/sdk-go-api$mainVersion"
     $goModFileContent | Set-Content -Path $goModFile
 
     &go build
