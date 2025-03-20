@@ -8,6 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from shared import sharedRouter
 from widget import widgetRouter
 from hosted import hostedRouter
+from advanced import advancedRouter
 from trinsic_api.configuration import Configuration
 from trinsic_api.api_client import ApiClient
 from trinsic_api.api.network_api import NetworkApi
@@ -33,12 +34,12 @@ def get_network_api():
 
 web_ui_path = pathlib.Path(__file__).parent / "../../../ui-web/samples/dist"
 
-
 app = FastAPI()
 
 app.include_router(sharedRouter, dependencies=[Depends(get_sessions_api)])
 app.include_router(widgetRouter, dependencies=[Depends(get_sessions_api)])
 app.include_router(hostedRouter, dependencies=[Depends(get_sessions_api)])
+app.include_router(advancedRouter, dependencies=[Depends(get_sessions_api)])
 
 app.mount("/", StaticFiles(directory=web_ui_path, html=True), name="static")
 
