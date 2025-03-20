@@ -1,16 +1,21 @@
-@app.get("/launch/{provider_id}")
-async def launch(provider_id: str, redirectUrl: str):
-    try:
-        request = CreateSessionRequest()
-        request.providers = [provider_id]
-        request.launch_provider_directly = True
+from fastapi import Request, APIRouter, Depends, HTTPException
+from pydantic import BaseModel
+from trinsic_api.api.sessions_api import SessionsApi, CreateHostedProviderSessionRequest
+from fastapi.responses import RedirectResponse
 
-        data = sessions_api.create_session(create_session_request=request)
+hostedRouter = APIRouter()
+@hostedRouter.get("/hosted")
+async def redirect():
+    return RedirectResponse(url="/hosted.html")
 
-        if (data.launch_url is None):
-            raise Exception("No launch URL returned from Trinsic API")
-        
-        launch_url = data.launch_url + "&redirectUrl=" + redirectUrl if redirectUrl else data.launch_url
-        return RedirectResponse(url=launch_url)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+
+@hostedRouter.get("/hosted-launch/{provider_id}")
+async def launch(request: Request, provider_id: str, sessions_api: SessionsApi = Depends()):
+    request = CreateHostedProviderSessionRequest(redirect_url = request.query_params.get("redirectUrl"), provider=provider_id)
+
+    data = sessions_api.create_hosted_provider_session(create_hosted_provider_session_request=request)
+
+    if (data.launch_url is None):
+        raise Exception("No launch URL returned from Trinsic API")
+    
+    return RedirectResponse(url=data.launch_url)
