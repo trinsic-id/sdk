@@ -10,6 +10,9 @@ use Psr\Http\Server\MiddlewareInterface as MiddlewareInterface;
 use Slim\Factory\AppFactory;
 use Dotenv\Dotenv;
 
+# This is a hack to suppress a warning that are thrown by the SDK, e.g. auto generated nullability warnings
+error_reporting(E_ALL & ~E_DEPRECATED);
+
 class JsonBodyParserMiddleware implements MiddlewareInterface
 {
     public function process(Request $request, RequestHandler $handler): Response
@@ -25,6 +28,28 @@ class JsonBodyParserMiddleware implements MiddlewareInterface
 
         return $handler->handle($request);
     }
+}
+
+$staticDir = realpath(__DIR__ . '/../../../../ui-web/samples/dist');
+
+$requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$filePath = $staticDir . $requestUri;
+
+// Serve static files if they exist - hacking around the fact we're serving these from our ui-web sdk folder
+if (file_exists($filePath) && is_file($filePath)) {
+    $mimeTypes = [
+        'css' => 'text/css',
+        'js'  => 'application/javascript',
+        'html' => 'text/html',
+        '' => 'text/html'
+    ];
+    
+    $ext = pathinfo($filePath, PATHINFO_EXTENSION);
+    $mime = $mimeTypes[$ext] ?? 'application/octet-stream';
+    
+    header("Content-Type: $mime");
+    readfile($filePath);
+    exit;
 }
 
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../');

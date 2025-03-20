@@ -20,7 +20,7 @@ Make sure to create a new `.env` file to set your Trinsic Access Token. You can 
 After you created your `.env` file, install the sample's dependencies by running `composer update`. After which you should be good to start the application:
 
 ```sh
-php -S localhost:8080 -t public
+php -S localhost:3000 -t public
 ```
 
 ## Support

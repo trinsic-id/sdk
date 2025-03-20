@@ -16,11 +16,11 @@ $config->setAccessToken($_ENV['TRINSIC_ACCESS_TOKEN']);
 $network = new NetworkApi(null, $config);
 $sessions = new SessionsApi(null, $config);
 
-$app->get("/providers", function (Request $request, Response $response, $args) use ($network) {
-    $result = $network->listProviders();
-    $response->getBody()->write(json_encode($result));
-    return $response->withHeader('Content-Type', 'application/json');
-});
+$sharedRoutes = require 'shared.php';
+$sharedRoutes($app, $network, $sessions);
+
+$widgetRoutes = require 'widget.php';
+$widgetRoutes($app, $sessions);
 
 $app->get("/launch/{providerId}", function (Request $request, Response $response, $args) use ($sessions) {
     $providerId = $args['providerId'];
@@ -45,35 +45,4 @@ $app->get("/launch/{providerId}", function (Request $request, Response $response
     return $response->withStatus(500);
 });
 
-$app->post("/create-session", function (Request $request, Response $response, $args) use ($sessions) {
-    $createRequest = new CreateSessionRequest();
-    $result = $sessions->createSession($createRequest);
 
-    $response->getBody()->write(json_encode($result));
-    return $response->withHeader('Content-Type', 'application/json');
-});
-
-$app->post("/exchange-result", function (Request $request, Response $response, $args) use ($sessions) {
-    $body = $request->getParsedBody();
-
-    $exchangeRequest = new GetSessionResultRequest();
-    $exchangeRequest->setResultsAccessKey($body['resultsAccessKey']);
-
-    $result = $sessions->getSessionResult($body['sessionId'], $exchangeRequest);
-
-    $response->getBody()->write(json_encode($result));
-    return $response->withHeader('Content-Type', 'application/json');
-});
-
-// Index route to serve the index.html file
-$app->get('/', function (Request $request, Response $response, $args) {
-    return $response
-        ->withHeader('Location', '/index.html')
-        ->withStatus(302);
-});
-
-$app->get('/redirect', function (Request $request, Response $response, $args) {
-    return $response
-        ->withHeader('Location', '/redirect.html')
-        ->withStatus(302);
-});
