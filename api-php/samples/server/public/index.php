@@ -7,6 +7,10 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Psr\Http\Server\MiddlewareInterface as MiddlewareInterface;
 
+use Trinsic\Api\Api\NetworkApi as NetworkApi;
+use Trinsic\Api\Api\SessionsApi as SessionsApi;
+use Trinsic\Api\Configuration as Configuration;
+
 use Slim\Factory\AppFactory;
 use Dotenv\Dotenv;
 
@@ -65,6 +69,22 @@ $app->add(function (Request $request, RequestHandler $handler) {
 
 $app->add(new JsonBodyParserMiddleware());
 
-require __DIR__ . '/../src/routes.php';
+$config = new Configuration();
+$config->setAccessToken($_ENV['TRINSIC_ACCESS_TOKEN']);
+
+$network = new NetworkApi(null, $config);
+$sessions = new SessionsApi(null, $config);
+
+$sharedRoutes = require '../src/shared.php';
+$sharedRoutes($app, $network, $sessions);
+
+$widgetRoutes = require '../src/widget.php';
+$widgetRoutes($app, $sessions);
+
+$hostedRoutes = require '../src/hosted.php';
+$hostedRoutes($app, $sessions);
+
+$advancedRoutes = require '../src/advanced.php';
+$advancedRoutes($app, $sessions);
 
 $app->run();
