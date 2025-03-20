@@ -4,7 +4,6 @@ try {
     Write-Host "Building api-ruby sample project..."
     Push-Location $RB_SAMPLES_DIR
 
-    bundle update trinsic_api
     bundle install
     ruby validator.rb
     $exitCode = $LASTEXITCODE
