@@ -2,6 +2,11 @@ require 'sinatra/base'
 require_relative 'config'
 module SharedRoutes
   def self.registered(app)
+
+    get '/' do
+      send_file File.join(settings.public_folder, 'index.html')
+    end  
+    
     app.get '/redirect' do
       send_file File.join(settings.public_folder, 'redirect.html')
     end
