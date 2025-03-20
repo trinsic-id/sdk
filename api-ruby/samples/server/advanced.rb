@@ -47,7 +47,6 @@ module AdvancedRoutes
           redirect "/advanced-popup?#{URI.encode_www_form(query_params)}"
         end
       rescue TrinsicApi::ApiError => e
-        puts e.response_body
         error_content = e.response_body.to_s
         redirect "/advanced-popup?error=#{URI.encode_www_form_component(error_content)}"
       end
