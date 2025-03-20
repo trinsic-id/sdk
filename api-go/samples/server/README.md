@@ -22,7 +22,7 @@ After you created your `.env` file you are good to run the project
 
 ```sh
 # Running:
-go run main.go
+go run .
 
 # Building:
 go build -o sample && ./sample
