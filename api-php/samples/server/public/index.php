@@ -36,7 +36,7 @@ class JsonBodyParserMiddleware implements MiddlewareInterface
 
 $staticDir = realpath(__DIR__ . '/../../../../ui-web/samples/dist');
 
-$requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$requestUri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 $filePath = $staticDir . $requestUri;
 
 // Serve static files if they exist - hacking around the fact we're serving these from our ui-web sdk folder
@@ -70,21 +70,21 @@ $app->add(function (Request $request, RequestHandler $handler) {
 $app->add(new JsonBodyParserMiddleware());
 
 $config = new Configuration();
-$config->setAccessToken($_ENV['TRINSIC_ACCESS_TOKEN']);
+$config->setAccessToken($_ENV['TRINSIC_ACCESS_TOKEN'] ?? '');
 
 $network = new NetworkApi(null, $config);
 $sessions = new SessionsApi(null, $config);
 
-$sharedRoutes = require '../src/shared.php';
+$sharedRoutes = require __DIR__ . '/../src/shared.php';
 $sharedRoutes($app, $network, $sessions);
 
-$widgetRoutes = require '../src/widget.php';
+$widgetRoutes = require  __DIR__ . '/../src/widget.php';
 $widgetRoutes($app, $sessions);
 
-$hostedRoutes = require '../src/hosted.php';
+$hostedRoutes = require  __DIR__ . '/../src/hosted.php';
 $hostedRoutes($app, $sessions);
 
-$advancedRoutes = require '../src/advanced.php';
+$advancedRoutes = require  __DIR__ . '/../src/advanced.php';
 $advancedRoutes($app, $sessions);
 
 $app->run();
