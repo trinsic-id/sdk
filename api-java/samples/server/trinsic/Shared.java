@@ -3,7 +3,11 @@ package id.trinsic;
 import id.trinsic.api.NetworkApi;
 import id.trinsic.api.SessionsApi;
 import id.trinsic.api.models.GetSessionResultRequest;
+import id.trinsic.api.models.RecommendRequest;
+import id.trinsic.api.models.RecommendResponse;
 import io.javalin.Javalin;
+
+import java.util.List;
 
 public class Shared{
     public static void SharedRoutes(Javalin app, NetworkApi network, SessionsApi session){
@@ -12,9 +16,20 @@ public class Shared{
             String target = "/redirect.html" + (query != null ? "?" + query : "");
             ctx.redirect(target);
         });
+
         app.get("/providers", ctx -> {
-            var providers = network.listProviders();
-            ctx.json(providers);
+            // Get query param
+            String ipAddress = ctx.queryParam("ipAddress");
+
+            // Build request
+            RecommendRequest req = new RecommendRequest();
+            req.setIpAddresses(List.of(ipAddress)); // Assuming it's a list
+
+            // Call the service
+            RecommendResponse result = network.recommendProviders(req);
+
+            // Return JSON response
+            ctx.json(result);
         });
 
         app.post("/exchange-result", ctx -> {
