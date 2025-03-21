@@ -7,8 +7,15 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Psr\Http\Server\MiddlewareInterface as MiddlewareInterface;
 
+use Trinsic\Api\Api\NetworkApi as NetworkApi;
+use Trinsic\Api\Api\SessionsApi as SessionsApi;
+use Trinsic\Api\Configuration as Configuration;
+
 use Slim\Factory\AppFactory;
 use Dotenv\Dotenv;
+
+# This is a hack to suppress a warning that are thrown by the SDK, e.g. auto generated nullability warnings
+error_reporting(E_ALL & ~E_DEPRECATED);
 
 class JsonBodyParserMiddleware implements MiddlewareInterface
 {
@@ -27,6 +34,28 @@ class JsonBodyParserMiddleware implements MiddlewareInterface
     }
 }
 
+$staticDir = realpath(__DIR__ . '/../../../../ui-web/samples/dist');
+
+$requestUri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+$filePath = $staticDir . $requestUri;
+
+// Serve static files if they exist - hacking around the fact we're serving these from our ui-web sdk folder
+if (file_exists($filePath) && is_file($filePath)) {
+    $mimeTypes = [
+        'css' => 'text/css',
+        'js'  => 'application/javascript',
+        'html' => 'text/html',
+        '' => 'text/html'
+    ];
+    
+    $ext = pathinfo($filePath, PATHINFO_EXTENSION);
+    $mime = $mimeTypes[$ext] ?? 'application/octet-stream';
+    
+    header("Content-Type: $mime");
+    readfile($filePath);
+    exit;
+}
+
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
 
@@ -40,6 +69,22 @@ $app->add(function (Request $request, RequestHandler $handler) {
 
 $app->add(new JsonBodyParserMiddleware());
 
-require __DIR__ . '/../src/routes.php';
+$config = new Configuration();
+$config->setAccessToken($_ENV['TRINSIC_ACCESS_TOKEN'] ?? '');
+
+$network = new NetworkApi(null, $config);
+$sessions = new SessionsApi(null, $config);
+
+$sharedRoutes = require __DIR__ . '/../src/shared.php';
+$sharedRoutes($app, $network, $sessions);
+
+$widgetRoutes = require  __DIR__ . '/../src/widget.php';
+$widgetRoutes($app, $sessions);
+
+$hostedRoutes = require  __DIR__ . '/../src/hosted.php';
+$hostedRoutes($app, $sessions);
+
+$advancedRoutes = require  __DIR__ . '/../src/advanced.php';
+$advancedRoutes($app, $sessions);
 
 $app->run();
