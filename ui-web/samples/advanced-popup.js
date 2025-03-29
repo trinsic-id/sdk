@@ -5,7 +5,23 @@ MicroModal.init();
 window.exchangeResult = exchangeResult;
 
 async function showDeeplink(url){
+  document.getElementById("qrcode-canvas").style.removeProperty("display");
   await QRCode.toCanvas(document.getElementById('qrcode-canvas'), url);
+}
+
+function showContent(content) {
+  document.getElementById("show-content").style.removeProperty("display");
+  document.getElementById("show-content").innerText = content;
+}
+
+function handleNextStep(nextStep, content) {
+  if(nextStep === "DeeplinkToMobile") {
+    showDeeplink(content);
+  }
+
+  if(nextStep === "ShowContent") {
+    showContent(content);
+  }
 }
 
 async function startResultsPolling(sessionId, resultsAccessKey){
@@ -71,19 +87,19 @@ async function initializeAdvancedPopup() {
   document.getElementById("next-step").innerText = nextStep;
   document.getElementById("content-refresh").innerText = shouldRefresh ? "Yes, refreshing at " + refreshAfter : "No";
   document.getElementById("polling").innerText = "Yes";
-  if(nextStep === "DeeplinkToMobile") {
-    showDeeplink(content);
-  }
+
+  handleNextStep(nextStep, content);
+
   // Since we are not redirected elsewhere, the only other method of getting the results is via polling.
   startResultsPolling(sessionId, resultsAccessKey);
 
   // Some integrations require their content to be refreshed.
   if(shouldRefresh) {
-    startRefreshing(sessionId, resultsAccessKey, refreshAfter);
+    startRefreshing(sessionId, nextStep, resultsAccessKey, refreshAfter);
   }
 }
 
-async function startRefreshing(sessionId, resultsAccessKey, refreshAfter) {
+async function startRefreshing(sessionId, nextStep, resultsAccessKey, refreshAfter) {
   console.log(new Date(refreshAfter))
   const timeout = new Date(refreshAfter) - new Date();
 
@@ -99,7 +115,7 @@ async function startRefreshing(sessionId, resultsAccessKey, refreshAfter) {
         resultsAccessKey: resultsAccessKey
       })
     }).then(r => r.json());
-    showDeeplink(result.nextStep.content);
+    handleNextStep(nextStep, result.nextStep.content);
     document.getElementById("content-refresh").innerText = "Yes, refreshing at " + result.nextStep.refresh.refreshAfter;
     startRefreshing(sessionId, resultsAccessKey, result.nextStep.refresh.refreshAfter);
   }, timeout);
