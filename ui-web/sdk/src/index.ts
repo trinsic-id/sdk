@@ -169,6 +169,12 @@ function hideModal() {
   } catch (err) {
     console.error("Error closing modal:", err);
   }
+
   document.body.classList.remove("lock-bg");
-  // Do not remove the modal from the DOM
+
+  // Remove modal from the DOM
+  const modal = document.getElementById("trinsic-ui");
+  if (modal) {
+    modal.remove();
+  }
 }
