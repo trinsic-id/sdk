@@ -14,17 +14,21 @@ export async function launchIframe(
   launchUrl: string
 ): Promise<TrinsicSessionResult> {
   launchUrl += "&launchMode=iframe";
-  const cssLink = document.createElement("link");
-  cssLink.href = "https://content.trinsic.id/connect/assets/widget-iframe.css";
-  cssLink.rel = "stylesheet";
-  cssLink.id = "trinsic-ui-css";
-
-  document.head.appendChild(cssLink);
 
   if (!launchUrl) {
     throw new Error(
       "Please specify a launch URL by calling our API via one of our backend SDKs"
     );
+  }
+
+  const existingCssLink = document.getElementById("trinsic-ui-css");
+  if (!existingCssLink) {
+    const cssLink = document.createElement("link");
+    cssLink.href = "https://content.trinsic.id/connect/assets/widget-iframe.css";
+    cssLink.rel = "stylesheet";
+    cssLink.id = "trinsic-ui-css";
+
+    document.head.appendChild(cssLink);
   }
 
   showModal(launchUrl);
