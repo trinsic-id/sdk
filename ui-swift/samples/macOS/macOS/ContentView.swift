@@ -46,7 +46,7 @@ struct ContentView: View {
                 
                 print("Button clicked, opening: \(url)")
                 
-                let result = try await trinsicUI.launchSession(launchUrl: url.absoluteString, callbackURL: "trinsic-ui-macos://custom-auth-callback/")
+                let result = try await trinsicUI.launchSession(launchUrl: url.absoluteString, callbackUrlScheme: "trinsic-ui-macos")
                 print("Success \(result.success)")
                 print("Canceled \(result.canceled)")
                 print("Session id \(String(describing: result.sessionId))")
