@@ -19,10 +19,6 @@ public class MainActivity extends AppCompatActivity {
     // It will likely do so by using the Trinsic backend API SDK to create a session and return the launch URL.
     private static String BACKEND_CREATE_SESSION_ENDPOINT = "https://api.trinsic.id/api/mobiletest/create-session";
 
-    // Replace the below with a URL that uses a custom scheme that you've properly registered in your app's AndroidManifest.xml
-    // The path (in this case "/callback") can be anything.
-    private static String CALLBACK_REDIRECT_URL = "trinsic-android-ui-sample-redirect-scheme:///callback";
-
     private ActivityMainBinding binding;
     private TrinsicUI trinsicUI;
 
@@ -53,12 +49,11 @@ public class MainActivity extends AppCompatActivity {
                 String launchUrl;
                 try {
                     launchUrl = createLaunchUrl();
-                    trinsicUI.LaunchSession(MainActivity.this, launchUrl, CALLBACK_REDIRECT_URL);
+                    trinsicUI.LaunchSession(MainActivity.this, launchUrl);
                 } catch (Exception e) {
                     Toast.makeText(MainActivity.this, "Failed to create launch URL: " + e.getMessage(), Toast.LENGTH_LONG);
                     throw new RuntimeException(e);
                 }
-
             }
         });
     }
