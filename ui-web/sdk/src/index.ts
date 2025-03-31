@@ -13,7 +13,7 @@ let isMicroModalInitialized = false;
 export async function launchIframe(
   launchUrl: string
 ): Promise<TrinsicSessionResult> {
-  launchUrl += "&embed=iframe";
+  launchUrl += "&launchMode=iframe";
   const cssLink = document.createElement("link");
   cssLink.href = "https://content.trinsic.id/connect/assets/widget-iframe.css";
   cssLink.rel = "stylesheet";
@@ -49,6 +49,7 @@ export async function launchIframe(
 }
 
 export async function launchRedirect(launchUrl: string) {
+  launchUrl += "&launchMode=redirect";
   window.location.href = launchUrl;
 }
 
@@ -72,11 +73,12 @@ export async function launchPopup(
     throw new Error("Failed to open popup window");
   }
 
-  const launchUrl = await getLaunchUrl();
+  let launchUrl = await getLaunchUrl();
   if (!launchUrl) {
     throw new Error("Invalid launch URL " + launchUrl);
   }
 
+  launchUrl += "&launchMode=popup";
   popup.location.href = launchUrl;
 
   var result = new Promise<TrinsicSessionResult>((resolve, reject) => {
