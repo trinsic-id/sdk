@@ -5,7 +5,7 @@ import type { LaunchSessionResult } from '.';
 export interface Spec extends TurboModule {
   launchSession(
     launchUrl: string,
-    callbackUrl: string
+    callbackUrlScheme: string
   ): Promise<LaunchSessionResult>;
 }
 

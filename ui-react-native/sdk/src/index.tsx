@@ -26,9 +26,9 @@ const ReactNativeUi = ReactNativeUiModule
 
 export function launchSession(
   launchUrl: string,
-  callbackUrl: string
+  callbackUrlScheme: string
 ): Promise<LaunchSessionResult> {
-  return ReactNativeUi.launchSession(launchUrl, callbackUrl);
+  return ReactNativeUi.launchSession(launchUrl, callbackUrlScheme);
 }
 
 export interface LaunchSessionResult {

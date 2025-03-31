@@ -7,8 +7,8 @@ RCT_EXPORT_MODULE()
 
 // Example method
 // See // https://reactnative.dev/docs/native-modules-ios
-RCT_EXPORT_METHOD(launchSession:(NSString*)launchURl
-                  callbackUrl:(NSString*)callbackUrl
+RCT_EXPORT_METHOD(launchSession:(NSString*)launchUrl
+                  callbackUrlScheme:(NSString*)callbackUrlScheme
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 {
@@ -18,7 +18,7 @@ RCT_EXPORT_METHOD(launchSession:(NSString*)launchURl
     BOOL cancelled = NO; // Replace with actual logic
     
     TrinsicUI *trinsicUI = [[TrinsicUI alloc]init];
-    [trinsicUI launchSessionWithLaunchUrl:launchURl callbackURL:callbackUrl completionHandler:^(LaunchSessionResult * _Nullable result, NSError * _Nullable error) {
+    [trinsicUI launchSessionWithLaunchUrl:launchUrl callbackUrlScheme:callbackUrlScheme completionHandler:^(LaunchSessionResult * _Nullable result, NSError * _Nullable error) {
         if(error) {
             NSString *errorMessage = [error localizedDescription];
             reject(@"launch_session_error", errorMessage, error);

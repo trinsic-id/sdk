@@ -11,8 +11,8 @@ export default function App() {
   const handleButtonPress = async () => {
     const getSessionUrlResult = await fetch(SESSION_CREATE_URL);
     const launchUrl = await getSessionUrlResult.text();
-    const callbackUrl = 'trinsic-ui-example-redirect-scheme-react-native://callback';
-    const result = await launchSession(launchUrl, callbackUrl);
+    const callbackUrlScheme = 'trinsic-ui-example-redirect-scheme-react-native';
+    const result = await launchSession(launchUrl, callbackUrlScheme);
     setResult(result);
   };
 
