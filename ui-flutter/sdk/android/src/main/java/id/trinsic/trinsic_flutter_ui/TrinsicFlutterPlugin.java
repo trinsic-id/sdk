@@ -98,26 +98,19 @@ public class TrinsicFlutterPlugin implements FlutterPlugin, ActivityAware, Metho
 
         if (call.method.equals("launchSession") && call.hasArgument("launchUrl")) {
             String launchUrl = call.argument("launchUrl");
-            String redirectUrl = call.argument("redirectUrl");
 
             Uri parsedUrl = Uri.parse(call.argument("launchUrl"));
             if (!parsedUrl.getQueryParameterNames().contains("sessionId")) {
                 result.error("invalid_url", "Invalid launch URL", null);
                 return;
             }
-            String sessionId = parsedUrl.getQueryParameter("sessionId");
 
-            try {
-                id.trinsic.android.ui.PlatformUtil.ValidateRedirectUrl(context, redirectUrl);
-            } catch (IllegalArgumentException e) {
-                result.error("illegal_argument", e.getMessage(), null);
-                return;
-            }
+            String sessionId = parsedUrl.getQueryParameter("sessionId");
 
             // TODO: race condition prevention on `callbacks`?
             callbacks.put(sessionId, result);
 
-            AcceptanceSessionLaunchParams launchParams = new AcceptanceSessionLaunchParams(sessionId, launchUrl, redirectUrl);
+            AcceptanceSessionLaunchParams launchParams = new AcceptanceSessionLaunchParams(sessionId, launchUrl);
             activityPluginBinding.getActivity().startActivityForResult(invokeContract.createIntent(context, launchParams), 1);
             return;
         }

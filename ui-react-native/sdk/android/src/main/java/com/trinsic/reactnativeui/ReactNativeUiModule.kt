@@ -74,7 +74,7 @@ class ReactNativeUiModule internal constructor(private val context: ReactApplica
 
     Callbacks[sessionId] = promise;
 
-    val launchParams : AcceptanceSessionLaunchParams = AcceptanceSessionLaunchParams(sessionId, newLaunchUrl, callbackUrl);
+    val launchParams : AcceptanceSessionLaunchParams = AcceptanceSessionLaunchParams(sessionId, newLaunchUrl);
     currentActivity?.startActivityForResult(currentActivity?.let { invokeContract.createIntent(it, launchParams) }, 1)
   }
 

@@ -11,10 +11,9 @@ import 'package:trinsic_flutter_ui/trinsic_flutter_ui.dart';
 const String backendCreateSessionEndpoint =
     'https://api.trinsic.id/api/mobiletest/create-session';
 
-// Replace the below with a URL that uses a custom scheme that you've properly registered in your app's AndroidManifest.xml
-// The path (in this case "/callback") can be anything.
-const String callbackRedirectUrl =
-    "trinsic-flutter-ui-testbed-redirect-scheme://callback";
+// Replace the below with the custom scheme that you've properly registered in your app's AndroidManifest.xml
+const String callbackRedirectUrlScheme =
+    "trinsic-flutter-ui-testbed-redirect-scheme";
 
 //----------- No need to modify anything below here -----------
 void main() {
@@ -68,7 +67,7 @@ class _MyAppState extends State<MyApp> {
     Map? result;
     try {
       result =
-          await TrinsicFlutter.launchSession(launchUrl, callbackRedirectUrl);
+          await TrinsicFlutter.launchSession(launchUrl, callbackRedirectUrlScheme);
     } on PlatformException catch (e) {
       debugPrint("Error: $e");
       setStateText("Failed to launch");

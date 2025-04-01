@@ -23,7 +23,7 @@ public class TrinsicFlutterPlugin: NSObject, FlutterPlugin {
   
   private func handleLaunchSession(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
       guard let args = call.arguments as? [String: Any],
-          let redirectUrl = args["redirectUrl"] as? String,
+          let redirectUrlScheme = args["redirectUrlScheme"] as? String,
           let launchUrlString = args["launchUrl"] as? String else {
         result(FlutterError(code: "BAD_ARGS", message: "Missing or invalid arguments", details: nil))
         return
@@ -34,7 +34,7 @@ public class TrinsicFlutterPlugin: NSObject, FlutterPlugin {
           do {
               // Await the asynchronous launchSession function
 
-              let sessionResult = try await trinsicUI.launchSession(launchUrl: launchUrlString, callbackURL: redirectUrl)
+              let sessionResult = try await trinsicUI.launchSession(launchUrl: launchUrlString, callbackUrlScheme: redirectUrlScheme)
               // You can use sessionResult if needed
 
                   let returnData: [String: Any?] = [
