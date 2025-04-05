@@ -94,7 +94,7 @@ $xml.Project.AppendChild($itemGroupElement) | Out-Null
 # Save the modified .csproj file
 $xml.Save($csprojPath)
 
-#Copy-Item "$PSScriptRoot/README.md" "$PSScriptRoot/sdk/src/Trinsic.Api"
+Copy-Item "$PSScriptRoot/README.md" "$PSScriptRoot/sdk/src/Trinsic.Api"
 Copy-Item "$PSScriptRoot/../LICENSE" "$PSScriptRoot/sdk/src/Trinsic.Api"
 
 try {
