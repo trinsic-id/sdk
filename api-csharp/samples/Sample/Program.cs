@@ -12,7 +12,7 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 {
     serverOptions.ListenAnyIP(3005); // Listens on http://localhost:3005
 });
-builder.Services.AddApi(options =>
+builder.Services.AddTrinsicApi(options =>
 {
     // the type of token here depends on the api security specifications
     options.AddTokens(new BearerToken(Environment.GetEnvironmentVariable("TRINSIC_ACCESS_TOKEN")));
