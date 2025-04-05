@@ -5,16 +5,22 @@ namespace Sample;
 
 public static class HostedProviderSession
 {
-    public static void MapHostedProviderSessionRoutes(this WebApplication app, SessionsApi sessionApi)
+    public static void MapHostedProviderSessionRoutes(this WebApplication app, ISessionsApi sessionApi)
     {
         app.MapGet("/hosted", context => Shared.ServeFile(context, "../../../ui-web/samples/dist/hosted.html"));
         app.MapGet("/hosted-launch/{providerId}", async (HttpContext context, string providerId) =>
         {
             var redirectUrl = context.Request.Query["redirectUrl"].ToString();
 
-            var request = new CreateHostedProviderSessionRequest(providerId, null, redirectUrl);
+            var request = new CreateHostedProviderSessionRequest(providerId, redirectUrl, null);
 
-            var result = await sessionApi.CreateHostedProviderSessionAsync(request);
+            var response = await sessionApi.CreateHostedProviderSessionAsync(request);
+            if (!response.IsOk)
+            {
+                throw new HttpRequestException(response.ReasonPhrase);
+            }
+
+            var result = response.Ok();
 
             context.Response.Redirect(result.LaunchUrl);
         });

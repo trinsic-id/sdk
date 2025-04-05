@@ -8,7 +8,7 @@ namespace Sample;
 
 public static class AdvancedProviderSession
 {
-    public static void MapAdvancedProviderSessionRoutes(this WebApplication app, SessionsApi sessionApi)
+    public static void MapAdvancedProviderSessionRoutes(this WebApplication app, ISessionsApi sessionApi)
     {
         app.MapGet("/advanced", context => Shared.ServeFile(context, "../../../ui-web/samples/dist/advanced.html"));
         app.MapGet("/advanced-popup",
@@ -21,7 +21,11 @@ public static class AdvancedProviderSession
             {
                 ResultsAccessKey = request.ResultsAccessKey
             });
-            await context.Response.WriteAsJsonAsync(result);
+            if (!result.IsOk)
+            {
+                throw new HttpRequestException(result.ReasonPhrase);
+            }
+            await context.Response.WriteAsJsonAsync(result.Ok());
         });
 
         app.MapGet("/advanced-launch/{providerId}", async (HttpContext context, string providerId) =>
@@ -32,12 +36,18 @@ public static class AdvancedProviderSession
                 .Select(x => (IntegrationCapability)Enum.Parse(typeof(IntegrationCapability), x)).ToList();
 
             var request =
-                new CreateAdvancedProviderSessionRequest(capabilities, fallbackToTrinsicUI, providerId, null,
+                new CreateAdvancedProviderSessionRequest(capabilities, providerId,fallbackToTrinsicUI,  null,
                     redirectUrl);
 
             try
             {
-                var result = await sessionApi.CreateAdvancedProviderSessionAsync(request);
+                var response = await sessionApi.CreateAdvancedProviderSessionAsync(request);
+                if (!response.IsOk)
+                {
+                    throw new HttpRequestException(response.ReasonPhrase);
+                }
+
+                var result = response.Ok();
                 if (result.NextStep.Method == IntegrationLaunchMethod.LaunchBrowser)
                 {
                     context.Response.Redirect(result.NextStep.Content);
@@ -52,7 +62,7 @@ public static class AdvancedProviderSession
             }
             catch (ApiException exception)
             {
-                var content = (string)exception.ErrorContent;
+                var content = (string)exception.RawContent;
                 context.Response.Redirect(
                     $"/advanced-popup?error={System.Web.HttpUtility.UrlEncode(content)}");
             }
@@ -64,7 +74,11 @@ public static class AdvancedProviderSession
             var result =
                 await sessionApi.GetSessionResultAsync(sessionId,
                     new GetSessionResultRequest(request.ResultsAccessKey));
-            await context.Response.WriteAsJsonAsync(result, new JsonSerializerOptions()
+            if (!result.IsOk)
+            {
+                throw new HttpRequestException(result.ReasonPhrase);
+            }
+            await context.Response.WriteAsJsonAsync(result.Ok(), new JsonSerializerOptions()
             {
                 Converters = { new JsonStringEnumConverter() },
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase

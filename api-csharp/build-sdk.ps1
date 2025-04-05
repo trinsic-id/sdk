@@ -3,14 +3,49 @@ $additionalProperties = @{
     packageVersion                           = "[VERSION]"
     nullableReferenceTypes                   = "true"
     modelPropertySorting                     = "alphabetical"
-    library                                  = "httpclient"
+    library                                  = "generichost"
     useDateTimeOffset                        = "true"
     validatable                              = "false"
     disallowAdditionalPropertiesIfNotPresent = "false"
-    licenseId                                = "MIT"        
+    licenseId                                = "MIT" 
+       
 }
 & "$PSScriptRoot/../helpers/generate-client.ps1" -language "csharp" -outputFolder "$PSScriptRoot/sdk" -additionalProperties $additionalProperties
 
+## HOTFIX THE DATEONLY PARSER
+# Set the line to find (exact match)
+$targetLine = 'if (DateOnly.TryParseExact(value, format, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out DateOnly result))'
+# Set the replacement line
+$replacementLine = '                if (DateOnly.TryParseExact(value, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly result))'
+
+# Normalize by removing ALL whitespace
+function NormalizeLine($line) {
+    return ($line -replace '\s', '')
+}
+
+$normalizedTarget = NormalizeLine $targetLine
+
+Get-ChildItem -Path "$PSScriptRoot/sdk" -Recurse -Include *.cs | ForEach-Object {
+    $filePath = $_.FullName
+    $content = Get-Content $filePath
+
+    $modified = $false
+    $newContent = $content | ForEach-Object {
+        $normalizedCurrent = NormalizeLine $_
+        if ($normalizedCurrent -eq $normalizedTarget) {
+            Write-Host "MATCH FOUND in $filePath`n$_"
+            $modified = $true
+            $replacementLine
+        } else {
+            $_
+        }
+    }
+
+    if ($modified) {
+        Set-Content -Path $filePath -Value $newContent
+        Write-Host "Updated: $filePath"
+    }
+}
 
 # Modify package to include a README.md
 $csprojPath = "$PSScriptRoot/sdk/src/Trinsic.Api/Trinsic.Api.csproj"
@@ -58,7 +93,7 @@ $xml.Project.AppendChild($itemGroupElement) | Out-Null
 # Save the modified .csproj file
 $xml.Save($csprojPath)
 
-Copy-Item "$PSScriptRoot/README.md" "$PSScriptRoot/sdk/src/Trinsic.Api"
+#Copy-Item "$PSScriptRoot/README.md" "$PSScriptRoot/sdk/src/Trinsic.Api"
 Copy-Item "$PSScriptRoot/../LICENSE" "$PSScriptRoot/sdk/src/Trinsic.Api"
 
 try {
