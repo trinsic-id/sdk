@@ -29,11 +29,17 @@ The package needs to be configured with your app's access token, which is
 available in the [Trinsic Dashboard](https://dashboard.trinsic.id).
 
 ```cs
-var configuration = new Configuration { AccessToken = "your-access-token" };
 
-var attachments = new AttachmentsApi(configuration);
-var network = new NetworkApi(configuration);
-var sessions = new SessionsApi(configuration);
+// Add the trinsic api to your dependency injection framework 
+builder.Services.AddTrinsicApi(options =>
+{
+    // the type of token here depends on the api security specifications
+    options.AddTokens(new BearerToken(Environment.GetEnvironmentVariable("TRINSIC_ACCESS_TOKEN")));
+});
+
+var sessionApi = app.Services.GetService<ISessionsApi>()!;
+var networkApi = app.Services.GetService<INetworkApi>()!;
+var attachmentsApi = app.Services.GetService<IAttachmentsApi>()!;
 ```
 
 You can find a full C# example in the [samples](https://github.com/trinsic-id/sdk/tree/main/api-csharp/samples) folder.

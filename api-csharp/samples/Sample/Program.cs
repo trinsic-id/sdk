@@ -1,22 +1,26 @@
 using Microsoft.Extensions.FileProviders;
 using Sample;
+using Trinsic.Api;
 using Trinsic.Api.Api;
 using Trinsic.Api.Client;
+using Trinsic.Api.Extensions;
 
 DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(3005); // Listens on http://localhost:3005
+});
+builder.Services.AddTrinsicApi(options =>
+{
+    // the type of token here depends on the api security specifications
+    options.AddTokens(new BearerToken(Environment.GetEnvironmentVariable("TRINSIC_ACCESS_TOKEN")));
+});
 
 var app = builder.Build();
-
-var configuration = new Configuration()
-{
-    AccessToken = Environment.GetEnvironmentVariable("TRINSIC_ACCESS_TOKEN")!
-};
-
-var networkApi = new NetworkApi(configuration);
-var sessionApi = new SessionsApi(configuration);
-
+var sessionApi = app.Services.GetService<ISessionsApi>()!;
+var networkApi = app.Services.GetService<INetworkApi>()!;
 app.MapSharedRoutes(sessionApi, networkApi);
 app.MapWidgetSessionRoutes(sessionApi);
 app.MapHostedProviderSessionRoutes(sessionApi);
