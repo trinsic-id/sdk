@@ -25,7 +25,10 @@ public static class AdvancedProviderSession
             {
                 throw new HttpRequestException(result.ReasonPhrase);
             }
-            await context.Response.WriteAsJsonAsync(result.Ok());
+            await context.Response.WriteAsJsonAsync(result.Ok(), new JsonSerializerOptions()
+            {
+                Converters = { new JsonStringEnumConverter() }
+            });
         });
 
         app.MapGet("/advanced-launch/{providerId}", async (HttpContext context, string providerId) =>

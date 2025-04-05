@@ -8,7 +8,10 @@ using Trinsic.Api.Extensions;
 DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(3005); // Listens on http://localhost:3005
+});
 builder.Services.AddApi(options =>
 {
     // the type of token here depends on the api security specifications
