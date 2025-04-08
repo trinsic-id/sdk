@@ -4,6 +4,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Trinsic\Api\Model\GetSessionResultRequest as GetSessionResultRequest;
 use Trinsic\Api\Model\RecommendRequest as RecommendRequest;
+use Trinsic\Api\Model\RecommendationInfo as RecommendationInfo;
 use Trinsic\Api\Model\RecommendResponse as RecommendResponse;
 
 return function ($app, $network, $sessions) {
@@ -30,7 +31,10 @@ return function ($app, $network, $sessions) {
         $ipAddress = $request->getQueryParams()['ipAddress'];
 
         $req = new RecommendRequest();
-        $req->setIpAddresses([$ipAddress]);
+        $reqInfo = new RecommendationInfo();
+
+        $reqInfo->setIpAddresses([$ipAddress]);
+        $req->setRecommendationInfo($reqInfo);
 
         $result = $network->recommendProviders($req);
     

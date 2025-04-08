@@ -13,9 +13,10 @@ module SharedRoutes
 
     app.get '/providers' do
       ipAddress = params[:ipAddress]
-      
+      info_args = {}
+      info_args[:ip_addresses] = [ipAddress] if ipAddress
       req = TrinsicApi::RecommendRequest.new({
-        ip_addresses: [ipAddress]
+        recommendation_info: info_args
       })
 
       result = TrinsicServices::NETWORK.recommend_providers({recommend_request: req})

@@ -2,7 +2,6 @@ import {
   SessionsApi,
   Configuration,
   NetworkApi,
-  CreateWidgetSessionRequest,
 } from "@trinsic/api";
 import { sharedRoutes } from "./shared";
 import { widgetRoutes } from "./widget";
@@ -33,17 +32,6 @@ app.use(
   "/assets",
   express.static(path.join("../../../ui-web/samples/dist/assets"))
 );
-
-
-
-// app.get("/launch/:providerId", async (req: any, res: any) => {
-//   const request: CreateSessionRequest = {
-//     launchProviderDirectly: true,
-//     providers: [req.params.providerId],
-//   };
-//   const result = await createSession(request);
-//   res.redirect(result.launchUrl + "&redirectUrl=" + req.query.redirectUrl);
-// });
 
 
 app.listen(PORT, () => {
