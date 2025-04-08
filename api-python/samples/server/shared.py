@@ -3,6 +3,7 @@ from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from trinsic_api.api.sessions_api import SessionsApi, GetSessionResultRequest
 from trinsic_api.api.network_api import NetworkApi, RecommendRequest
+from trinsic_api.models import RecommendationInfo
 
 sharedRouter = APIRouter()
 
@@ -13,7 +14,7 @@ async def redirect(request: Request):
 @sharedRouter.get("/providers")
 async def get_providers(request: Request, network_api: NetworkApi = Depends()):
     ip_address = request.query_params.get("ipAddress")  # Get query param
-    req = RecommendRequest(ip_addresses=[ip_address])
+    req = RecommendRequest(recommendation_info=RecommendationInfo(ip_addresses=[ip_address]))
     data = network_api.recommend_providers(req)
     return data
 
