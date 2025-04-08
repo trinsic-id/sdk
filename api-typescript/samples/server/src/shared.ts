@@ -14,7 +14,9 @@ export function sharedRoutes(app: Express, networkApi: NetworkApi, sessionsApi: 
     app.get("/providers", async (req: any, res: any) => {
         const ipAddress = req.query.ipAddress;
         const result = await networkApi.recommendProviders({
+          recommendationInfo: {
             ipAddresses: [ipAddress]
+          }
         });
         res.send(result);
     });
