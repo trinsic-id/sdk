@@ -33,7 +33,6 @@ available in the [Trinsic Dashboard](https://dashboard.trinsic.id).
 // Add the trinsic api to your dependency injection framework 
 builder.Services.AddTrinsicApi(options =>
 {
-    // the type of token here depends on the api security specifications
     options.AddTokens(new BearerToken(Environment.GetEnvironmentVariable("TRINSIC_ACCESS_TOKEN")));
 });
 
