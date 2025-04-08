@@ -10,9 +10,9 @@ export function widgetRoutes(app: Express, sessionsApi: SessionsApi) {
     });
 
     app.post("/create-session", async (req: any, res: any) => {
-        const request: CreateWidgetSessionRequest = {};
         try {
-          const result = await sessionsApi.createWidgetSession(request);
+          const redirectUrl = req.query.redirectUrl;
+          const result = await sessionsApi.createWidgetSession({redirectUrl: redirectUrl});
           console.debug("Created session", result);
           res.send(result);
         } catch (e: any) {

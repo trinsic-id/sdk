@@ -17,7 +17,6 @@ from trinsic_api.api.sessions_api import SessionsApi
 token = os.getenv("TRINSIC_ACCESS_TOKEN") or ""
 auth_token = "Bearer " + token
 configuration = Configuration.get_default()
-print(token)
 # Set to true if you want debug request logging
 configuration.debug = False
 configuration.access_token = token
