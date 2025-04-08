@@ -15,7 +15,7 @@ return function ($app, $sessions) {
     });
 
     $app->post("/create-session", function (Request $request, Response $response, $args) use ($sessions) {
-        $redirectUrl = $request->getQueryParams()['redirectUrl'];
+        $redirectUrl = $request->getQueryParams()['redirectUrl'] ?? null;
         $createRequest = new CreateWidgetSessionRequest();
         $createRequest->setRedirectUrl($redirectUrl);
         $result = $sessions->createWidgetSession($createRequest);

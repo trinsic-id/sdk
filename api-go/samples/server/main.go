@@ -14,6 +14,7 @@ func main() {
 	authToken := os.Getenv("TRINSIC_ACCESS_TOKEN")
 	config := trinsic_api.NewConfiguration()
 	config.AddDefaultHeader("Authorization", "Bearer "+authToken)
+	config.Debug = true
 	api = trinsic_api.NewAPIClient(config)
 
 	app := fiber.New()

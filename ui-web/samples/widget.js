@@ -9,8 +9,12 @@ async function launchWidget() {
     await launch(launchMode)
 }
 
-async function createSession() {
-    const launchUrl = await fetch(`/create-session?redirectUrl=${window.location.origin + '/redirect'}`, {
+async function createSession(withRedirect) {
+    let url = '/create-session';
+    if(withRedirect){
+        url += '?redirectUrl=' + window.location.origin + '/redirect';
+    }
+    const launchUrl = await fetch(url, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -26,8 +30,7 @@ async function launch(launchMode) {
     switch (launchMode) {
         case 'popup':
             result = await launchPopup(async () => {
-                const launchUrl = await createSession();
-                return launchUrl +  '&redirectUrl=' + window.location.origin + '/redirect';
+                return await createSession();
             });
             await exchangeResult(result);
             break;
@@ -37,8 +40,8 @@ async function launch(launchMode) {
             await exchangeResult(result);
             break;
         case 'redirect':
-            const redirectLaunchUrl = await createSession();
-            await launchRedirect(redirectLaunchUrl, '');
+            const redirectLaunchUrl = await createSession(true);
+            await launchRedirect(redirectLaunchUrl);
             break;
         default:
             console.error("Invalid launch mode:", launchMode);

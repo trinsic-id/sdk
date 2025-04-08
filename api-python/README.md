@@ -29,7 +29,12 @@ from trinsic_api.api.network_api import NetworkApi
 from trinsic_api.api.sessions_api import SessionsApi
 
 auth_token = "Bearer " + "your-access-token"
-api_client = ApiClient(configuration=None, header_name="Authorization", header_value=auth_token)
+configuration = Configuration.get_default()
+# Set to true if you want debug request logging
+configuration.debug = False
+configuration.access_token = token
+
+api_client = ApiClient(configuration=configuration)
 
 attachments_api = AttachmentsApi(api_client)
 network_api = NetworkApi(api_client)
