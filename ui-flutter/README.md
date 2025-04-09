@@ -8,6 +8,27 @@ This library must be paired with an [api library](https://github.com/trinsic-id/
 
 Currently, only iOS and Android are supported.
 
+## Documentation
+
+See the [Trinsic docs](https://docs.trinsic.id/docs/) for more detailed information on how to start integrating with our identity acceptance network.
+
+## Supported Use Cases
+
+### Widget and Hosted Provider Sessions
+
+This library supports launching both [Widget](https://docs.trinsic.id/docs/widget-session) and [Hosted Provider](https://docs.trinsic.id/docs/hosted-provider-session) Sessions.
+
+You _must_ specify a `redirectUrl` when creating either kind of Session, and that `redirectUrl` _must_ use a custom scheme which you register against your app (see below).
+
+### Advanced Provider Sessions
+
+This library provides **only minimal** support for [Advanced Provider Sessions](https://docs.trinsic.id/docs/advanced-provider-session). 
+
+Specifically, it can be used only to execute Sessions which return a `launchMethod` of `LaunchBrowser` and a `collectionMethod` of `CaptureRedirect`.
+
+All other interaction methods are not supported by this library and will require additional effort to implement; please contact Trinsic for guidance.
+
+
 ## Installation
 
 Simply add this library to your Flutter project:
