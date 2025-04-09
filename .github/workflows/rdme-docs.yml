@@ -16,7 +16,6 @@ on:
       - "ui-android/README.md"
       - "ui-expo/README.md"
       - "ui-flutter/README.md"
-      - "ui-react-native/README.md"
       - "ui-swift/README.md"
       - "ui-web/README.md"
       - ".readme/**"
@@ -142,18 +141,6 @@ jobs:
         uses: readmeio/rdme@v8
         with:
           rdme: docs .readme/ui-flutter.md --key=${{ secrets.README_API_KEY }} --version=0.1
-  ui-react-native:
-    name: Sync React Native SDK Readme
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repo
-        uses: actions/checkout@v3
-      - name: Prepare readme file
-        run: cat ui-react-native/README.md >> .readme/ui-react-native.md
-      - name: Run `docs` command
-        uses: readmeio/rdme@v8
-        with:
-          rdme: docs .readme/ui-react-native.md --key=${{ secrets.README_API_KEY }} --version=0.1
   ui-swift:
     name: Sync Swift SDK Readme
     runs-on: ubuntu-latest

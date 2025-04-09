@@ -27,7 +27,6 @@
 				"com.github.trinsic-id:sdk-android-ui",
 				"@trinsic/expo-ui",
 				"trinsic_flutter_ui",
-				"@trinsic/react-native-ui",
 				"trinsic-ui-ios",
 				"@trinsic/web-ui"
 			],
