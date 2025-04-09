@@ -4,6 +4,10 @@ The Trinsic Android UI Library provides ways to launch verification sessions dir
 
 This library must be paired with an [api library](https://github.com/trinsic-id/sdk#api-libraries) as part of a full integration.
 
+## Documentation
+
+See the [Trinsic docs](https://docs.trinsic.id/docs/) for more detailed information on how to start integrating with our identity acceptance network.
+
 ## Supported Use Cases
 
 ### Widget and Hosted Provider Sessions
