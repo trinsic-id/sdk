@@ -4,7 +4,7 @@ MicroModal.init();
 
 window.exchangeResult = exchangeResult;
 
-async function showDeeplink(url){
+async function showDeeplink(url) {
   document.getElementById("qrcode-canvas").style.removeProperty("display");
   await QRCode.toCanvas(document.getElementById('qrcode-canvas'), url);
 }
@@ -15,16 +15,17 @@ function showContent(content) {
 }
 
 function handleNextStep(nextStep, content) {
-  if(nextStep === "DeeplinkToMobile") {
+  console.log("Next step: ", nextStep);
+  if (nextStep === "DeeplinkToMobile") {
     showDeeplink(content);
   }
 
-  if(nextStep === "ShowContent") {
+  if (nextStep === "ShowContent") {
     showContent(content);
   }
 }
 
-async function startResultsPolling(sessionId, resultsAccessKey){
+async function startResultsPolling(sessionId, resultsAccessKey) {
   let result = null;
   let resultUrl = `/poll-results/${sessionId}`;
   let resultPollingInterval = setInterval(async () => {
@@ -43,7 +44,7 @@ async function startResultsPolling(sessionId, resultsAccessKey){
     document.getElementById("success").innerText = result.session.success;
     document.getElementById("error-code").innerText = result.session.errorCode || "N/A";
 
-    if(result.session.done === true){
+    if (result.session.done === true) {
       clearInterval(resultPollingInterval);
       const data = {
         success: result.session.success,
@@ -66,18 +67,18 @@ async function initializeAdvancedPopup() {
   const shouldRefresh = urlSearchParams.get('shouldRefresh') === 'true';
   const refreshAfter = urlSearchParams.get('refreshAfter');
   const error = urlSearchParams.get('error');
-  if(error) {
+  if (error) {
     const decoded = decodeURIComponent(error);
     const parsedError = JSON.parse(decoded);
     let errorContent = `${parsedError.title}<br/> 
         <b>Trace id: ${parsedError.traceId}</b><br/>`;
-    if(parsedError.errors) {
-        errorContent += "<ul style=\"margin-top: 30px\">";
-        //errors is an object with keys and values, iterate over the keys and values
-        Object.keys(parsedError.errors).forEach(key => {
-            errorContent += `<li>${key}: ${parsedError.errors[key]}</li>`;
-        });
-        errorContent += "</ul>";
+    if (parsedError.errors) {
+      errorContent += "<ul style=\"margin-top: 30px\">";
+      //errors is an object with keys and values, iterate over the keys and values
+      Object.keys(parsedError.errors).forEach(key => {
+        errorContent += `<li>${key}: ${parsedError.errors[key]}</li>`;
+      });
+      errorContent += "</ul>";
     }
     document.getElementById("advanced-modal-content").innerHTML = errorContent;
     return;
@@ -94,13 +95,12 @@ async function initializeAdvancedPopup() {
   startResultsPolling(sessionId, resultsAccessKey);
 
   // Some integrations require their content to be refreshed.
-  if(shouldRefresh) {
+  if (shouldRefresh) {
     startRefreshing(sessionId, nextStep, resultsAccessKey, refreshAfter);
   }
 }
 
 async function startRefreshing(sessionId, nextStep, resultsAccessKey, refreshAfter) {
-  console.log(new Date(refreshAfter))
   const timeout = new Date(refreshAfter) - new Date();
 
   console.log("Refreshing in ", timeout);
@@ -115,9 +115,9 @@ async function startRefreshing(sessionId, nextStep, resultsAccessKey, refreshAft
         resultsAccessKey: resultsAccessKey
       })
     }).then(r => r.json());
-    handleNextStep(nextStep, result.nextStep.content);
+    handleNextStep(result.nextStep.method, result.nextStep.content);
     document.getElementById("content-refresh").innerText = "Yes, refreshing at " + result.nextStep.refresh.refreshAfter;
-    startRefreshing(sessionId, resultsAccessKey, result.nextStep.refresh.refreshAfter);
+    startRefreshing(sessionId, result.nextStep.method, resultsAccessKey, result.nextStep.refresh.refreshAfter);
   }, timeout);
 }
 

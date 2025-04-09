@@ -3,6 +3,7 @@ package id.trinsic;
 import id.trinsic.api.NetworkApi;
 import id.trinsic.api.SessionsApi;
 import id.trinsic.api.models.GetSessionResultRequest;
+import id.trinsic.api.models.RecommendationInfo;
 import id.trinsic.api.models.RecommendRequest;
 import id.trinsic.api.models.RecommendResponse;
 import io.javalin.Javalin;
@@ -23,7 +24,9 @@ public class Shared{
 
             // Build request
             RecommendRequest req = new RecommendRequest();
-            req.setIpAddresses(List.of(ipAddress)); // Assuming it's a list
+            RecommendationInfo info = new RecommendationInfo();
+            info.setIpAddresses(List.of(ipAddress)); // Assuming it's a list
+            req.setRecommendationInfo(info);
 
             // Call the service
             RecommendResponse result = network.recommendProviders(req);

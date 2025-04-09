@@ -75,7 +75,7 @@ func AdvancedRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 		// Prepare query parameters
 		queryParams := url.Values{
 			"sessionId":        {result.SessionId},
-			"resultsAccessKey": {*result.ResultCollection.ResultsAccessKey.Get()},
+			"resultsAccessKey": {result.ResultCollection.ResultsAccessKey},
 			"nextStep":         {string(result.NextStep.Method)},
 			"content":          {result.NextStep.Content},
 			"shouldRefresh":    {strconv.FormatBool(shouldRefresh)},

@@ -5,7 +5,7 @@ namespace Sample;
 
 public static class Shared
 {
-    public static void MapSharedRoutes(this WebApplication app, SessionsApi sessionApi, NetworkApi networkApi)
+    public static void MapSharedRoutes(this WebApplication app, ISessionsApi sessionApi, INetworkApi networkApi)
     {
         app.MapGet("/", context => Shared.ServeFile(context, "../../../ui-web/samples/dist/index.html"));
         app.MapGet("/redirect", context => Shared.ServeFile(context, "../../../ui-web/samples/dist/redirect.html"));
@@ -13,11 +13,18 @@ public static class Shared
         app.MapGet("/providers", async context =>   
         {
             var ipAddress = context.Request.Query["ipAddress"].ToString();
-            var providers = await networkApi.RecommendProvidersAsync(new()
+            var result = await networkApi.RecommendProvidersAsync(new RecommendRequest()
             {
-                IpAddresses = [ipAddress]
+                RecommendationInfo = new RecommendationInfo()
+                {
+                    IpAddresses = [ipAddress],
+                }
             });
-            await context.Response.WriteAsJsonAsync(providers);
+            if (!result.IsOk)
+            {
+                throw new HttpRequestException(result.ReasonPhrase);
+            }
+            await context.Response.WriteAsJsonAsync(result.Ok());
         });
 
         app.MapPost("/exchange-result", async context =>
@@ -30,8 +37,12 @@ public static class Shared
                 // Call the method to exchange the results key
                 var result = await sessionApi.GetSessionResultAsync(request.SessionId, new GetSessionResultRequest(request.ResultsAccessKey));
 
+                if (!result.IsOk)
+                {
+                    throw new HttpRequestException(result.ReasonPhrase);
+                }
                 // Return the result as JSON
-                await context.Response.WriteAsJsonAsync(result);
+                await context.Response.WriteAsJsonAsync(result.Ok());
             }
             catch (Exception e)
             {
