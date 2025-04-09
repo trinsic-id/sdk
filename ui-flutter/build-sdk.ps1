@@ -23,7 +23,7 @@ try {
     Write-Host "Setting version to $version"
 
     $fileContent = Get-Content -Path "pubspec.yaml"
-    $fileContent = $fileContent -replace "^version: [\d\.]+$", "version: $version"
+    $fileContent = $fileContent -replace "^version: [\d\.\-a-z]+$", "version: $version"
     $fileContent | Set-Content -Path "pubspec.yaml"
 
     Write-Host "Ensuring CHANGELOG.md starts with version $version"
