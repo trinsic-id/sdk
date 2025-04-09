@@ -4,15 +4,15 @@ The Trinsic Android UI Library provides ways to launch verification sessions dir
 
 This library must be paired with an [api library](https://github.com/trinsic-id/sdk#api-libraries) as part of a full integration.
 
-# Supported Use Cases
+## Supported Use Cases
 
-## Widget and Hosted Provider Sessions
+### Widget and Hosted Provider Sessions
 
 This library supports launching both [Widget](https://docs.trinsic.id/docs/widget-session) and [Hosted Provider](https://docs.trinsic.id/docs/hosted-provider-session) Sessions.
 
 You _must_ specify a `redirectUrl` when creating either kind of Session, and that `redirectUrl` _must_ use a custom scheme which you register against your app (see below).
 
-## Advanced Provider Sessions
+### Advanced Provider Sessions
 
 This library provides **only minimal** support for [Advanced Provider Sessions](https://docs.trinsic.id/docs/advanced-provider-session). 
 
@@ -21,11 +21,11 @@ Specifically, it can be used only to execute Sessions which return a `launchMeth
 All other interaction methods are not supported by this library and will require additional effort to implement; please contact Trinsic for guidance.
 
 
-# Installation (Gradle)
+## Installation (Gradle)
 
 This library is delivered via Jitpack.
 
-## 1. Add Jitpack to Gradle Repositories
+### 1. Add Jitpack to Gradle Repositories
 
 Add jitpack to the `repositories` block in your Gradle build file:
 
@@ -40,7 +40,7 @@ repositories {
 }
 ```
 
-## 2. Add library as dependency
+### 2. Add library as dependency
 
 Add the library as a Gradle dependency:
 
@@ -51,13 +51,13 @@ dependencies {
 }
 ```
 
-# Installation (others)
+## Installation (others)
 
 See the [library's page on Jitpack](https://jitpack.io/#trinsic-id/sdk-android-ui) for installation instructions for Maven and others.
 
-# Setup
+## Setup
 
-## 1. Choose a Custom Scheme
+### 1. Choose a Custom Scheme
 
 First, choose a custom scheme to register against your app. This is necessary for the library to hook into the final session redirect and pass the results back to your application.
 
@@ -65,7 +65,7 @@ The custom scheme can be any valid URL scheme, but it **must be globally unique*
 
 An example of a good scheme is `acme-corp-shopping-app-trinsic-redirect`.
 
-## 2. Register the `CallbackActivity` in your app's `AndroidManifest.xml`
+### 2. Register the `CallbackActivity` in your app's `AndroidManifest.xml`
 
 Place the following snippet in your app's `AndroidManifest.xml`, replacing `[YOURCUSTOMSCHEME]` with the scheme you chose in step 1
 
@@ -83,11 +83,11 @@ Place the following snippet in your app's `AndroidManifest.xml`, replacing `[YOU
 </activity>
 ```
 
-## 3. (Optional) Setup Task Affinity
+### 3. (Optional) Setup Task Affinity
 
 If your app's manifest specifies the `android:taskAffinity` property on any activity which calls this library, you must make some adjustments.
 
-### Custom Task Affinity
+#### Custom Task Affinity
 
 If your activity specifies a custom task affinity (which is _not_ an empty string), simply make the following changes:
 
@@ -107,7 +107,7 @@ Simply paste the following snippet next to where you pasted the above snippet, r
     android:taskAffinity="whatever.custom" />
 ```
 
-### Empty Task Affinity
+#### Empty Task Affinity
 
 > [!WARNING]  
 > A [security vulnerability](https://developer.android.com/privacy-and-security/risks/strandhogg) -- affecting all versions of Android below Android 9.0 / API 28 -- is partially mitigated by explicitly specifying an empty `taskAffinity`.
