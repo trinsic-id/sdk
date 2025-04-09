@@ -9,7 +9,7 @@
   "rubyPatchVersion": "0",
   "swiftUIVersion": "2.0.0",
   "androidUIVersion": "2.0.0",
-  "flutterUIVersion": "2.0.0-rc1",
+  "flutterUIVersion": "2.0.0",
   "expoUIVersion": "1.0.0",
   "reactNativeUIVersion": "2.0.0-rc1",
   "webUIVersion": "2.1.0"
