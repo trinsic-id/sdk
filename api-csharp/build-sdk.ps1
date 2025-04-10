@@ -9,6 +9,7 @@ $additionalProperties = @{
     disallowAdditionalPropertiesIfNotPresent = "false"
     licenseId                                = "MIT" 
     apiName                                  = "TrinsicApi"
+    targetFramework                          = "net8.0"
        
 }
 & "$PSScriptRoot/../helpers/generate-client.ps1" -language "csharp" -outputFolder "$PSScriptRoot/sdk" -additionalProperties $additionalProperties
