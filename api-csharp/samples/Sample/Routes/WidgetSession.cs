@@ -17,7 +17,7 @@ public static class WidgetSession
             });
             if (!response.IsOk)
             {
-                throw new HttpRequestException(response.ReasonPhrase);
+                throw new HttpRequestException(response.RawContent);
             }
             await
                 context.Response.WriteAsJsonAsync(response.Ok());

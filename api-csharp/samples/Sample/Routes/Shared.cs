@@ -8,23 +8,24 @@ public static class Shared
     public static void MapSharedRoutes(this WebApplication app, ISessionsApi sessionApi, INetworkApi networkApi)
     {
         app.MapGet("/", context => Shared.ServeFile(context, "../../../ui-web/samples/dist/index.html"));
+        app.MapGet("/error-popup", context => Shared.ServeFile(context, "../../../ui-web/samples/dist/error-popup.html"));
         app.MapGet("/redirect", context => Shared.ServeFile(context, "../../../ui-web/samples/dist/redirect.html"));
 
         app.MapGet("/providers", async context =>   
         {
             var ipAddress = context.Request.Query["ipAddress"].ToString();
-            var result = await networkApi.RecommendProvidersAsync(new RecommendRequest()
+            var response = await networkApi.RecommendProvidersAsync(new RecommendRequest()
             {
                 RecommendationInfo = new RecommendationInfo()
                 {
                     IpAddresses = [ipAddress],
                 }
             });
-            if (!result.IsOk)
+            if (!response.IsOk)
             {
-                throw new HttpRequestException(result.ReasonPhrase);
+                throw new HttpRequestException(response.RawContent);
             }
-            await context.Response.WriteAsJsonAsync(result.Ok());
+            await context.Response.WriteAsJsonAsync(response.Ok());
         });
 
         app.MapPost("/exchange-result", async context =>
@@ -35,14 +36,14 @@ public static class Shared
                 var request = await context.Request.ReadFromJsonAsync<ExchangeResultRequest>();
 
                 // Call the method to exchange the results key
-                var result = await sessionApi.GetSessionResultAsync(request.SessionId, new GetSessionResultRequest(request.ResultsAccessKey));
+                var response = await sessionApi.GetSessionResultAsync(request.SessionId, new GetSessionResultRequest(request.ResultsAccessKey));
 
-                if (!result.IsOk)
+                if (!response.IsOk)
                 {
-                    throw new HttpRequestException(result.ReasonPhrase);
+                    throw new HttpRequestException(response.RawContent);
                 }
                 // Return the result as JSON
-                await context.Response.WriteAsJsonAsync(result.Ok());
+                await context.Response.WriteAsJsonAsync(response.Ok());
             }
             catch (Exception e)
             {

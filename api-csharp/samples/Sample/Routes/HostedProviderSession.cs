@@ -17,7 +17,7 @@ public static class HostedProviderSession
             var response = await sessionApi.CreateHostedProviderSessionAsync(request);
             if (!response.IsOk)
             {
-                throw new HttpRequestException(response.ReasonPhrase);
+                throw new HttpRequestException(response.RawContent);
             }
 
             var result = response.Ok();

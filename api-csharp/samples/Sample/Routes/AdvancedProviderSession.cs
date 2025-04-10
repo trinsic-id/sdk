@@ -17,15 +17,15 @@ public static class AdvancedProviderSession
         app.MapPost("/refresh-content/{sessionId}", async (HttpContext context, string sessionId) =>
         {
             var request = await context.Request.ReadFromJsonAsync<ResultsAccessKeyBody>();
-            var result = await sessionApi.RefreshStepContentAsync(Guid.Parse(sessionId), new RefreshStepContentRequest()
+            var response = await sessionApi.RefreshStepContentAsync(Guid.Parse(sessionId), new RefreshStepContentRequest()
             {
                 ResultsAccessKey = request.ResultsAccessKey
             });
-            if (!result.IsOk)
+            if (!response.IsOk)
             {
-                throw new HttpRequestException(result.ReasonPhrase);
+                throw new HttpRequestException(response.RawContent);
             }
-            await context.Response.WriteAsJsonAsync(result.Ok(), new JsonSerializerOptions()
+            await context.Response.WriteAsJsonAsync(response.Ok(), new JsonSerializerOptions()
             {
                 Converters = { new JsonStringEnumConverter() }
             });
@@ -47,7 +47,7 @@ public static class AdvancedProviderSession
                 var response = await sessionApi.CreateAdvancedProviderSessionAsync(request);
                 if (!response.IsOk)
                 {
-                    throw new HttpRequestException(response.ReasonPhrase);
+                    throw new HttpRequestException(response.RawContent);
                 }
 
                 var result = response.Ok();
@@ -79,7 +79,7 @@ public static class AdvancedProviderSession
                     new GetSessionResultRequest(request.ResultsAccessKey));
             if (!result.IsOk)
             {
-                throw new HttpRequestException(result.ReasonPhrase);
+                throw new HttpRequestException(result.RawContent);
             }
             await context.Response.WriteAsJsonAsync(result.Ok(), new JsonSerializerOptions()
             {
