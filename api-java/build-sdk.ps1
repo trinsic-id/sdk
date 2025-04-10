@@ -29,6 +29,10 @@ try {
     # Remove the auto-generated github action; our PAT doesn't let us push it and we don't need it
     Remove-Item -Path ".github/workflows/maven.yml" -Force
 
+    # Fetch the build.gradle file
+    $buildGradleFile = "build.gradle"
+    $buildGradleFileContent = Get-Content -Path $buildGradleFile
+
     # Convert content to an array for easier manipulation
     $gradleLines = $buildGradleFileContent -split "`n"
 
