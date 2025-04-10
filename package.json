@@ -4,6 +4,6 @@
   "version": "0.0.1",
   "license": "MIT",
   "dependencies": {
-    "@openapitools/openapi-generator-cli": "2.13.5"
+    "@openapitools/openapi-generator-cli": "2.18.4"
   }
 }
