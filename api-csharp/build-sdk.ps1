@@ -15,39 +15,76 @@ $additionalProperties = @{
 & "$PSScriptRoot/../helpers/generate-client.ps1" -language "csharp" -outputFolder "$PSScriptRoot/sdk" -additionalProperties $additionalProperties
 
 ## HOTFIX THE DATEONLY PARSER
-# Set the line to find (exact match)
-$targetLine = 'if (DateOnly.TryParseExact(value, format, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out DateOnly result))'
-# Set the replacement line
-$replacementLine = '                if (DateOnly.TryParseExact(value, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly result))'
+$targetLineDateOnly = 'if (DateOnly.TryParseExact(value, format, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out DateOnly result))'
+$replacementLineDateOnly = '                if (DateOnly.TryParseExact(value, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly result))'
+
+## HOTFIX ALL API INTERFACES TO BE PARTIAL
+$targetLineAttachmentsApi = 'public interface IAttachmentsApi : IApi'
+$replacementLineAttachmentsApi = '    public partial interface IAttachmentsApi : IApi'
+$targetLineSessionsApi = 'public interface ISessionsApi : IApi'
+$replacementLineSessionsApi = '    public partial interface ISessionsApi : IApi'
+$targetLineNetworkApi = 'public interface INetworkApi : IApi'
+$replacementLineNetworkApi = '    public partial interface INetworkApi : IApi'
+
+## HOTFIX TOKEN PROVIDER
+$targetLineProvider1 = 'services.AddSingleton(typeof(RateLimitProvider<>).MakeGenericType(tokenType));'
+$replacementLineProvider1 = '                    services.AddTransient(typeof(ConstantTokenProvider<>).MakeGenericType(tokenType));'
+$targetLineProvider2 = 'services.AddSingleton(typeof(TokenProvider<>).MakeGenericType(tokenType),'
+$replacementLineProvider2 = '                    services.AddTransient(typeof(TokenProvider<>).MakeGenericType(tokenType),'
+$targetLineProvider3 = 's => s.GetRequiredService(typeof(RateLimitProvider<>).MakeGenericType(tokenType)));'
+$replacementLineProvider3 = '                        s => s.GetRequiredService(typeof(ConstantTokenProvider<>).MakeGenericType(tokenType)));'
 
 # Normalize by removing ALL whitespace
 function NormalizeLine($line) {
     return ($line -replace '\s', '')
 }
 
-$normalizedTarget = NormalizeLine $targetLine
+# Apply a hotfix to all code files in a given directory (crude line-based replacement)
+function ApplyHotfix($targetLine, $replacementLine, $rootPath = "$PSScriptRoot/sdk", $filePattern = "*.cs") {
+    $normalizedTarget = NormalizeLine $targetLine
 
-Get-ChildItem -Path "$PSScriptRoot/sdk" -Recurse -Include *.cs | ForEach-Object {
-    $filePath = $_.FullName
-    $content = Get-Content $filePath
+    echo "Applying hotfix for $targetLine ($normalizedTarget) to $replacementLine in $rootPath"
 
-    $modified = $false
-    $newContent = $content | ForEach-Object {
-        $normalizedCurrent = NormalizeLine $_
-        if ($normalizedCurrent -eq $normalizedTarget) {
-            Write-Host "MATCH FOUND in $filePath`n$_"
-            $modified = $true
-            $replacementLine
-        } else {
-            $_
+    Get-ChildItem -Path $rootPath -Recurse -Include $filePattern | ForEach-Object {
+        $filePath = $_.FullName
+        $content = Get-Content $filePath
+
+        $modified = $false
+        $newContent = $content | ForEach-Object {
+            $normalizedLine = NormalizeLine($_)
+            if ($normalizedLine -eq $normalizedTarget) {
+                Write-Host "MATCH FOUND in $filePath`n$normalizedLine"
+                $modified = $true
+                $replacementLine
+            } else {
+                $_
+            }
+        }
+
+        if ($modified) {
+            Set-Content -Path $filePath -Value $newContent
+            Write-Host "Updated: $filePath"
         }
     }
-
-    if ($modified) {
-        Set-Content -Path $filePath -Value $newContent
-        Write-Host "Updated: $filePath"
-    }
 }
+
+ApplyHotfix $targetLineDateOnly $replacementLineDateOnly
+ApplyHotfix $targetLineAttachmentsApi $replacementLineAttachmentsApi
+ApplyHotfix $targetLineSessionsApi $replacementLineSessionsApi
+ApplyHotfix $targetLineNetworkApi $replacementLineNetworkApi
+ApplyHotfix $targetLineProvider1 $replacementLineProvider1
+ApplyHotfix $targetLineProvider2 $replacementLineProvider2
+ApplyHotfix $targetLineProvider3 $replacementLineProvider3
+
+# Next to this Powershell script is a sibling folder, `Additional`, which needs to get copied to ./sdk/src/Trinsic.Api/
+# such that we end up with a folder structure like this: ./sdk/src/Trinsic.Api/Additional/AttachmentsApiAdditional.cs
+$additionalFolder = "$PSScriptRoot/./Additional"
+echo "Copying $additionalFolder to $PSScriptRoot/sdk/src/Trinsic.Api/Additional"
+$destinationFolder = "$PSScriptRoot/sdk/src/Trinsic.Api/Additional"
+if (Test-Path $destinationFolder) {
+    Remove-Item -Path $destinationFolder -Recurse -Force
+}
+Copy-Item -Path $additionalFolder -Destination $destinationFolder -Recurse
 
 # Modify package to include a README.md
 $csprojPath = "$PSScriptRoot/sdk/src/Trinsic.Api/Trinsic.Api.csproj"
