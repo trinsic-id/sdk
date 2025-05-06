@@ -29,10 +29,9 @@ try {
     # Remove the auto-generated github action; our PAT doesn't let us push it and we don't need it
     Remove-Item -Path ".github/workflows/maven.yml" -Force
 
-    # OpenAPI generator doesn't generate archiveClassifier but we use gradle 8+ which requires it
+    # Fetch the build.gradle file
     $buildGradleFile = "build.gradle"
     $buildGradleFileContent = Get-Content -Path $buildGradleFile
-    $buildGradleFileContent = $buildGradleFileContent -replace "classifier =", "archiveClassifier="
 
     # Convert content to an array for easier manipulation
     $gradleLines = $buildGradleFileContent -split "`n"
