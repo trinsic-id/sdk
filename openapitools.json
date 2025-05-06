@@ -2,9 +2,9 @@
   "$schema": "./node_modules/@openapitools/openapi-generator-cli/config.schema.json",
   "spaces": 2,
   "generator-cli": {
-    "version": "7.13.0-20250409.104541-86",
+    "version": "7.13.0",
     "repository": {
-      "downloadUrl": "https://oss.sonatype.org/content/repositories/snapshots/org/openapitools/openapi-generator-cli/7.13.0-SNAPSHOT/openapi-generator-cli-7.13.0-20250409.104541-86.jar"
+      "downloadUrl": "https://github.com/trinsic-id/static-dependencies/releases/download/openapitools-7.13.0/openapi-generator-cli-7.13.0.jar"
     }
   }
 }
