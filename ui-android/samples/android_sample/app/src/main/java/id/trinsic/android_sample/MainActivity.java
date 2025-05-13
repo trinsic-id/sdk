@@ -15,9 +15,15 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
+    // The custom redirect scheme you've chosen to use.
+    // This is only used to construct the BACKEND_CREATE_SESSION_ENDPOINT url, which is a testing utility, not a core part of an integration.
+    private static String CUSTOM_REDIRECT_SCHEME = "trinsic-android-ui-sample-redirect-scheme";
+
     // Replace the below with a URL that, when called with a GET request, will return a session launch URL as the only text content of the response.
     // It will likely do so by using the Trinsic backend API SDK to create a session and return the launch URL.
-    private static String BACKEND_CREATE_SESSION_ENDPOINT = "https://api.trinsic.id/api/mobiletest/create-session";
+    // NOTE: The default value here points to a Trinsic-hosted mobile tester page, which provides simple functionality to easily test
+    // your integration *without* having to use Trinsic's actual backend API. This does not create actual Sessions in Trinsic's platform.
+    private static String BACKEND_CREATE_SESSION_ENDPOINT = "https://api.trinsic.id/api/mobiletest/create-session?redirectScheme=" + CUSTOM_REDIRECT_SCHEME;
 
     private ActivityMainBinding binding;
     private TrinsicUI trinsicUI;
@@ -26,9 +32,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Misc. setup, unrelated to Trinsic SDK
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        // Set up Trinsic SDK, specifying a callback which will be called when a launched Session is resolved.
+        // This does not launch a Session; it only prepares the SDK to launch one.
+        // NOTE: This registers an activity callback listener, so it *must always* be called by this method.
+        // Do not conditionally call this.
         trinsicUI = new TrinsicUI(this, (result) -> {
             if (result.getCanceled()) {
                 // This happens if the user closed the Android Custom Tabs activity by hitting the "X" button or by hitting Back
@@ -42,13 +53,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // On button press, fetch a Session URL, and then invoke the Trinsic SDK with it
         binding.buttonLaunch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Log.d("OnClick", "Invoking Trinsic client");
-                String launchUrl;
+
                 try {
-                    launchUrl = createLaunchUrl();
+                    // Fetch a session URL
+                    String launchUrl = createLaunchUrl();
+
+                    // Launch the Session with the Trinsic SDK.
+                    // When the Session is completed (successfully or unsuccessfully), your app
+                    // will be notified via the callback you specified when constructing a new TrinsicUI() above.
                     trinsicUI.LaunchSession(MainActivity.this, launchUrl);
                 } catch (Exception e) {
                     Toast.makeText(MainActivity.this, "Failed to create launch URL: " + e.getMessage(), Toast.LENGTH_LONG);
@@ -59,7 +76,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String createLaunchUrl() throws Exception {
-        // Horrible hack to allow us to do networking on the UI thread since this is a simple sample
+        // Create a maximally-permissive Thread Policy, as we are using an inefficient / unrecommended method
+        // of making an HTTP request.
+        // In a real app, this request should be done using a proper HTTP request flow,
+        // and you should not create a thread policy as we are here.
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 

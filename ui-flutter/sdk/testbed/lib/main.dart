@@ -6,14 +6,15 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:trinsic_flutter_ui/trinsic_flutter_ui.dart';
 
-// Replace the below with a URL that, when called with a GET request, will return a session launch URL as the only text content of the response.
-// It will likely do so by using the Trinsic backend API SDK to create a session and return the launch URL.
-const String backendCreateSessionEndpoint =
-    'https://api.trinsic.id/api/mobiletest/create-session';
-
 // Replace the below with the custom scheme that you've properly registered in your app's AndroidManifest.xml
 const String callbackRedirectUrlScheme =
     "trinsic-flutter-ui-testbed-redirect-scheme";
+
+// Replace the below with a URL that, when called with a GET request, will return a session launch URL as the only text content of the response.
+// It will likely do so by using the Trinsic backend API SDK to create a session and return the launch URL.
+const String backendCreateSessionEndpoint =
+    'https://api.trinsic.id/api/mobiletest/create-session?redirectScheme=$callbackRedirectUrlScheme';
+
 
 //----------- No need to modify anything below here -----------
 void main() {
