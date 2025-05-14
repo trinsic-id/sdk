@@ -10,6 +10,13 @@ export interface TrinsicSessionResult {
 
 let isMicroModalInitialized = false;
 
+/**
+ * Launches an iFrame for the Trinsic Widget UI that waits for the user to complete their verification.
+ * @param launchUrl - The launch url retrieved from the Trinsic API.
+ * @returns A promise that resolves with the result of the session.
+ * @example
+ * const sessionResult = await launchIframe('https://');
+ */
 export async function launchIframe(
   launchUrl: string
 ): Promise<TrinsicSessionResult> {
@@ -52,11 +59,25 @@ export async function launchIframe(
   });
 }
 
+/**
+ * Launches the user through a redirect towards any of the Trinsic launch URLs (applies to Widget, Hosted and Advanced Sessions).
+ * @param launchUrl - The launch url retrieved from the Trinsic API.
+ * @returns The method does not return a value, but redirects the user to the specified URL.
+ * @example
+ * await launchRedirect('https://');
+ */
 export async function launchRedirect(launchUrl: string) {
   launchUrl += "&launchMode=redirect";
   window.location.href = launchUrl;
 }
 
+/**
+ * Launches the user through a popup towards any of the Trinsic launch URLs (applies to Widget, Hosted and Advanced Sessions).
+ * @param getLaunchUrl - A promise you give us where you retrieve the launch from your backend. This is a promise because of browser restrictions in Safari where popups need to be created, opened and directed to the final domain in the same event loop.
+ * @returns A promise that resolves with the result of the session.
+ * @example
+ * const sessionResult = await launchPopup(() => return await fetch('https://my-backend/create-session').then(res => res.json()));
+ */
 export async function launchPopup(
   getLaunchUrl: () => Promise<string>
 ): Promise<TrinsicSessionResult> {
