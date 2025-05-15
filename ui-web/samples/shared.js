@@ -22,9 +22,9 @@ export function catchErrorAlert(error) {
 }
 export async function jsonHandleError(response) {
     if (!response.ok) {
-        console.warn("Request failed, parsing to an alert", response);       
+        console.warn("Request failed: parsing to an alert", response);       
 
-        let alertText = "Request failed, check the logs on the backend for more information.\nUrl: " + response.url;        
+        let alertText = "Request failed: check the logs on the backend for more information.\nUrl: " + response.url;        
 
         // Show error message after short timeout to not delay the popup closing
         setTimeout(() => {
