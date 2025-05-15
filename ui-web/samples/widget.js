@@ -1,6 +1,6 @@
 import { launchIframe, launchRedirect, launchPopup } from "@trinsic/web-ui";
 import MicroModal from "micromodal";
-import { jsonHandleError } from "./shared";
+import { jsonHandleError, catchErrorAlert } from "./shared";
 MicroModal.init();
 
 window.launchWidget = launchWidget;
