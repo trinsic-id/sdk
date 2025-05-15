@@ -1,6 +1,9 @@
 import SwiftUI
 import TrinsicUI
 
+let sampleCallbackUrlScheme = "trinsic-ui-macos"
+let startUrl =  "https://api.trinsic.id/api/mobiletest/create-session?redirectScheme=\(sampleCallbackUrlScheme)"
+
 struct ContentView: View {
     @State private var isButtonEnabled = false
     @State private var redirectedURL: URL?
@@ -8,9 +11,6 @@ struct ContentView: View {
     let trinsicUI = TrinsicUI()
     // Or a customized one that you can provide yourself
     //let trinsicUI = TrinsicUI(presentationContextProvider: CustomContextProvider.init())
-
-    let callbackUrlScheme = "trinsic-ui-macos"
-    let startUrl =  "https://api.trinsic.id/api/mobiletest/create-session?redirectScheme=\(callbackUrlScheme)"
 
     var body: some View {
         VStack {
@@ -48,7 +48,7 @@ struct ContentView: View {
                 
                 print("Button clicked, opening: \(url)")
                 
-                let result = try await trinsicUI.launchSession(launchUrl: url.absoluteString, callbackUrlScheme: callbackUrlScheme)
+                let result = try await trinsicUI.launchSession(launchUrl: url.absoluteString, callbackUrlScheme: sampleCallbackUrlScheme)
                 print("Success \(result.success)")
                 print("Canceled \(result.canceled)")
                 print("Session id \(String(describing: result.sessionId))")
