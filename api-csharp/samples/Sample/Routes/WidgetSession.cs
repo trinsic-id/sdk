@@ -15,10 +15,7 @@ public static class WidgetSession
             {
                 RedirectUrl = redirectUrl
             });
-            if (!response.IsOk)
-            {
-                throw new HttpRequestException(response.RawContent);
-            }
+            response.LogAndThrowIfError(app.Logger);
             await
                 context.Response.WriteAsJsonAsync(response.Ok());
         });

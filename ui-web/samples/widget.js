@@ -1,5 +1,6 @@
 import { launchIframe, launchRedirect, launchPopup } from "@trinsic/web-ui";
 import MicroModal from "micromodal";
+import { jsonHandleError } from "./shared";
 MicroModal.init();
 
 window.launchWidget = launchWidget;
@@ -11,7 +12,7 @@ async function launchWidget() {
 
 async function createSession(withRedirect) {
     let url = '/create-session';
-    if(withRedirect){
+    if (withRedirect) {
         url += '?redirectUrl=' + window.location.origin + '/redirect';
     }
     const launchUrl = await fetch(url, {
@@ -20,7 +21,7 @@ async function createSession(withRedirect) {
             "Content-Type": "application/json",
         }
     })
-        .then((response) => response.json())
+        .then(r => jsonHandleError(r))
         .then((r) => r.launchUrl);
     return launchUrl;
 }
@@ -31,19 +32,22 @@ async function launch(launchMode) {
         case 'popup':
             result = await launchPopup(async () => {
                 return await createSession();
-            });
-            await exchangeResult(result);
+            }).catch(e => catchErrorAlert(e));
             break;
         case 'iframe':
             const launchUrl = await createSession();
-            result = await launchIframe(launchUrl);
+            result = await launchIframe(launchUrl).catch(e => catchErrorAlert(e));
             await exchangeResult(result);
             break;
         case 'redirect':
             const redirectLaunchUrl = await createSession(true);
-            await launchRedirect(redirectLaunchUrl);
+            await launchRedirect(redirectLaunchUrl).catch(e => catchErrorAlert(e));
             break;
         default:
             console.error("Invalid launch mode:", launchMode);
+            return;
+    }
+    if (result !== undefined) {
+        await exchangeResult(result);
     }
 }

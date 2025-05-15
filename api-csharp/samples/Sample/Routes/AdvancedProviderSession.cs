@@ -19,12 +19,9 @@ public static class AdvancedProviderSession
             var request = await context.Request.ReadFromJsonAsync<ResultsAccessKeyBody>();
             var response = await sessionApi.RefreshStepContentAsync(Guid.Parse(sessionId), new RefreshStepContentRequest()
             {
-                ResultsAccessKey = request.ResultsAccessKey
+                ResultsAccessKey = request.ResultsAccessKey 
             });
-            if (!response.IsOk)
-            {
-                throw new HttpRequestException(response.RawContent);
-            }
+            response.LogAndThrowIfError(app.Logger);
             await context.Response.WriteAsJsonAsync(response.Ok(), new JsonSerializerOptions()
             {
                 Converters = { new JsonStringEnumConverter() }
@@ -41,47 +38,31 @@ public static class AdvancedProviderSession
             var request =
                 new CreateAdvancedProviderSessionRequest(capabilities, providerId,fallbackToTrinsicUI,  null,
                     redirectUrl);
+            var response = await sessionApi.CreateAdvancedProviderSessionAsync(request);
+            response.LogAndThrowIfError(app.Logger);
 
-            try
+            var result = response.Ok();
+            if (result.NextStep.Method == IntegrationLaunchMethod.LaunchBrowser)
             {
-                var response = await sessionApi.CreateAdvancedProviderSessionAsync(request);
-                if (!response.IsOk)
-                {
-                    throw new HttpRequestException(response.RawContent);
-                }
-
-                var result = response.Ok();
-                if (result.NextStep.Method == IntegrationLaunchMethod.LaunchBrowser)
-                {
-                    context.Response.Redirect(result.NextStep.Content);
-                }
-                else
-                {
-                    var shouldRefresh = result.NextStep.Refresh != null;
-                    var refreshAfter = shouldRefresh ? result.NextStep.Refresh.RefreshAfter : DateTimeOffset.MaxValue;
-                    context.Response.Redirect(
-                        $"/advanced-popup?sessionId={result.SessionId}&resultsAccessKey={result.ResultCollection.ResultsAccessKey}&nextStep={result.NextStep.Method}&content={System.Web.HttpUtility.UrlEncode(result.NextStep.Content)}&shouldRefresh={shouldRefresh.ToString().ToLowerInvariant()}&refreshAfter={System.Web.HttpUtility.UrlEncode(refreshAfter.ToString("O"))}");
-                }
+                context.Response.Redirect(result.NextStep.Content);
             }
-            catch (ApiException exception)
+            else
             {
-                var content = (string)exception.RawContent;
+                var shouldRefresh = result.NextStep.Refresh != null;
+                var refreshAfter = result.NextStep.Refresh?.RefreshAfter  ?? DateTimeOffset.MaxValue;
                 context.Response.Redirect(
-                    $"/advanced-popup?error={System.Web.HttpUtility.UrlEncode(content)}");
+                    $"/advanced-popup?sessionId={result.SessionId}&resultsAccessKey={result.ResultCollection.ResultsAccessKey}&nextStep={result.NextStep.Method}&content={System.Web.HttpUtility.UrlEncode(result.NextStep.Content)}&shouldRefresh={shouldRefresh.ToString().ToLowerInvariant()}&refreshAfter={System.Web.HttpUtility.UrlEncode(refreshAfter.ToString("O"))}");
             }
         });
 
         app.MapPost("/poll-results/{sessionId}", async (HttpContext context, string sessionId) =>
         {
             var request = await context.Request.ReadFromJsonAsync<ResultsAccessKeyBody>();
-            var result =
+            var response =
                 await sessionApi.GetSessionResultAsync(sessionId,
                     new GetSessionResultRequest(request.ResultsAccessKey));
-            if (!result.IsOk)
-            {
-                throw new HttpRequestException(result.RawContent);
-            }
-            await context.Response.WriteAsJsonAsync(result.Ok(), new JsonSerializerOptions()
+            response.LogAndThrowIfError(app.Logger);
+            await context.Response.WriteAsJsonAsync(response.Ok(), new JsonSerializerOptions()
             {
                 Converters = { new JsonStringEnumConverter() },
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
