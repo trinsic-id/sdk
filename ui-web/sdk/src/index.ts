@@ -77,9 +77,26 @@ export async function launchPopup(
     throw new Error("Failed to open popup window");
   }
 
-  let launchUrl = await getLaunchUrl();
-  if (!launchUrl) {
-    throw new Error("Invalid launch URL " + launchUrl);
+  // Safely retrieve a launch url and close the popup on failure.
+  let launchUrl = "";
+  try {
+    launchUrl = await getLaunchUrl();
+    if(!launchUrl) {
+      throw new Error("Launch URL is empty");
+    }
+    if(!launchUrl.startsWith("https://")){
+      throw new Error("Launch URL must start with https://");
+    }
+  }
+  catch(error) {
+    console.error("Error getting launch URL", error);
+    try {
+      popup.close();
+    }
+    catch(error) {
+      console.error("Error closing popup", error);
+    }
+    throw new Error("Failed to get launch URL");
   }
 
   launchUrl += "&launchMode=popup";
