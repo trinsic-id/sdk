@@ -14,7 +14,7 @@
     "vite": "5.4.1"
   },
   "dependencies": {
-    "@trinsic/web-ui": "2.1.0",
+    "@trinsic/web-ui": "2.1.2",
     "micromodal": "^0.4.10",
     "qrcode": "^1.5.4"
   },
