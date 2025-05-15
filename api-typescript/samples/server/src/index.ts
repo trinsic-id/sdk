@@ -9,6 +9,8 @@ import { hostedRoutes } from "./hosted";
 import path from "path";
 import express from "express";
 import { advancedRoutes } from "./advanced";
+import 'express-async-errors';
+import { handleErrors } from "./handleErrors";
 
 const app = express();
 const PORT = 3000;
@@ -22,6 +24,7 @@ const networkApi = new NetworkApi(newConfiguration);
 
 app.use(express.json());
 
+
 sharedRoutes(app, networkApi, sessionsApi)
 widgetRoutes(app, sessionsApi);
 hostedRoutes(app, sessionsApi);
@@ -33,6 +36,7 @@ app.use(
   express.static(path.join("../../../ui-web/samples/dist/assets"))
 );
 
+handleErrors(app);
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}/`);

@@ -1,4 +1,4 @@
-import { CreateWidgetSessionRequest, SessionsApi } from "@trinsic/api";
+import { SessionsApi } from "@trinsic/api";
 import path from "path";
 import {Express} from "express"
 
@@ -10,16 +10,9 @@ export function widgetRoutes(app: Express, sessionsApi: SessionsApi) {
     });
 
     app.post("/create-session", async (req: any, res: any) => {
-        try {
-          const redirectUrl = req.query.redirectUrl;
-          const result = await sessionsApi.createWidgetSession({redirectUrl: redirectUrl});
-          console.debug("Created session", result);
-          res.send(result);
-        } catch (e: any) {
-          console.error(e);
-          const body = await e.response.text();
-          console.log(body);
-          throw e;
-        }
+        const redirectUrl = req.query.redirectUrl;
+        const result = await sessionsApi.createWidgetSession({redirectUrl: redirectUrl});
+        console.debug("Created session", result);
+        res.send(result);
       });
 }

@@ -22,16 +22,10 @@ export function sharedRoutes(app: Express, networkApi: NetworkApi, sessionsApi: 
     });
 
     app.post("/exchange-result", async (req: any, res: any) => {
-        try {
-          const result = await sessionsApi.getSessionResult(req.body.sessionId, {
-            resultsAccessKey: req.body.resultsAccessKey,
-          });
-          res.send(result);
-        } catch (e: any) {
-          console.error(e);
-          const body = await e.response.text();
-          console.log(body);
-        }
+        const result = await sessionsApi.getSessionResult(req.body.sessionId, {
+          resultsAccessKey: req.body.resultsAccessKey,
+        });
+        res.send(result);
       });
 }
 

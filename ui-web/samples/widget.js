@@ -14,15 +14,19 @@ async function createSession(withRedirect) {
     if(withRedirect){
         url += '?redirectUrl=' + window.location.origin + '/redirect';
     }
-    const launchUrl = await fetch(url, {
+    const launchUrlResponse = await fetch(url, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         }
     })
-        .then((response) => response.json())
-        .then((r) => r.launchUrl);
-    return launchUrl;
+        .then((response) => response.json());
+
+    if(launchUrlResponse.launchUrl === undefined){
+        alert("Error creating session: " + JSON.stringify(launchUrlResponse, null, 2));
+        throw new Error("Error creating session: " + JSON.stringify(launchUrlResponse, null, 2));
+    }
+    return launchUrlResponse.launchUrl;
 }
 
 async function launch(launchMode) {

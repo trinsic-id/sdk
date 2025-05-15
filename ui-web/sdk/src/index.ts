@@ -77,9 +77,14 @@ export async function launchPopup(
     throw new Error("Failed to open popup window");
   }
 
-  let launchUrl = await getLaunchUrl();
-  if (!launchUrl) {
-    throw new Error("Invalid launch URL " + launchUrl);
+  let launchUrl = "";
+  try {
+    launchUrl = await getLaunchUrl();
+  }
+  catch(error) {
+    console.error("Error getting launch URL", error);
+    popup.close();
+    throw new Error("Failed to get launch URL");
   }
 
   launchUrl += "&launchMode=popup";

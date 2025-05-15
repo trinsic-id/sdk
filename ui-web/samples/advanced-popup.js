@@ -29,32 +29,42 @@ async function startResultsPolling(sessionId, resultsAccessKey) {
   let result = null;
   let resultUrl = `/poll-results/${sessionId}`;
   let resultPollingInterval = setInterval(async () => {
-    result = await fetch(resultUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        resultsAccessKey: resultsAccessKey
-      })
-    })
-      .then((response) => response.json())
-      .then((r) => r);
-    document.getElementById("done").innerText = result.session.done;
-    document.getElementById("success").innerText = result.session.success;
-    document.getElementById("error-code").innerText = result.session.errorCode || "N/A";
-
-    if (result.session.done === true) {
-      clearInterval(resultPollingInterval);
-      const data = {
-        success: result.session.success,
-        resultsAccessKey: resultsAccessKey,
-        sessionId: sessionId,
-      };
-
-      console.debug("Sending message to opener", data, window.opener);
-      window.opener?.postMessage(data, "*");
+    try {
+      var response = await fetch(resultUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          resultsAccessKey: resultsAccessKey
+        })
+      });
+      result = await response.json();
+      if(!response.ok){
+        throw new Error(JSON.stringify(result));
+      }
+        
+      document.getElementById("done").innerText = result.session.done;
+      document.getElementById("success").innerText = result.session.success;
+      document.getElementById("error-code").innerText = result.session.errorCode || "N/A";
+  
+      if (result.session.done === true) {
+        clearInterval(resultPollingInterval);
+        const data = {
+          success: result.session.success,
+          resultsAccessKey: resultsAccessKey,
+          sessionId: sessionId,
+        };
+  
+        console.debug("Sending message to opener", data, window.opener);
+        window.opener?.postMessage(data, "*");
+      }
     }
+    catch(error){ 
+      console.error("Error polling results: ", error);
+      alert("Error polling results: " + error);
+    }
+    
   }, 2000);
 }
 
@@ -105,19 +115,30 @@ async function startRefreshing(sessionId, nextStep, resultsAccessKey, refreshAft
 
   console.log("Refreshing in ", timeout);
   setTimeout(async () => {
-    console.log("Refreshing");
-    const result = await fetch("refresh-content/" + sessionId, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        resultsAccessKey: resultsAccessKey
-      })
-    }).then(r => r.json());
-    handleNextStep(result.nextStep.method, result.nextStep.content);
-    document.getElementById("content-refresh").innerText = "Yes, refreshing at " + result.nextStep.refresh.refreshAfter;
-    startRefreshing(sessionId, result.nextStep.method, resultsAccessKey, result.nextStep.refresh.refreshAfter);
+    try {
+      console.log("Refreshing");
+      const response = await fetch("refresh-content/" + sessionId, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          resultsAccessKey: resultsAccessKey
+        })
+      });
+      const result = await response.json();
+      if(!response.ok){
+        throw new Error(JSON.stringify(result));
+      }
+      handleNextStep(result.nextStep.method, result.nextStep.content);
+      document.getElementById("content-refresh").innerText = "Yes, refreshing at " + result.nextStep.refresh.refreshAfter;
+      startRefreshing(sessionId, result.nextStep.method, resultsAccessKey, result.nextStep.refresh.refreshAfter);
+    }
+    catch(error){
+      console.error("Error refreshing content, cancelling refreshing: ", error);
+      alert("Error refreshing content, cancelling refreshing: " + error);
+    }
+    
   }, timeout);
 }
 

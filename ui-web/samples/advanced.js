@@ -13,7 +13,7 @@ async function launchAdvancedProvider(providerId) {
   postUrl += `&capabilities=${capabilities.join(',')}`;
 
   const result = await launchPopup(() => postUrl + '&redirectUrl=' + window.location.origin + '/redirect');
-    await exchangeResult(result);
+  await exchangeResult(result);
 }
 
 

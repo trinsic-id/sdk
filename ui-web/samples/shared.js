@@ -29,14 +29,19 @@ async function exchangeResult(response) {
 
 async function getProviders(launchMethod) {
     const ip = await window.ipAddress();
-    const providers = await fetch(`/providers?ipAddress=${ip}`, {
+    let providers;
+    const response = await fetch(`/providers?ipAddress=${ip}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
         },
 
-    })
-        .then((response) => response.json());
+    });
+    providers = await response.json();
+    if (!response.ok) {
+        alert("Error fetching providers: " + JSON.stringify(providers, null, 2));
+        return;
+    }
     
     for (let i = 0; i < providers.recognized.length; i++) {
 

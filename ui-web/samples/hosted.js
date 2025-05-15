@@ -24,7 +24,7 @@ async function launch(launchUrl, launchMode) {
       break;
     case 'redirect':
       //Result is exchanged through the redirect capture, see redirect.html
-      await launchRedirect(launchUrl, window.location.origin + '/redirect');
+      await launchRedirect(launchUrl + "&redirectUrl="+window.location.origin + '/redirect');
       break;
   }
 }
