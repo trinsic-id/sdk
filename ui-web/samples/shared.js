@@ -2,13 +2,38 @@ window.exchangeResult = exchangeResult;
 window.getProviders = getProviders;
 window.ipAddress = async () => {
     try {
-        const response = await fetch("https://ipwhois.app/json/");
-        const data = await response.json();
+        const data = await fetch("https://ipwhois.app/json/").then(r => jsonHandleError(r));
         const ip = data?.ip ?? null;
         return ip;
-      } catch (error) {
+    } catch (error) {
         console.error("Failed to fetch country code:", error);
-      }
+        return null;
+    }
+}
+export function catchErrorAlert(error) {
+    console.error("Error:", error);
+    const errorMessage = error?.message || "An unknown error occurred.";
+    const errorDetails = error?.details || "No additional details available.";
+    // Show error message after short timeout to not delay the popup closing
+    setTimeout(() => {
+        alert(`Error: ${errorMessage}\nDetails: ${errorDetails}`);
+    }, 150);
+    
+}
+export async function jsonHandleError(response) {
+    if (!response.ok) {
+        console.warn("Request failed: parsing to an alert", response);       
+
+        let alertText = "Request failed: check the logs on the backend for more information.\nUrl: " + response.url;        
+
+        // Show error message after short timeout to not delay the popup closing
+        setTimeout(() => {
+            alert(alertText);
+        }, 150);
+        throw new Error(alertText);
+    }
+    const data = await response.json();
+    return data;
 }
 async function exchangeResult(response) {
     console.debug("Exchanging result, response:", response);
@@ -22,22 +47,26 @@ async function exchangeResult(response) {
             resultsAccessKey: response.resultsAccessKey,
         }),
     })
-        .then((response) => response.json());
+        .then(r => jsonHandleError(r))
     document.getElementById("results").innerText = JSON.stringify(result, null, 2);
     MicroModal.show('results-modal');
 }
 
 async function getProviders(launchMethod) {
     const ip = await window.ipAddress();
-    const providers = await fetch(`/providers?ipAddress=${ip}`, {
+    let url = "/providers";
+    if (ip) {
+        url += `?ipAddress=${ip}`;
+    }
+    const providers = await fetch(url, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
         },
 
     })
-        .then((response) => response.json());
-    
+        .then(r => jsonHandleError(r));
+
     for (let i = 0; i < providers.recognized.length; i++) {
 
         document.getElementById(

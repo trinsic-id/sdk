@@ -1,5 +1,6 @@
 import QRCode from 'qrcode'
 import MicroModal from "micromodal";
+import { jsonHandleError } from './shared';
 MicroModal.init();
 
 window.exchangeResult = exchangeResult;
@@ -38,7 +39,7 @@ async function startResultsPolling(sessionId, resultsAccessKey) {
         resultsAccessKey: resultsAccessKey
       })
     })
-      .then((response) => response.json())
+    .then(r => jsonHandleError(r))
       .then((r) => r);
     document.getElementById("done").innerText = result.session.done;
     document.getElementById("success").innerText = result.session.success;
@@ -114,7 +115,7 @@ async function startRefreshing(sessionId, nextStep, resultsAccessKey, refreshAft
       body: JSON.stringify({
         resultsAccessKey: resultsAccessKey
       })
-    }).then(r => r.json());
+    }).then(r => jsonHandleError(r));
     handleNextStep(result.nextStep.method, result.nextStep.content);
     document.getElementById("content-refresh").innerText = "Yes, refreshing at " + result.nextStep.refresh.refreshAfter;
     startRefreshing(sessionId, result.nextStep.method, resultsAccessKey, result.nextStep.refresh.refreshAfter);
