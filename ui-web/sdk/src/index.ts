@@ -84,19 +84,15 @@ export async function launchPopup(
     if(!launchUrl) {
       throw new Error("Launch URL is empty");
     }
-    if(!launchUrl.startsWith("https://")){
-      throw new Error("Launch URL must start with https://");
-    }
   }
   catch(error) {
-    console.error("Error getting launch URL", error);
     try {
       popup.close();
     }
     catch(error) {
-      console.error("Error closing popup", error);
+      console.debug("Error closing popup", error);
     }
-    throw new Error("Failed to get launch URL");
+    throw error;
   }
 
   launchUrl += "&launchMode=popup";
@@ -188,7 +184,7 @@ function hideModal() {
   try {
     MicroModal.close("trinsic-ui");
   } catch (err) {
-    console.error("Error closing modal:", err);
+    console.debug("Error closing modal:", err);
   }
 
   document.body.classList.remove("lock-bg");
