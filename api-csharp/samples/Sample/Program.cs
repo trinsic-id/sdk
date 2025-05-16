@@ -10,7 +10,7 @@ DotNetEnv.Env.Load();
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
-    serverOptions.ListenAnyIP(3005); // Listens on http://localhost:3005
+    serverOptions.ListenAnyIP(3000);
 });
 builder.Services.AddTrinsicApi(options =>
 {
