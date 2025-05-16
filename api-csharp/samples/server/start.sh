@@ -8,10 +8,10 @@ if [ -z "$TRINSIC_ACCESS_TOKEN" ]; then
 fi
 
 echo "Build UI sample..."
-cd ../../ui-web/samples
+cd ../../../ui-web/samples
 npm install
 npm run build
 
 echo "Starting C# API sample..."
-cd ../../api-csharp/samples
+cd ../../api-csharp/samples/server
 dotnet run --project ./Sample/Sample.csproj
