@@ -31,7 +31,6 @@ func main() {
 				code = e.Code
 			}
 
-			// Optionally: unwrap custom errors from Trinsic SDK
 
 			return c.Status(code).JSON(fiber.Map{
 				"message": "Request failed: check logs for details.",
