@@ -1,9 +1,8 @@
 from fastapi import Request, APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from trinsic_api.api.sessions_api import SessionsApi, CreateAdvancedProviderSessionRequest, GetSessionResultRequest, RefreshStepContentRequest
-from trinsic_api.exceptions import BadRequestException
 
-from urllib.parse import urlencode, quote_plus
+from urllib.parse import urlencode
 from datetime import datetime, timezone
 from fastapi.responses import RedirectResponse
 import json
@@ -26,34 +25,29 @@ async def launch(request: Request, provider_id: str, sessions_api: SessionsApi =
     
     request = CreateAdvancedProviderSessionRequest(redirect_url = request.query_params.get("redirectUrl"), provider=provider_id, fallback_to_hosted_ui = fallbackToTrinsicUI, capabilities = request.query_params.get("capabilities").split(","))
 
-    try:
-        result = sessions_api.create_advanced_provider_session(create_advanced_provider_session_request=request)
-        if result.next_step.method == 'LaunchBrowser':
-            return RedirectResponse(result.next_step.content)
-        else:
-            should_refresh = result.next_step.refresh is not None
-            refresh_after = (
-                result.next_step.refresh.refresh_after.isoformat()
-                if should_refresh else
-                datetime.now(timezone.utc).isoformat()
-            )
+    result = sessions_api.create_advanced_provider_session(create_advanced_provider_session_request=request)
+    if result.next_step.method == 'LaunchBrowser':
+        return RedirectResponse(result.next_step.content)
+    else:
+        should_refresh = result.next_step.refresh is not None
+        refresh_after = (
+            result.next_step.refresh.refresh_after.isoformat()
+            if should_refresh else
+            datetime.now(timezone.utc).isoformat()
+        )
 
-            print()
+        print()
 
-            query_params = {
-                "sessionId": result.session_id,
-                "resultsAccessKey": result.result_collection.results_access_key,
-                "nextStep": result.next_step.method.value,
-                "content": result.next_step.content,
-                "shouldRefresh": str(should_refresh).lower(),
-                "refreshAfter": refresh_after
-            }
+        query_params = {
+            "sessionId": result.session_id,
+            "resultsAccessKey": result.result_collection.results_access_key,
+            "nextStep": result.next_step.method.value,
+            "content": result.next_step.content,
+            "shouldRefresh": str(should_refresh).lower(),
+            "refreshAfter": refresh_after
+        }
 
-            return RedirectResponse(f"/advanced-popup?{urlencode(query_params)}")
-    except BadRequestException as e:
-
-        error_content = str(e.body)
-        return RedirectResponse(f"/advanced-popup?error={quote_plus(error_content)}")
+        return RedirectResponse(f"/advanced-popup?{urlencode(query_params)}")
 
 def json_serial(obj):
     """JSON serializer for objects not serializable by default."""
