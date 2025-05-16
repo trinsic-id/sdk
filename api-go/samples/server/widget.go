@@ -22,10 +22,7 @@ func WidgetRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 		data, _, err := req.Execute()
 
 		if err != nil {
-			print(err.Error())
-			return c.Status(500).JSON(fiber.Map{
-				"error": err.Error(),
-			})
+			return err
 		}
 
 		return c.JSON(data)

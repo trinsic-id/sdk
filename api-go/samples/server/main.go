@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 
 	"github.com/gofiber/fiber/v2"
@@ -17,7 +18,28 @@ func main() {
 	config.Debug = true
 	api = trinsic_api.NewAPIClient(config)
 
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		ErrorHandler: func(c *fiber.Ctx, err error) error {
+			// Log error to console
+			log.Printf("[Error] %v\n", err)
+
+			// Default to 500 if not set
+			code := fiber.StatusInternalServerError
+
+			// If it's a fiber.*Error, use its Code
+			if e, ok := err.(*fiber.Error); ok {
+				code = e.Code
+			}
+
+			// Optionally: unwrap custom errors from Trinsic SDK
+			// if it's something like Trinsic.ApiException, parse its fields here
+
+			return c.Status(code).JSON(fiber.Map{
+				"message": "Request failed: check logs for details.",
+				"error":   err.Error(),
+			})
+		},
+	})
 
 	SharedRoutes(app, api)
 	WidgetRoutes(app, api)

@@ -28,9 +28,7 @@ func SharedRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 		data, _, err := req.Execute()
 
 		if err != nil {
-			return c.Status(500).JSON(fiber.Map{
-				"error": err.Error(),
-			})
+			return err
 		}
 
 		return c.JSON(data)
@@ -57,9 +55,7 @@ func SharedRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 		data, _, err := api.SessionsAPI.GetSessionResult(c.Context(), req.SessionId).GetSessionResultRequest(request).Execute()
 
 		if err != nil {
-			return c.Status(500).JSON(fiber.Map{
-				"error": err.Error(),
-			})
+			return err
 		}
 
 		return c.JSON(data)
