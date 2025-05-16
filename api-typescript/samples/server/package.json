@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "prestart": "cd ../../../ui-web/samples && npm ci && npm run build && cd ../../api-typescript/samples",
-    "start": "ts-node-dev --respawn --transpile-only --env-file=.env -- src/index.ts",
+    "start": "ts-node-dev --respawn --transpile-only -- src/index.ts",
     "build": "tsc"
   },
   "author": "",
@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@trinsic/api": "2.0.0",
+    "dotenv": "^16.5.0",
     "express": "4.21.2",
     "express-async-errors": "3.1.1"
   }
