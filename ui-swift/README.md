@@ -72,7 +72,7 @@ You can retrieve the launch url from a trusted backend that can reach out to the
 
 ```swift
 let trinsicUI = TrinsicUI()
-let result = try await trinsicUI.launchSession(launchUrl: "[REPLACE_ME]", callbackURL: "[REPLACE_ME]")
+let result = try await trinsicUI.launchSession(launchUrl: "[REPLACE_ME]", callbackUrlScheme: "[REPLACE_ME]")
 ```
 
 ## SDK Versioning
