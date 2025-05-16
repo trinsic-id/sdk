@@ -1,21 +1,24 @@
-import { Image, StyleSheet, Platform, Button } from "react-native";
+import { Image, StyleSheet, Button } from "react-native";
 import { HelloWave } from "@/components/HelloWave";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useState } from "react";
+import * as Linking from "expo-linking";
 import { launchSession, LaunchSessionResult } from "../../library";
 const SESSION_CREATE_URL = "https://api.trinsic.id/api/mobiletest/create-session";
 
 export default function HomeScreen() {
   const [result, setResult] = useState<LaunchSessionResult | null>();
   const handleButtonPress = async () => {
-    const getSessionUrlResult = await fetch(SESSION_CREATE_URL);
+    const callbackPath = "/";
+    const url = Linking.createURL(callbackPath);
+    const fetchUrl = SESSION_CREATE_URL + "?redirectUrl=" +encodeURIComponent(url);
+    console.log("Creating session at fake API endpoint: ", fetchUrl);
+    const getSessionUrlResult = await fetch(fetchUrl);
     const launchUrl = await getSessionUrlResult.text();
-    const callbackUrl = "trinsic-expo-go-sample://callback";
-    const result = await launchSession(launchUrl, {
-      callbackPath: "/",
-    });
+    console.log("Launch URL: ", launchUrl);
+    const result = await launchSession(launchUrl, callbackPath);
     setResult(result);
   };
   return (

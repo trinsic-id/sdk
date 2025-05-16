@@ -1,25 +1,31 @@
 import * as WebBrowser from "expo-web-browser";
-import * as Linking from "expo-linking";
+import { AuthSessionOpenOptions } from "expo-web-browser";
 
+/**
+ * Wraps the expo-web-browser `openAuthSessionAsync` method and parses the result into a Trinsic LaunchSessionResult.
+ * For more information on the parameters, see the [expo-web-browser documentation](https://docs.expo.dev/versions/latest/sdk/webbrowser/#webbrowseropenauthsessionasyncurl-redirecturl-options).
+ *
+ * @param url The url to open in the web browser. This should be a login page.
+ * @param redirectUrl _Optional_ - The url to deep link back into your app.
+ * On web, this defaults to the output of [`Linking.createURL("")`](./linking/#linkingcreateurlpath-namedparameters).
+ * @param options _Optional_ - An object extending the [`WebBrowserOpenOptions`](#webbrowseropenoptions).
+ * If there is no native AuthSession implementation available (which is the case on Android)
+ * these params will be used in the browser polyfill. If there is a native AuthSession implementation,
+ * these params will be ignored.
+ *
+ * @return
+ * - If the user does not permit the application to authenticate with the given url, the Promise fulfills with `{ type: 'cancel' }` object.
+ * - If the user closed the web browser, the Promise fulfills with `{ type: 'cancel' }` object.
+ * - If the browser is closed using [`dismissBrowser`](#webbrowserdismissbrowser),
+ * the Promise fulfills with `{ type: 'dismiss' }` object.
+ */
 export async function launchSession(
   launchUrl: string,
-  callback: {
-    callbackUrl?: string | undefined;
-    callbackPath?: string | undefined;
-  }
+  redirectUrl?: string | null,
+  options: AuthSessionOpenOptions = {}
 ): Promise<LaunchSessionResult> {
   if (launchUrl === null || launchUrl === undefined || launchUrl.length === 0) {
     throw new Error("Launch URL is required");
-  }
-  if (
-    (callback.callbackPath === null ||
-      callback.callbackPath === undefined ||
-      callback.callbackPath.length === 0) &&
-    (callback.callbackUrl === null ||
-      callback.callbackUrl === undefined ||
-      callback.callbackUrl.length === 0)
-  ) {
-    throw new Error("Callback URL or scheme is required");
   }
 
   const urlResult = tryParseToUrl(launchUrl);
@@ -40,17 +46,11 @@ export async function launchSession(
     url.searchParams.append("launchMode", "mobile");
   }
 
-  const callbackUrl =
-    callback.callbackUrl || Linking.createURL(callback.callbackPath!);
-
-  if (!url.searchParams.has("redirectUrl")) {
-    url.searchParams.append("redirectUrl", callbackUrl);
-  }
-
   try {
     let result = await WebBrowser.openAuthSessionAsync(
       url.toString(),
-      callbackUrl
+      redirectUrl,
+      options
     );
     const { sessionId, resultsAccessKey } = parseResult(result);
     return {
