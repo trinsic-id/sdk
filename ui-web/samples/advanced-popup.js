@@ -67,24 +67,6 @@ async function initializeAdvancedPopup() {
   const content = urlSearchParams.get('content');
   const shouldRefresh = urlSearchParams.get('shouldRefresh') === 'true';
   const refreshAfter = urlSearchParams.get('refreshAfter');
-  const error = urlSearchParams.get('error');
-  if (error) {
-    const decoded = decodeURIComponent(error);
-    const parsedError = JSON.parse(decoded);
-    let errorContent = `${parsedError.title}<br/> 
-        <b>Trace id: ${parsedError.traceId}</b><br/>`;
-    if (parsedError.errors) {
-      errorContent += "<ul style=\"margin-top: 30px\">";
-      //errors is an object with keys and values, iterate over the keys and values
-      Object.keys(parsedError.errors).forEach(key => {
-        errorContent += `<li>${key}: ${parsedError.errors[key]}</li>`;
-      });
-      errorContent += "</ul>";
-    }
-    document.getElementById("advanced-modal-content").innerHTML = errorContent;
-    return;
-  }
-  console.log(content);
   document.getElementById("session-id").innerText = sessionId;
   document.getElementById("next-step").innerText = nextStep;
   document.getElementById("content-refresh").innerText = shouldRefresh ? "Yes, refreshing at " + refreshAfter : "No";

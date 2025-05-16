@@ -21,7 +21,7 @@ builder.Services.AddTrinsicApi(options =>
 var app = builder.Build();
 var sessionApi = app.Services.GetService<ISessionsApi>()!;
 var networkApi = app.Services.GetService<INetworkApi>()!;
-app.UseDeveloperExceptionPage();
+app.UseMiddleware<JsonExceptionMiddleware>();
 app.MapSharedRoutes(sessionApi, networkApi);
 app.MapWidgetSessionRoutes(sessionApi);
 app.MapHostedProviderSessionRoutes(sessionApi);
@@ -35,4 +35,3 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 app.Run();
-
