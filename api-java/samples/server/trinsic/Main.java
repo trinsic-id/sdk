@@ -10,6 +10,7 @@ import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
 
 import java.nio.file.Paths;
+import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
@@ -39,6 +40,29 @@ public class Main {
                 staticFileConfig.location = Location.EXTERNAL;
             });
             javalinConfig.jsonMapper(new id.trinsic.CustomJacksonMapper());
+        });
+
+        // Global handler for Trinsic API errors
+        app.exception(ApiException.class, (e, ctx) -> {
+            e.printStackTrace();
+            int status = e.getCode();
+            String message = e.getMessage();
+
+            // Optional: parse e.getResponseBody() if available and JSON
+            ctx.status(status);
+            ctx.json(Map.of(
+                    "message", "Request failed: check logs for details.",
+                    "error", message
+            ));
+        });
+
+        // Optional: generic fallback
+        app.exception(Exception.class, (e, ctx) -> {
+            e.printStackTrace(); // or use logger
+            ctx.status(500).json(Map.of(
+                    "message", "Unexpected server error",
+                    "error", e.getMessage()
+            ));
         });
 
         id.trinsic.Shared.SharedRoutes(app, network, session);

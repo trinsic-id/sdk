@@ -31,7 +31,6 @@ func main() {
 				code = e.Code
 			}
 
-
 			return c.Status(code).JSON(fiber.Map{
 				"message": "Request failed: check logs for details.",
 				"error":   err.Error(),

@@ -23,55 +23,50 @@ public class Advanced {
         });
 
         app.get("/advanced-launch/{provider}", ctx -> {
-            try {
-                String provider = ctx.pathParam("provider");
-                String redirectUrl = ctx.queryParam("redirectUrl");
-                boolean fallbackToTrinsicUI = "true".equals(ctx.queryParam("fallbackToTrinsicUI"));
+            String provider = ctx.pathParam("provider");
+            String redirectUrl = ctx.queryParam("redirectUrl");
+            boolean fallbackToTrinsicUI = "true".equals(ctx.queryParam("fallbackToTrinsicUI"));
 
-                // Build request
-                CreateAdvancedProviderSessionRequest req = new CreateAdvancedProviderSessionRequest();
-                req.setProvider(provider);
-                req.setRedirectUrl(redirectUrl);
-                req.setFallbackToHostedUI(fallbackToTrinsicUI);
+            // Build request
+            CreateAdvancedProviderSessionRequest req = new CreateAdvancedProviderSessionRequest();
+            req.setProvider(provider);
+            req.setRedirectUrl(redirectUrl);
+            req.setFallbackToHostedUI(fallbackToTrinsicUI);
 
-                String capabilitiesParam = ctx.queryParam("capabilities");
-                List<IntegrationCapability> capabilities = capabilitiesParam != null
-                        ? Arrays.stream(capabilitiesParam.split(","))
-                        .map(String::trim)
-                        .map(IntegrationCapability::fromValue)
-                        .collect(Collectors.toList())
-                        : List.of();
+            String capabilitiesParam = ctx.queryParam("capabilities");
+            List<IntegrationCapability> capabilities = capabilitiesParam != null
+                    ? Arrays.stream(capabilitiesParam.split(","))
+                    .map(String::trim)
+                    .map(IntegrationCapability::fromValue)
+                    .collect(Collectors.toList())
+                    : List.of();
 
-                req.setCapabilities(capabilities);
+            req.setCapabilities(capabilities);
 
-                // Call API
-                CreateAdvancedProviderSessionResponse result =
-                        session.createAdvancedProviderSession(req);
+            // Call API
+            CreateAdvancedProviderSessionResponse result =
+                    session.createAdvancedProviderSession(req);
 
-                var nextStep = result.getNextStep();
-                if (nextStep.getMethod().getValue().equals(IntegrationLaunchMethod.LAUNCH_BROWSER.getValue())) {
-                    ctx.redirect(nextStep.getContent());
-                } else {
-                    boolean shouldRefresh = nextStep.getRefresh() != null;
-                    String refreshAfter = shouldRefresh
-                            ? nextStep.getRefresh().getRefreshAfter().toString()
-                            : Instant.now().toString();
+            var nextStep = result.getNextStep();
+            if (nextStep.getMethod().getValue().equals(IntegrationLaunchMethod.LAUNCH_BROWSER.getValue())) {
+                ctx.redirect(nextStep.getContent());
+            } else {
+                boolean shouldRefresh = nextStep.getRefresh() != null;
+                String refreshAfter = shouldRefresh
+                        ? nextStep.getRefresh().getRefreshAfter().toString()
+                        : Instant.now().toString();
 
-                    String redirectQuery = String.format(
-                            "sessionId=%s&resultsAccessKey=%s&nextStep=%s&content=%s&shouldRefresh=%s&refreshAfter=%s",
-                            URLEncoder.encode(result.getSessionId().toString(), StandardCharsets.UTF_8),
-                            URLEncoder.encode(result.getResultCollection().getResultsAccessKey(), StandardCharsets.UTF_8),
-                            URLEncoder.encode(nextStep.getMethod().getValue(), StandardCharsets.UTF_8),
-                            URLEncoder.encode(nextStep.getContent(), StandardCharsets.UTF_8),
-                            shouldRefresh,
-                            URLEncoder.encode(refreshAfter, StandardCharsets.UTF_8)
-                    );
+                String redirectQuery = String.format(
+                        "sessionId=%s&resultsAccessKey=%s&nextStep=%s&content=%s&shouldRefresh=%s&refreshAfter=%s",
+                        URLEncoder.encode(result.getSessionId().toString(), StandardCharsets.UTF_8),
+                        URLEncoder.encode(result.getResultCollection().getResultsAccessKey(), StandardCharsets.UTF_8),
+                        URLEncoder.encode(nextStep.getMethod().getValue(), StandardCharsets.UTF_8),
+                        URLEncoder.encode(nextStep.getContent(), StandardCharsets.UTF_8),
+                        shouldRefresh,
+                        URLEncoder.encode(refreshAfter, StandardCharsets.UTF_8)
+                );
 
-                    ctx.redirect("/advanced-popup?" + redirectQuery);
-                }
-            } catch (ApiException e) {
-                String error = URLEncoder.encode(e.getResponseBody(), StandardCharsets.UTF_8);
-                ctx.redirect("/advanced-popup?error=" + error);
+                ctx.redirect("/advanced-popup?" + redirectQuery);
             }
         });
 
