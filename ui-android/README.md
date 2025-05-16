@@ -8,6 +8,10 @@ This library must be paired with an [api library](https://github.com/trinsic-id/
 
 See the [Trinsic docs](https://docs.trinsic.id/docs/) for more detailed information on how to start integrating with our identity acceptance network.
 
+## Usage
+
+For usage instructions, see our [sample app](https://github.com/trinsic-id/sdk/tree/main/ui-android/samples/android_sample), which includes a README with detailed instructions on how to implement this library in your own app.
+
 ## Supported Use Cases
 
 ### Widget and Hosted Provider Sessions
@@ -68,6 +72,35 @@ First, choose a custom scheme to register against your app. This is necessary fo
 The custom scheme can be any valid URL scheme, but it **must be globally unique**. No other app -- including any of your own -- should register against the same scheme.
 
 An example of a good scheme is `acme-corp-shopping-app-trinsic-redirect`.
+
+### 2. Register and use the Custom Scheme with Trinsic
+
+#### a. Register the Custom Scheme with Trinsic
+After choosing a custom scheme, you must register it as a valid `redirectUrl` with Trinsic.
+This can be done on the Trinsic Dashboard.
+
+For example, if you chose `acme-corp-shopping-app-trinsic-redirect`, you would register the following URL with Trinsic:
+
+```
+acme-corp-shopping-app-trinsic-redirect:///*
+```
+
+**Things to note**:
+- The `*` at the end of the URL is a wildcard. It allows any path to be used in redirect URLs for this scheme.
+    - This library does not care about the redirect URL's path, only its scheme.
+- The triple slash (`///`) is required to construct a valid redirect URL with a custom scheme.
+    - The first two slashes are part of the scheme, and the third slash is the start of the path.
+
+#### b. Use the Custom Scheme with Trinsic
+After registering the custom scheme in the Dashboard, you may now use it in a `redirectUrl` when creating a Session.
+
+For example, given the custom scheme `acme-corp-shopping-app-trinsic-redirect`, the following is a valid `redirectUrl`:
+
+```
+acme-corp-shopping-app-trinsic-redirect:///callback
+```
+
+The path (`callback`) can be any valid path string.
 
 ### 2. Register the `CallbackActivity` in your app's `AndroidManifest.xml`
 
