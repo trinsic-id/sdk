@@ -14,7 +14,6 @@ echo "Preparing PHP API sample..."
 cd ../../api-php/samples/server
 composer install
 
-# Fail if the composer install fails
 if [ $? -ne 0 ]; then
     echo "Error: composer install failed"
     exit 1
