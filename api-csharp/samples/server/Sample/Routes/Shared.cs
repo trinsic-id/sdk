@@ -10,10 +10,6 @@ public static class Shared
 {
     public static void MapSharedRoutes(this WebApplication app, ISessionsApi sessionApi, INetworkApi networkApi)
     {
-        app.MapGet("/", context => ServeFile(context, "../../../ui-web/samples/dist/index.html"));
-        app.MapGet("/error-popup", context => ServeFile(context, "../../../ui-web/samples/dist/error-popup.html"));
-        app.MapGet("/redirect", context => ServeFile(context, "../../../ui-web/samples/dist/redirect.html"));
-
         app.MapGet("/providers", async context =>
         {
             List<string> ipAddresses = context.Request.Query["ipAddress"] == StringValues.Empty ? [] : [context.Request.Query["ipAddress"].ToString()];
@@ -40,11 +36,5 @@ public static class Shared
             // Return the result as JSON
             await context.Response.WriteAsJsonAsync(response.Ok());
         });
-    }
-    public static async Task ServeFile(HttpContext context, string file)
-    {
-        var htmlContent = await File.ReadAllTextAsync(file);
-        context.Response.ContentType = "text/html";
-        await context.Response.WriteAsync(htmlContent);
     }
 }

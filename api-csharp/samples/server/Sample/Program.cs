@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.FileProviders;
 using Sample;
 using Trinsic.Api;
@@ -7,10 +8,14 @@ using Trinsic.Api.Extensions;
 
 DotNetEnv.Env.Load();
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions()
+{
+    Args = args,
+    WebRootPath = Path.Combine(Directory.GetCurrentDirectory(), "../../../../ui-web/samples/dist")
+});
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
-    serverOptions.ListenAnyIP(3005); // Listens on http://localhost:3005
+    serverOptions.ListenAnyIP(3000);
 });
 builder.Services.AddTrinsicApi(options =>
 {
@@ -28,10 +33,8 @@ app.MapHostedProviderSessionRoutes(sessionApi);
 app.MapAdvancedProviderSessionRoutes(sessionApi);
 
 //Serve web sdk
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "../../../ui-web/samples/dist/assets")),
-    RequestPath = "/assets"
-});
+app.UseRewriter(new RewriteOptions()
+    .Add(new HtmlFallbackRewriteRule()));
+app.UseStaticFiles();
 
 app.Run();

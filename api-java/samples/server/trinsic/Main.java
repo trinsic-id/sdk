@@ -2,10 +2,8 @@ package id.trinsic;
 
 import id.trinsic.api.NetworkApi;
 import id.trinsic.api.SessionsApi;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
-import io.github.cdimascio.dotenv.Dotenv;
+import io.github.cdimascio.dotenv.DotenvBuilder;
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
 
@@ -14,7 +12,7 @@ import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
-        var dotenv = Dotenv.load();
+        var dotenv = new DotenvBuilder().ignoreIfMissing().load();
         var authToken = dotenv.get("TRINSIC_ACCESS_TOKEN");
 
         if (authToken == null) {

@@ -11,6 +11,15 @@ import path from "path";
 import express from "express";
 import { Request, Response, NextFunction } from "express";
 import { advancedRoutes } from "./advanced";
+import { config } from 'dotenv';
+import { existsSync } from 'fs';
+
+if (existsSync('.env')) {
+  config(); // Load .env if it exists
+  console.log('.env file loaded');
+} else {
+  console.log('No .env file found, continuing without it');
+}
 
 
 const app = express();

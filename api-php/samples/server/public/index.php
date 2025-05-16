@@ -57,9 +57,16 @@ if (file_exists($filePath) && is_file($filePath)) {
 }
 
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
-$dotenv->load();
+$dotenv->safeLoad();
 
-$authToken = getenv('TRINSIC_AUTH_TOKEN');
+// Load environment variables from .env file into same structure so it can be used by the SDK 
+foreach ($_ENV as $key => $value) {
+    if (getenv($key) === false) {
+        putenv("$key=$value");
+    }
+}
+
+$authToken = getenv('TRINSIC_ACCESS_TOKEN');
 
 $app = AppFactory::create();
 
@@ -110,7 +117,7 @@ $app->add(function (Request $request, RequestHandler $handler) {
 $app->add(new JsonBodyParserMiddleware());
 
 $config = new Configuration();
-$config->setAccessToken($_ENV['TRINSIC_ACCESS_TOKEN'] ?? '');
+$config->setAccessToken($authToken);
 
 $network = new NetworkApi(null, $config);
 $sessions = new SessionsApi(null, $config);
