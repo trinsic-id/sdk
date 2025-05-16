@@ -37,7 +37,6 @@ async function launch(launchMode) {
         case 'iframe':
             const launchUrl = await createSession();
             result = await launchIframe(launchUrl).catch(e => catchErrorAlert(e));
-            await exchangeResult(result);
             break;
         case 'redirect':
             const redirectLaunchUrl = await createSession(true);
@@ -47,7 +46,7 @@ async function launch(launchMode) {
             console.error("Invalid launch mode:", launchMode);
             return;
     }
-    if (result !== undefined) {
+    if (result !== undefined && result.success) {
         await exchangeResult(result);
     }
 }

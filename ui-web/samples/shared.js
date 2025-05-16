@@ -11,12 +11,19 @@ window.ipAddress = async () => {
     }
 }
 export function catchErrorAlert(error) {
-    console.error("Error:", error);
-    const errorMessage = error?.message || "An unknown error occurred.";
-    const errorDetails = error?.details || "No additional details available.";
+    let errorMessage = "";
+    let errorDetails = "";
+    // Check if the error is a Trinsic error
+    if(error.success === false){
+        console.warn("Trinsic error:", error);
+        errorMessage = `Message: ${error.msg}\nSession Id: ${error.sessionId}` || `An unknown error occurred.`;
+    } else {
+        console.error("Error:", error);
+        errorMessage = error?.message || "An unknown error occurred.";
+    }    
     // Show error message after short timeout to not delay the popup closing
     setTimeout(() => {
-        alert(`Error: ${errorMessage}\nDetails: ${errorDetails}`);
+        alert(errorMessage);
     }, 150);
     
 }
