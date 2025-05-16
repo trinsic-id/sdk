@@ -6,6 +6,11 @@ See the [Trinsic docs](https://docs.trinsic.id/docs/) for more detailed informat
 
 ## How This Sample Works
 
+> [!IMPORTANT]  
+> This sample, by default, *does not hit Trinsic's API* or perform real verifications. Instead, it uses a Trinsic-provided test API which allows for quick and convenient testing of the library's functionality **without** needing a real API key or a backend of your own.
+> 
+> Once you have implemented your own backend, this sample can easily be configured to perform real verifications simply by changing the `BACKEND_CREATE_SESSION_ENDPOINT` constant in `MainActivity.java` to point to your backend's endpoint.
+
 This sample implements the Trinsic Android UI Library to the extent necessary to demonstrate the basic functionality of the library.
 
 The relevant files for this sample are:
@@ -17,10 +22,6 @@ The relevant files for this sample are:
   - Adds jitpack as a Maven repository
 - [app/build.gradle.kts](https://github.com/trinsic-id/sdk/blob/main/ui-android/samples/android_sample/app/build.gradle.kts)
   - Adds Trinsic Android SDK as a dependency
-
-This sample, by default, *does not hit Trinsic's API* or perform real verifications. Instead, it uses a Trinsic-provided test API which allows for quick and convenient testing of the library's functionality **without** needing a real API key or a backend of your own.
-
-Once you have implemented your own backend, this sample can easily be configured to perform real verifications simply by changing the `BACKEND_CREATE_SESSION_ENDPOINT` constant in `MainActivity.java` to point to your backend's endpoint.
 
 ## Implementation Guide
 
