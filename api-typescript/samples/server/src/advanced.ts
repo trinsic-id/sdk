@@ -16,43 +16,33 @@ export function advancedRoutes(app: Express, sessionsApi: SessionsApi) {
     });
 
     app.get("/advanced-launch/:provider", async (req: any, res: any) => {
-        try {
-            const provider = req.params.provider;
-            const redirectUrl = req.query.redirectUrl;
-            const fallbackToTrinsicUI = req.query.fallbackToTrinsicUI;
-            const capabilities = req.query.capabilities.split(",");
-    
-    
-            const result = await sessionsApi.createAdvancedProviderSession({
-                provider: provider,
-                redirectUrl: redirectUrl,
-                capabilities: capabilities,
-                fallbackToHostedUI: fallbackToTrinsicUI === "true"
-            });
-    
-            if(result.nextStep.method === "LaunchBrowser") {
-                res.redirect(result.nextStep.content);
-                return;
-            } else {
-                const shouldRefresh = result.nextStep.refresh != null
-                const refreshAfter = shouldRefresh ? result.nextStep.refresh?.refreshAfter.toISOString() : 0;
-                res.redirect(`/advanced-popup?sessionId=${encodeURIComponent(result.sessionId)}&resultsAccessKey=${encodeURIComponent(result.resultCollection.resultsAccessKey ?? "")}&nextStep=${encodeURIComponent(result.nextStep.method)}&content=${encodeURIComponent(result.nextStep.content)}&shouldRefresh=${encodeURIComponent(shouldRefresh)}&refreshAfter=${encodeURIComponent(refreshAfter?? "")}`);
-            }
-        }
-        catch(error: unknown){
-            if(error instanceof ResponseError){
-                const content = await error.response.text();
-                res.redirect(`/advanced-popup?error=${encodeURIComponent(content)}`);
-            } else {
-                console.error("Unknown error", error);
-            }
+        const provider = req.params.provider;
+        const redirectUrl = req.query.redirectUrl;
+        const fallbackToTrinsicUI = req.query.fallbackToTrinsicUI;
+        const capabilities = req.query.capabilities.split(",");
+
+
+        const result = await sessionsApi.createAdvancedProviderSession({
+            provider: provider,
+            redirectUrl: redirectUrl,
+            capabilities: capabilities,
+            fallbackToHostedUI: fallbackToTrinsicUI === "true"
+        });
+
+        if(result.nextStep.method === "LaunchBrowser") {
+            res.redirect(result.nextStep.content);
+            return;
+        } else {
+            const shouldRefresh = result.nextStep.refresh != null
+            const refreshAfter = shouldRefresh ? result.nextStep.refresh?.refreshAfter.toISOString() : 0;
+            res.redirect(`/advanced-popup?sessionId=${encodeURIComponent(result.sessionId)}&resultsAccessKey=${encodeURIComponent(result.resultCollection.resultsAccessKey ?? "")}&nextStep=${encodeURIComponent(result.nextStep.method)}&content=${encodeURIComponent(result.nextStep.content)}&shouldRefresh=${encodeURIComponent(shouldRefresh)}&refreshAfter=${encodeURIComponent(refreshAfter?? "")}`);
         }
     });
 
     app.post('/refresh-content/:sessionId', async (req: any, res: any) => {
         const sessionId = req.params.sessionId;
         const resultsAccessKey = req.body.resultsAccessKey;
-        const result = await sessionsApi.refreshStepContent(sessionId, {resultsAccessKey: resultsAccessKey});
+        const result = await sessionsApi.refreshStepContent(sessionId, {resultsAccessKey: resultsAccessKey });
         res.json(result);
     });
 
