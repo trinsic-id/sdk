@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"net/url"
 	"strconv"
 	"strings"
@@ -45,16 +44,9 @@ func AdvancedRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 		opts := api.SessionsAPI.CreateAdvancedProviderSession(c.Context()).
 			CreateAdvancedProviderSessionRequest(req)
 
-		result, response, err := opts.Execute()
+		result, _, err := opts.Execute()
 		if err != nil {
-			bodyBytes, err := io.ReadAll(response.Body)
-			if err != nil {
-				panic(err)
-			}
-
-			bodyString := string(bodyBytes)
-			errorContent := url.QueryEscape(bodyString)
-			return c.Redirect("/advanced-popup?error=" + errorContent)
+			return err
 		}
 
 		// Handle response
@@ -105,7 +97,7 @@ func AdvancedRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 		data, _, err := req.Execute()
 
 		if err != nil {
-			return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+			return err
 		}
 
 		return c.JSON(data)
@@ -131,7 +123,7 @@ func AdvancedRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 		data, _, err := req.Execute()
 
 		if err != nil {
-			return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+			return err
 		}
 
 		return c.JSON(data)
