@@ -7,7 +7,6 @@ public static class HostedProviderSession
 {
     public static void MapHostedProviderSessionRoutes(this WebApplication app, ISessionsApi sessionApi)
     {
-        app.MapGet("/hosted", context => Shared.ServeFile(context, "../../../ui-web/samples/dist/hosted.html"));
         app.MapGet("/hosted-launch/{providerId}", async (HttpContext context, string providerId) =>
         {
             var redirectUrl = context.Request.Query["redirectUrl"].ToString();

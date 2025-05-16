@@ -4,6 +4,18 @@ This repository is the home of Trinsic's API (backend) and UI (frontend) librari
 
 You can find our platform's documentation at [docs.trinsic.id](https://docs.trinsic.id)
 
+## Getting started
+
+> [!TIP]
+> Each backend sample wraps the `/ui-web/samples/` sample as the frontend, including Widget, Hosted and Advanced sessions.
+
+1. Retrieve your auth token from the Trinsic Dashboard
+1. Configure `localhost:3000` as an approved redirect url in your app's settings in the dashboard. 
+1. Configure it either as environment variable (`TRINSIC_ACCESS_TOKEN`) or in your backend stack's sample `.env` file.
+1. Go to your preferred backend stack's sample (`/language/samples/server`) and run the backend using `start.sh`. _Note this assumes you have the toolchain working locally, inspect the `start.sh` file to see the required steps_. 
+1. Explore the API and it's capabilities by navigating to [localhost:3000](http://localhost:3000). 
+
+
 ## API Libraries
 
 Use these libraries in your backend to communicate with the Trinsic API.

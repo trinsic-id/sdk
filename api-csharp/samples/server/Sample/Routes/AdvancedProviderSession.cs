@@ -10,10 +10,6 @@ public static class AdvancedProviderSession
 {
     public static void MapAdvancedProviderSessionRoutes(this WebApplication app, ISessionsApi sessionApi)
     {
-        app.MapGet("/advanced", context => Shared.ServeFile(context, "../../../ui-web/samples/dist/advanced.html"));
-        app.MapGet("/advanced-popup",
-            context => Shared.ServeFile(context, "../../../ui-web/samples/dist/advanced-popup.html"));
-
         app.MapPost("/refresh-content/{sessionId}", async (HttpContext context, string sessionId) =>
         {
             var request = await context.Request.ReadFromJsonAsync<ResultsAccessKeyBody>();
