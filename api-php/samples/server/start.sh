@@ -7,7 +7,7 @@ fi
 
 echo "Build UI sample..."
 cd ../../../ui-web/samples
-npm install
+npm ci
 npm run build
 
 echo "Preparing PHP API sample..."

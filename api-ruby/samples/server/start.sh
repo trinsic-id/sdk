@@ -9,7 +9,7 @@ fi
 
 echo "Build UI sample..."
 cd ../../../ui-web/samples
-npm install
+npm ci
 npm run build
 
 echo "Installing Ruby dependencies..."
