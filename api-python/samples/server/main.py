@@ -3,12 +3,14 @@ load_dotenv()
 
 import os
 import pathlib
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Request, Depends
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
 from shared import sharedRouter
 from widget import widgetRouter
 from hosted import hostedRouter
 from advanced import advancedRouter
+from trinsic_api.exceptions import ApiException
 from trinsic_api.configuration import Configuration
 from trinsic_api.api_client import ApiClient
 from trinsic_api.api.network_api import NetworkApi
@@ -41,6 +43,33 @@ app.include_router(hostedRouter, dependencies=[Depends(get_sessions_api)])
 app.include_router(advancedRouter, dependencies=[Depends(get_sessions_api)])
 
 app.mount("/", StaticFiles(directory=web_ui_path, html=True), name="static")
+
+# === Error Handlers ===
+
+@app.exception_handler(ApiException)
+async def trinsic_api_exception_handler(request: Request, exc: ApiException):
+    print(f"[Trinsic API error] {exc}")
+
+    return JSONResponse(
+        status_code=exc.status_code if hasattr(exc, "status_code") else 500,
+        content={
+            "message": "Request failed: check logs for details.",
+            "error": str(exc)
+        }
+    )
+
+@app.exception_handler(Exception)
+async def generic_exception_handler(request: Request, exc: Exception):
+    print(f"[Unhandled exception] {exc}")
+
+    return JSONResponse(
+        status_code=500,
+        content={
+            "message": "An unexpected error occurred.",
+            "error": str(exc)
+        }
+    )
+
 
 if __name__ == "__main__":
     import uvicorn
