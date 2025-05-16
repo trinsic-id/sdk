@@ -13,10 +13,9 @@ module SharedRoutes
 
     app.get '/providers' do
       ipAddress = params[:ipAddress]
-      info_args = {}
-      info_args[:ip_addresses] = [ipAddress] if ipAddress
       req = TrinsicApi::RecommendRequest.new({
-        recommendation_info: info_args
+        recommendation_info: TrinsicApi::RecommendationInfo.new({
+          ip_addresses: ipAddress ? [ipAddress] :nil })
       })
 
       result = TrinsicServices::NETWORK.recommend_providers({recommend_request: req})
@@ -31,7 +30,7 @@ module SharedRoutes
   
       opts = {
         get_session_result_request: TrinsicApi::GetSessionResultRequest.new({
-          results_access_key: access_key 
+          results_access_key: access_key
         })
       }
   
