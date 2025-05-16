@@ -29,46 +29,39 @@ return function ($app, $sessions) {
     });
 
     $app->get("/advanced-launch/{provider}", function (Request $request, Response $response, $args) use ($sessions) {
-        try {
-            $provider = $args['provider'];
-            $queryParams = $request->getQueryParams();
-            $redirectUrl = $queryParams['redirectUrl'] ?? null;
-            $fallbackToTrinsicUI = ($queryParams['fallbackToTrinsicUI'] ?? 'false') === 'true';
-            $capabilities = isset($queryParams['capabilities']) ? explode(",", $queryParams['capabilities']) : [];
-    
-            $req = new CreateAdvancedProviderSessionRequest();
-            $req->setRedirectUrl($redirectUrl);
-            $req->setProvider($provider);
-            $req->setCapabilities($capabilities);
-            $req->setFallbackToHostedUi($fallbackToTrinsicUI);
-    
-            $result = $sessions->createAdvancedProviderSession($req);
-    
-            if ($result->getNextStep()->getMethod() === 'LaunchBrowser') {
-                return $response
-                    ->withHeader('Location', $result->getNextStep()->getContent())
-                    ->withStatus(302);
-            } else {
-                $shouldRefresh = !is_null($result->getNextStep()->getRefresh());
-                $refreshAfter = $shouldRefresh ? $result->getNextStep()->getRefresh()->getRefreshAfter()->format(DATE_ISO8601) : gmdate(DATE_ISO8601);
-    
-                $queryParams = http_build_query([
-                    'sessionId' => $result->getSessionId(),
-                    'resultsAccessKey' => $result->getResultCollection()->getResultsAccessKey(),
-                    'nextStep' => $result->getNextStep()->getMethod(),
-                    'content' => $result->getNextStep()->getContent(),
-                    'shouldRefresh' => $shouldRefresh ? 'true' : 'false',
-                    'refreshAfter' => $refreshAfter
-                ]);
-    
-                return $response
-                    ->withHeader('Location', "/advanced-popup?$queryParams")
-                    ->withStatus(302);
-            }
-        } catch (ApiException $e) {
-            $errorContent = urlencode($e->getResponseBody());
+        $provider = $args['provider'];
+        $queryParams = $request->getQueryParams();
+        $redirectUrl = $queryParams['redirectUrl'] ?? null;
+        $fallbackToTrinsicUI = ($queryParams['fallbackToTrinsicUI'] ?? 'false') === 'true';
+        $capabilities = isset($queryParams['capabilities']) ? explode(",", $queryParams['capabilities']) : [];
+
+        $req = new CreateAdvancedProviderSessionRequest();
+        $req->setRedirectUrl($redirectUrl);
+        $req->setProvider($provider);
+        $req->setCapabilities($capabilities);
+        $req->setFallbackToHostedUi($fallbackToTrinsicUI);
+
+        $result = $sessions->createAdvancedProviderSession($req);
+
+        if ($result->getNextStep()->getMethod() === 'LaunchBrowser') {
             return $response
-                ->withHeader('Location', "/advanced-popup?error=$errorContent")
+                ->withHeader('Location', $result->getNextStep()->getContent())
+                ->withStatus(302);
+        } else {
+            $shouldRefresh = !is_null($result->getNextStep()->getRefresh());
+            $refreshAfter = $shouldRefresh ? $result->getNextStep()->getRefresh()->getRefreshAfter()->format(DATE_ISO8601) : gmdate(DATE_ISO8601);
+
+            $queryParams = http_build_query([
+                'sessionId' => $result->getSessionId(),
+                'resultsAccessKey' => $result->getResultCollection()->getResultsAccessKey(),
+                'nextStep' => $result->getNextStep()->getMethod(),
+                'content' => $result->getNextStep()->getContent(),
+                'shouldRefresh' => $shouldRefresh ? 'true' : 'false',
+                'refreshAfter' => $refreshAfter
+            ]);
+
+            return $response
+                ->withHeader('Location', "/advanced-popup?$queryParams")
                 ->withStatus(302);
         }
     });
@@ -77,7 +70,6 @@ return function ($app, $sessions) {
         $sessionId = $args['sessionId'];
         $body = json_decode($request->getBody()->getContents(), true);
         $resultsAccessKey = $body['resultsAccessKey'] ?? null;
-    
         $req = new RefreshStepContentRequest();
         $req->setResultsAccessKey($resultsAccessKey);
         $result = $sessions->refreshStepContent($sessionId, $req);

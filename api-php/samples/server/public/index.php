@@ -10,7 +10,7 @@ use Psr\Http\Server\MiddlewareInterface as MiddlewareInterface;
 use Trinsic\Api\Api\NetworkApi as NetworkApi;
 use Trinsic\Api\Api\SessionsApi as SessionsApi;
 use Trinsic\Api\Configuration as Configuration;
-
+use Trinsic\Api\ApiException;
 use Slim\Factory\AppFactory;
 use Dotenv\Dotenv;
 
@@ -63,6 +63,46 @@ $authToken = getenv('TRINSIC_AUTH_TOKEN');
 
 $app = AppFactory::create();
 
+// Error handling middleware
+$errorMiddleware = $app->addErrorMiddleware(true, true, true);
+
+$customHandler = function (
+    $request,
+    Throwable $exception,
+    bool $displayErrorDetails,
+    bool $logErrors,
+    bool $logErrorDetails
+) use ($app): Response {
+    $response = $app->getResponseFactory()->createResponse();
+
+    $statusCode = $exception instanceof ApiException
+        ? ($exception->getCode() ?: 500)
+        : 500;
+
+    $message = $exception instanceof ApiException
+        ? "Trinsic API error: {$exception->getMessage()}"
+        : "Unexpected error: {$exception->getMessage()}";
+
+    error_log($message);
+
+    if (method_exists($exception, 'getResponseBody')) {
+        $message = "Trinsic APIException: {$exception->getCode()} - {$exception->getResponseBody()}";
+        error_log("Response body: " . json_encode($exception->getResponseBody()));
+    }
+
+    $response->getBody()->write(json_encode([
+        'message' => 'Request failed: check logs for details.',
+        'error' => $message,
+    ]));
+
+    return $response
+        ->withHeader('Content-Type', 'application/json')
+        ->withStatus($statusCode);
+};
+
+// Attach custom handler as the default
+$errorMiddleware->setDefaultErrorHandler($customHandler);
+
 $app->add(function (Request $request, RequestHandler $handler) {
     return $handler->handle($request);
 });
@@ -86,5 +126,6 @@ $hostedRoutes($app, $sessions);
 
 $advancedRoutes = require  __DIR__ . '/../src/advanced.php';
 $advancedRoutes($app, $sessions);
+
 
 $app->run();
