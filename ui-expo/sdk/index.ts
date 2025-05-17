@@ -52,12 +52,12 @@ export async function launchSession(
       redirectUrl,
       options
     );
-    const { sessionId, resultsAccessKey } = parseResult(result);
+    const { sessionId, resultsAccessKey, success, canceled } = parseResult(result);
     return {
       sessionId: sessionId,
       resultsAccessKey: resultsAccessKey,
-      success: result.type === "success",
-      canceled: result.type === "cancel" || result.type === "dismiss",
+      success: result.type === "success" ? success === "true" : false,
+      canceled: result.type === "cancel" || result.type === "dismiss" || canceled === "true",
     };
   } catch (_) {
     return {
@@ -81,14 +81,18 @@ function tryParseToUrl(url: string): { valid: boolean; url: URL | null } {
 function parseResult(result: WebBrowser.WebBrowserAuthSessionResult): {
   sessionId: string | null;
   resultsAccessKey: string | null;
+  success: string | null;
+  canceled: string | null;
 } {
   if (result.type === "success") {
     const url = new URL(result.url);
     const sessionId = url.searchParams.get("sessionId");
     const resultsAccessKey = url.searchParams.get("resultsAccessKey");
-    return { sessionId, resultsAccessKey };
+    const success = url.searchParams.get("success");
+    const canceled = url.searchParams.get("canceled");
+    return { sessionId, resultsAccessKey, success, canceled };
   }
-  return { sessionId: null, resultsAccessKey: null };
+  return { sessionId: null, resultsAccessKey: null, success: null, canceled: null };
 }
 
 export interface LaunchSessionResult {
