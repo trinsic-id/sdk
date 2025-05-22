@@ -1,4 +1,4 @@
-$CS_SAMPLES_DIR = "$PSScriptRoot/samples"
+$CS_SAMPLES_DIR = "$PSScriptRoot/samples/server"
 
 try {
     Write-Host "Building api-csharp sample project..."
