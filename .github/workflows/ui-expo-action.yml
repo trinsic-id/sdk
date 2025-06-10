@@ -18,14 +18,11 @@ jobs:
       - name: Install NPM dependencies
         run: npm ci
       - name: Build UI Expo SDK
-        run: ./ui-expo/build-sdk.ps1
-        shell: pwsh
+        run: ./ui-expo/build-sdk.sh
       - name: Build UI Expo Sample
-        run: ./ui-expo/build-samples.ps1
-        shell: pwsh
+        run: ./ui-expo/build-samples.sh
       - name: Publish ui Expo SDK
         if: inputs.publish == true
-        run: ./ui-expo/publish-sdk.ps1
-        shell: pwsh
+        run: ./ui-expo/publish-sdk.sh
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

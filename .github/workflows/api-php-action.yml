@@ -23,15 +23,12 @@ jobs:
         run: npm ci
       - name: Generate SDK
         id: generate-sdk
-        run: ./api-php/build-sdk.ps1
-        shell: pwsh
+        run: ./api-php/build-sdk.sh
       - name: Build sample
-        run: ./api-php/build-samples.ps1
-        shell: pwsh
+        run: ./api-php/build-samples.sh
       - name: Publish SDK
         if: inputs.publish == true
-        run: ./api-php/publish-sdk.ps1
-        shell: pwsh
+        run: ./api-php/publish-sdk.sh
         env:
           PAT_GITHUB: ${{ secrets.PAT_GITHUB }}
           PACKAGE_VERSION: ${{ steps.generate-sdk.outputs.trinsic-package-version }}

@@ -18,14 +18,11 @@ jobs:
       - name: Install NPM dependencies
         run: npm ci
       - name: Generate backend SDK
-        run: ./api-typescript/build-sdk.ps1
-        shell: pwsh
+        run: ./api-typescript/build-sdk.sh
       - name: Build sample
-        run: ./api-typescript/build-samples.ps1
-        shell: pwsh
+        run: ./api-typescript/build-samples.sh
       - name: Publish SDK
         if: inputs.publish == true
-        run: ./api-typescript/publish-sdk.ps1
-        shell: pwsh
+        run: ./api-typescript/publish-sdk.sh
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

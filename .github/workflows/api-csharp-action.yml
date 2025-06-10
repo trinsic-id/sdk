@@ -18,14 +18,11 @@ jobs:
       - name: Install NPM dependencies
         run: npm ci
       - name: Generate SDK
-        run: ./api-csharp/build-sdk.ps1
-        shell: pwsh
+        run: ./api-csharp/build-sdk.sh
       - name: Build sample
-        run: ./api-csharp/build-samples.ps1
-        shell: pwsh
+        run: ./api-csharp/build-samples.sh
       - name: Publish SDK
         if: inputs.publish == true
-        run: ./api-csharp/publish-sdk.ps1
-        shell: pwsh
+        run: ./api-csharp/publish-sdk.sh
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
