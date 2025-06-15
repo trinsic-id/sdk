@@ -1,0 +1,39 @@
+{
+    "name": "trinsic/service-results",
+    "description": "ServiceResults project for standardized result handling in Trinsic SDK",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "trinsic",
+        "verification",
+        "identity",
+        "results",
+        "sdk"
+    ],
+    "authors": [
+        {
+            "name": "Trinsic ID",
+            "email": "support@trinsic.id"
+        }
+    ],
+    "require": {
+        "php": ">=8.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0",
+        "psalm/plugin-phpunit": "^0.18.4",
+        "vimeo/psalm": "^5.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Trinsic\\ServiceResults\\": ""
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Trinsic\\ServiceResults\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
