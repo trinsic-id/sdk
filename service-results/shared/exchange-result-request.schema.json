@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ExchangeResultRequest",
+  "description": "Standard request model for exchanging session result access keys",
+  "type": "object",
+  "properties": {
+    "sessionId": {
+      "type": "string",
+      "description": "The unique identifier for the verification session",
+      "format": "uuid",
+      "example": "550e8400-e29b-41d4-a716-446655440000"
+    },
+    "resultsAccessKey": {
+      "type": "string",
+      "description": "The access key needed to retrieve session results",
+      "minLength": 1,
+      "example": "rak_abcd1234..."
+    }
+  },
+  "required": ["sessionId", "resultsAccessKey"],
+  "additionalProperties": false
+}

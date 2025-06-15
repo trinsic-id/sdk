@@ -1,0 +1,37 @@
+{
+  "name": "@trinsic/service-results",
+  "version": "1.0.0",
+  "description": "ServiceResults project for standardized result handling in Trinsic SDK",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "trinsic",
+    "verification",
+    "identity",
+    "results",
+    "sdk"
+  ],
+  "author": "Trinsic ID",
+  "license": "MIT",
+  "peerDependencies": {
+    "@trinsic/api": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "jest": "^29.0.0",
+    "typescript": "^5.8.3"
+  },
+  "files": [
+    "dist/**/*",
+    "README.md"
+  ]
+}
