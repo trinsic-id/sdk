@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.FileProviders;
 using Sample;
+using Sample.Routes;
 using Trinsic.Api;
 using Trinsic.Api.Api;
 using Trinsic.Api.Client;
@@ -31,6 +32,9 @@ app.MapSharedRoutes(sessionApi, networkApi);
 app.MapWidgetSessionRoutes(sessionApi);
 app.MapHostedProviderSessionRoutes(sessionApi);
 app.MapAdvancedProviderSessionRoutes(sessionApi);
+
+// Add ServiceResults example routes
+app.MapServiceResultsExampleRoutes(sessionApi);
 
 //Serve web sdk
 app.UseRewriter(new RewriteOptions()
