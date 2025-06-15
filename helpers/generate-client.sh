@@ -118,11 +118,13 @@ if [ ! -d "$publishFolder" ]; then
 fi
 
 # Get version
-version=$("$SCRIPT_DIR/../get-version.sh" "$versionName")
+version=$("$SCRIPT_DIR/../get-version.sh" "$versionName"  | tail -n 1)
 if [ $? -ne 0 ]; then
     echo "Error: Failed to get version for $versionName"
     exit 1
 fi
+
+echo "Creating $language SDK with version $version"
 
 # Replace [VERSION] placeholder in additional properties
 concatenatedAdditionalProperties=$(echo "$additionalProperties" | sed "s/\[VERSION\]/$version/g")
