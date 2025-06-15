@@ -9,7 +9,42 @@ handle_error() {
     exit 1
 }
 
-# TODO: Convert from corresponding PowerShell script
-echo "This script needs to be manually converted from the PowerShell version"
-echo "Script path: $SCRIPT_DIR"
-exit 1
+FLUTTER_SAMPLES_DIR="$SCRIPT_DIR/samples/flutter_sample"
+
+echo "Building ui-flutter sample project..."
+
+# Change to the flutter samples directory
+cd "$FLUTTER_SAMPLES_DIR" || handle_error "Failed to change to flutter_sample directory"
+
+# Run flutter pub get
+flutter pub get
+
+if [ $? -ne 0 ]; then
+    handle_error "flutter pub failed"
+fi
+
+# Run flutter analyze
+flutter analyze
+
+if [ $? -ne 0 ]; then
+    handle_error "flutter analyze failed"
+fi
+
+# Run flutter test
+flutter test
+
+if [ $? -ne 0 ]; then
+    handle_error "flutter test failed"
+fi
+
+echo "Building Flutter Android APK..."
+
+# Build flutter Android APK
+flutter build apk
+
+if [ $? -ne 0 ]; then
+    handle_error "The flutter build APK command failed with exit code $?"
+fi
+
+# Return to original directory
+cd - >/dev/null

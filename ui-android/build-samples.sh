@@ -9,7 +9,15 @@ handle_error() {
     exit 1
 }
 
-# TODO: Convert from corresponding PowerShell script
-echo "This script needs to be manually converted from the PowerShell version"
-echo "Script path: $SCRIPT_DIR"
-exit 1
+# Change to the samples/android_sample directory
+cd "$SCRIPT_DIR/samples/android_sample" || handle_error "Failed to change to android_sample directory"
+
+# Run gradlew build
+./gradlew build
+
+if [ $? -ne 0 ]; then
+    handle_error "gradlew sample build failed"
+fi
+
+# Return to original directory
+cd - >/dev/null
