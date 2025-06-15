@@ -9,7 +9,22 @@ handle_error() {
     exit 1
 }
 
-# TODO: Convert from corresponding PowerShell script
-echo "This script needs to be manually converted from the PowerShell version"
-echo "Script path: $SCRIPT_DIR"
-exit 1
+# Variables
+destinationLocation="$SCRIPT_DIR/sdk"
+sourceLocation="$SCRIPT_DIR/sdk-build"
+repositoryPath="trinsic-id/sdk-php-api"
+name="PHP"
+
+# Call the submodule helper script
+"$SCRIPT_DIR/../helpers/submodule.sh" \
+    --name "$name" \
+    --source "$sourceLocation" \
+    --destination "$destinationLocation" \
+    --sdk-repo-path "$SDK_REPOSITORY_PATH" \
+    --github-pat "$PAT_GITHUB" \
+    --repository-path "$repositoryPath" \
+    --package-version "$PACKAGE_VERSION"
+
+if [ $? -ne 0 ]; then
+    handle_error "submodule.sh script failed"
+fi

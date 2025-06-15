@@ -9,7 +9,9 @@ handle_error() {
     exit 1
 }
 
-# TODO: Convert from corresponding PowerShell script
-echo "This script needs to be manually converted from the PowerShell version"
-echo "Script path: $SCRIPT_DIR"
-exit 1
+# Publish NuGet packages
+dotnet nuget push "$SCRIPT_DIR/sdk/publish/*.nupkg" --source "https://api.nuget.org/v3/index.json" --api-key "$NUGET_API_KEY"
+
+if [ $? -ne 0 ]; then
+    handle_error "dotnet nuget push failed"
+fi
