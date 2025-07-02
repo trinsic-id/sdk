@@ -74,17 +74,21 @@ export async function launchRedirect(launchUrl: string) {
 /**
  * Launches the user through a popup towards any of the Trinsic launch URLs (applies to Widget, Hosted and Advanced Sessions).
  * @param getLaunchUrl - A promise you give us where you retrieve the launch from your backend. This is a promise because of browser restrictions in Safari where popups need to be created, opened and directed to the final domain in the same event loop.
+ * @param loadingDomain - The domain of the loading page that will be used to load the launch url. The domain will first need to be added to the dashboard. Optional, otherwise will load from api.trinsic.id
+ * @param relyingPartyName - The name of the relying party that will be used to load the launch url. Optional, otherwise will use Trinsic as the relying party name
  * @returns A promise that resolves with the result of the session.
  * @example
  * const sessionResult = await launchPopup(() => return await fetch('https://my-backend/create-session').then(res => res.json()));
  */
 export async function launchPopup(
-  getLaunchUrl: () => Promise<string>
+  getLaunchUrl: () => Promise<string>,
+  loadingDomain?: string,
+  relyingPartyName?: string
 ): Promise<TrinsicSessionResult> {
   const userAgents = detectUserAgents();
   const popup = window.open(
-    "https://api.trinsic.id/loading",
-    "Trinsic",
+    `https://${loadingDomain || "api.trinsic.id"}/loading`,
+    relyingPartyName || "Trinsic",
     userAgents.isDesktop
       ? "width=600,height=900"
       : "width=" +
