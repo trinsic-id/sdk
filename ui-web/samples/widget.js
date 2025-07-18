@@ -1,6 +1,6 @@
-import { launchIframe, launchRedirect, launchPopup } from "@trinsic/web-ui";
-import MicroModal from "micromodal";
+import { launchRedirect, launchPopup } from "@trinsic/web-ui";
 import { jsonHandleError, catchErrorAlert } from "./shared";
+import MicroModal from "micromodal";
 MicroModal.init();
 
 window.launchWidget = launchWidget;
@@ -33,10 +33,6 @@ async function launch(launchMode) {
             result = await launchPopup(async () => {
                 return await createSession();
             }).catch(e => catchErrorAlert(e));
-            break;
-        case 'iframe':
-            const launchUrl = await createSession();
-            result = await launchIframe(launchUrl).catch(e => catchErrorAlert(e));
             break;
         case 'redirect':
             const redirectLaunchUrl = await createSession(true);

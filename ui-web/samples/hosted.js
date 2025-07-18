@@ -1,4 +1,4 @@
-import { launchIframe, launchRedirect, launchPopup } from "@trinsic/web-ui";
+import { launchRedirect, launchPopup } from "@trinsic/web-ui";
 import MicroModal from "micromodal";
 MicroModal.init();
 
@@ -15,11 +15,6 @@ async function launch(launchUrl, launchMode) {
   switch (launchMode) {
     case 'popup':
       result = await launchPopup(() => launchUrl + '&redirectUrl=' + window.location.origin + '/redirect');
-      await exchangeResult(result);
-      break;
-    case 'iframe':
-      console.log("launching iframe ", launchUrl);
-      result = await launchIframe(launchUrl);
       await exchangeResult(result);
       break;
     case 'redirect':
