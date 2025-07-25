@@ -1,6 +1,6 @@
 # Web UI SDK Sample
 
-This simple application demonstrates how to set up the Trinsic SDK to start verification flows and read their results. It consumes endpoints from the API samples to launch verification flows through iframe, redirection, and popup mode. Furthermore, it also demonstrate how to intiate direct flows for a specific digital identity provider.
+This simple application demonstrates how to set up the Trinsic SDK to start verification flows and read their results. It consumes endpoints from the API samples to launch verification flows through a redirection or a popup. Furthermore, it also demonstrate how to intiate direct flows for a specific digital identity provider.
 
 ## Dependencies
 

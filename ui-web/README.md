@@ -24,47 +24,46 @@ If you're using a CDN, for example unpkg, you can use the below source.
 ```html
 <script src="http://unpkg.com/@trinsic/web-ui"><script>
 ```
+
 ## Usage
+
 ### Setup
-The library exports three methods: `launchIframe(launchUrl)`, `launchPopup(launchUrl)` and `launchRedirect(launchUrl, redirectUrl)`.
+
+The library exports two methods: `launchPopup(launchUrl)` and `launchRedirect(launchUrl, redirectUrl)`.
 
 #### Bundler
+
 When using a module bundler import the functions as follows:
 
 ```js
-import { launchIframe, launchRedirect, launchPopup } from "@trinsic/web-ui";
+import { launchRedirect, launchPopup } from "@trinsic/web-ui";
 ```
 
-
 #### Script Tag
+
 When using a direct script tag, you can access the methods via the global `TrinsicUI` variable:
 
 ```js
-await TrinsicUI.launchIframe(LAUNCH_URL);
+await TrinsicUI.launchPopup(async () => CREATE_LAUNCH_URL);
 ```
 
 ### Launch a Session
+
 First, retrieve a launch URL from a trusted backend that can reach out to the Trinsic servers and create sessions. [See our API libraries.](https://github.com/trinsic-id/sdk#api-libraries).
 
 Then, launch the session using one of the three methods exposed by this library:
 
-#### `launchIframe`
-
-Call `await launchIframe(launchUrl)` to launch the Session as an embedded floating iFrame in-page.
-
-This method returns a promise which will resolve when the Session is completed (successfully or unsuccessfully) or aborted by the user.
-
 #### `launchPopup`
 
-Call `await launchPopup(launchUrl)` to launch the Session as a popup.
+Call `await launchPopup(() => create_session_on_your_backend)` to launch the Session as a popup.
 
-This call functions similarly to `launchIframe` -- it will return a promise which will resolve when the Session is finished.
+This call will return a promise which will resolve when the Session is finished.
 
 #### `launchRedirect`
 
 Call `launchRedirect(launchUrl, redirectUrl)` to launch the session by redirecting the user's browser window. This is similar to an OAuth flow.
 
-This method has no return value, and cannot be awaited in the same way `launchIframe` and `launchPopup` can.
+This method has no return value, and cannot be awaited in the same way that `launchPopup` can.
 
 When the user completes or aborts the Session, they will be redirected back to your application at `redirectUrl`, with the following query parameters appended:
 
@@ -77,11 +76,9 @@ When the user completes or aborts the Session, they will be redirected back to y
 - `sessionId`
   - The ID of the session that the user is redirecting back from
 
-
 For example, calling `launchRedirect(launchUrl, "https://example.com/trinsic-redirect")` will cause the user to be redirected to `https://example.com/trinsic-redirect?success=true&sessionId=...&resultsAccessKey=...` upon completion of the Session.
 
-***Note:** These parameters can be set to arbitrary values by curious or malicious users simply by editing their browser URL bar. Don't implicitly trust the `success` parameter -- always fetch the Session results from your backend to confirm. Similarly, keep a record of the session ID you sent the user to, and correlate it against the `sessionId` query parameter.*
-
+**\*Note:** These parameters can be set to arbitrary values by curious or malicious users simply by editing their browser URL bar. Don't implicitly trust the `success` parameter -- always fetch the Session results from your backend to confirm. Similarly, keep a record of the session ID you sent the user to, and correlate it against the `sessionId` query parameter.\*
 
 You can find a full example of an app using this library in the [samples](https://github.com/trinsic-id/sdk/tree/main/ui-web/samples) folder.
 
