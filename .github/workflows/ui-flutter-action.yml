@@ -46,13 +46,10 @@ jobs:
       - name: Verify credentials
         run: cat $XDG_CONFIG_HOME/dart/pub-credentials.json
       - name: Build SDK
-        run: ./ui-flutter/build-sdk.ps1
-        shell: pwsh
+        run: ./ui-flutter/build-sdk.sh
       - name: Build Samples
-        run: ./ui-flutter/build-samples.ps1
-        shell: pwsh
+        run: ./ui-flutter/build-samples.sh
       - name: Publish SDK
         working-directory: ./
         if: inputs.publish == true
-        run: ./ui-flutter/publish-sdk.ps1
-        shell: pwsh
+        run: ./ui-flutter/publish-sdk.sh
