@@ -9,7 +9,7 @@
   "rubyPatchVersion": "0-alpha.1",
   "swiftUIVersion": "0-alpha.1",
   "androidUIVersion": "0-alpha.1",
-  "flutterUIVersion": "0-alpha.1",
-  "expoUIVersion": "0-alpha.1",
-  "webUIVersion": " 0-alpha.1"
+  "flutterUIVersion": "2.0.1-alpha.1",
+  "expoUIVersion": "2.0.1-alpha.1",
+  "webUIVersion": " 2.0.1-alpha.1"
 }

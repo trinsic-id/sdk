@@ -10,7 +10,7 @@ handle_error() {
 }
 
 # Additional properties for C# client generation
-additionalProperties="packageName=Trinsic.Api,packageVersion=[VERSION],nullableReferenceTypes=true,modelPropertySorting=alphabetical,library=generichost,useDateTimeOffset=true,validatable=false,disallowAdditionalPropertiesIfNotPresent=false,licenseId=MIT,apiName=TrinsicApi,targetFramework=net8.0"
+additionalProperties="packageName=Trinsic.Api,packageVersion=[VERSION],nullableReferenceTypes=true,modelPropertySorting=alphabetical,library=generichost,useDateTimeOffset=true,validatable=false,disallowAdditionalPropertiesIfNotPresent=false,licenseId=MIT,apiName=TrinsicApi,targetFramework=net9.0"
 
 # Generate the C# client
 "$SCRIPT_DIR/../helpers/generate-client.sh" \
