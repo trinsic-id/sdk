@@ -7,9 +7,9 @@
   "pythonPatchVersion": "0-alpha.1",
   "phpPatchVersion": "0-alpha.1",
   "rubyPatchVersion": "0-alpha.1",
-  "swiftUIVersion": "2.0.0-alpha.1",
-  "androidUIVersion": "2.0.0-alpha.1",
-  "flutterUIVersion": "2.0.0-alpha.1",
-  "expoUIVersion": "2.0.1-alpha.1",
-  "webUIVersion": " 2.0.1-alpha.1"
+  "swiftUIVersion": "2.0.0",
+  "androidUIVersion": "2.0.0",
+  "flutterUIVersion": "2.0.0",
+  "expoUIVersion": "2.0.1",
+  "webUIVersion": " 2.2.0"
 }
