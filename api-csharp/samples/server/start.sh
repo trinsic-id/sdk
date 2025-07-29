@@ -1,8 +1,8 @@
 #!/bin/bash
 
 if [ -z "$TRINSIC_ACCESS_TOKEN" ]; then
-    if [ ! -f .env ] || ! grep -q "TRINSIC_ACCESS_TOKEN" .env; then
-        echo "Error: TRINSIC_ACCESS_TOKEN environment variable not set or .env file not found"
+    if [ ! -f Sample/.env ] || ! grep -q "TRINSIC_ACCESS_TOKEN" Sample/.env; then
+        echo "Error: TRINSIC_ACCESS_TOKEN environment variable not set or Sample/.env file not found"
         exit 1
     fi
 fi
