@@ -11,7 +11,8 @@ export default {
         widget: resolve(__dirname, "widget.html"),
         hosted: resolve(__dirname, "hosted.html"),
         advanced: resolve(__dirname, "advanced.html"),
-        advancedPopup: resolve(__dirname, "advanced-popup.html")
+        advancedPopup: resolve(__dirname, "advanced-popup.html"),
+        advancedPollAfterRedirect: resolve(__dirname, "advanced-poll-after-redirect.html"),
       },
     },
   },
