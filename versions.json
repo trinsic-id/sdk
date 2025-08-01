@@ -2,7 +2,7 @@
   "backendVersion": "2.1",
   "nodePatchVersion": "0-alpha1",
   "csharpPatchVersion": "0-alpha1",
-  "javaPatchVersion": "0-alpha1",
+  "javaPatchVersion": "0-alpha2",
   "goPatchVersion": "0-alpha1",
   "pythonPatchVersion": "0-alpha1",
   "phpPatchVersion": "0-alpha1",
