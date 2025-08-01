@@ -1,4 +1,4 @@
-trinsic_api
+trinsic_api==2.1.0-alpha1
 fastapi
 pydantic
 load_dotenv

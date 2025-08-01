@@ -90,7 +90,7 @@ func AdvancedRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 
 		// Create request
 		request := trinsic_api.RefreshStepContentRequest{
-			ResultsAccessKey: *trinsic_api.NewNullableString(&requestPayload.ResultsAccessKey),
+			ResultsAccessKey: requestPayload.ResultsAccessKey,
 		}
 
 		req := api.SessionsAPI.RefreshStepContent(c.Context(), sessionId).RefreshStepContentRequest(request)
