@@ -13,10 +13,7 @@ public static class AdvancedProviderSession
         app.MapPost("/refresh-content/{sessionId}", async (HttpContext context, string sessionId) =>
         {
             var request = await context.Request.ReadFromJsonAsync<ResultsAccessKeyBody>();
-            var response = await sessionApi.RefreshStepContentAsync(Guid.Parse(sessionId), new RefreshStepContentRequest()
-            {
-                ResultsAccessKey = request.ResultsAccessKey 
-            });
+            var response = await sessionApi.RefreshStepContentAsync(Guid.Parse(sessionId), new RefreshStepContentRequest(request.ResultsAccessKey));
             response.LogAndThrowIfError(app.Logger);
             await context.Response.WriteAsJsonAsync(response.Ok(), new JsonSerializerOptions()
             {

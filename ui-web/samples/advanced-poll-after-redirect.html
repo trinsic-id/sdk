@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="icon" href="https://cdn.trinsic.id/assets/logo/favicon.ico" />
+  <script type="module" src="./shared.js"></script>
+  <script type="module" src="./advanced-poll-after-redirect.js"></script>
+  <title>Trinsic UI sample</title>
+</head>
+
+<body class="friendly-text">
+  <div class="modal micromodal-slide is-open" id="advanced-modal">
+    <div class="modal__overlay">
+      <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
+        <header class="modal__header">
+          <h2 class="modal__title" id="modal-1-title">
+            Poll After Redirect
+          </h2>
+        </header>
+        <main class="modal__content" id="advanced-modal-content">
+          <p>
+            The results of the verification aren't yet available; we're now polling for results.<br/>
+            This is related to the `PollAfterRedirect` capability.<br/><br/>
+            <b>Session ID:</b> <code id="session-id"></code> <br/>
+            <b>Success:</b> <code id="success"></code> <br/>
+            <b>Done:</b> <code id="done"></code> <br/>
+            <b>Last polled:</b> <code id="last-polled"></code> <br/>
+            <b>Error code:</b> <code id="error-code"></code> <br/>
+          
+            </div>
+          </p>
+        </main>
+        <footer class="modal__footer">
+        </footer>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
