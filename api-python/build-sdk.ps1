@@ -2,7 +2,7 @@ $additionalProperties = @{
     packageName    = "trinsic_api"
     packageVersion = "[VERSION]"
     packageUrl     = "https://trinsic.id"
-    projectName    = "Trinsic-Api"
+    projectName    = "trinsic_api"
 }
 & "$PSScriptRoot/../helpers/generate-client.ps1" -language "python" -outputFolder "$PSScriptRoot/sdk" -additionalProperties $additionalProperties
 
