@@ -10,6 +10,7 @@ window.ipAddress = async () => {
         return null;
     }
 }
+
 export function catchErrorAlert(error) {
     let errorMessage = "";
     let errorDetails = "";
@@ -42,6 +43,7 @@ export async function jsonHandleError(response) {
     const data = await response.json();
     return data;
 }
+
 async function exchangeResult(response) {
     console.debug("Exchanging result, response:", response);
     const result = await fetch("/exchange-result", {
@@ -53,8 +55,7 @@ async function exchangeResult(response) {
             sessionId: response.sessionId,
             resultsAccessKey: response.resultsAccessKey,
         }),
-    })
-        .then(r => jsonHandleError(r))
+    }).then(r => jsonHandleError(r))
     document.getElementById("results").innerText = JSON.stringify(result, null, 2);
     MicroModal.show('results-modal');
 }

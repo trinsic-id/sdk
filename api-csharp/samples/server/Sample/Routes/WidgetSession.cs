@@ -15,8 +15,8 @@ public static class WidgetSession
                 RedirectUrl = redirectUrl
             });
             response.LogAndThrowIfError(app.Logger);
-            await
-                context.Response.WriteAsJsonAsync(response.Ok());
+
+            await context.Response.WriteAsJsonAsync(response.Ok());
         });
     }
 }

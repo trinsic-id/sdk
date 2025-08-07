@@ -47,10 +47,12 @@ async function startResultsPolling(sessionId, resultsAccessKey) {
 
     if (result.session.done === true) {
       clearInterval(resultPollingInterval);
+
       const data = {
         success: result.session.success,
         resultsAccessKey: resultsAccessKey,
         sessionId: sessionId,
+        isTrinsicSamplePopupMessage: true,
       };
 
       console.debug("Sending message to opener", data, window.opener);
