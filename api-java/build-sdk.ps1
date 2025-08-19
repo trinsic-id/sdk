@@ -33,6 +33,14 @@ try {
     $buildGradleFile = "build.gradle"
     $buildGradleFileContent = Get-Content -Path $buildGradleFile
 
+    # HACK: Building this SDK breaks in Gradle 9+ for two reasons:
+    # 1. The generated code uses 'main' instead of 'mainClass' in the JavaExec task
+    # 2. For some reason, `sourceCompatibility = JavaVersion.VERSION_11` breaks, because it needs to be prefixed with `java.` or surrounded by `java { ...}`
+    # This hack fixes those problems
+    $buildGradleFileContent = $buildGradleFileContent -replace 'main = System.getProperty', 'mainClass = System.getProperty'
+    $buildGradleFileContent = $buildGradleFileContent -replace 'sourceCompatibility = JavaVersion.VERSION_11', 'java.sourceCompatibility = JavaVersion.VERSION_11'
+    $buildGradleFileContent = $buildGradleFileContent -replace 'targetCompatibility = JavaVersion.VERSION_11', 'java.targetCompatibility = JavaVersion.VERSION_11'
+
     # Convert content to an array for easier manipulation
     $gradleLines = $buildGradleFileContent -split "`n"
 
