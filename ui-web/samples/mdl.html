@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="icon" href="https://cdn.trinsic.id/assets/logo/favicon.ico" />
+  <script type="module" src="./shared.js"></script>
+  <script type="module" src="./hosted.js"></script>
+  <title>Trinsic UI sample</title>
+</head>
+
+<body class="friendly-text">
+  <h1>Trinsic Frontend Client Sample</h1>
+  <p><a href="https://docs.trinsic.id/docs/integration-guide">Read more</a> in our integration guide about the different
+    session launch modes.</p>
+    <a href="/"> &lt;-- Back</a>
+  <div style="border: 1px solid black;padding: 5px; margin: 5px;">
+    <h3>mDL Exchange (Digital Credentials API)</h3>
+
+    <p>
+      <b>Select provider:</b>
+      <label>
+        <input type="radio" name="mdlProvider" value="google-wallet" checked>
+        Google Wallet
+      </label>      
+      <label>
+        <input type="radio" name="mdlProvider" value="apple-wallet" disabled>
+        Apple Wallet (coming soon)
+      </label>
+    </p>
+  </div>
+
+  <div class="modal micromodal-slide" id="results-modal" aria-hidden="true">
+    <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+      <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
+        <header class="modal__header">
+          <h2 class="modal__title" id="modal-1-title">
+            Session Results
+          </h2>
+          <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
+        </header>
+        <main class="modal__content" id="modal-1-content">
+          <p>
+            <b>Session ID:</b> <code id="session-id"></code> <br/>
+            <pre id="results">
+
+            </pre>
+          </p>
+        </main>
+        <footer class="modal__footer">
+          <button class="modal__btn" data-micromodal-close aria-label="Close this dialog window">Close</button>
+        </footer>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
