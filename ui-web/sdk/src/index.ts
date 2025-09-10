@@ -145,9 +145,6 @@ export async function performMdlExchange(requestObjectBase64Url: string) : Promi
     throw new Error("Unexpected platform '" + platform + "'");
   }
 
-  if (platform === "apple-wallet") {
-    throw new Error("Apple Wallet is not yet supported by this SDK, but will be available soon.");
-  }
 
   if (exchangeMechanism === "NativeApp") {
     throw new Error("This request was created for the 'NativeApp' exchange mechanism, and can only be used in a native mobile app.");
@@ -191,4 +188,40 @@ export async function performMdlExchange(requestObjectBase64Url: string) : Promi
     exchangeId: exchangeId,
     token: base64urlEncoded,
   };
+}
+
+/**
+ * Performs useragent sniffing to determine if the user is on an Apple Wallet-supporting device.
+ * 
+ * This can help determine which wallet options to display to the user.
+ * 
+ * NOTE: This is a simple heuristic and is likely not 100% accurate at this time.
+ *
+ * @returns Whether the user is on an Apple Wallet-supporting browser
+ */
+export function isUserOnEligibleAppleWalletBrowser(): boolean {
+  if(!navigator.credentials || !navigator.credentials.get) {
+    return false;
+  }
+
+  const userAgents = detectUserAgents();
+  return userAgents.isIos || userAgents.isSafari || userAgents.isMacOs || !!(window as any).ApplePaySession;
+}
+
+/**
+ * Performs useragent sniffing to determine if the user is on an Android device using Chrome.
+ * 
+ * This can help determine which wallet options to display to the user.
+ * 
+ * NOTE: This is a simple heuristic and is likely not 100% accurate at this time.
+ *
+ * @returns Whether the user is on a Google Wallet-supporting browser
+ */
+export function isUserOnEligibleGoogleWalletBrowser(): boolean {
+  if(!navigator.credentials || !navigator.credentials.get) {
+    return false;
+  }
+
+  const userAgents = detectUserAgents();
+  return userAgents.isAndroid && userAgents.isChrome;
 }
