@@ -26,11 +26,13 @@ builder.Services.AddTrinsicApi(options =>
 var app = builder.Build();
 var sessionApi = app.Services.GetService<ISessionsApi>()!;
 var networkApi = app.Services.GetService<INetworkApi>()!;
+var mdlApi = app.Services.GetService<IMdlApi>()!;
 app.UseMiddleware<JsonExceptionMiddleware>();
 app.MapSharedRoutes(sessionApi, networkApi);
 app.MapWidgetSessionRoutes(sessionApi);
 app.MapHostedProviderSessionRoutes(sessionApi);
 app.MapAdvancedProviderSessionRoutes(sessionApi);
+app.MapMdlExchangeRoutes(mdlApi);
 
 //Serve web sdk
 app.UseRewriter(new RewriteOptions()
