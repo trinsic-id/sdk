@@ -1,4 +1,4 @@
-import { performMdlExchange } from "@trinsic/web-ui";
+import { performMdlExchange, } from "@trinsic/web-ui";
 import MicroModal from "micromodal";
 MicroModal.init();
 
@@ -45,11 +45,11 @@ async function executeMdlExchange() {
     const exchangeData = window.mdlExchangeData;
     const exchangeId = exchangeData.exchangeId;
     const exchangeContext = exchangeData.exchangeContext;
-    const requestObjectBase64 = exchangeData.requestObjectBase64;
+    const requestObjectBase64Url = exchangeData.requestObjectBase64Url;
 
     // `performMdlExchange` is a function in Trinsic's Web SDK.
-    // `requestObjectBase64` is a string that comes directly from the "create exchange" endpoint -- it is passed in exactly as-is.
-    const mdlResult = await performMdlExchange(requestObjectBase64);
+    // `requestObjectBase64Url` is a string that comes directly from the "create exchange" endpoint -- it is passed in exactly as-is.
+    const mdlResult = await performMdlExchange(requestObjectBase64Url);
     const resultExchangeId = mdlResult.exchangeId;
     const resultToken = mdlResult.token; // This is a string that should be sent to Trinsic's "finalize exchange" endpoint exactly as-is.
 
