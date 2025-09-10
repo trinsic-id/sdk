@@ -17,7 +17,7 @@ jobs:
         run: xcodebuild -resolvePackageDependencies -project iOS.xcodeproj
         working-directory: ui-swift/samples/iOS
       - name: Build the project
-        run: xcodebuild -project iOS.xcodeproj -scheme iOS -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 12,OS=latest' build
+        run: xcodebuild -project iOS.xcodeproj -scheme iOS -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' build
         working-directory: ui-swift/samples/iOS
   macos:
     runs-on: macos-latest
