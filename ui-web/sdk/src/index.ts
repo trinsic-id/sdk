@@ -145,9 +145,6 @@ export async function performMdlExchange(requestObjectBase64Url: string) : Promi
     throw new Error("Unexpected platform '" + platform + "'");
   }
 
-  if (platform === "apple-wallet") {
-    throw new Error("Apple Wallet is not yet supported by this SDK, but will be available soon.");
-  }
 
   if (exchangeMechanism === "NativeApp") {
     throw new Error("This request was created for the 'NativeApp' exchange mechanism, and can only be used in a native mobile app.");
