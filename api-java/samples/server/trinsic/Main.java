@@ -66,7 +66,7 @@ public class Main {
         id.trinsic.Shared.SharedRoutes(app, network, session);
         id.trinsic.Widget.WidgetRoutes(app, session);
         id.trinsic.Hosted.HostedRoutes(app, session);
-        id.trinsic.Advanced.AdvancedRoutes(app, session);
+        id.trinsic.Direct.DirectRoutes(app, session);
 
 
         app.start(3000);

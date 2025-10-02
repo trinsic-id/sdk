@@ -61,7 +61,7 @@ async function startResultsPolling(sessionId, resultsAccessKey) {
   }, 2000);
 }
 
-async function initializeAdvancedPopup() {
+async function initializeDirectPopup() {
   const urlSearchParams = new URLSearchParams(window.location.search);
   const sessionId = urlSearchParams.get('sessionId');
   const resultsAccessKey = urlSearchParams.get('resultsAccessKey');
@@ -106,4 +106,4 @@ async function startRefreshing(sessionId, nextStep, resultsAccessKey, refreshAft
   }, timeout);
 }
 
-initializeAdvancedPopup();
+initializeDirectPopup();

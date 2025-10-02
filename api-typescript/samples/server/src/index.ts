@@ -1,26 +1,21 @@
-import 'express-async-errors'; // 👈 this must come before your routes
-import {
-  SessionsApi,
-  Configuration,
-  NetworkApi,
-} from "@trinsic/api";
+import "express-async-errors"; // 👈 this must come before your routes
+import { SessionsApi, Configuration, NetworkApi } from "@trinsic/api";
 import { sharedRoutes } from "./shared";
 import { widgetRoutes } from "./widget";
 import { hostedRoutes } from "./hosted";
 import path from "path";
 import express from "express";
 import { Request, Response, NextFunction } from "express";
-import { advancedRoutes } from "./advanced";
-import { config } from 'dotenv';
-import { existsSync } from 'fs';
+import { directRoutes } from "./direct";
+import { config } from "dotenv";
+import { existsSync } from "fs";
 
-if (existsSync('.env')) {
+if (existsSync(".env")) {
   config(); // Load .env if it exists
-  console.log('.env file loaded');
+  console.log(".env file loaded");
 } else {
-  console.log('No .env file found, continuing without it');
+  console.log("No .env file found, continuing without it");
 }
-
 
 const app = express();
 const PORT = 3000;
@@ -34,10 +29,10 @@ const networkApi = new NetworkApi(newConfiguration);
 
 app.use(express.json());
 
-sharedRoutes(app, networkApi, sessionsApi)
+sharedRoutes(app, networkApi, sessionsApi);
 widgetRoutes(app, sessionsApi);
 hostedRoutes(app, sessionsApi);
-advancedRoutes(app, sessionsApi);
+directRoutes(app, sessionsApi);
 
 // Serve web SDK
 app.use(
@@ -45,23 +40,25 @@ app.use(
   express.static(path.join("../../../ui-web/samples/dist/assets"))
 );
 
-
 app.use(async (err: any, req: Request, res: Response, next: NextFunction) => {
   try {
     if (err?.response?.body) {
       const content = await err.response.text();
-      console.error(`Request failed with status ${err.response.status}: ${content}`);
-    }
-    else {
+      console.error(
+        `Request failed with status ${err.response.status}: ${content}`
+      );
+    } else {
       console.error(err);
     }
-  }
-  catch (e) {
+  } catch (e) {
     console.error("Error reading error response", e);
   }
-  res.status(err.statusCode || 500).json({ message: `Request failed: check the logs on the backend for more information. ${err.message}` || 'Request failed: check the logs on the backend for more information.' });
+  res.status(err.statusCode || 500).json({
+    message:
+      `Request failed: check the logs on the backend for more information. ${err.message}` ||
+      "Request failed: check the logs on the backend for more information.",
+  });
 });
-
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}/`);

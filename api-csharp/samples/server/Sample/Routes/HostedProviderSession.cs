@@ -10,8 +10,9 @@ public static class HostedProviderSession
         app.MapGet("/hosted-launch/{providerId}", async (HttpContext context, string providerId) =>
         {
             var redirectUrl = context.Request.Query["redirectUrl"].ToString();
+            
 
-            var request = new CreateHostedProviderSessionRequest(providerId, redirectUrl, null);
+            var request = new CreateHostedProviderSessionRequest(providerId, redirectUrl, EnvironmentHelper.GetVerificationProfileIdOrThrow());
 
             var response = await sessionApi.CreateHostedProviderSessionAsync(request);
             response.LogAndThrowIfError(app.Logger);

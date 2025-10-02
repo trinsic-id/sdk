@@ -9,7 +9,7 @@ from fastapi.responses import JSONResponse
 from shared import sharedRouter
 from widget import widgetRouter
 from hosted import hostedRouter
-from advanced import advancedRouter
+from direct import directRouter
 from trinsic_api.exceptions import ApiException
 from trinsic_api.configuration import Configuration
 from trinsic_api.api_client import ApiClient
@@ -40,7 +40,7 @@ app = FastAPI()
 app.include_router(sharedRouter, dependencies=[Depends(get_sessions_api)])
 app.include_router(widgetRouter, dependencies=[Depends(get_sessions_api)])
 app.include_router(hostedRouter, dependencies=[Depends(get_sessions_api)])
-app.include_router(advancedRouter, dependencies=[Depends(get_sessions_api)])
+app.include_router(directRouter, dependencies=[Depends(get_sessions_api)])
 
 app.mount("/", StaticFiles(directory=web_ui_path, html=True), name="static")
 

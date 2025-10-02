@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * The TrinsicUI instance, which will be used to launch a Hosted or Widget session.
      * <p>
-     * Not used for Advanced Sessions, or for mDL Exchanges.
+     * Not used for Direct Sessions, or for mDL Exchanges.
      */
     private TrinsicUI trinsicUI;
 

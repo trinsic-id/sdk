@@ -41,7 +41,7 @@ func main() {
 	SharedRoutes(app, api)
 	WidgetRoutes(app, api)
 	HostedRoutes(app, api)
-	AdvancedRoutes(app, api)
+	DirectRoutes(app, api)
 
 	app.Listen(":3000")
 }

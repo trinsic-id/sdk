@@ -7,29 +7,33 @@
   <link rel="stylesheet" href="./style.css" />
   <link rel="icon" href="https://cdn.trinsic.id/assets/logo/favicon.ico" />
   <script type="module" src="./shared.js"></script>
-  <script type="module" src="./advanced-poll-after-redirect.js"></script>
+  <script type="module" src="./direct-popup.js"></script>
   <title>Trinsic UI sample</title>
 </head>
 
 <body class="friendly-text">
-  <div class="modal micromodal-slide is-open" id="advanced-modal">
+  <div class="modal micromodal-slide is-open" id="direct-modal">
     <div class="modal__overlay">
       <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
         <header class="modal__header">
           <h2 class="modal__title" id="modal-1-title">
-            Poll After Redirect
+            Direct Provider Session
           </h2>
         </header>
-        <main class="modal__content" id="advanced-modal-content">
+        <main class="modal__content" id="direct-modal-content">
           <p>
-            The results of the verification aren't yet available; we're now polling for results.<br/>
-            This is related to the `PollAfterRedirect` capability.<br/><br/>
+            We've launched a direct provider session. We'll update this modal with the status of the session. <br/>
             <b>Session ID:</b> <code id="session-id"></code> <br/>
+            <b>Content should be refreshed:</b> <code id="content-refresh"></code> <br/>
+            <b>Next step:</b> <code id="next-step"></code> <br/>
+            <b>Polling for result:</b> <code id="polling"></code> <br/>
             <b>Success:</b> <code id="success"></code> <br/>
             <b>Done:</b> <code id="done"></code> <br/>
-            <b>Last polled:</b> <code id="last-polled"></code> <br/>
             <b>Error code:</b> <code id="error-code"></code> <br/>
-          
+            
+            <canvas id="qrcode-canvas" style="max-width: 400px;max-height:400px;display:none;"></canvas>
+            <div id="show-content" style="font-size: 4em; font-weight: bold; width: 100%; height: auto; text-align: center;display:none;">
+
             </div>
           </p>
         </main>

@@ -7,7 +7,7 @@ require 'trinsic_api'
 require_relative 'shared'
 require_relative 'widget'
 require_relative 'hosted'
-require_relative 'advanced'
+require_relative 'direct'
 
 
 class MyApp < Sinatra::Base
@@ -24,7 +24,7 @@ class MyApp < Sinatra::Base
   register SharedRoutes
   register WidgetRoutes
   register HostedRoutes
-  register AdvancedRoutes
+  register DirectRoutes
 
   # Custom error handler for unhandled exceptions
   error do

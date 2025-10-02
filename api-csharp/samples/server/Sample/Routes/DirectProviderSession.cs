@@ -6,9 +6,9 @@ using Trinsic.Api.Model;
 
 namespace Sample;
 
-public static class AdvancedProviderSession
+public static class DirectProviderSession
 {
-    public static void MapAdvancedProviderSessionRoutes(this WebApplication app, ISessionsApi sessionApi)
+    public static void MapDirectProviderSessionRoutes(this WebApplication app, ISessionsApi sessionApi)
     {
         app.MapPost("/refresh-content/{sessionId}", async (HttpContext context, string sessionId) =>
         {
@@ -21,7 +21,7 @@ public static class AdvancedProviderSession
             });
         });
 
-        app.MapGet("/advanced-launch/{providerId}", async (HttpContext context, string providerId) =>
+        app.MapGet("/direct-launch/{providerId}", async (HttpContext context, string providerId) =>
         {
             var fallbackToTrinsicUI = bool.Parse(context.Request.Query["fallbackToTrinsicUI"].ToString());
             var redirectUrl = context.Request.Query["redirectUrl"].ToString();
@@ -29,9 +29,9 @@ public static class AdvancedProviderSession
                 .Select(x => (IntegrationCapability)Enum.Parse(typeof(IntegrationCapability), x)).ToList();
 
             var request =
-                new CreateAdvancedProviderSessionRequest(capabilities, providerId,fallbackToTrinsicUI,  null,
+                new CreateDirectProviderSessionRequest(capabilities, providerId, EnvironmentHelper.GetVerificationProfileIdOrThrow(),fallbackToTrinsicUI,  null,
                     redirectUrl);
-            var response = await sessionApi.CreateAdvancedProviderSessionAsync(request);
+            var response = await sessionApi.CreateDirectProviderSessionAsync(request);
             response.LogAndThrowIfError(app.Logger);
 
             var result = response.Ok();
@@ -52,7 +52,7 @@ public static class AdvancedProviderSession
         {
             var request = await context.Request.ReadFromJsonAsync<ResultsAccessKeyBody>();
             var response =
-                await sessionApi.GetSessionResultAsync(sessionId,
+                await sessionApi.GetSessionResultAsync(Guid.Parse(sessionId),
                     new GetSessionResultRequest(request.ResultsAccessKey));
             response.LogAndThrowIfError(app.Logger);
             await context.Response.WriteAsJsonAsync(response.Ok(), new JsonSerializerOptions()

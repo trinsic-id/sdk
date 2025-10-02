@@ -20,14 +20,13 @@ This library supports launching both [Widget](https://docs.trinsic.id/docs/widge
 
 You _must_ specify a `redirectUrl` when creating either kind of Session, and that `redirectUrl` _must_ use a custom scheme which you register against your app (see below).
 
-### Advanced Provider Sessions
+### Direct Provider Sessions
 
-This library provides **only minimal** support for [Advanced Provider Sessions](https://docs.trinsic.id/docs/advanced-provider-session). 
+This library provides **only minimal** support for [Direct Provider Sessions](https://docs.trinsic.id/docs/direct-provider-session).
 
 Specifically, it can be used only to execute Sessions which return a `launchMethod` of `LaunchBrowser` and a `collectionMethod` of `CaptureRedirect`.
 
 All other interaction methods are not supported by this library and will require additional effort to implement; please contact Trinsic for guidance.
-
 
 ## Installation (Gradle)
 
@@ -76,6 +75,7 @@ An example of a good scheme is `acme-corp-shopping-app-trinsic-redirect`.
 ### 2. Register and use the Custom Scheme with Trinsic
 
 #### a. Register the Custom Scheme with Trinsic
+
 After choosing a custom scheme, you must register it as a valid `redirectUrl` with Trinsic.
 This can be done on the Trinsic Dashboard.
 
@@ -86,12 +86,14 @@ acme-corp-shopping-app-trinsic-redirect:///*
 ```
 
 **Things to note**:
+
 - The `*` at the end of the URL is a wildcard. It allows any path to be used in redirect URLs for this scheme.
-    - This library does not care about the redirect URL's path, only its scheme.
+  - This library does not care about the redirect URL's path, only its scheme.
 - The triple slash (`///`) is required to construct a valid redirect URL with a custom scheme.
-    - The first two slashes are part of the scheme, and the third slash is the start of the path.
+  - The first two slashes are part of the scheme, and the third slash is the start of the path.
 
 #### b. Use the Custom Scheme with Trinsic
+
 After registering the custom scheme in the Dashboard, you may now use it in a `redirectUrl` when creating a Session.
 
 For example, given the custom scheme `acme-corp-shopping-app-trinsic-redirect`, the following is a valid `redirectUrl`:
@@ -154,12 +156,13 @@ Simply paste the following snippet next to where you pasted the above snippet, r
 > Note that this vulnerability is **not related to this library**: if your app's minimum SDK version is less than 28 then it is inherently vulnerable, as the issue exists within Android itself. This library has no effect on your app's security.
 >
 > Your options are:
+>
 > 1. (**Recommended**) Increase your app's minimum SDK version to `28` or higher
->       1. Unless your app requires it (which is uncommon), you can safely remove the `android:taskAffinity=""` property after this change
->       2. This will prevent your app from running on [roughly 9%](https://gs.statcounter.com/os-version-market-share/android) of Android devices
->       3. This is the only way to fully mitigate the aforementioned security issue.
+>    1. Unless your app requires it (which is uncommon), you can safely remove the `android:taskAffinity=""` property after this change
+>    2. This will prevent your app from running on [roughly 9%](https://gs.statcounter.com/os-version-market-share/android) of Android devices
+>    3. This is the only way to fully mitigate the aforementioned security issue.
 > 2. Remove the `android:taskAffinity=""` field without changing your app's minimum SDK version
->       1. Your app may be vulnerable to activity hijacking on older Android devices
+>    1. Your app may be vulnerable to activity hijacking on older Android devices
 
 If you specify a custom task affinity of `""` (an empty string), this library cannot function.
 

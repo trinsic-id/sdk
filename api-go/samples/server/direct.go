@@ -11,17 +11,17 @@ import (
 	trinsic_api "github.com/trinsic-id/sdk-go-api/v2"
 )
 
-func AdvancedRoutes(app *fiber.App, api *trinsic_api.APIClient) {
-	app.Get("/advanced", func(c *fiber.Ctx) error {
-		return c.Redirect("/advanced.html")
+func DirectRoutes(app *fiber.App, api *trinsic_api.APIClient) {
+	app.Get("/direct", func(c *fiber.Ctx) error {
+		return c.Redirect("/direct.html")
 	})
 
-	app.Get("/advanced-popup", func(c *fiber.Ctx) error {
+	app.Get("/direct-popup", func(c *fiber.Ctx) error {
 		queryParams := c.OriginalURL()[len(c.Path()):]
-		return c.Redirect("/advanced-popup.html" + queryParams)
+		return c.Redirect("/direct-popup.html" + queryParams)
 	})
 
-	app.Get("/advanced-launch/:provider", func(c *fiber.Ctx) error {
+	app.Get("/direct-launch/:provider", func(c *fiber.Ctx) error {
 		provider := c.Params("provider")
 		redirectUrl := c.Query("redirectUrl")
 		fallbackToTrinsicUI := c.Query("fallbackToTrinsicUI") == "true"
@@ -33,7 +33,7 @@ func AdvancedRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 		}
 
 		// Create request
-		req := trinsic_api.CreateAdvancedProviderSessionRequest{
+		req := trinsic_api.CreateDirectProviderSessionRequest{
 			RedirectUrl:        *trinsic_api.NewNullableString(&redirectUrl),
 			Provider:           provider,
 			Capabilities:       integrationCapabilities,
@@ -41,8 +41,8 @@ func AdvancedRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 		}
 
 		// Call API
-		opts := api.SessionsAPI.CreateAdvancedProviderSession(c.Context()).
-			CreateAdvancedProviderSessionRequest(req)
+		opts := api.SessionsAPI.CreateDirectProviderSession(c.Context()).
+			CreateDirectProviderSessionRequest(req)
 
 		result, _, err := opts.Execute()
 		if err != nil {
@@ -74,7 +74,7 @@ func AdvancedRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 			"refreshAfter":     {refreshAfter},
 		}
 
-		return c.Redirect("/advanced-popup?" + queryParams.Encode())
+		return c.Redirect("/direct-popup?" + queryParams.Encode())
 	})
 
 	app.Post("/refresh-content/:sessionId", func(c *fiber.Ctx) error {

@@ -131,8 +131,8 @@ $widgetRoutes($app, $sessions);
 $hostedRoutes = require  __DIR__ . '/../src/hosted.php';
 $hostedRoutes($app, $sessions);
 
-$advancedRoutes = require  __DIR__ . '/../src/advanced.php';
-$advancedRoutes($app, $sessions);
+$directRoutes = require  __DIR__ . '/../src/direct.php';
+$directRoutes($app, $sessions);
 
 
 $app->run();

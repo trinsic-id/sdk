@@ -2,13 +2,13 @@ import MicroModal from "micromodal";
 import { catchErrorAlert } from "./shared";
 MicroModal.init();
 
-window.launchAdvancedProvider = launchAdvancedProvider;
+window.launchDirectProvider = launchDirectProvider;
 
-async function launchAdvancedProvider(providerId) {
+async function launchDirectProvider(providerId) {
   let fallbackToTrinsicUI = document.querySelector('input[name="fallbackToTrinsicUI"]:checked').value;
   let checkedItems = document.querySelectorAll('input[name="TrinsicCapabilities"]:checked');
   let capabilities = Array.from(checkedItems).map(item => item.value);
-  let postUrl = `advanced-launch/${providerId}?1=1`;
+  let postUrl = `direct-launch/${providerId}?1=1`;
   postUrl += `&fallbackToTrinsicUI=${fallbackToTrinsicUI}`;
   postUrl += `&capabilities=${capabilities.join(',')}`;
   postUrl += `&redirectUrl=${window.location.origin}/redirect`;
@@ -29,7 +29,7 @@ function launchPopupAndWaitForPostMessage(url) {
   // Open the popup window
   const popup = window.open(
     url,
-    "Trinsic Advanced Session Popup",
+    "Trinsic Direct Session Popup",
     `width=${popupWidth},height=${popupHeight},left=${left},top=${top}`
   );
 
@@ -54,4 +54,4 @@ function launchPopupAndWaitForPostMessage(url) {
     return result;
 }
 
-getProviders('launchAdvancedProvider');
+getProviders('launchDirectProvider');

@@ -21,7 +21,7 @@
       // If postRedirectAction is "poll", the results of the Session are not immediately available, so we need to poll for them
       // (related to `PollAfterRedirect` capability)
       if (postRedirectAction === "poll") {
-        const pollUrl = window.location.origin + "/advanced-poll-after-redirect?sessionId=" + sessionId + "&resultsAccessKey=" + resultsAccessKey;
+        const pollUrl = window.location.origin + "/direct-poll-after-redirect?sessionId=" + sessionId + "&resultsAccessKey=" + resultsAccessKey;
         window.location.href = pollUrl;
         return;
       }

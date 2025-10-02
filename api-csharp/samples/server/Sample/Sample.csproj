@@ -9,6 +9,6 @@
 
   <ItemGroup>
     <PackageReference Include="DotNetEnv" Version="3.1.1" />
-    <PackageReference Include="Trinsic.Api" Version="2.1.2-alpha2" />
+    <PackageReference Include="Trinsic.Api" Version="2.2.0-alpha1" />
   </ItemGroup>
 </Project>

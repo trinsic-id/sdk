@@ -10,7 +10,7 @@ public static class WidgetSession
         app.MapPost("/create-session", async context =>
         {
             var redirectUrl = context.Request.Query["redirectUrl"].ToString();
-            var response = await sessionApi.CreateWidgetSessionAsync(new CreateWidgetSessionRequest()
+            var response = await sessionApi.CreateWidgetSessionAsync(new CreateWidgetSessionRequest(EnvironmentHelper.GetVerificationProfileIdOrThrow())
             {
                 RedirectUrl = redirectUrl
             });

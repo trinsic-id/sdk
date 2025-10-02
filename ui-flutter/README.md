@@ -20,14 +20,13 @@ This library supports launching both [Widget](https://docs.trinsic.id/docs/widge
 
 You _must_ specify a `redirectUrl` when creating either kind of Session, and that `redirectUrl` _must_ use a custom scheme which you register against your app (see below).
 
-### Advanced Provider Sessions
+### Direct Provider Sessions
 
-This library provides **only minimal** support for [Advanced Provider Sessions](https://docs.trinsic.id/docs/advanced-provider-session). 
+This library provides **only minimal** support for [Direct Provider Sessions](https://docs.trinsic.id/docs/direct-provider-session).
 
 Specifically, it can be used only to execute Sessions which return a `launchMethod` of `LaunchBrowser` and a `collectionMethod` of `CaptureRedirect`.
 
 All other interaction methods are not supported by this library and will require additional effort to implement; please contact Trinsic for guidance.
-
 
 ## Installation
 

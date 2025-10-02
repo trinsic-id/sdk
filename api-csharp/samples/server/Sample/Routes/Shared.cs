@@ -13,7 +13,7 @@ public static class Shared
         app.MapGet("/providers", async context =>
         {
             List<string> ipAddresses = context.Request.Query["ipAddress"] == StringValues.Empty ? [] : [context.Request.Query["ipAddress"].ToString()];
-            var response = await networkApi.RecommendProvidersAsync(new RecommendRequest
+            var response = await networkApi.RecommendProvidersAsync(new RecommendRequest(EnvironmentHelper.GetVerificationProfileIdOrThrow())
             {
                 RecommendationInfo = new RecommendationInfo
                 {
@@ -30,7 +30,7 @@ public static class Shared
             var request = await context.Request.ReadFromJsonAsync<ExchangeResultRequest>();
 
             // Call the method to exchange the results key
-            var response = await sessionApi.GetSessionResultAsync(request.SessionId, new GetSessionResultRequest(request.ResultsAccessKey ));
+            var response = await sessionApi.GetSessionResultAsync(Guid.Parse(request.SessionId), new GetSessionResultRequest(request.ResultsAccessKey ));
             response.LogAndThrowIfError(app.Logger);
             
             // Return the result as JSON

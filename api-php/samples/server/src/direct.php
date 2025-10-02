@@ -2,8 +2,8 @@
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use Trinsic\Api\Model\CreateAdvancedProviderSessionRequest as CreateAdvancedProviderSessionRequest;
-use Trinsic\Api\Model\CreateAdvancedProviderSessionResponse as CreateAdvancedProviderSessionResponse;
+use Trinsic\Api\Model\CreateDirectProviderSessionRequest as CreateDirectProviderSessionRequest;
+use Trinsic\Api\Model\CreateDirectProviderSessionResponse as CreateDirectProviderSessionResponse;
 use Trinsic\Api\Model\GetSessionResultRequest as GetSessionResultRequest;
 use Trinsic\Api\Model\RefreshStepContentRequest as RefreshStepContentRequest;
 use Trinsic\Api\ApiException as ApiException;
@@ -11,37 +11,37 @@ use Trinsic\Api\ApiException as ApiException;
 return function ($app, $sessions) {
     
     // Index route to serve the index.html file
-    $app->get('/advanced', function (Request $request, Response $response, $args) {
+    $app->get('/direct', function (Request $request, Response $response, $args) {
         return $response
-            ->withHeader('Location', '/advanced.html')
+            ->withHeader('Location', '/direct.html')
             ->withStatus(302);
     });
 
-    $app->get('/advanced-popup', function (Request $request, Response $response, $args) {
+    $app->get('/direct-popup', function (Request $request, Response $response, $args) {
         $queryParams = $request->getQueryParams();
         
         $queryString = http_build_query($queryParams);
         
-        $redirectUrl = '/advanced-popup.html' . (!empty($queryString) ? '?' . $queryString : '');
+        $redirectUrl = '/direct-popup.html' . (!empty($queryString) ? '?' . $queryString : '');
         return $response
             ->withHeader('Location', $redirectUrl)
             ->withStatus(302);
     });
 
-    $app->get("/advanced-launch/{provider}", function (Request $request, Response $response, $args) use ($sessions) {
+    $app->get("/direct-launch/{provider}", function (Request $request, Response $response, $args) use ($sessions) {
         $provider = $args['provider'];
         $queryParams = $request->getQueryParams();
         $redirectUrl = $queryParams['redirectUrl'] ?? null;
         $fallbackToTrinsicUI = ($queryParams['fallbackToTrinsicUI'] ?? 'false') === 'true';
         $capabilities = isset($queryParams['capabilities']) ? explode(",", $queryParams['capabilities']) : [];
 
-        $req = new CreateAdvancedProviderSessionRequest();
+        $req = new CreateDirectProviderSessionRequest();
         $req->setRedirectUrl($redirectUrl);
         $req->setProvider($provider);
         $req->setCapabilities($capabilities);
         $req->setFallbackToHostedUi($fallbackToTrinsicUI);
 
-        $result = $sessions->createAdvancedProviderSession($req);
+        $result = $sessions->createDirectProviderSession($req);
 
         if ($result->getNextStep()->getMethod() === 'LaunchBrowser') {
             return $response
@@ -61,7 +61,7 @@ return function ($app, $sessions) {
             ]);
 
             return $response
-                ->withHeader('Location', "/advanced-popup?$queryParams")
+                ->withHeader('Location', "/direct-popup?$queryParams")
                 ->withStatus(302);
         }
     });

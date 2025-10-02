@@ -1,6 +1,6 @@
 from fastapi import Request, APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
-from trinsic_api.api.sessions_api import SessionsApi, CreateAdvancedProviderSessionRequest, GetSessionResultRequest, RefreshStepContentRequest
+from trinsic_api.api.sessions_api import SessionsApi, CreateDirectProviderSessionRequest, GetSessionResultRequest, RefreshStepContentRequest
 
 from urllib.parse import urlencode
 from datetime import datetime, timezone
@@ -8,24 +8,24 @@ from fastapi.responses import RedirectResponse
 import json
 from datetime import date, datetime
 
-advancedRouter = APIRouter()
+directRouter = APIRouter()
 
-@advancedRouter.get("/advanced")
-async def advanced():
-    return RedirectResponse(url="/advanced.html")
+@directRouter.get("/direct")
+async def direct():
+    return RedirectResponse(url="/direct.html")
 
-@advancedRouter.get("/advanced-popup")
-async def advancedPopup(request: Request):
-    return RedirectResponse(url=f"/advanced-popup.html?{request.query_params}")
+@directRouter.get("/direct-popup")
+async def directPopup(request: Request):
+    return RedirectResponse(url=f"/direct-popup.html?{request.query_params}")
 
 
-@advancedRouter.get("/advanced-launch/{provider_id}")
+@directRouter.get("/direct-launch/{provider_id}")
 async def launch(request: Request, provider_id: str, sessions_api: SessionsApi = Depends()):
     fallbackToTrinsicUI = request.query_params.get("fallbackToTrinsicUI", "").strip().lower() == "true"
-    
-    request = CreateAdvancedProviderSessionRequest(redirect_url = request.query_params.get("redirectUrl"), provider=provider_id, fallback_to_hosted_ui = fallbackToTrinsicUI, capabilities = request.query_params.get("capabilities").split(","))
 
-    result = sessions_api.create_advanced_provider_session(create_advanced_provider_session_request=request)
+    request = CreateDirectProviderSessionRequest(redirect_url = request.query_params.get("redirectUrl"), provider=provider_id, fallback_to_hosted_ui = fallbackToTrinsicUI, capabilities = request.query_params.get("capabilities").split(","))
+
+    result = sessions_api.create_direct_provider_session(create_direct_provider_session_request=request)
     if result.next_step.method == 'LaunchBrowser':
         return RedirectResponse(result.next_step.content)
     else:
@@ -47,7 +47,7 @@ async def launch(request: Request, provider_id: str, sessions_api: SessionsApi =
             "refreshAfter": refresh_after
         }
 
-        return RedirectResponse(f"/advanced-popup?{urlencode(query_params)}")
+        return RedirectResponse(f"/direct-popup?{urlencode(query_params)}")
 
 def json_serial(obj):
     """JSON serializer for objects not serializable by default."""
@@ -55,7 +55,7 @@ def json_serial(obj):
         return obj.isoformat()
     raise TypeError(f"Type {type(obj)} not serializable")
 
-@advancedRouter.post("/poll-results/{session_id}")
+@directRouter.post("/poll-results/{session_id}")
 async def poll_results(session_id: str, request: Request, sessions_api: SessionsApi = Depends()):
     request_payload = await request.json()
     results_access_key = request_payload.get("resultsAccessKey")
@@ -67,7 +67,7 @@ async def poll_results(session_id: str, request: Request, sessions_api: Sessions
     
     return JSONResponse(content=json.loads(json.dumps(result.to_dict(), default=json_serial)))
 
-@advancedRouter.post("/refresh-content/{session_id}")
+@directRouter.post("/refresh-content/{session_id}")
 async def refresh_content(session_id: str, request: Request, sessions_api: SessionsApi = Depends()):
     request_payload = await request.json()
     results_access_key = request_payload.get("resultsAccessKey")

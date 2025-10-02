@@ -10,25 +10,25 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Advanced {
-    public static void AdvancedRoutes(Javalin app, SessionsApi session){
-        app.get("/advanced", ctx -> {
-            ctx.redirect("/advanced.html");
+public class Direct {
+    public static void DirectRoutes(Javalin app, SessionsApi session){
+        app.get("/direct", ctx -> {
+            ctx.redirect("/direct.html");
         });
 
-        app.get("/advanced-popup", ctx -> {
+        app.get("/direct-popup", ctx -> {
             String query = ctx.queryString(); // grabs everything after '?'
-            String target = "/advanced-popup.html" + (query != null ? "?" + query : "");
+            String target = "/direct-popup.html" + (query != null ? "?" + query : "");
             ctx.redirect(target);
         });
 
-        app.get("/advanced-launch/{provider}", ctx -> {
+        app.get("/direct-launch/{provider}", ctx -> {
             String provider = ctx.pathParam("provider");
             String redirectUrl = ctx.queryParam("redirectUrl");
             boolean fallbackToTrinsicUI = "true".equals(ctx.queryParam("fallbackToTrinsicUI"));
 
             // Build request
-            CreateAdvancedProviderSessionRequest req = new CreateAdvancedProviderSessionRequest();
+            CreateDirectProviderSessionRequest req = new CreateDirectProviderSessionRequest();
             req.setProvider(provider);
             req.setRedirectUrl(redirectUrl);
             req.setFallbackToHostedUI(fallbackToTrinsicUI);
@@ -44,8 +44,8 @@ public class Advanced {
             req.setCapabilities(capabilities);
 
             // Call API
-            CreateAdvancedProviderSessionResponse result =
-                    session.createAdvancedProviderSession(req);
+            CreateDirectProviderSessionResponse result =
+                    session.createDirectProviderSession(req);
 
             var nextStep = result.getNextStep();
             if (nextStep.getMethod().getValue().equals(IntegrationLaunchMethod.LAUNCH_BROWSER.getValue())) {
@@ -66,7 +66,7 @@ public class Advanced {
                         URLEncoder.encode(refreshAfter, StandardCharsets.UTF_8)
                 );
 
-                ctx.redirect("/advanced-popup?" + redirectQuery);
+                ctx.redirect("/direct-popup?" + redirectQuery);
             }
         });
 

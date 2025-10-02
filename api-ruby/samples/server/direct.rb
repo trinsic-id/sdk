@@ -1,22 +1,22 @@
 require 'sinatra/base'
 require_relative 'config'
-module AdvancedRoutes
+module DirectRoutes
   def self.registered(app)
-    app.get '/advanced' do
-      send_file File.join(settings.public_folder, 'advanced.html')
+    app.get '/direct' do
+      send_file File.join(settings.public_folder, 'direct.html')
     end
 
-    app.get '/advanced-popup' do
-      send_file File.join(settings.public_folder, 'advanced-popup.html')
+    app.get '/direct-popup' do
+      send_file File.join(settings.public_folder, 'direct-popup.html')
     end
 
-    app.get('/advanced-launch/:provider') do
+    app.get('/direct-launch/:provider') do
       provider = params[:provider]
       redirectUrl = params[:redirectUrl]
       fallbackToTrinsicUI = params[:fallbackToTrinsicUI] == "true"
       capabilities = params[:capabilities].split(",")
 
-      req = TrinsicApi::CreateAdvancedProviderSessionRequest.new({
+      req = TrinsicApi::CreateDirectProviderSessionRequest.new({
         redirect_url: redirectUrl,
         provider: provider,
         capabilities: capabilities,
@@ -24,10 +24,10 @@ module AdvancedRoutes
       })
 
       opts = {
-        create_advanced_provider_session_request: req
+        create_direct_provider_session_request: req
       }
 
-      result = TrinsicServices::SESSIONS.create_advanced_provider_session(opts)
+      result = TrinsicServices::SESSIONS.create_direct_provider_session(opts)
 
       if result.next_step.method == 'LaunchBrowser'
         redirect result.next_step.content
@@ -43,7 +43,7 @@ module AdvancedRoutes
           refreshAfter: refresh_after
         }
   
-        redirect "/advanced-popup?#{URI.encode_www_form(query_params)}"
+        redirect "/direct-popup?#{URI.encode_www_form(query_params)}"
       end
     end
 
@@ -57,7 +57,7 @@ module AdvancedRoutes
           results_access_key: results_access_key
         })
       })
-      json AdvancedRoutes.deep_transform(result.to_body)
+      json DirectRoutes.deep_transform(result.to_body)
     end
 
     app.post('/poll-results/:sessionId') do
@@ -71,7 +71,7 @@ module AdvancedRoutes
         })
       })
 
-      json AdvancedRoutes.deep_transform(result.to_body)
+      json DirectRoutes.deep_transform(result.to_body)
     end
 
   end

@@ -31,7 +31,7 @@ app.UseMiddleware<JsonExceptionMiddleware>();
 app.MapSharedRoutes(sessionApi, networkApi);
 app.MapWidgetSessionRoutes(sessionApi);
 app.MapHostedProviderSessionRoutes(sessionApi);
-app.MapAdvancedProviderSessionRoutes(sessionApi);
+app.MapDirectProviderSessionRoutes(sessionApi);
 app.MapMdlExchangeRoutes(mdlApi);
 
 //Serve web sdk
