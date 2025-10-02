@@ -44,7 +44,7 @@ public static class DirectProviderSession
                 var shouldRefresh = result.NextStep.Refresh != null;
                 var refreshAfter = result.NextStep.Refresh?.RefreshAfter  ?? DateTimeOffset.MaxValue;
                 context.Response.Redirect(
-                    $"/advanced-popup?sessionId={result.SessionId}&resultsAccessKey={result.ResultCollection.ResultsAccessKey}&nextStep={result.NextStep.Method}&content={System.Web.HttpUtility.UrlEncode(result.NextStep.Content)}&shouldRefresh={shouldRefresh.ToString().ToLowerInvariant()}&refreshAfter={System.Web.HttpUtility.UrlEncode(refreshAfter.ToString("O"))}");
+                    $"/direct-popup?sessionId={result.SessionId}&resultsAccessKey={result.ResultCollection.ResultsAccessKey}&nextStep={result.NextStep.Method}&content={System.Web.HttpUtility.UrlEncode(result.NextStep.Content)}&shouldRefresh={shouldRefresh.ToString().ToLowerInvariant()}&refreshAfter={System.Web.HttpUtility.UrlEncode(refreshAfter.ToString("O"))}");
             }
         });
 

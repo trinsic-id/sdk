@@ -20,7 +20,7 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 builder.Services.AddTrinsicApi(options =>
 {
     // the type of token here depends on the api security specifications
-    options.AddTokens(new BearerToken(Environment.GetEnvironmentVariable("TRINSIC_ACCESS_TOKEN")));
+    options.AddTokens(new BearerToken(EnvironmentHelper.GetAuthTokenOrThrow()));
 });
 
 var app = builder.Build();
