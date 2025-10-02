@@ -7,7 +7,7 @@ public static class WidgetSession
 {
     public static void MapWidgetSessionRoutes(this WebApplication app, ISessionsApi sessionApi)
     {
-        app.MapPost("/create-session", async context =>
+        app.MapPost("/create-widget-session", async context =>
         {
             var redirectUrl = context.Request.Query["redirectUrl"].ToString();
             var response = await sessionApi.CreateWidgetSessionAsync(new CreateWidgetSessionRequest(EnvironmentHelper.GetVerificationProfileIdOrThrow())

@@ -1,25 +1,50 @@
-import { launchRedirect, launchPopup } from "@trinsic/web-ui";
+import { launchRedirect, createPopupAndWaitForResults } from "@trinsic/web-ui";
+import { jsonHandleError, catchErrorAlert } from "./shared";
 import MicroModal from "micromodal";
 MicroModal.init();
 
 window.launchHostedProvider = launchHostedProvider;
 
-async function launchHostedProvider(providerId) {
-  const launchUrl = `hosted-launch/${providerId}?1=1`
-  let launchMode = document.querySelector('input[name="hostedLaunch"]:checked').value;
-  await launch(launchUrl, launchMode)
+async function createHostedSession(providerId) {
+  let url = `/create-hosted-session/${providerId}?redirectUrl=${window.location.origin}/redirect`;
+  const session = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    }
+  }).then(r => jsonHandleError(r));
+
+  // Store resultsAccessKey from created Session in localStorage for later retrieval
+  // NOTE: Do not do this in production. resultsAccessKey should be stored securely in your backend, correlated with your user's session.
+  if (session.sessionId && session.resultsAccessKey) {
+    localStorage.setItem(`resultsAccessKey:${session.sessionId}`, session.resultsAccessKey);
+  }
+
+  return session;
 }
 
-async function launch(launchUrl, launchMode) {
+async function launchHostedProvider(providerId) {
+  let launchMode = document.querySelector('input[name="hostedLaunch"]:checked').value;
+
   let result = null;
+  let sessionData = null;
+
   switch (launchMode) {
     case 'popup':
-      result = await launchPopup(() => launchUrl + '&redirectUrl=' + window.location.origin + '/redirect');
-      await exchangeResult(result);
+      result = await createPopupAndWaitForResults({
+        sessionCreationFunction: async () => {
+          const session = await createHostedSession(providerId);
+          sessionData = session;
+
+          return session.launchUrl;
+        }
+      }).catch(e => catchErrorAlert(e));
+      await exchangeResult(sessionData);
       break;
     case 'redirect':
-      //Result is exchanged through the redirect capture, see redirect.html
-      await launchRedirect(launchUrl + '&redirectUrl='+window.location.origin + '/redirect');
+      // Create a hosted session and redirect to it
+      const session = await createHostedSession(providerId);
+      await launchRedirect(session.launchUrl).catch(e => catchErrorAlert(e));
       break;
   }
 }

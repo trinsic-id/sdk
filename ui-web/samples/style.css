@@ -97,7 +97,7 @@ ul li button .launch-name {
 .modal__container {
   background-color: #fff;
   padding: 30px;
-  max-width: 500px;
+  max-width: 50vw;
   max-height: 100vh;
   border-radius: 4px;
   overflow-y: auto;
