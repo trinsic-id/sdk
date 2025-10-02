@@ -21,7 +21,7 @@ public static class DirectProviderSession
             });
         });
 
-        app.MapGet("/direct-launch/{providerId}", async (HttpContext context, string providerId) =>
+        app.MapPost("/create-direct-session/{providerId}", async (HttpContext context, string providerId) =>
         {
             var fallbackToTrinsicUI = bool.Parse(context.Request.Query["fallbackToTrinsicUI"].ToString());
             var redirectUrl = context.Request.Query["redirectUrl"].ToString();
@@ -34,18 +34,11 @@ public static class DirectProviderSession
             var response = await sessionApi.CreateDirectProviderSessionAsync(request);
             response.LogAndThrowIfError(app.Logger);
 
-            var result = response.Ok();
-            if (result.NextStep.Method == IntegrationLaunchMethod.LaunchBrowser)
+            await context.Response.WriteAsJsonAsync(response.Ok(), new JsonSerializerOptions()
             {
-                context.Response.Redirect(result.NextStep.Content);
-            }
-            else
-            {
-                var shouldRefresh = result.NextStep.Refresh != null;
-                var refreshAfter = result.NextStep.Refresh?.RefreshAfter  ?? DateTimeOffset.MaxValue;
-                context.Response.Redirect(
-                    $"/direct-popup?sessionId={result.SessionId}&resultsAccessKey={result.ResultCollection.ResultsAccessKey}&nextStep={result.NextStep.Method}&content={System.Web.HttpUtility.UrlEncode(result.NextStep.Content)}&shouldRefresh={shouldRefresh.ToString().ToLowerInvariant()}&refreshAfter={System.Web.HttpUtility.UrlEncode(refreshAfter.ToString("O"))}");
-            }
+                Converters = { new JsonStringEnumConverter() },
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
         });
 
         app.MapPost("/poll-results/{sessionId}", async (HttpContext context, string sessionId) =>

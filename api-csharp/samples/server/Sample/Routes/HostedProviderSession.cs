@@ -7,19 +7,16 @@ public static class HostedProviderSession
 {
     public static void MapHostedProviderSessionRoutes(this WebApplication app, ISessionsApi sessionApi)
     {
-        app.MapGet("/hosted-launch/{providerId}", async (HttpContext context, string providerId) =>
+        app.MapPost("/create-hosted-session/{providerId}", async (HttpContext context, string providerId) =>
         {
             var redirectUrl = context.Request.Query["redirectUrl"].ToString();
-            
 
             var request = new CreateHostedProviderSessionRequest(providerId, redirectUrl, EnvironmentHelper.GetVerificationProfileIdOrThrow());
 
             var response = await sessionApi.CreateHostedProviderSessionAsync(request);
             response.LogAndThrowIfError(app.Logger);
 
-            var result = response.Ok();
-
-            context.Response.Redirect(result.LaunchUrl);
+            await context.Response.WriteAsJsonAsync(response.Ok());
         });
     }
 }
