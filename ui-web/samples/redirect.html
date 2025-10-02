@@ -4,52 +4,42 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="icon" href="https://content.trinsic.id/assets/logo/favicon.ico" />
   <title>Trinsic redirect</title>
 </head>
 
 <body>
   <script type="module" src="./shared.js"></script>
-  <script type="module">
-    (() => {
-      // Parse out the query parameters from the URL
-      const params = new URLSearchParams(window.location.search);
-      const postRedirectAction = params.get("postRedirectAction");
-      const resultsAccessKey = params.get("resultsAccessKey");
-      const sessionId = params.get("sessionId");
-      const success = params.get("success") === "true";
-
-      // If postRedirectAction is "poll", the results of the Session are not immediately available, so we need to poll for them
-      // (related to `PollAfterRedirect` capability)
-      if (postRedirectAction === "poll") {
-        const pollUrl = window.location.origin + "/direct-poll-after-redirect?sessionId=" + sessionId + "&resultsAccessKey=" + resultsAccessKey;
-        window.location.href = pollUrl;
-        return;
-      }
-
-      // Otherwise, results are immediately available to fetch from Trinsic's API, so we should proceed.
-      // Produce a message to send to the page which opened this window
-      const data = {
-        success: success,
-        resultsAccessKey: resultsAccessKey,
-        sessionId: sessionId,
-        isTrinsicSamplePopupMessage: true,
-      };
-
-      console.debug("Sending message to opener", data, window.opener);
-
-      if (window.opener) {
-        window.opener?.postMessage(data, "*");
-      } else {
-        exchangeResult(data);
-      }
-    })();
-  </script>
+  <script type="module" src="./redirect.js">    </script>
   <noscript>
     <p>This page requires JavaScript to work properly.</p>
   </noscript>
   <div>Completing the flow</div>
   <a href="/"> &lt;-- Back</a>
-  <pre id="results"></pre>
+
+  <div class="modal micromodal-slide" id="results-modal" aria-hidden="true">
+    <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+      <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
+        <header class="modal__header">
+          <h2 class="modal__title" id="modal-1-title">
+            Session Results
+          </h2>
+          <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
+        </header>
+        <main class="modal__content" id="modal-1-content">
+          <p>
+          <pre id="results">
+
+            </pre>
+          </p>
+        </main>
+        <footer class="modal__footer">
+          <button class="modal__btn" data-micromodal-close aria-label="Close this dialog window">Close</button>
+        </footer>
+      </div>
+    </div>
+  </div>
 </body>
 
 </html>

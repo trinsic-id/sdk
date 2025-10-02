@@ -1,5 +1,6 @@
 import QRCode from 'qrcode'
 import MicroModal from "micromodal";
+import { signalRedirectFromPopup } from '@trinsic/web-ui';
 import { jsonHandleError } from './shared';
 MicroModal.init();
 
@@ -39,7 +40,7 @@ async function startResultsPolling(sessionId, resultsAccessKey) {
         resultsAccessKey: resultsAccessKey
       })
     })
-    .then(r => jsonHandleError(r))
+      .then(r => jsonHandleError(r))
       .then((r) => r);
     document.getElementById("done").innerText = result.session.done;
     document.getElementById("success").innerText = result.session.success;
@@ -48,15 +49,10 @@ async function startResultsPolling(sessionId, resultsAccessKey) {
     if (result.session.done === true) {
       clearInterval(resultPollingInterval);
 
-      const data = {
-        success: result.session.success,
-        resultsAccessKey: resultsAccessKey,
-        sessionId: sessionId,
-        isTrinsicSamplePopupMessage: true,
-      };
-
-      console.debug("Sending message to opener", data, window.opener);
-      window.opener?.postMessage(data, "*");
+      signalRedirectFromPopup({
+        sessionId: sessionId, 
+        closeWindowAfterSignal: true
+      });
     }
   }, 2000);
 }
