@@ -36,7 +36,7 @@ export interface CreatePopupOptions {
 /**
  * Creates a popup window and returns a `TrinsicPopup` object to manage it and await completion.
  * 
- * Lorem ipsem
+ * Call this function as the first step in performing a Trinsic verification.
  * @param options 
  * @returns 
  */
@@ -65,15 +65,24 @@ export function createPopup(options?: CreatePopupOptions): TrinsicPopup {
 
 
 export interface CreatePopupAndWaitForResultsOptions extends CreatePopupOptions, WaitForResultsOptions {
-    initializationFunction: () => Promise<string>;
+    /**
+     * An asynchronous function which should call your backend to create a Trinsic Session, and return the launch URL.
+     * 
+     * You MUST create the Trinsic Session in this callback in order to properly work around browser restrictions regarding popups.
+     * @returns 
+     */
+    sessionCreationFunction: () => Promise<string>;
 }
 
-export async function createPopupAndWaitForResults(options?: CreatePopupAndWaitForResultsOptions): Promise<TrinsicPopupResult> {
+/**
+ * A helper function which provides a single-shot method to create a popup, initialize it with a launch URL, and wait for results.
+ */
+export async function createPopupAndWaitForResults(options: CreatePopupAndWaitForResultsOptions): Promise<TrinsicPopupResult> {
     // Create a popup window
     const popup = createPopup(options);
 
     // Call the initialization function to get the launch URL
-    const launchUrl = await options?.initializationFunction();
+    const launchUrl = await options?.sessionCreationFunction();
     if (!launchUrl) {
         throw new Error("Launch URL is empty");
     }
