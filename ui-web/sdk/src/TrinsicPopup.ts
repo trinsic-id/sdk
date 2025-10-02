@@ -15,16 +15,20 @@ export class TrinsicPopup {
     }
 
     /**
-     * Whether the popup window is definitely still open.
+     * Whether the popup window is *maybe* closed.
      * 
-     * This may return false negatives (i.e., this function may return "false" even if the window is still open).
-     * This is because the `Cross-Origin-Opener-Policy` security header, if set on any page a popup visits (e.g. an Identity Provider's page), will
-     * cause the browser to sever the connection an opening window has to the popup, making it impossible to check if it's closed.
+     * Specifically, this returns `true` if either of the following conditions (which cannot be distinguished) is true:
+     * - The popup window is closed
+     * OR
+     * - The popup window is open, but the browser has severed the connection between the opener window and the popup window.
      * 
-     * If this functions returns `true`, the popup window is open.
-     * If this function returns `false`, the popup window MAY be closed. Offer the user the opportunity to cancel out of the Session, but do not automatically do so.
+     * The second case could occur if the `Cross-Origin-Opener-Policy` security header, is set on any page a popup visits (e.g. an Identity Provider's page).
+     * This header causes the browser to sever the connection an opening window has to the popup, making it impossible to check if it's closed.
+     * 
+     * If this functions returns `false`, the popup window is definitely open.
+     * If this function returns `true`, the popup window MAY be closed. Offer the user the opportunity to cancel out of the Session, but do not automatically do so.
      */
-    get isDefinitelyOpen() {
+    get isMaybeClosed() {
         return this.popup && !this.popup.closed;
     }
 
@@ -44,7 +48,7 @@ export class TrinsicPopup {
      */
     dispose() {
         if (this._hasDisposed) return;
-        if (this.isDefinitelyOpen) {
+        if (!this.isMaybeClosed) {
             try {
                 this.popup.close();
             } catch (error) {
@@ -78,7 +82,7 @@ export class TrinsicPopup {
         if (this._hasInitialized) {
             throw new Error("Popup has already been initialized");
         }
-        if (!this.isDefinitelyOpen) {
+        if (this.isMaybeClosed) {
             throw new Error("Call to initialize() failed because popup window is closed or inaccessible");
         }
 
@@ -183,7 +187,7 @@ export class TrinsicPopup {
                     }
 
                     // Don't poll if we still have a connection to the popup -- no need, since polling is a backup mechanism
-                    if (this.isDefinitelyOpen) {
+                    if (!this.isMaybeClosed) {
                         return;
                     }
 
@@ -212,7 +216,7 @@ export class TrinsicPopup {
                 }
 
                 // Poll for popup having been closed
-                if (options?.onWindowMaybeClosed && !this.isDefinitelyOpen && !hasCalledMaybeClosed) {
+                if (options?.onWindowMaybeClosed && this.isMaybeClosed && !hasCalledMaybeClosed) {
                     hasCalledMaybeClosed = true;
                     options.onWindowMaybeClosed!();
                 }
