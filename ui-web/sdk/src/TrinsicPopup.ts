@@ -29,7 +29,7 @@ export class TrinsicPopup {
      * If this function returns `true`, the popup window MAY be closed. Offer the user the opportunity to cancel out of the Session, but do not automatically do so.
      */
     get isMaybeClosed() {
-        return this.popup && !this.popup.closed;
+        return !this.popup || this.popup.closed;
     }
 
     /**
