@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"os"
 	trinsic_api "github.com/trinsic-id/sdk-go-api/v2"
 )
 
@@ -15,12 +16,14 @@ func SharedRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 
 	app.Get("/providers", func(c *fiber.Ctx) error {
 		ipAddress := c.Query("ipAddress")
+		verificationProfileId := os.Getenv("TRINSIC_VERIFICATION_PROFILE_ID")
 		request := trinsic_api.RecommendRequest{
 			RecommendationInfo: *trinsic_api.NewNullableRecommendationInfo(
 				&trinsic_api.RecommendationInfo{
 					IpAddresses: []string{ipAddress},
 				},
 			),
+			VerificationProfileId: verificationProfileId,
 		}
 
 		req := api.NetworkAPI.RecommendProviders(c.Context()).RecommendRequest(request)

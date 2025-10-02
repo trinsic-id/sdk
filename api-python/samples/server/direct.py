@@ -1,7 +1,7 @@
 from fastapi import Request, APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from trinsic_api.api.sessions_api import SessionsApi, CreateDirectProviderSessionRequest, GetSessionResultRequest, RefreshStepContentRequest
-
+import os
 from urllib.parse import urlencode
 from datetime import datetime, timezone
 from fastapi.responses import RedirectResponse
@@ -23,7 +23,7 @@ async def directPopup(request: Request):
 async def launch(request: Request, provider_id: str, sessions_api: SessionsApi = Depends()):
     fallbackToTrinsicUI = request.query_params.get("fallbackToTrinsicUI", "").strip().lower() == "true"
 
-    request = CreateDirectProviderSessionRequest(redirect_url = request.query_params.get("redirectUrl"), provider=provider_id, fallback_to_hosted_ui = fallbackToTrinsicUI, capabilities = request.query_params.get("capabilities").split(","))
+    request = CreateDirectProviderSessionRequest(redirect_url = request.query_params.get("redirectUrl"), verification_profile_id=os.getenv("TRINSIC_VERIFICATION_PROFILE_ID"), provider=provider_id, fallback_to_hosted_ui = fallbackToTrinsicUI, capabilities = request.query_params.get("capabilities").split(","))
 
     result = sessions_api.create_direct_provider_session(create_direct_provider_session_request=request)
     if result.next_step.method == 'LaunchBrowser':

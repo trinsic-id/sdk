@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"net/url"
 	"strconv"
 	"strings"
@@ -26,6 +27,7 @@ func DirectRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 		redirectUrl := c.Query("redirectUrl")
 		fallbackToTrinsicUI := c.Query("fallbackToTrinsicUI") == "true"
 		capabilities := strings.Split(c.Query("capabilities"), ",")
+		verificationProfileId := os.Getenv("TRINSIC_VERIFICATION_PROFILE_ID")
 		// Convert []string to []trinsic_api.IntegrationCapability
 		var integrationCapabilities []trinsic_api.IntegrationCapability
 		for _, c := range capabilities {
@@ -38,6 +40,7 @@ func DirectRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 			Provider:           provider,
 			Capabilities:       integrationCapabilities,
 			FallbackToHostedUI: *trinsic_api.NewNullableBool(&fallbackToTrinsicUI),
+			VerificationProfileId: verificationProfileId,
 		}
 
 		// Call API

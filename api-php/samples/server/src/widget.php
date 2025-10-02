@@ -16,9 +16,11 @@ return function ($app, $sessions) {
 
     $app->post("/create-session", function (Request $request, Response $response, $args) use ($sessions) {
         $redirectUrl = $request->getQueryParams()['redirectUrl'] ?? null;
-        $createRequest = new CreateWidgetSessionRequest();
-        $createRequest->setRedirectUrl($redirectUrl);
-        $result = $sessions->createWidgetSession($createRequest);
+        $req = new CreateWidgetSessionRequest();
+        $req->setRedirectUrl($redirectUrl);
+        $verificationProfileId = getenv('TRINSIC_VERIFICATION_PROFILE_ID');
+        $req->setVerificationProfileId($verificationProfileId);
+        $result = $sessions->createWidgetSession($req);
     
         $response->getBody()->write(json_encode($result));
         return $response->withHeader('Content-Type', 'application/json');
