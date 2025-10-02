@@ -1,57 +1,58 @@
 import MicroModal from "micromodal";
-import { catchErrorAlert } from "./shared";
+import { catchErrorAlert, jsonHandleError } from "./shared";
+import { createPopupAndWaitForResults } from "@trinsic/web-ui";
 MicroModal.init();
 
 window.launchDirectProvider = launchDirectProvider;
 
-async function launchDirectProvider(providerId) {
+async function createDirectSession(providerId) {
+  // Construct POST URL
   let fallbackToTrinsicUI = document.querySelector('input[name="fallbackToTrinsicUI"]:checked').value;
   let checkedItems = document.querySelectorAll('input[name="TrinsicCapabilities"]:checked');
   let capabilities = Array.from(checkedItems).map(item => item.value);
-  let postUrl = `direct-launch/${providerId}?1=1`;
-  postUrl += `&fallbackToTrinsicUI=${fallbackToTrinsicUI}`;
+  let postUrl = `/create-direct-session/${providerId}`;
+  postUrl += `?fallbackToTrinsicUI=${fallbackToTrinsicUI}`;
   postUrl += `&capabilities=${capabilities.join(',')}`;
   postUrl += `&redirectUrl=${window.location.origin}/redirect`;
+  const session = await fetch(postUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    }
+  }).then(r => jsonHandleError(r));
 
-  const result = await launchPopupAndWaitForPostMessage(postUrl).catch(e => catchErrorAlert(e));
-  if(result !== undefined) {
-    await exchangeResult(result);
+  // Store resultsAccessKey from created Session in localStorage for later retrieval
+  // NOTE: Do not do this in production. resultsAccessKey should be stored securely in your backend, correlated with your user's session.
+  if (session.sessionId && session.resultCollection?.resultsAccessKey) {
+    localStorage.setItem(`resultsAccessKey:${session.sessionId}`, session.resultCollection.resultsAccessKey);
   }
+
+  return session;
 }
 
-function launchPopupAndWaitForPostMessage(url) {
-  // Determine the dimensions and position of the popup
-  const popupWidth = 600;
-  const popupHeight = 900;
-  const left = window.screenX + (window.outerWidth - popupWidth) / 2;
-  const top = window.screenY + (window.outerHeight - popupHeight) / 2;
+async function launchDirectProvider(providerId) {
+  let sessionData = null;
 
-  // Open the popup window
-  const popup = window.open(
-    url,
-    "Trinsic Direct Session Popup",
-    `width=${popupWidth},height=${popupHeight},left=${left},top=${top}`
-  );
+  await createPopupAndWaitForResults({
+    sessionCreationFunction: async () => {
+      const session = await createDirectSession(providerId);
 
-  if (!popup) {
-    throw new Error("Failed to open popup window");
-  }
+      sessionData = {
+        sessionId: session.sessionId,
+        resultsAccessKey: session.resultCollection?.resultsAccessKey
+      };
 
-  // Return a promise which resolves when the popup sends a message indicating it's done
-  var result = new Promise((resolve, reject) => {
-    window.addEventListener(
-      "message",
-      (event) => {
-        if (event.data?.isTrinsicSamplePopupMessage === true) {
-          popup?.close();
-          resolve(event.data);
-        }
-      },
-      false
-    );
-  });
+      // If the next step is "LaunchBrowser", just return the next step's launch URL.
+      // If the next step is anything else, then we should return a URL that points to our advanced-session-handling popup.
+      if (session.nextStep?.method === "LaunchBrowser") {
+        return session.nextStep.content;
+      } else {
+        return `${location.origin}/direct-popup?sessionId=${session.sessionId}&resultsAccessKey=${session.resultCollection?.resultsAccessKey}&nextStep=${session.nextStep?.method}&content=${encodeURIComponent(session.nextStep?.content || "")}&shouldRefresh=${(session.nextStep?.refresh != null).toString().toLowerCase()}&refreshAfter=${encodeURIComponent(session.nextStep?.refresh?.refreshAfter || "")}`
+      }
+    }
+  }).catch(e => catchErrorAlert(e));
 
-    return result;
+  await exchangeResult(sessionData);
 }
 
 getProviders('launchDirectProvider');
