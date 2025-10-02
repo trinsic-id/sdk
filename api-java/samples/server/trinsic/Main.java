@@ -9,11 +9,13 @@ import io.javalin.http.staticfiles.Location;
 
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.UUID;
 
 public class Main {
     public static void main(String[] args) {
         var dotenv = new DotenvBuilder().ignoreIfMissing().load();
         var authToken = dotenv.get("TRINSIC_ACCESS_TOKEN");
+        var verificationProfileId = UUID.fromString(dotenv.get("TRINSIC_VERIFICATION_PROFILE_ID"));
 
         if (authToken == null) {
             System.err.println("TRINSIC_ACCESS_TOKEN is not set");
@@ -63,10 +65,10 @@ public class Main {
             ));
         });
 
-        id.trinsic.Shared.SharedRoutes(app, network, session);
-        id.trinsic.Widget.WidgetRoutes(app, session);
-        id.trinsic.Hosted.HostedRoutes(app, session);
-        id.trinsic.Direct.DirectRoutes(app, session);
+        id.trinsic.Shared.SharedRoutes(app, network, session, verificationProfileId);
+        id.trinsic.Widget.WidgetRoutes(app, session, verificationProfileId);
+        id.trinsic.Hosted.HostedRoutes(app, session, verificationProfileId);
+        id.trinsic.Direct.DirectRoutes(app, session, verificationProfileId);
 
 
         app.start(3000);

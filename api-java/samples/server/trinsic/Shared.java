@@ -1,5 +1,5 @@
 package id.trinsic;
-
+import java.util.UUID;
 import id.trinsic.api.NetworkApi;
 import id.trinsic.api.SessionsApi;
 import id.trinsic.api.models.GetSessionResultRequest;
@@ -7,11 +7,11 @@ import id.trinsic.api.models.RecommendationInfo;
 import id.trinsic.api.models.RecommendRequest;
 import id.trinsic.api.models.RecommendResponse;
 import io.javalin.Javalin;
-
+import java.util.UUID;
 import java.util.List;
 
 public class Shared{
-    public static void SharedRoutes(Javalin app, NetworkApi network, SessionsApi session){
+    public static void SharedRoutes(Javalin app, NetworkApi network, SessionsApi session, UUID verificationProfileId){
         app.get("/redirect", ctx -> {
             String query = ctx.queryString(); // grabs everything after '?'
             String target = "/redirect.html" + (query != null ? "?" + query : "");
@@ -27,6 +27,7 @@ public class Shared{
             RecommendationInfo info = new RecommendationInfo();
             info.setIpAddresses(List.of(ipAddress)); // Assuming it's a list
             req.setRecommendationInfo(info);
+            req.setVerificationProfileId(verificationProfileId);
 
             // Call the service
             RecommendResponse result = network.recommendProviders(req);
@@ -41,7 +42,7 @@ public class Shared{
             var request = new GetSessionResultRequest();
             request.setResultsAccessKey(body.resultsAccessKey);
 
-            var result = session.getSessionResult(body.sessionId, request);
+            var result = session.getSessionResult(UUID.fromString(body.sessionId), request);
 
             ctx.json(result);
         });

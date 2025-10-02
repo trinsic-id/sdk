@@ -1,5 +1,5 @@
 package id.trinsic;
-
+import java.util.UUID;
 import id.trinsic.api.SessionsApi;
 import id.trinsic.api.models.*;
 import io.javalin.Javalin;
@@ -9,9 +9,10 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.UUID;
 
 public class Direct {
-    public static void DirectRoutes(Javalin app, SessionsApi session){
+    public static void DirectRoutes(Javalin app, SessionsApi session, UUID verificationProfileId){
         app.get("/direct", ctx -> {
             ctx.redirect("/direct.html");
         });
@@ -32,6 +33,7 @@ public class Direct {
             req.setProvider(provider);
             req.setRedirectUrl(redirectUrl);
             req.setFallbackToHostedUI(fallbackToTrinsicUI);
+            req.setVerificationProfileId(verificationProfileId);
 
             String capabilitiesParam = ctx.queryParam("capabilities");
             List<IntegrationCapability> capabilities = capabilitiesParam != null
@@ -95,7 +97,7 @@ public class Direct {
             request.setResultsAccessKey(resultsAccessKey);
 
             GetSessionResultResponse result =
-                    session.getSessionResult(sessionId, request);
+                    session.getSessionResult(UUID.fromString(sessionId), request);
 
             ctx.json(result); // Or wrap if needed
         });

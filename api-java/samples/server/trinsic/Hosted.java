@@ -4,9 +4,9 @@ import id.trinsic.api.SessionsApi;
 import id.trinsic.api.models.CreateHostedProviderSessionRequest;
 import id.trinsic.api.models.CreateHostedProviderSessionResponse;
 import io.javalin.Javalin;
-
+import java.util.UUID;
 public class Hosted {
-    public static void HostedRoutes(Javalin app, SessionsApi session){
+    public static void HostedRoutes(Javalin app, SessionsApi session, UUID verificationProfileId){
         app.get("/hosted", ctx -> {
             ctx.redirect("/hosted.html");
         });
@@ -22,6 +22,7 @@ public class Hosted {
             CreateHostedProviderSessionRequest req = new CreateHostedProviderSessionRequest();
             req.setRedirectUrl(redirectUrl);
             req.setProvider(provider);
+            req.setVerificationProfileId(verificationProfileId);
 
             // Call the service
             CreateHostedProviderSessionResponse result = session.createHostedProviderSession(req);

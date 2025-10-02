@@ -8,6 +8,5 @@ if [ -z "$TRINSIC_ACCESS_TOKEN" ]; then
 fi
 
 echo "Starting Java API sample..."
-cd ../../api-java/samples/server
 mvn clean install
 mvn exec:java

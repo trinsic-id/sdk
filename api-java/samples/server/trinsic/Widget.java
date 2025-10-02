@@ -3,11 +3,11 @@ package id.trinsic;
 import id.trinsic.api.SessionsApi;
 import id.trinsic.api.models.CreateWidgetSessionRequest;
 import io.javalin.Javalin;
-
+import java.util.UUID;
 import java.util.Map;
 
 public class Widget{
-    public static void WidgetRoutes(Javalin app, SessionsApi session){
+    public static void WidgetRoutes(Javalin app, SessionsApi session, UUID verificationProfileId){
         app.get("/widget", ctx -> {
            ctx.redirect("/widget.html");
         });
@@ -16,6 +16,7 @@ public class Widget{
             var redirectUrl = ctx.queryParam("redirectUrl");
             var request = new CreateWidgetSessionRequest();
             request.setRedirectUrl(redirectUrl);
+            request.setVerificationProfileId(verificationProfileId);
             var result = session.createWidgetSession(request);
             Map<String, Object> response = Map.of(
                     "launchUrl", result.getLaunchUrl(),
