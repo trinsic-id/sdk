@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"os"
 	trinsic_api "github.com/trinsic-id/sdk-go-api/v2"
 )
 
@@ -12,10 +13,11 @@ func WidgetRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 
 	app.Post("/create-session", func(c *fiber.Ctx) error {
 		redirectUrl := c.Query("redirectUrl")
-
+		verificationProfileId := os.Getenv("TRINSIC_VERIFICATION_PROFILE_ID")
 		// Create request with nullable redirectUrl
 		request := trinsic_api.CreateWidgetSessionRequest{
 			RedirectUrl: *trinsic_api.NewNullableString(&redirectUrl),
+			VerificationProfileId: verificationProfileId,
 		}
 
 		req := api.SessionsAPI.CreateWidgetSession(c.Context()).CreateWidgetSessionRequest(request)
