@@ -1,5 +1,5 @@
 /**
- * Launches the user through a redirect towards any of the Trinsic launch URLs (applies to Widget, Hosted and Advanced Sessions).
+ * Launches the user through a redirect towards a Trinsic Session launch URL.
  * @param launchUrl - The launch url retrieved from the Trinsic API.
  * @returns The method does not return a value, but redirects the user to the specified URL.
  * @example

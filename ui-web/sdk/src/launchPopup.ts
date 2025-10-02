@@ -7,7 +7,7 @@ export interface CreatePopupOptions {
      * 
      * By default, this points to a loading page hosted by Trinsic, on a Trinsic domain name.
      * 
-     * Default value: "https://api.trinsic.id/loading"
+     * Default value: "https://verify.trinsic.id/loading"
      */
     initialUrl?: string;
 
@@ -49,7 +49,7 @@ export function createPopup(options?: CreatePopupOptions): TrinsicPopup {
     const top = window.screenY + (window.outerHeight - popupHeight) / 2;
 
     const popup = window.open(
-        options?.initialUrl || "https://api.trinsic.id/loading",
+        options?.initialUrl || "https://verify.trinsic.id/loading",
         options?.initialWindowTitle || "Trinsic",
         userAgents.isDesktop
             ? `width=${popupWidth},height=${popupHeight},left=${left},top=${top}`
