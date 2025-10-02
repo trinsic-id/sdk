@@ -55,6 +55,7 @@ If you are using this library to launch Trinsic sessions from within an iFrame, 
       - Therefore, in certain circumstances, it may be impossible for the popup window to send the finalization signal to the parent window.
     - As a consequence, you **must** provide a value for `pollingFunction` when awaiting a popup's completion.
         - This function should hit your backend and query the status of the session.
+        - The library will only call `pollingFunction` if it detects that the browser has closed off cross-window communication with the popup.
 
 ## Usage
 ### Redirect Query Parameters
