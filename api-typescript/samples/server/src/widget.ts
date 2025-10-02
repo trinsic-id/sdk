@@ -1,6 +1,6 @@
 import { CreateWidgetSessionRequest, SessionsApi } from "@trinsic/api";
 import path from "path";
-import { Express } from "express"
+import { Express } from "express";
 
 export function widgetRoutes(app: Express, sessionsApi: SessionsApi) {
   app.get("/widget", (req: any, res: any) => {
@@ -11,7 +11,10 @@ export function widgetRoutes(app: Express, sessionsApi: SessionsApi) {
 
   app.post("/create-session", async (req: any, res: any) => {
     const redirectUrl = req.query.redirectUrl;
-    const result = await sessionsApi.createWidgetSession({ redirectUrl:  redirectUrl });
+    const result = await sessionsApi.createWidgetSession({
+      redirectUrl: redirectUrl,
+      verificationProfileId: process.env.TRINSIC_VERIFICATION_PROFILE_ID!,
+    });
     console.debug("Created session", result);
     res.send(result);
   });

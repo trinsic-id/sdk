@@ -1,9 +1,13 @@
 import { NetworkApi, SessionsApi } from "@trinsic/api";
 const path = require("path");
-import { Express } from "express"
+import { Express } from "express";
 import express from "express";
 
-export function sharedRoutes(app: Express, networkApi: NetworkApi, sessionsApi: SessionsApi) {
+export function sharedRoutes(
+  app: Express,
+  networkApi: NetworkApi,
+  sessionsApi: SessionsApi
+) {
   app.get("/", express.static(path.join("../../../ui-web/samples/dist")));
   app.get("/redirect", (req: any, res: any) => {
     res.sendFile(
@@ -14,9 +18,10 @@ export function sharedRoutes(app: Express, networkApi: NetworkApi, sessionsApi: 
   app.get("/providers", async (req: any, res: any) => {
     const ipAddress = req.query.ipAddress;
     const result = await networkApi.recommendProviders({
+      verificationProfileId: process.env.TRINSIC_VERIFICATION_PROFILE_ID!,
       recommendationInfo: {
-        ipAddresses: [ipAddress]
-      }
+        ipAddresses: [ipAddress],
+      },
     });
     res.send(result);
   });
@@ -28,4 +33,3 @@ export function sharedRoutes(app: Express, networkApi: NetworkApi, sessionsApi: 
     res.send(result);
   });
 }
-

@@ -22,6 +22,7 @@ export function directRoutes(app: Express, sessionsApi: SessionsApi) {
     const capabilities = req.query.capabilities.split(",");
 
     const result = await sessionsApi.createDirectProviderSession({
+      verificationProfileId: process.env.TRINSIC_VERIFICATION_PROFILE_ID!,
       provider: provider,
       redirectUrl: redirectUrl,
       capabilities: capabilities,
