@@ -182,6 +182,11 @@ export class TrinsicPopup {
                         return;
                     }
 
+                    // Don't poll if we still have a connection to the popup -- no need, since polling is a backup mechanism
+                    if (this.isDefinitelyOpen) {
+                        return;
+                    }
+
                     // Perform a poll
                     try {
                         const isComplete = this._pollingIndicatedSuccess || await options.pollingFunction!();
@@ -291,6 +296,8 @@ export interface WaitForResultsOptions {
      * Required if your code is running inside of an iFrame whose origin is different from its embedding page's origin.
      * 
      * This is necessary because certain circumstances could cause cross-window messaging to be blocked by the browser when running inside a cross-origin iFrame.
+     * 
+     * This function is not called unless the library detects that the browser has closed off cross-window communication with the popup.
      */
     pollingFunction?: () => Promise<boolean>;
 
