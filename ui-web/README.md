@@ -25,18 +25,14 @@ If you're using a CDN, for example unpkg, you can use the below source.
 <script src="http://unpkg.com/@trinsic/web-ui"><script>
 ```
 
-## Usage
-
-### Setup
-
-The library exports two methods: `launchPopup(launchUrl)` and `launchRedirect(launchUrl, redirectUrl)`.
+## Setup
 
 #### Bundler
 
 When using a module bundler import the functions as follows:
 
 ```js
-import { launchRedirect, launchPopup } from "@trinsic/web-ui";
+import { createPopup } from "@trinsic/web-ui";
 ```
 
 #### Script Tag
@@ -47,40 +43,118 @@ When using a direct script tag, you can access the methods via the global `Trins
 await TrinsicUI.launchPopup(async () => CREATE_LAUNCH_URL);
 ```
 
-### Launch a Session
+## A Note on iFrames
 
-First, retrieve a launch URL from a trusted backend that can reach out to the Trinsic servers and create sessions. [See our API libraries.](https://github.com/trinsic-id/sdk#api-libraries).
+If you are using this library to launch Trinsic sessions from within an iFrame, there are some additional complexities and requirements to be aware of:
 
-Then, launch the session using one of the three methods exposed by this library:
+- **1. Popup flow is required**
+    - Due to browser security restrictions regarding cookies in iFrames, many Identity Providers' web flows do not support being launched in an iFrame.
+    - Therefore, if you are running within an iFrame, you **must** use the popup flow to launch sessions.
+- **2. Polling function is required with the popup flow**
+    - This library's popup flow primarily works via cross-window messaging between the popup window and the parent window. However, certain Identity Providers may use browser security headers (e.g. `Cross-Origin-Opener-Policy`) which prevent this cross-window messaging from working.
+      - Therefore, in certain circumstances, it may be impossible for the popup window to send the finalization signal to the parent window.
+    - As a consequence, you **must** provide a value for `pollingFunction` when awaiting a popup's completion.
+        - This function should hit your backend and query the status of the session.
 
-#### `launchPopup`
+## Usage
+### Redirect Query Parameters
 
-Call `await launchPopup(() => create_session_on_your_backend)` to launch the Session as a popup.
+When using either flow below, the user will be redirected back to a URL controlled by your application when they are finished with a verification.
 
-This call will return a promise which will resolve when the Session is finished.
+The following query parameters will be appended to the redirect URL:
 
-#### `launchRedirect`
+| Parameter   | Description                                                           |
+| ----------- | --------------------------------------------------------------------- |
+| `success`   | Can be `true` or `false`. Whether the Session completed successfully. |
+| `sessionId` | The ID of the session that the user is redirecting back from.         |
 
-Call `launchRedirect(launchUrl, redirectUrl)` to launch the session by redirecting the user's browser window. This is similar to an OAuth flow.
+**Note:** These parameters can be set to arbitrary values by curious or malicious users simply by editing their browser URL bar. Don't implicitly trust the `success` parameter -- always fetch the Session results from your backend to confirm. Similarly, keep a record of the session ID you sent the user to, and correlate it against the `sessionId` query parameter.
 
-This method has no return value, and cannot be awaited in the same way that `launchPopup` can.
+----
 
-When the user completes or aborts the Session, they will be redirected back to your application at `redirectUrl`, with the following query parameters appended:
+### Top-Level Redirect Flow
 
-- `success`
-  - Can be `true` or `false`
-  - Whether the Session completed successfully
-- `resultsAccessKey`
-  - May not be present (e.g. if the Session was aborted)
-  - Must be processed by your backend to fetch the final identity results for the Session
-- `sessionId`
-  - The ID of the session that the user is redirecting back from
+Use this flow if you wish to redirect the user's entire browser window to perform a verification.
 
-For example, calling `launchRedirect(launchUrl, "https://example.com/trinsic-redirect")` will cause the user to be redirected to `https://example.com/trinsic-redirect?success=true&sessionId=...&resultsAccessKey=...` upon completion of the Session.
+#### 1. Create Session
+Create a Trinsic Session in your backend, then send the `launchUrl` to your frontend.
 
-**\*Note:** These parameters can be set to arbitrary values by curious or malicious users simply by editing their browser URL bar. Don't implicitly trust the `success` parameter -- always fetch the Session results from your backend to confirm. Similarly, keep a record of the session ID you sent the user to, and correlate it against the `sessionId` query parameter.\*
+#### 2. Call `launchRedirect(launchUrl)`
 
-You can find a full example of an app using this library in the [samples](https://github.com/trinsic-id/sdk/tree/main/ui-web/samples) folder.
+From your frontend, call the `launchRedirect(launchUrl)` method, which will redirect the user's browser.
+
+#### 3. Handle Redirect
+
+When the user is redirected back to your application, hit Trinsic's API to fetch the Session status and results.
+
+----
+
+### Popup Redirect Flow
+
+Use this flow if you wish to launch the verification in a popup window, receiving a callback when the session is completed.
+
+#### 1. Call `createPopup`
+
+Call the `createPopup` method, which will return a `TrinsicPopup` instance.
+
+If the popup fails to open (such as if the browser blocks it), this method will throw.
+
+```js
+import { createPopup, TrinsicPopup } from "@trinsic/web-ui";
+
+let popup: TrinsicPopup;
+try {
+  popup = createPopup({
+    initialWindowTitle: "Test",
+  });
+} catch (e) {
+  console.error("Failed to create popup", e);
+  return;
+}
+```
+
+#### 2. Create Trinsic Session
+Once the popup has been created, call your backend to create a session via Trinsic's API. Return the `launchUrl` to your frontend.
+
+#### 3. Initialize popup & await results
+Once your frontend has a `launchUrl`, call the `initialize` method on the `TrinsicPopup` instance. This will redirect the open popup window to the `launchUrl`.
+
+```js
+// Initialize popup with Launch URL for Session
+popup.initialize(launchUrl);
+
+// Await results
+const popupResult = await popup.waitForCompletion({
+  onWindowMaybeClosed: () => {
+    // OPTIONAL
+    //
+    // This function is called when the connection to the popup window is lost.
+    // This can occur if the popup is closed, but can also occur if the popup
+    // visits a page with a restrictive `Cross-Origin-Opener-Policy` header,
+    // thus causing the browser to sever the connection to the popup for security reasons.
+
+    // Because the popup may still be open and may still resolve successfully, you should not
+    // take an authoritative action here. Instead, use this callback to prompt your UI
+    // to display a prompt to the user, where they are given the opportunity to cancel out or retry.
+  },
+
+  pollingFunction: async () => {
+    // OPTIONAL unless running in an iFrame
+    //
+    // A function which will periodically be called to check if the session is complete.
+    // If this function returns `true`, the `waitForCompletion()` call will resolve.
+    //
+    // This MUST be specified if you are launching a popup from within an iFrame.
+  }
+});
+
+// `code` contains a response code indicating the reason the `waitForCompletion()` call resolved.
+const {sessionId, code} = popupResult.code;
+
+// To know if the Session was successful or unsuccessful, call your backend to hit Trinsic's API.
+```
+
+----
 
 ## SDK Versioning
 
