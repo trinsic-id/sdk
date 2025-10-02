@@ -31,6 +31,8 @@ return function ($app, $network, $sessions) {
         $ipAddress = $request->getQueryParams()['ipAddress'];
 
         $req = new RecommendRequest();
+        $verificationProfileId = getenv('TRINSIC_VERIFICATION_PROFILE_ID');
+        $req->setVerificationProfileId($verificationProfileId);
         $reqInfo = new RecommendationInfo();
 
         $reqInfo->setIpAddresses([$ipAddress]);

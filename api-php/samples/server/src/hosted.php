@@ -19,6 +19,8 @@ return function ($app, $sessions) {
         $redirectUrl = $request->getQueryParams()['redirectUrl'];
     
         $req = new CreateHostedProviderSessionRequest();
+        $verificationProfileId = getenv('TRINSIC_VERIFICATION_PROFILE_ID');
+        $req->setVerificationProfileId($verificationProfileId);
         $req->setRedirectUrl($redirectUrl);
         $req->setProvider($provider);
     

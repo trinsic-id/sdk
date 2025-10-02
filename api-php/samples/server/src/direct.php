@@ -38,6 +38,8 @@ return function ($app, $sessions) {
         $req = new CreateDirectProviderSessionRequest();
         $req->setRedirectUrl($redirectUrl);
         $req->setProvider($provider);
+        $verificationProfileId = getenv('TRINSIC_VERIFICATION_PROFILE_ID');
+        $req->setVerificationProfileId($verificationProfileId);
         $req->setCapabilities($capabilities);
         $req->setFallbackToHostedUi($fallbackToTrinsicUI);
 
