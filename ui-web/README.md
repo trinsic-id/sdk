@@ -115,7 +115,9 @@ try {
 ```
 
 #### 2. Create Trinsic Session
-Once the popup has been created, call your backend to create a session via Trinsic's API. Return the `launchUrl` to your frontend.
+Once the popup has been created, call your backend to create a session via Trinsic's API. Pass a `redirectUrl` pointing back to your application, which will be hit in step 4.
+
+Return the `launchUrl` to your frontend. 
 
 #### 3. Initialize popup & await results
 Once your frontend has a `launchUrl`, call the `initialize` method on the `TrinsicPopup` instance. This will redirect the open popup window to the `launchUrl`.
