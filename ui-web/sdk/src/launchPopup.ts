@@ -82,7 +82,14 @@ export async function createPopupAndWaitForResults(options: CreatePopupAndWaitFo
     const popup = createPopup(options);
 
     // Call the initialization function to get the launch URL
-    const launchUrl = await options?.sessionCreationFunction();
+    let launchUrl: string;
+    try {
+        launchUrl = await options?.sessionCreationFunction();
+    } catch (error) {
+        popup.dispose();
+        throw error;
+    }
+
     if (!launchUrl) {
         throw new Error("Launch URL is empty");
     }
