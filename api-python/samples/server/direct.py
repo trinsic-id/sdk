@@ -19,35 +19,14 @@ async def directPopup(request: Request):
     return RedirectResponse(url=f"/direct-popup.html?{request.query_params}")
 
 
-@directRouter.get("/direct-launch/{provider_id}")
+@directRouter.post("/create-direct-session/{provider_id}")
 async def launch(request: Request, provider_id: str, sessions_api: SessionsApi = Depends()):
     fallbackToTrinsicUI = request.query_params.get("fallbackToTrinsicUI", "").strip().lower() == "true"
 
     request = CreateDirectProviderSessionRequest(redirect_url = request.query_params.get("redirectUrl"), verification_profile_id=os.getenv("TRINSIC_VERIFICATION_PROFILE_ID"), provider=provider_id, fallback_to_hosted_ui = fallbackToTrinsicUI, capabilities = request.query_params.get("capabilities").split(","))
 
     result = sessions_api.create_direct_provider_session(create_direct_provider_session_request=request)
-    if result.next_step.method == 'LaunchBrowser':
-        return RedirectResponse(result.next_step.content)
-    else:
-        should_refresh = result.next_step.refresh is not None
-        refresh_after = (
-            result.next_step.refresh.refresh_after.isoformat()
-            if should_refresh else
-            datetime.now(timezone.utc).isoformat()
-        )
-
-        print()
-
-        query_params = {
-            "sessionId": result.session_id,
-            "resultsAccessKey": result.result_collection.results_access_key,
-            "nextStep": result.next_step.method.value,
-            "content": result.next_step.content,
-            "shouldRefresh": str(should_refresh).lower(),
-            "refreshAfter": refresh_after
-        }
-
-        return RedirectResponse(f"/direct-popup?{urlencode(query_params)}")
+    return JSONResponse(content=json.loads(json.dumps(result.to_dict(), default=json_serial)))
 
 def json_serial(obj):
     """JSON serializer for objects not serializable by default."""

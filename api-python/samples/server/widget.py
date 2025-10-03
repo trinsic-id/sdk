@@ -9,7 +9,7 @@ widgetRouter = APIRouter()
 async def redirect():
     return RedirectResponse(url="/widget.html")
 
-@widgetRouter.post("/create-session")
+@widgetRouter.post("/create-widget-session")
 async def create_session(request: Request, sessions_api: SessionsApi = Depends()):
     redirect_url = request.query_params.get("redirectUrl")  # Get query param
     request = CreateWidgetSessionRequest(

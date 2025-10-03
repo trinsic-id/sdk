@@ -1,6 +1,8 @@
 from dotenv import load_dotenv
 
 load_dotenv()
+from pathlib import Path
+from static_file_middleware import StaticFileMiddleware
 
 import os
 import pathlib
@@ -34,8 +36,6 @@ def get_sessions_api():
 def get_network_api():
     return network_api
 
-web_ui_path = pathlib.Path(__file__).parent / "../../../ui-web/samples/dist"
-
 app = FastAPI()
 
 app.include_router(sharedRouter, dependencies=[Depends(get_sessions_api)])
@@ -43,7 +43,11 @@ app.include_router(widgetRouter, dependencies=[Depends(get_sessions_api)])
 app.include_router(hostedRouter, dependencies=[Depends(get_sessions_api)])
 app.include_router(directRouter, dependencies=[Depends(get_sessions_api)])
 
-app.mount("/", StaticFiles(directory=web_ui_path, html=True), name="static")
+# Absolute path to our static files
+static_dir = Path(__file__).parent.parent.parent.parent / "ui-web" / "samples" / "dist"
+print(f"Serving static files from {static_dir}")
+
+app.add_middleware(StaticFileMiddleware, static_dir=str(static_dir))
 
 # === Error Handlers ===
 
