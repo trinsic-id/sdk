@@ -32,7 +32,7 @@ jobs:
       - name: Run `docs` command
         uses: readmeio/rdme@v8
         with:
-          rdme: docs .readme/api-csharp.md --key=${{ secrets.README_API_KEY }} --version=0.1
+          rdme: docs .readme/api-csharp.md --key=${{ secrets.README_API_KEY }} --version=1.0
   api-go:
     name: Sync Go SDK Readme
     runs-on: ubuntu-latest
@@ -44,7 +44,7 @@ jobs:
       - name: Run `docs` command
         uses: readmeio/rdme@v8
         with:
-          rdme: docs .readme/api-go.md --key=${{ secrets.README_API_KEY }} --version=0.1
+          rdme: docs .readme/api-go.md --key=${{ secrets.README_API_KEY }} --version=1.0
   api-java:
     name: Sync Java SDK Readme
     runs-on: ubuntu-latest
@@ -56,7 +56,7 @@ jobs:
       - name: Run `docs` command
         uses: readmeio/rdme@v8
         with:
-          rdme: docs .readme/api-java.md --key=${{ secrets.README_API_KEY }} --version=0.1
+          rdme: docs .readme/api-java.md --key=${{ secrets.README_API_KEY }} --version=1.0
   api-php:
     name: Sync PHP SDK Readme
     runs-on: ubuntu-latest
@@ -68,7 +68,7 @@ jobs:
       - name: Run `docs` command
         uses: readmeio/rdme@v8
         with:
-          rdme: docs .readme/api-php.md --key=${{ secrets.README_API_KEY }} --version=0.1
+          rdme: docs .readme/api-php.md --key=${{ secrets.README_API_KEY }} --version=1.0
   api-python:
     name: Sync Python SDK Readme
     runs-on: ubuntu-latest
@@ -80,7 +80,7 @@ jobs:
       - name: Run `docs` command
         uses: readmeio/rdme@v8
         with:
-          rdme: docs .readme/api-python.md --key=${{ secrets.README_API_KEY }} --version=0.1
+          rdme: docs .readme/api-python.md --key=${{ secrets.README_API_KEY }} --version=1.0
   api-ruby:
     name: Sync Ruby SDK Readme
     runs-on: ubuntu-latest
@@ -92,7 +92,7 @@ jobs:
       - name: Run `docs` command
         uses: readmeio/rdme@v8
         with:
-          rdme: docs .readme/api-ruby.md --key=${{ secrets.README_API_KEY }} --version=0.1
+          rdme: docs .readme/api-ruby.md --key=${{ secrets.README_API_KEY }} --version=1.0
   api-typescript:
     name: Sync TypeScript SDK Readme
     runs-on: ubuntu-latest
@@ -104,7 +104,7 @@ jobs:
       - name: Run `docs` command
         uses: readmeio/rdme@v8
         with:
-          rdme: docs .readme/api-typescript.md --key=${{ secrets.README_API_KEY }} --version=0.1
+          rdme: docs .readme/api-typescript.md --key=${{ secrets.README_API_KEY }} --version=1.0
   ui-android:
     name: Sync Android SDK Readme
     runs-on: ubuntu-latest
@@ -116,7 +116,7 @@ jobs:
       - name: Run `docs` command
         uses: readmeio/rdme@v8
         with:
-          rdme: docs .readme/ui-android.md --key=${{ secrets.README_API_KEY }} --version=0.1
+          rdme: docs .readme/ui-android.md --key=${{ secrets.README_API_KEY }} --version=1.0
   ui-expo:
     name: Sync Expo SDK Readme
     runs-on: ubuntu-latest
@@ -128,7 +128,7 @@ jobs:
       - name: Run `docs` command
         uses: readmeio/rdme@v8
         with:
-          rdme: docs .readme/ui-expo.md --key=${{ secrets.README_API_KEY }} --version=0.1
+          rdme: docs .readme/ui-expo.md --key=${{ secrets.README_API_KEY }} --version=1.0
   ui-flutter:
     name: Sync Flutter SDK Readme
     runs-on: ubuntu-latest
@@ -140,7 +140,7 @@ jobs:
       - name: Run `docs` command
         uses: readmeio/rdme@v8
         with:
-          rdme: docs .readme/ui-flutter.md --key=${{ secrets.README_API_KEY }} --version=0.1
+          rdme: docs .readme/ui-flutter.md --key=${{ secrets.README_API_KEY }} --version=1.0
   ui-swift:
     name: Sync Swift SDK Readme
     runs-on: ubuntu-latest
@@ -152,7 +152,7 @@ jobs:
       - name: Run `docs` command
         uses: readmeio/rdme@v8
         with:
-          rdme: docs .readme/ui-swift.md --key=${{ secrets.README_API_KEY }} --version=0.1
+          rdme: docs .readme/ui-swift.md --key=${{ secrets.README_API_KEY }} --version=1.0
   ui-web:
     name: Sync Web SDK Readme
     runs-on: ubuntu-latest
@@ -164,4 +164,4 @@ jobs:
       - name: Run `docs` command
         uses: readmeio/rdme@v8
         with:
-          rdme: docs .readme/ui-web.md --key=${{ secrets.README_API_KEY }} --version=0.1
+          rdme: docs .readme/ui-web.md --key=${{ secrets.README_API_KEY }} --version=1.0
