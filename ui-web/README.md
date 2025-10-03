@@ -155,6 +155,26 @@ const {sessionId, code} = popupResult.code;
 // To know if the Session was successful or unsuccessful, call your backend to hit Trinsic's API.
 ```
 
+#### 4. Handle Redirect
+
+When the popup is redirected back to your application at your specified `redirectUrl`, use the `signalRedirectFromPopup` method to notify the original window that the session has completed.
+
+```js
+import { signalRedirectFromPopup } from "@trinsic/web-ui";
+
+const urlParams = new URLSearchParams(window.location.search);
+const sessionId = urlParams.get("sessionId");
+
+signalRedirectFromPopup(
+  {
+    sessionId: sessionId,
+    closeWindowAfterSignal: true
+  }
+);
+```
+
+This will immediately resolve the awaiting `waitForCompletion()` call in the original window.
+
 ----
 
 ## SDK Versioning
