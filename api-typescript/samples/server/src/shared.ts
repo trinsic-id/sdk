@@ -1,5 +1,7 @@
 import { NetworkApi, SessionsApi } from "@trinsic/api";
 import express, { Request, Response, NextFunction } from "express";
+import type { Application } from "express"; // ✅ import the type explicitly
+
 import path from "path";
 import fs from "fs";
 // Middleware to serve files if they exist
@@ -27,7 +29,7 @@ function serveStaticFileIfExists(staticDir: string) {
 }
 
 export function sharedRoutes(
-  app: Express,
+  app: Application,
   networkApi: NetworkApi,
   sessionsApi: SessionsApi
 ) {
