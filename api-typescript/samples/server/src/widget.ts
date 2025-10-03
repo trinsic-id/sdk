@@ -9,7 +9,7 @@ export function widgetRoutes(app: Express, sessionsApi: SessionsApi) {
     );
   });
 
-  app.post("/create-session", async (req: any, res: any) => {
+  app.post("/create-widget-session", async (req: any, res: any) => {
     const redirectUrl = req.query.redirectUrl;
     const result = await sessionsApi.createWidgetSession({
       redirectUrl: redirectUrl,

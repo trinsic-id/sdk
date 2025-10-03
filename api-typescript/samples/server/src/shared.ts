@@ -1,19 +1,45 @@
 import { NetworkApi, SessionsApi } from "@trinsic/api";
-const path = require("path");
-import { Express } from "express";
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
+import type { Application } from "express"; // ✅ import the type explicitly
+
+import path from "path";
+import fs from "fs";
+// Middleware to serve files if they exist
+function serveStaticFileIfExists(staticDir: string) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    let requestPath = req.path;
+    if (req.path === "/") {
+      requestPath = "/index.html"; // default to index.html
+    }
+    const filePath = path.join(staticDir, requestPath);
+    fs.stat(filePath, (err, stats) => {
+      if (!err && stats.isFile()) {
+        res.sendFile(filePath);
+      } else {
+        fs.stat(path.join(staticDir, requestPath + ".html"), (err, stats) => {
+          if (!err && stats.isFile()) {
+            res.sendFile(path.join(staticDir, requestPath + ".html"));
+          } else {
+            next();
+          }
+        });
+      }
+    });
+  };
+}
 
 export function sharedRoutes(
-  app: Express,
+  app: Application,
   networkApi: NetworkApi,
   sessionsApi: SessionsApi
 ) {
-  app.get("/", express.static(path.join("../../../ui-web/samples/dist")));
-  app.get("/redirect", (req: any, res: any) => {
-    res.sendFile(
-      path.join(__dirname, "../../../../ui-web/samples/dist/redirect.html")
-    );
-  });
+  // Use the middleware for a specific base path
+  app.use(
+    "/",
+    serveStaticFileIfExists(
+      path.join(__dirname, "../../../../ui-web/samples/dist")
+    )
+  );
 
   app.get("/providers", async (req: any, res: any) => {
     const ipAddress = req.query.ipAddress;
