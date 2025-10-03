@@ -8,8 +8,10 @@ module WidgetRoutes
 
     app.post '/create-session' do
       redirectUrl = params[:redirectUrl]
+      verificationProfileId = ENV['TRINSIC_VERIFICATION_PROFILE_ID']
       req = TrinsicApi::CreateWidgetSessionRequest.new
       req.redirect_url = redirectUrl
+      req.verification_profile_id = verificationProfileId
 
       result = TrinsicServices::SESSIONS.create_widget_session({
         create_widget_session_request: req

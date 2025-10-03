@@ -13,9 +13,17 @@ module SharedRoutes
 
     app.get '/providers' do
       ipAddress = params[:ipAddress]
+      verificationProfileId = ENV['TRINSIC_VERIFICATION_PROFILE_ID']
+      
+      # Create recommendation info with IP addresses if provided
+      recommendation_info = TrinsicApi::RecommendationInfo.new({
+        ip_addresses: ipAddress ? [ipAddress] : nil
+      })
+      
+      # Create the recommend request with required verification_profile_id
       req = TrinsicApi::RecommendRequest.new({
-        recommendation_info: TrinsicApi::RecommendationInfo.new({
-          ip_addresses: ipAddress ? [ipAddress] :nil })
+        verification_profile_id: verificationProfileId,
+        recommendation_info: recommendation_info
       })
 
       result = TrinsicServices::NETWORK.recommend_providers({recommend_request: req})

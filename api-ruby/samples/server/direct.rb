@@ -15,12 +15,14 @@ module DirectRoutes
       redirectUrl = params[:redirectUrl]
       fallbackToTrinsicUI = params[:fallbackToTrinsicUI] == "true"
       capabilities = params[:capabilities].split(",")
+      verificationProfileId = ENV['TRINSIC_VERIFICATION_PROFILE_ID']
 
       req = TrinsicApi::CreateDirectProviderSessionRequest.new({
         redirect_url: redirectUrl,
         provider: provider,
         capabilities: capabilities,
-        fallback_to_hosted_ui: fallbackToTrinsicUI
+        fallback_to_hosted_ui: fallbackToTrinsicUI,
+        verification_profile_id: verificationProfileId
       })
 
       opts = {

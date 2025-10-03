@@ -9,9 +9,11 @@ module HostedRoutes
     app.get '/hosted-launch/:provider' do
       provider = params[:provider]
       redirectUrl = params[:redirectUrl]
+      verificationProfileId = ENV['TRINSIC_VERIFICATION_PROFILE_ID']
       req = TrinsicApi::CreateHostedProviderSessionRequest.new({
         redirect_url: redirectUrl,
-        provider: provider
+        provider: provider,
+        verification_profile_id: verificationProfileId
       })
 
       opts = {
