@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3a1fa02854a04806638efb93372def32",
+    "content-hash": "0f84d7601ad17b9eecf6fce8c33bca01",
     "packages": [
         {
             "name": "fig/http-message-util",
@@ -1513,16 +1513,16 @@
         },
         {
             "name": "trinsic/api",
-            "version": "2.2.0-alpha1",
+            "version": "2.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/trinsic-id/sdk-php-api.git",
-                "reference": "0baf430ae95597a760ef8ee076bf89f5a6df1df6"
+                "reference": "fbd23473abf58d291f6b3bd26609de9f913dea68"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/trinsic-id/sdk-php-api/zipball/0baf430ae95597a760ef8ee076bf89f5a6df1df6",
-                "reference": "0baf430ae95597a760ef8ee076bf89f5a6df1df6",
+                "url": "https://api.github.com/repos/trinsic-id/sdk-php-api/zipball/fbd23473abf58d291f6b3bd26609de9f913dea68",
+                "reference": "fbd23473abf58d291f6b3bd26609de9f913dea68",
                 "shasum": ""
             },
             "require": {
@@ -1566,9 +1566,9 @@
             ],
             "support": {
                 "issues": "https://github.com/trinsic-id/sdk-php-api/issues",
-                "source": "https://github.com/trinsic-id/sdk-php-api/tree/v2.2.0-alpha1"
+                "source": "https://github.com/trinsic-id/sdk-php-api/tree/v2.2.0"
             },
-            "time": "2025-10-02T21:54:09+00:00"
+            "time": "2025-10-03T18:14:31+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
@@ -1658,9 +1658,7 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "trinsic/api": 15
-    },
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {},
