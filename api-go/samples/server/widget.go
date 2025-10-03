@@ -11,7 +11,7 @@ func WidgetRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 		return c.Redirect("/widget.html")
 	})
 
-	app.Post("/create-session", func(c *fiber.Ctx) error {
+	app.Post("/create-widget-session", func(c *fiber.Ctx) error {
 		redirectUrl := c.Query("redirectUrl")
 		verificationProfileId := os.Getenv("TRINSIC_VERIFICATION_PROFILE_ID")
 		// Create request with nullable redirectUrl
