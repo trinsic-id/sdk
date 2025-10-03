@@ -15,7 +15,7 @@ export function directRoutes(app: Express, sessionsApi: SessionsApi) {
     );
   });
 
-  app.get("/direct-launch/:provider", async (req: any, res: any) => {
+  app.post("/create-direct-session/:provider", async (req: any, res: any) => {
     const provider = req.params.provider;
     const redirectUrl = req.query.redirectUrl;
     const fallbackToTrinsicUI = req.query.fallbackToTrinsicUI;
@@ -29,28 +29,7 @@ export function directRoutes(app: Express, sessionsApi: SessionsApi) {
       fallbackToHostedUI: fallbackToTrinsicUI === "true",
     });
 
-    if (result.nextStep.method === "LaunchBrowser") {
-      res.redirect(result.nextStep.content);
-      return;
-    } else {
-      const shouldRefresh = result.nextStep.refresh != null;
-      const refreshAfter = shouldRefresh
-        ? result.nextStep.refresh?.refreshAfter.toISOString()
-        : 0;
-      res.redirect(
-        `/direct-popup?sessionId=${encodeURIComponent(
-          result.sessionId
-        )}&resultsAccessKey=${encodeURIComponent(
-          result.resultCollection.resultsAccessKey ?? ""
-        )}&nextStep=${encodeURIComponent(
-          result.nextStep.method
-        )}&content=${encodeURIComponent(
-          result.nextStep.content
-        )}&shouldRefresh=${encodeURIComponent(
-          shouldRefresh
-        )}&refreshAfter=${encodeURIComponent(refreshAfter ?? "")}`
-      );
-    }
+    res.json(result);
   });
 
   app.post("/refresh-content/:sessionId", async (req: any, res: any) => {

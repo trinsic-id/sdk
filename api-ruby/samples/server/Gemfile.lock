@@ -7,7 +7,8 @@ GEM
     dotenv (3.1.7)
     ethon (0.16.0)
       ffi (>= 1.15.0)
-    ffi (1.17.1)
+    ffi (1.17.1-arm64-darwin)
+    ffi (1.17.1-x86_64-linux-gnu)
     httparty (0.22.0)
       csv
       mini_mime (>= 1.0.0)
@@ -20,6 +21,9 @@ GEM
       bigdecimal (~> 3.1)
     mustermann (3.0.3)
       ruby2_keywords (~> 0.0.1)
+    nio4r (2.7.4)
+    puma (7.0.4)
+      nio4r (~> 2.0)
     rack (3.1.12)
     rack-protection (4.1.1)
       base64 (>= 0.1.0)
@@ -30,6 +34,8 @@ GEM
       rack (>= 3.0.0)
     rack-test (2.2.0)
       rack (>= 1.3)
+    rackup (2.2.1)
+      rack (>= 3)
     ruby2_keywords (0.0.5)
     sinatra (4.1.1)
       logger (>= 1.6.0)
@@ -45,7 +51,7 @@ GEM
       sinatra (= 4.1.1)
       tilt (~> 2.0)
     tilt (2.6.0)
-    trinsic_api (2.0.0)
+    trinsic_api (2.2.0.pre.alpha1)
       typhoeus (~> 1.0, >= 1.0.1)
     typhoeus (1.4.1)
       ethon (>= 0.9.0)
@@ -58,11 +64,13 @@ DEPENDENCIES
   dotenv
   httparty
   minitest
+  puma (~> 7.0)
   rack (~> 3.1.12)
   rack-test
+  rackup (~> 2.2)
   sinatra (~> 4.1.1)
   sinatra-contrib
-  trinsic_api
+  trinsic_api (~> 2.2.0.pre.alpha1)
 
 BUNDLED WITH
    2.6.6

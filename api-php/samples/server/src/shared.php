@@ -9,12 +9,6 @@ use Trinsic\Api\Model\RecommendResponse as RecommendResponse;
 
 return function ($app, $network, $sessions) {
     
-    // Index route to serve the index.html file
-    $app->get('/', function (Request $request, Response $response, $args) {
-        return $response
-            ->withHeader('Location', '/index.html')
-            ->withStatus(302);
-    });
 
     $app->get('/redirect', function (Request $request, Response $response, $args) {
         $queryParams = $request->getQueryParams();

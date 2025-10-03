@@ -7,11 +7,8 @@ import io.javalin.Javalin;
 import java.util.UUID;
 public class Hosted {
     public static void HostedRoutes(Javalin app, SessionsApi session, UUID verificationProfileId){
-        app.get("/hosted", ctx -> {
-            ctx.redirect("/hosted.html");
-        });
 
-        app.get("/hosted-launch/{provider}", ctx -> {
+        app.post("/create-hosted-session/{provider}", ctx -> {
             // Get path parameter
             String provider = ctx.pathParam("provider");
 
@@ -28,7 +25,7 @@ public class Hosted {
             CreateHostedProviderSessionResponse result = session.createHostedProviderSession(req);
 
             // Redirect to result URL
-            ctx.redirect(result.getLaunchUrl());
+            ctx.json(result);
         });
     }
 }

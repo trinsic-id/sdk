@@ -13,9 +13,6 @@ import java.util.UUID;
 
 public class Direct {
     public static void DirectRoutes(Javalin app, SessionsApi session, UUID verificationProfileId){
-        app.get("/direct", ctx -> {
-            ctx.redirect("/direct.html");
-        });
 
         app.get("/direct-popup", ctx -> {
             String query = ctx.queryString(); // grabs everything after '?'
@@ -23,7 +20,7 @@ public class Direct {
             ctx.redirect(target);
         });
 
-        app.get("/direct-launch/{provider}", ctx -> {
+        app.post("/create-direct-session/{provider}", ctx -> {
             String provider = ctx.pathParam("provider");
             String redirectUrl = ctx.queryParam("redirectUrl");
             boolean fallbackToTrinsicUI = "true".equals(ctx.queryParam("fallbackToTrinsicUI"));
@@ -49,27 +46,7 @@ public class Direct {
             CreateDirectProviderSessionResponse result =
                     session.createDirectProviderSession(req);
 
-            var nextStep = result.getNextStep();
-            if (nextStep.getMethod().getValue().equals(IntegrationLaunchMethod.LAUNCH_BROWSER.getValue())) {
-                ctx.redirect(nextStep.getContent());
-            } else {
-                boolean shouldRefresh = nextStep.getRefresh() != null;
-                String refreshAfter = shouldRefresh
-                        ? nextStep.getRefresh().getRefreshAfter().toString()
-                        : Instant.now().toString();
-
-                String redirectQuery = String.format(
-                        "sessionId=%s&resultsAccessKey=%s&nextStep=%s&content=%s&shouldRefresh=%s&refreshAfter=%s",
-                        URLEncoder.encode(result.getSessionId().toString(), StandardCharsets.UTF_8),
-                        URLEncoder.encode(result.getResultCollection().getResultsAccessKey(), StandardCharsets.UTF_8),
-                        URLEncoder.encode(nextStep.getMethod().getValue(), StandardCharsets.UTF_8),
-                        URLEncoder.encode(nextStep.getContent(), StandardCharsets.UTF_8),
-                        shouldRefresh,
-                        URLEncoder.encode(refreshAfter, StandardCharsets.UTF_8)
-                );
-
-                ctx.redirect("/direct-popup?" + redirectQuery);
-            }
+            ctx.json(result);
         });
 
         app.post("/refresh-content/{sessionId}", ctx -> {
@@ -84,7 +61,7 @@ public class Direct {
             RefreshStepContentResponse result =
                     session.refreshStepContent(UUID.fromString(sessionId), request);
 
-            ctx.json(result); // Or wrap it if you need `deep_transform`
+            ctx.json(result);
         });
 
         app.post("/poll-results/{sessionId}", ctx -> {
@@ -99,7 +76,7 @@ public class Direct {
             GetSessionResultResponse result =
                     session.getSessionResult(UUID.fromString(sessionId), request);
 
-            ctx.json(result); // Or wrap if needed
+            ctx.json(result);
         });
     }
 }

@@ -8,6 +8,7 @@ import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
 
 import java.nio.file.Paths;
+import java.io.File;
 import java.util.Map;
 import java.util.UUID;
 
@@ -22,8 +23,6 @@ public class Main {
             System.exit(1);
         }
 
-        var webUiPath = Paths.get("../../../ui-web/samples/dist").normalize().toString();
-
         var apiClient = new ApiClient();
         apiClient.setRequestInterceptor(interceptor -> {
             interceptor.setHeader("Authorization", "Bearer " + authToken);
@@ -34,13 +33,23 @@ public class Main {
 
 
         var app = Javalin.create(javalinConfig -> {
-            javalinConfig.staticFiles.add(staticFileConfig -> {
-                staticFileConfig.hostedPath = "/";
-                staticFileConfig.directory = webUiPath;
-                staticFileConfig.location = Location.EXTERNAL;
-            });
+    
             javalinConfig.jsonMapper(new id.trinsic.CustomJacksonMapper());
         });
+
+        String baseDir = new File(StaticFileMiddleware.class.getProtectionDomain()
+            .getCodeSource()
+            .getLocation()
+            .getPath())
+            .getParentFile()
+            .getAbsolutePath();
+
+        String staticDir = Paths.get(baseDir, "../../../../ui-web/samples/dist")
+            .normalize()
+            .toAbsolutePath()
+            .toString();
+
+        
 
         // Global handler for Trinsic API errors
         app.exception(ApiException.class, (e, ctx) -> {
@@ -69,7 +78,8 @@ public class Main {
         id.trinsic.Widget.WidgetRoutes(app, session, verificationProfileId);
         id.trinsic.Hosted.HostedRoutes(app, session, verificationProfileId);
         id.trinsic.Direct.DirectRoutes(app, session, verificationProfileId);
-
+            
+        app.get("/*", new StaticFileMiddleware(staticDir));
 
         app.start(3000);
     }

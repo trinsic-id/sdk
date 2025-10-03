@@ -9,7 +9,7 @@ export function hostedRoutes(app: Express, sessionsApi: SessionsApi) {
     );
   });
 
-  app.get("/hosted-launch/:provider", async (req: any, res: any) => {
+  app.post("/create-hosted-session/:provider", async (req: any, res: any) => {
     const provider = req.params.provider;
     const redirectUrl = req.query.redirectUrl;
 
@@ -18,6 +18,7 @@ export function hostedRoutes(app: Express, sessionsApi: SessionsApi) {
       provider: provider,
       redirectUrl: redirectUrl,
     });
-    res.redirect(result.launchUrl);
+
+    res.json(result);
   });
 }
