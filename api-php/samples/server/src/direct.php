@@ -9,26 +9,8 @@ use Trinsic\Api\Model\RefreshStepContentRequest as RefreshStepContentRequest;
 use Trinsic\Api\ApiException as ApiException;
 
 return function ($app, $sessions) {
-    
-    // Index route to serve the index.html file
-    $app->get('/direct', function (Request $request, Response $response, $args) {
-        return $response
-            ->withHeader('Location', '/direct.html')
-            ->withStatus(302);
-    });
 
-    $app->get('/direct-popup', function (Request $request, Response $response, $args) {
-        $queryParams = $request->getQueryParams();
-        
-        $queryString = http_build_query($queryParams);
-        
-        $redirectUrl = '/direct-popup.html' . (!empty($queryString) ? '?' . $queryString : '');
-        return $response
-            ->withHeader('Location', $redirectUrl)
-            ->withStatus(302);
-    });
-
-    $app->get("/direct-launch/{provider}", function (Request $request, Response $response, $args) use ($sessions) {
+    $app->post("/create-direct-session/{provider}", function (Request $request, Response $response, $args) use ($sessions) {
         $provider = $args['provider'];
         $queryParams = $request->getQueryParams();
         $redirectUrl = $queryParams['redirectUrl'] ?? null;
@@ -45,27 +27,9 @@ return function ($app, $sessions) {
 
         $result = $sessions->createDirectProviderSession($req);
 
-        if ($result->getNextStep()->getMethod() === 'LaunchBrowser') {
-            return $response
-                ->withHeader('Location', $result->getNextStep()->getContent())
-                ->withStatus(302);
-        } else {
-            $shouldRefresh = !is_null($result->getNextStep()->getRefresh());
-            $refreshAfter = $shouldRefresh ? $result->getNextStep()->getRefresh()->getRefreshAfter()->format(DATE_ISO8601) : gmdate(DATE_ISO8601);
-
-            $queryParams = http_build_query([
-                'sessionId' => $result->getSessionId(),
-                'resultsAccessKey' => $result->getResultCollection()->getResultsAccessKey(),
-                'nextStep' => $result->getNextStep()->getMethod(),
-                'content' => $result->getNextStep()->getContent(),
-                'shouldRefresh' => $shouldRefresh ? 'true' : 'false',
-                'refreshAfter' => $refreshAfter
-            ]);
-
-            return $response
-                ->withHeader('Location', "/direct-popup?$queryParams")
-                ->withStatus(302);
-        }
+        $response->getBody()->write(json_encode($result));
+        return $response->withHeader('Content-Type', 'application/json');
+        
     });
     
     $app->post("/refresh-content/{sessionId}", function (Request $request, Response $response, $args) use ($sessions) {

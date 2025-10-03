@@ -122,6 +122,13 @@ $config->setAccessToken($authToken);
 $network = new NetworkApi(null, $config);
 $sessions = new SessionsApi(null, $config);
 
+require_once __DIR__ . '/../src/static-file-middleware.php';
+// Absolute path to your static files
+$staticDir = realpath(__DIR__ . '/../../../../ui-web/samples/dist');
+
+// Register the middleware
+$app->add(new \App\Middleware\StaticFileMiddleware($staticDir));
+
 $sharedRoutes = require __DIR__ . '/../src/shared.php';
 $sharedRoutes($app, $network, $sessions);
 
