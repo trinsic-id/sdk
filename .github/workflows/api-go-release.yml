@@ -1,4 +1,4 @@
-name: Release API Go SDK
+name: Release API Go SDK (GIT)
 
 on:
   workflow_dispatch:

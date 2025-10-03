@@ -1,4 +1,4 @@
-name: Build and Publish API Go SDK
+name: Build and Publish API Go SDK (GIT)
 
 on:
   workflow_call:

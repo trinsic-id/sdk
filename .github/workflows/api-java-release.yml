@@ -1,4 +1,4 @@
-name: Release API Java SDK
+name: Release API Java SDK (GIT)
 
 on:
   workflow_dispatch:

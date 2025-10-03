@@ -1,4 +1,4 @@
-name: Build and Publish API PHP SDK
+name: Build and Publish API PHP SDK (GIT)
 
 on:
   workflow_call:

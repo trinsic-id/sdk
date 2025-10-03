@@ -1,4 +1,4 @@
-name: Release API PHP SDK
+name: Release API PHP SDK (GIT)
 
 on:
   workflow_dispatch:
