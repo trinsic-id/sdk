@@ -8,21 +8,14 @@ import java.util.Map;
 
 public class Widget{
     public static void WidgetRoutes(Javalin app, SessionsApi session, UUID verificationProfileId){
-        app.get("/widget", ctx -> {
-           ctx.redirect("/widget.html");
-        });
 
-        app.post("/create-session", ctx -> {
+        app.post("/create-widget-session", ctx -> {
             var redirectUrl = ctx.queryParam("redirectUrl");
             var request = new CreateWidgetSessionRequest();
             request.setRedirectUrl(redirectUrl);
             request.setVerificationProfileId(verificationProfileId);
             var result = session.createWidgetSession(request);
-            Map<String, Object> response = Map.of(
-                    "launchUrl", result.getLaunchUrl(),
-                    "sessionId", result.getSessionId()
-            );
-            ctx.json(response);
+            ctx.json(result);
         });
     }
 }

@@ -12,11 +12,6 @@ import java.util.List;
 
 public class Shared{
     public static void SharedRoutes(Javalin app, NetworkApi network, SessionsApi session, UUID verificationProfileId){
-        app.get("/redirect", ctx -> {
-            String query = ctx.queryString(); // grabs everything after '?'
-            String target = "/redirect.html" + (query != null ? "?" + query : "");
-            ctx.redirect(target);
-        });
 
         app.get("/providers", ctx -> {
             // Get query param
