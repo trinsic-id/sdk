@@ -28,9 +28,11 @@ export function signalRedirectFromPopup(options: SignalRedirectFromPopupOptions)
   // but can pierce a closed connection caused by a Cross-Origin-Opener-Policy on a page the popup visited during its journey.
   // In this way, BroadcastChannel can get the message sent in a situation where postMessage would fail.
   // Note: this will still fail to deliver, even same-origin, if the popup was opened by an iFrame which is embedded in a cross-origin page.
-  const broadcastChannel = new BroadcastChannel("TrinsicSession:" + options.sessionId);
-  broadcastChannel.postMessage(message);
-  broadcastChannel.close();
+  if (!!window.BroadcastChannel) {
+    const broadcastChannel = new BroadcastChannel("TrinsicSession:" + options.sessionId);
+    broadcastChannel.postMessage(message);
+    broadcastChannel.close();
+  }
 
   // Send same message via postMessage, which works cross-origin as long as the popup has not visited a page with a Cross-Origin-Opener-Policy set.
   window.opener?.postMessage(
