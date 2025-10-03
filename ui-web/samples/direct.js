@@ -52,7 +52,9 @@ async function launchDirectProvider(providerId) {
     }
   }).catch(e => catchErrorAlert(e));
 
-  await exchangeResult(sessionData);
+  if (sessionData) {
+    await exchangeResult(sessionData);
+  }
 }
 
 getProviders('launchDirectProvider');

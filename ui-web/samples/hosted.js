@@ -39,7 +39,10 @@ async function launchHostedProvider(providerId) {
           return session.launchUrl;
         }
       }).catch(e => catchErrorAlert(e));
-      await exchangeResult(sessionData);
+
+      if (sessionData) {
+        await exchangeResult(sessionData);
+      }
       break;
     case 'redirect':
       // Create a hosted session and redirect to it
