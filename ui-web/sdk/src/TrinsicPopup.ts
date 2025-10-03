@@ -259,7 +259,7 @@ export class TrinsicPopup {
             this._broadcastChannel = new BroadcastChannel("TrinsicSession:" + urlSessionId);
             this._broadcastChannel.onmessage = (event) => {
                 if (event.data?.sessionId !== this.sessionId) return; // Ignore messages not for our session
-                if (/*event.data?.type !== "TRINSIC_SESSION_SIGNAL" || */event.data?.sessionId !== this.sessionId) return; // Ignore messages not for our session
+                if (event.data?.type !== "TRINSIC_SESSION_SIGNAL" || event.data?.sessionId !== this.sessionId) return; // Ignore messages not for our session
                 if (this._hasReceivedFinalizationSignal) return; // Debounce multiple messages
 
                 this._hasReceivedFinalizationSignal = true;
@@ -269,7 +269,7 @@ export class TrinsicPopup {
 
         this._messageListener = (event: MessageEvent) => {
             if (event.source !== this.popup) return; // Ignore messages not from our popup
-            if (/*event.data?.type !== "TRINSIC_SESSION_SIGNAL" || */event.data?.sessionId !== this.sessionId) return; // Ignore messages not for our session
+            if (event.data?.type !== "TRINSIC_SESSION_SIGNAL" || event.data?.sessionId !== this.sessionId) return; // Ignore messages not for our session
             if (this._hasReceivedFinalizationSignal) return; // Debounce multiple messages
 
             this._hasReceivedFinalizationSignal = true;
