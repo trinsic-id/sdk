@@ -11,7 +11,7 @@ func HostedRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 		return c.Redirect("/hosted.html")
 	})
 
-	app.Get("/hosted-launch/:provider", func(c *fiber.Ctx) error {
+	app.Post("/create-hosted-session/:provider", func(c *fiber.Ctx) error {
 		provider := c.Params("provider")
 		redirectUrl := c.Query("redirectUrl")
 		verificationProfileId := os.Getenv("TRINSIC_VERIFICATION_PROFILE_ID")
@@ -29,6 +29,6 @@ func HostedRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 			return err
 		}
 
-		return c.Redirect(data.GetLaunchUrl())
+		return c.JSON(data)
 	})
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/gofiber/fiber/v2"
 	_ "github.com/joho/godotenv/autoload"
@@ -10,6 +11,8 @@ import (
 )
 
 var api *trinsic_api.APIClient
+
+
 
 func main() {
 	authToken := os.Getenv("TRINSIC_ACCESS_TOKEN")
@@ -38,10 +41,36 @@ func main() {
 		},
 	})
 
+	// Use the middleware for serving static files if they exist
+	app.Use("/", ServeFileIfExists("../../../ui-web/samples/dist"))
+
 	SharedRoutes(app, api)
 	WidgetRoutes(app, api)
 	HostedRoutes(app, api)
 	DirectRoutes(app, api)
 
 	app.Listen(":3000")
+}
+
+func ServeFileIfExists(staticDir string) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		// Build the absolute file path from the staticDir and request path
+		filePath := filepath.Join(staticDir, c.Path())
+
+		// Check if the file exists and is not a directory
+		info, err := os.Stat(filePath)
+		if err == nil && !info.IsDir() {
+			return c.SendFile(filePath)
+		} else {
+			filePath = filepath.Join(staticDir, c.Path()+".html")
+			info, err := os.Stat(filePath)
+			if err == nil && !info.IsDir() {
+				return c.SendFile(filePath)
+			}
+		}
+		println("File not found:", filePath)
+
+		// If not found, move to the next handler
+		return c.Next()
+	}
 }

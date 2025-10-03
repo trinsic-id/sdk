@@ -1,13 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"os"
-	"net/url"
-	"strconv"
 	"strings"
-	"time"
-
+	
 	"github.com/gofiber/fiber/v2"
 	trinsic_api "github.com/trinsic-id/sdk-go-api/v2"
 )
@@ -22,7 +18,7 @@ func DirectRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 		return c.Redirect("/direct-popup.html" + queryParams)
 	})
 
-	app.Get("/direct-launch/:provider", func(c *fiber.Ctx) error {
+	app.Post("/create-direct-session/:provider", func(c *fiber.Ctx) error {
 		provider := c.Params("provider")
 		redirectUrl := c.Query("redirectUrl")
 		fallbackToTrinsicUI := c.Query("fallbackToTrinsicUI") == "true"
@@ -52,32 +48,7 @@ func DirectRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 			return err
 		}
 
-		// Handle response
-		if result.NextStep.Method == trinsic_api.INTEGRATIONLAUNCHMETHOD_LAUNCH_BROWSER {
-			return c.Redirect(result.NextStep.Content)
-		}
-
-		refreshStep := result.NextStep.Refresh.Get()
-		shouldRefresh := refreshStep != nil
-		var refreshAfter string
-		if shouldRefresh {
-			fmt.Println(refreshStep)
-			refreshAfter = result.NextStep.Refresh.Get().RefreshAfter.Format(time.RFC3339)
-		} else {
-			refreshAfter = time.Now().UTC().Format(time.RFC3339)
-		}
-
-		// Prepare query parameters
-		queryParams := url.Values{
-			"sessionId":        {result.SessionId},
-			"resultsAccessKey": {result.ResultCollection.ResultsAccessKey},
-			"nextStep":         {string(result.NextStep.Method)},
-			"content":          {result.NextStep.Content},
-			"shouldRefresh":    {strconv.FormatBool(shouldRefresh)},
-			"refreshAfter":     {refreshAfter},
-		}
-
-		return c.Redirect("/direct-popup?" + queryParams.Encode())
+		return c.JSON(result)		
 	})
 
 	app.Post("/refresh-content/:sessionId", func(c *fiber.Ctx) error {
