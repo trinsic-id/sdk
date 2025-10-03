@@ -43,7 +43,7 @@ async function launchDirectProvider(providerId) {
       };
 
       // If the next step is "LaunchBrowser", just return the next step's launch URL.
-      // If the next step is anything else, then we should return a URL that points to our advanced-session-handling popup.
+      // If the next step is anything else, then we should return a URL that points to our direct-session-handling popup.
       if (session.nextStep?.method === "LaunchBrowser") {
         return session.nextStep.content;
       } else {
