@@ -10,7 +10,7 @@ module DirectRoutes
       send_file File.join(settings.public_folder, 'direct-popup.html')
     end
 
-    app.get('/direct-launch/:provider') do
+    app.post('/create-direct-session/:provider') do
       provider = params[:provider]
       redirectUrl = params[:redirectUrl]
       fallbackToTrinsicUI = params[:fallbackToTrinsicUI] == "true"
@@ -30,23 +30,7 @@ module DirectRoutes
       }
 
       result = TrinsicServices::SESSIONS.create_direct_provider_session(opts)
-
-      if result.next_step.method == 'LaunchBrowser'
-        redirect result.next_step.content
-      else
-        should_refresh = !result.next_step.refresh.nil?
-        refresh_after = should_refresh ? result.next_step.refresh.refresh_after.iso8601 : Time.now.utc.iso8601
-        query_params = {
-          sessionId: result.session_id,
-          resultsAccessKey: result.result_collection.results_access_key,
-          nextStep: result.next_step.method,
-          content: result.next_step.content,
-          shouldRefresh: should_refresh,
-          refreshAfter: refresh_after
-        }
-  
-        redirect "/direct-popup?#{URI.encode_www_form(query_params)}"
-      end
+      json result.to_body
     end
 
     app.post('/refresh-content/:sessionId') do

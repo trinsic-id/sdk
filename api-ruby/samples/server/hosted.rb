@@ -6,7 +6,7 @@ module HostedRoutes
       send_file File.join(settings.public_folder, 'hosted.html')
     end
 
-    app.get '/hosted-launch/:provider' do
+    app.post '/create-hosted-session/:provider' do
       provider = params[:provider]
       redirectUrl = params[:redirectUrl]
       verificationProfileId = ENV['TRINSIC_VERIFICATION_PROFILE_ID']
@@ -20,7 +20,7 @@ module HostedRoutes
         create_hosted_provider_session_request: req
       }
       result = TrinsicServices::SESSIONS.create_hosted_provider_session(opts)
-      redirect result.launch_url
+      json result.to_body
     end
   end
 end
