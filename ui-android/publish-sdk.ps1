@@ -1,5 +1,5 @@
 $sdkRepositoryPath = $Env:SDK_REPOSITORY_PATH 
-$githubPAT = $Env:PAT_GITHUB
+$githubPAT = $Env:MEWMBA_GIT_PUBLISH_TOKEN
 try {
     Set-Location "$PSScriptRoot/sdk"
 

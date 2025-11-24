@@ -19,6 +19,6 @@ jobs:
         run: ./ui-swift/publish-sdk.ps1
         shell: pwsh
         env:
-          PAT_GITHUB: ${{ secrets.PAT_GITHUB }}
+          MEWMBA_GIT_PUBLISH_TOKEN: ${{ secrets.MEWMBA_GIT_PUBLISH_TOKEN }}
           SDK_REPOSITORY_PATH: ${{ github.repository }}
           COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
