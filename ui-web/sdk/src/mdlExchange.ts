@@ -81,9 +81,9 @@ export async function performMdlExchange(
   }
 
   // Construct digital credential request
-  const req = {
+  const req : any = {
     digital: innerRequestObject,
-    mediation: undefined,
+    mediation: "required",
   };
 
   // Perform the DC API exchange
