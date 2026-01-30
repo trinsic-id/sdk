@@ -19,12 +19,14 @@ $targetLineDateOnly = 'if (DateOnly.TryParseExact(value, format, CultureInfo.Inv
 $replacementLineDateOnly = '                if (DateOnly.TryParseExact(value, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly result))'
 
 ## HOTFIX ALL API INTERFACES TO BE PARTIAL
-$targetLineAttachmentsApi = 'public interface IAttachmentsApi : IApi'
-$replacementLineAttachmentsApi = '    public partial interface IAttachmentsApi : IApi'
+$targetLineProvidersApi = 'public interface IProvidersApi : IApi'
+$replacementLineProvidersApi = '    public partial interface IProvidersApi : IApi'
 $targetLineSessionsApi = 'public interface ISessionsApi : IApi'
 $replacementLineSessionsApi = '    public partial interface ISessionsApi : IApi'
-$targetLineNetworkApi = 'public interface INetworkApi : IApi'
-$replacementLineNetworkApi = '    public partial interface INetworkApi : IApi'
+$targetLineVPApi = 'public interface IVerificationProfilesApi : IApi'
+$replacementLineVPApi = '    public partial interface IVerificationProfilesApi : IApi'
+$targetLineRedirectUrisApi = 'public interface IRedirectUrisApi : IApi'
+$replacementLineRedirectUrisApi = '    public partial interface IRedirectUrisApi : IApi'
 
 ## HOTFIX TOKEN PROVIDER
 $targetLineProvider1 = 'services.AddSingleton(typeof(RateLimitProvider<>).MakeGenericType(tokenType));'
@@ -69,9 +71,10 @@ function ApplyHotfix($targetLine, $replacementLine, $rootPath = "$PSScriptRoot/s
 }
 
 ApplyHotfix $targetLineDateOnly $replacementLineDateOnly
-ApplyHotfix $targetLineAttachmentsApi $replacementLineAttachmentsApi
+ApplyHotfix $targetLineProvidersApi $replacementLineProvidersApi
 ApplyHotfix $targetLineSessionsApi $replacementLineSessionsApi
-ApplyHotfix $targetLineNetworkApi $replacementLineNetworkApi
+ApplyHotfix $targetLineVPApi $replacementLineVPApi
+ApplyHotfix $targetLineRedirectUrisApi $replacementLineRedirectUrisApi
 ApplyHotfix $targetLineProvider1 $replacementLineProvider1
 ApplyHotfix $targetLineProvider2 $replacementLineProvider2
 ApplyHotfix $targetLineProvider3 $replacementLineProvider3
