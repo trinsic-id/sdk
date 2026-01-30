@@ -7,7 +7,6 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Psr\Http\Server\MiddlewareInterface as MiddlewareInterface;
 
-use Trinsic\Api\Api\NetworkApi as NetworkApi;
 use Trinsic\Api\Api\SessionsApi as SessionsApi;
 use Trinsic\Api\Configuration as Configuration;
 use Trinsic\Api\ApiException;
@@ -119,7 +118,6 @@ $app->add(new JsonBodyParserMiddleware());
 $config = new Configuration();
 $config->setAccessToken($authToken);
 
-$network = new NetworkApi(null, $config);
 $sessions = new SessionsApi(null, $config);
 
 require_once __DIR__ . '/../src/static-file-middleware.php';
@@ -130,7 +128,7 @@ $staticDir = realpath(__DIR__ . '/../../../../ui-web/samples/dist');
 $app->add(new \App\Middleware\StaticFileMiddleware($staticDir));
 
 $sharedRoutes = require __DIR__ . '/../src/shared.php';
-$sharedRoutes($app, $network, $sessions);
+$sharedRoutes($app, $sessions);
 
 $widgetRoutes = require  __DIR__ . '/../src/widget.php';
 $widgetRoutes($app, $sessions);
