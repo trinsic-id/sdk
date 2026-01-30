@@ -8,12 +8,12 @@ namespace Sample;
 
 public static class Shared
 {
-    public static void MapSharedRoutes(this WebApplication app, ISessionsApi sessionApi, INetworkApi networkApi)
+    public static void MapSharedRoutes(this WebApplication app, ISessionsApi sessionApi)
     {
         app.MapGet("/providers", async context =>
         {
             List<string> ipAddresses = context.Request.Query["ipAddress"] == StringValues.Empty ? [] : [context.Request.Query["ipAddress"].ToString()];
-            var response = await networkApi.RecommendProvidersAsync(new RecommendRequest(EnvironmentHelper.GetVerificationProfileIdOrThrow())
+            var response = await sessionApi.RecommendProvidersAsync(new RecommendProvidersRequest(EnvironmentHelper.GetVerificationProfileIdOrThrow())
             {
                 RecommendationInfo = new RecommendationInfo
                 {
