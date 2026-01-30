@@ -16,7 +16,6 @@ from direct import directRouter
 from trinsic_api.exceptions import ApiException
 from trinsic_api.configuration import Configuration
 from trinsic_api.api_client import ApiClient
-from trinsic_api.api.network_api import NetworkApi
 from trinsic_api.api.sessions_api import SessionsApi
 
 token = os.getenv("TRINSIC_ACCESS_TOKEN") or ""
@@ -28,13 +27,10 @@ configuration.access_token = token
 
 api_client = ApiClient(configuration=configuration)
 
-network_api = NetworkApi(api_client)
 sessions_api = SessionsApi(api_client)
 
 def get_sessions_api():
     return sessions_api
-def get_network_api():
-    return network_api
 
 app = FastAPI()
 
