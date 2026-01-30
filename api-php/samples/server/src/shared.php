@@ -22,15 +22,17 @@ return function ($app, $sessions) {
     });
 
     $app->get("/providers", function (Request $request, Response $response, $args) use ($sessions) {
-        $ipAddress = $request->getQueryParams()['ipAddress'];
+        $ipAddress = $request->getQueryParams()['ipAddress'] ?? null;
 
         $req = new RecommendProvidersRequest();
         $verificationProfileId = getenv('TRINSIC_VERIFICATION_PROFILE_ID');
         $req->setVerificationProfileId($verificationProfileId);
-        $reqInfo = new RecommendationInfo();
 
-        $reqInfo->setIpAddresses([$ipAddress]);
-        $req->setRecommendationInfo($reqInfo);
+        if ($ipAddress) {
+            $reqInfo = new RecommendationInfo();
+            $reqInfo->setIpAddresses([$ipAddress]);
+            $req->setRecommendationInfo($reqInfo);
+        }
 
         $result = $sessions->recommendProviders($req);
     
