@@ -26,7 +26,7 @@ module SharedRoutes
         recommendation_info: recommendation_info
       })
 
-      result = TrinsicServices::NETWORK.recommend_providers({recommend_request: req})
+      result = TrinsicServices::SESSIONS.recommend_providers({recommend_request: req})
       json result.to_body
     end
 

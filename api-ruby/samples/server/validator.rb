@@ -14,9 +14,8 @@ class MyAppTest < Minitest::Test
   end
 
   def test_trinsic_api_methods
-    assert defined?(TrinsicApi::NetworkApi), "TrinsicApi::NetworkApi should be defined"
     assert defined?(TrinsicApi::SessionsApi), "TrinsicApi::SessionsApi should be defined"
-    assert TrinsicApi::NetworkApi.instance_methods.include?(:list_providers), "list_providers method should be defined in TrinsicApi::NetworkApi"
+    assert TrinsicApi::SessionsApi.instance_methods.include?(:list_providers), "list_providers method should be defined in TrinsicApi::SessionsApi"
     assert TrinsicApi::SessionsApi.instance_methods.include?(:create_widget_session), "create_widget_session method should be defined in TrinsicApi::SessionsApi"
     assert TrinsicApi::SessionsApi.instance_methods.include?(:create_hosted_provider_session), "create_hosted_provider_session method should be defined in TrinsicApi::SessionsApi"
     assert TrinsicApi::SessionsApi.instance_methods.include?(:create_direct_provider_session), "create_direct_provider_session method should be defined in TrinsicApi::SessionsApi"

@@ -5,6 +5,5 @@ TrinsicApi.configure do |config|
 end
 
 module TrinsicServices
-  NETWORK = TrinsicApi::NetworkApi.new
   SESSIONS = TrinsicApi::SessionsApi.new
 end
