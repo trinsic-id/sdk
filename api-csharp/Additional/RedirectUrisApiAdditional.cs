@@ -3,7 +3,7 @@ using Trinsic.Api.Client;
 
 namespace Trinsic.Api.Api;
 
-public partial interface INetworkApi
+public partial interface IRedirectUrisApi
 {
     /// <summary>
     /// Sets the auth token used for all requests made by this client.
@@ -11,7 +11,7 @@ public partial interface INetworkApi
     public void SetAuthToken(string token);
 }
 
-public partial class NetworkApi
+public partial class RedirectUrisApi
 {
     public void SetAuthToken(string token)
     {
