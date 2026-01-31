@@ -1,31 +1,34 @@
 package id.trinsic;
 import java.util.UUID;
-import id.trinsic.api.NetworkApi;
 import id.trinsic.api.SessionsApi;
 import id.trinsic.api.models.GetSessionResultRequest;
 import id.trinsic.api.models.RecommendationInfo;
-import id.trinsic.api.models.RecommendRequest;
-import id.trinsic.api.models.RecommendResponse;
+import id.trinsic.api.models.RecommendProvidersRequest;
+import id.trinsic.api.models.RecommendProvidersResponse;
 import io.javalin.Javalin;
 import java.util.UUID;
 import java.util.List;
 
 public class Shared{
-    public static void SharedRoutes(Javalin app, NetworkApi network, SessionsApi session, UUID verificationProfileId){
+    public static void SharedRoutes(Javalin app, SessionsApi session, UUID verificationProfileId){
 
         app.get("/providers", ctx -> {
-            // Get query param
+            // Get query param (now optional)
             String ipAddress = ctx.queryParam("ipAddress");
 
             // Build request
-            RecommendRequest req = new RecommendRequest();
-            RecommendationInfo info = new RecommendationInfo();
-            info.setIpAddresses(List.of(ipAddress)); // Assuming it's a list
-            req.setRecommendationInfo(info);
+            RecommendProvidersRequest req = new RecommendProvidersRequest();
             req.setVerificationProfileId(verificationProfileId);
 
+            // Only set recommendation info if IP address is provided
+            if (ipAddress != null && !ipAddress.isEmpty()) {
+                RecommendationInfo info = new RecommendationInfo();
+                info.setIpAddresses(List.of(ipAddress));
+                req.setRecommendationInfo(info);
+            }
+
             // Call the service
-            RecommendResponse result = network.recommendProviders(req);
+            RecommendProvidersResponse result = session.recommendProviders(req);
 
             // Return JSON response
             ctx.json(result);

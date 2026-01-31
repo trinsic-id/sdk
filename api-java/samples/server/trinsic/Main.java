@@ -1,6 +1,5 @@
 package id.trinsic;
 
-import id.trinsic.api.NetworkApi;
 import id.trinsic.api.SessionsApi;
 
 import io.github.cdimascio.dotenv.DotenvBuilder;
@@ -28,7 +27,6 @@ public class Main {
             interceptor.setHeader("Authorization", "Bearer " + authToken);
         });
 
-        var network = new NetworkApi(apiClient);
         var session = new SessionsApi(apiClient);
 
 
@@ -74,7 +72,7 @@ public class Main {
             ));
         });
 
-        id.trinsic.Shared.SharedRoutes(app, network, session, verificationProfileId);
+        id.trinsic.Shared.SharedRoutes(app, session, verificationProfileId);
         id.trinsic.Widget.WidgetRoutes(app, session, verificationProfileId);
         id.trinsic.Hosted.HostedRoutes(app, session, verificationProfileId);
         id.trinsic.Direct.DirectRoutes(app, session, verificationProfileId);
