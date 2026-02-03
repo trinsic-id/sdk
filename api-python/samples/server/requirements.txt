@@ -1,4 +1,4 @@
-trinsic_api==3.0.0
+trinsic_api==3.0.1
 fastapi
 pydantic
 python-dotenv
