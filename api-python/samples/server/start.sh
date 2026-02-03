@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 if [ -z "$TRINSIC_ACCESS_TOKEN" ]; then
     if [ ! -f .env ] || ! grep -q "TRINSIC_ACCESS_TOKEN" .env; then
@@ -12,43 +13,41 @@ cd ../../../ui-web/samples
 npm ci
 npm run build
 
-
 cd ../../api-python/samples/server
 
-# Check if 'python' is available
-pythonPath=$(command -v python 2>/dev/null)
-pipPath=$(command -v pip 2>/dev/null)
+# Pin to Python 3.13
+PYTHON_VERSION="3.13"
 
-# If 'python' is not available, check for 'python3'
-if [ -z "$pythonPath" ]; then
-    pythonPath=$(command -v python3 2>/dev/null)
-    pipPath=$(command -v pip3 2>/dev/null)
+# Prefer pyenv if installed
+if command -v pyenv >/dev/null 2>&1; then
+    # Ensure pyenv shims are active in this non-interactive script
+    eval "$(pyenv init -)"
+
+    echo "Ensuring Python 3.13 is installed via pyenv..."
+    pyenv install -s "3.13"
+
+    # Point to this version to activate the venv
+    pythonPath="$(command -v python3.13)"
+else
+    # Look for the pinned python version
+    pythonPath="$(command -v python3.13 2>/dev/null || true)"
+    if [ -z "${pythonPath}" ]; then
+        echo "Python ${PYTHON_VERSION} (3.13) is required." >&2
+        echo "Install pyenv (recommended) or install a system python3.13, then re-run this script." >&2
+        exit 1
+    fi
 fi
 
-# If neither 'python' nor 'python3' is available, print an error and exit
-if [ -z "$pythonPath" ]; then
-    echo "Neither 'python' nor 'python3' was found in your system path." >&2
-    exit 1
-fi
+echo "Using Python interpreter: ${pythonPath}"
 
-echo "Setting up Python virtual environment..."
-"$pythonPath" -m venv venv
-if [ $? -ne 0 ]; then
-    echo "Failed to create virtual environment." >&2
-    exit 1
-fi
+echo "Setting up Python virtual environment in the current directory..."
+"${pythonPath}" -m venv venv
 
 echo "Activating virtual environment..."
-# Activate the virtual environment
 . ./venv/bin/activate
 
 echo "Installing Python dependencies..."
-pip install -r requirements.txt 
-
-if [ $? -ne 0 ]; then
-    echo "Error: Failed to install dependencies"
-    exit 1
-fi
+python -m pip install -r requirements.txt
 
 echo "Starting Python API sample..."
-"$pythonPath" main.py
+python main.py
