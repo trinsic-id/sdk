@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b722c68234c61d1efdff36b2ba64e802",
+    "content-hash": "1de8d55ed8b2f3893f19c28d84a8c824",
     "packages": [
         {
             "name": "fig/http-message-util",
@@ -1510,16 +1510,16 @@
         },
         {
             "name": "trinsic/api",
-            "version": "3.0.0",
+            "version": "3.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/trinsic-id/sdk-php-api.git",
-                "reference": "0bcc551873dbbd84057223e9d760d378ad63816e"
+                "reference": "1cce87db10f34e8a11dee0714fe831c28cd4c68d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/trinsic-id/sdk-php-api/zipball/0bcc551873dbbd84057223e9d760d378ad63816e",
-                "reference": "0bcc551873dbbd84057223e9d760d378ad63816e",
+                "url": "https://api.github.com/repos/trinsic-id/sdk-php-api/zipball/1cce87db10f34e8a11dee0714fe831c28cd4c68d",
+                "reference": "1cce87db10f34e8a11dee0714fe831c28cd4c68d",
                 "shasum": ""
             },
             "require": {
@@ -1563,9 +1563,9 @@
             ],
             "support": {
                 "issues": "https://github.com/trinsic-id/sdk-php-api/issues",
-                "source": "https://github.com/trinsic-id/sdk-php-api/tree/v3.0.0"
+                "source": "https://github.com/trinsic-id/sdk-php-api/tree/v3.0.1"
             },
-            "time": "2026-01-30T21:53:42+00:00"
+            "time": "2026-02-03T14:12:36+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
