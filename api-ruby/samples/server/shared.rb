@@ -21,12 +21,12 @@ module SharedRoutes
       })
       
       # Create the recommend request with required verification_profile_id
-      req = TrinsicApi::RecommendRequest.new({
+      req = TrinsicApi::RecommendProvidersRequest.new({
         verification_profile_id: verificationProfileId,
         recommendation_info: recommendation_info
       })
 
-      result = TrinsicServices::SESSIONS.recommend_providers({recommend_request: req})
+      result = TrinsicServices::SESSIONS.recommend_providers({recommend_providers_request: req})
       json result.to_body
     end
 
