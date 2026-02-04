@@ -24,7 +24,7 @@ if command -v pyenv >/dev/null 2>&1; then
     eval "$(pyenv init -)"
 
     echo "Ensuring Python 3.13 is installed via pyenv..."
-    pyenv install -s "3.13"
+    pyenv install -s "${PYTHON_VERSION}"
 
     # Point to this version to activate the venv
     pythonPath="$(command -v python3.13)"
@@ -32,8 +32,8 @@ else
     # Look for the pinned python version
     pythonPath="$(command -v python3.13 2>/dev/null || true)"
     if [ -z "${pythonPath}" ]; then
-        echo "Python ${PYTHON_VERSION} (3.13) is required." >&2
-        echo "Install pyenv (recommended) or install a system python3.13, then re-run this script." >&2
+        echo "Python ${PYTHON_VERSION} is required." >&2
+        echo "Install pyenv (recommended) or install a system python${PYTHON_VERSION}, then re-run this script." >&2
         exit 1
     fi
 fi
