@@ -9,8 +9,9 @@ trap 'rc=$?; [ $rc -eq 0 ] || echo "ERROR: exit=$rc at line ${LINENO:-?}" >&2' E
 # Specify which python version we want to use
 TARGET_PYTHON_VERSION="${TARGET_PYTHON_VERSION:-3.13}"
 
-# Specify which python version is the mimimum allowed
-MIN_PYTHON_VERSION="${MIN_PYTHON_VERSION:-3.10}"
+# Specify which python version is the minimum allowed
+# Python 3.6 is required based on vermin run
+MIN_PYTHON_VERSION="${MIN_PYTHON_VERSION:-3.6}"
 
 # This function compares two version strings. First is current version, second is minimum version
 ver_ge() {
@@ -119,6 +120,8 @@ echo "[*] Virtual environment enabled ✅"
 
 echo "[*] Activating virtual environment ⏳"
 . ${SCRIPT_DIR}/venv/bin/activate
+python -m ensurepip --upgrade >/dev/null
+python -m pip install --upgrade pip setuptools wheel -q
 echo "[*] Virtual environment activated ✅"
 
 echo "[*] Installing Python dependencies ⏳"
