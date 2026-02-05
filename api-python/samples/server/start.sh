@@ -1,54 +1,132 @@
-#!/bin/bash
+#!/usr/bin/env sh
+# Set -e: Error when a command fails (causes script to fail fast)
+# Set -u: Error when an env var isn't set
+set -eu
+# Pipefail that works in sh, bash, zsh, etc
+set -o pipefail 2>/dev/null || true
+trap 'rc=$?; [ $rc -eq 0 ] || echo "ERROR: exit=$rc at line ${LINENO:-?}" >&2' EXIT
 
+# Specify which python version we want to use
+TARGET_PYTHON_VERSION="${TARGET_PYTHON_VERSION:-3.13}"
+
+# Specify which python version is the minimum allowed
+# Python 3.6 is required based on vermin run
+MIN_PYTHON_VERSION="${MIN_PYTHON_VERSION:-3.6}"
+
+# This function compares two version strings. First is current version, second is minimum version
+ver_ge() {
+    cur=$1
+    min=$2
+
+    # Regex current version parts
+    cur_major=${cur%%.*}
+    cur_rest=${cur#*.}
+    cur_minor=${cur_rest%%.*}
+
+    # Regex minimum version parts
+    min_major=${min%%.*}
+    min_rest=${min#*.}
+    min_minor=${min_rest%%.*}
+
+    # We only target major version 3
+    [ "$cur_major" = "3" ] || return 1
+
+    # Current should be ge minimum
+    [ "$cur_minor" -ge "$min_minor" ] 2>/dev/null
+}
+
+# Gets the script's directory regardless if it's invoked via PATH or not
+case $0 in
+    */*) script=$0 ;;
+    *)
+        script=$(command -v -- "$0" 2>/dev/null || true)
+        [ -n "${script:-}" ] || script="./$0"
+        ;;
+esac
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$script")" && pwd -P)
+echo "[*] Script directory: $SCRIPT_DIR ℹ️"
+
+# Load variables from .env if present in script's directory
+if [ -f ${SCRIPT_DIR}/.env ]; then
+    echo "[*] Using .env found in script directory 🔍"
+    set -a
+    . ${SCRIPT_DIR}/.env
+    set +a
+fi
+
+# Require TRINSIC_ACCESS_TOKEN is set somehow
 if [ -z "$TRINSIC_ACCESS_TOKEN" ]; then
     if [ ! -f .env ] || ! grep -q "TRINSIC_ACCESS_TOKEN" .env; then
-        echo "Error: TRINSIC_ACCESS_TOKEN environment variable not set or .env file not found"
-        exit 1
+        echo "[X] TRINSIC_ACCESS_TOKEN environment variable not set or .env file not found"
+        exit 0
     fi
 fi
 
-echo "Build UI sample..."
-cd ../../../ui-web/samples
-npm ci
-npm run build
+echo "[*] Building UI sample ⏳"
+UI_SAMPLES_DIR="${SCRIPT_DIR}/../../../ui-web/samples"
+npm --prefix "$UI_SAMPLES_DIR" --silent ci
+npm --prefix "$UI_SAMPLES_DIR" --silent run build -- --logLevel=error
+echo "[*] UI Sample built ✅"
 
 
-cd ../../api-python/samples/server
+echo "[*] Searching for valid python installation ⏳"
+echo "[*] Targeting Python version ${TARGET_PYTHON_VERSION} 🐍"
+echo "[*] Minimum Python version ${MIN_PYTHON_VERSION} 🐍"
+TARGET_INTERPRETER_PATH=""
+# Prefer pyenv if installed
+if command -v pyenv >/dev/null 2>&1; then
+    echo "[*] Pyenv detected 👍"
+    # Ensure pyenv shims are active in this non-interactive script
+    eval "$(pyenv init -)"
 
-# Check if 'python' is available
-pythonPath=$(command -v python 2>/dev/null)
-pipPath=$(command -v pip 2>/dev/null)
+    # Ensure the target python version is available
+    pyenv install -s "${TARGET_PYTHON_VERSION}"
+    pyenv local "${TARGET_PYTHON_VERSION}"
 
-# If 'python' is not available, check for 'python3'
-if [ -z "$pythonPath" ]; then
-    pythonPath=$(command -v python3 2>/dev/null)
-    pipPath=$(command -v pip3 2>/dev/null)
+    # Point to this version to activate the venv
+    TARGET_INTERPRETER_PATH="$(command -v python)"
+else
+    # Walk $PATH to find an interpreter with the target version
+    echo "[*] Walking through path ⛰️"
+    IFS=:
+    for d in $PATH; do
+        for p in "$d"/python3 "$d"/python; do
+            [ -x "$p" ] || continue
+            v=$("$p" -c 'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}")' 2>/dev/null) || {
+                echo "[!] Failed to find the python version of ${d:-UNKNOWN}" >&2
+                continue
+            }
+            echo "[*] Checking $v"
+            if ver_ge "$v" "$MIN_PYTHON_VERSION"; then
+                TARGET_INTERPRETER_PATH="$p"
+                echo "[*] Found interpreter match for version $v -> $TARGET_INTERPRETER_PATH" >&2
+                break 2
+            fi
+        done
+    done
+    unset IFS
 fi
 
-# If neither 'python' nor 'python3' is available, print an error and exit
-if [ -z "$pythonPath" ]; then
-    echo "Neither 'python' nor 'python3' was found in your system path." >&2
-    exit 1
+if [ -z "${TARGET_INTERPRETER_PATH:-}" ]; then
+    echo "[X] Could not find a valid Python interpreter. Please install pyenv (https://github.com/pyenv/pyenv) or manually install Python with a minimum version of ${MIN_PYTHON_VERSION:-3} and add it to your PATH" >&2
+    exit 0
 fi
 
-echo "Setting up Python virtual environment..."
-"$pythonPath" -m venv venv
-if [ $? -ne 0 ]; then
-    echo "Failed to create virtual environment." >&2
-    exit 1
-fi
+echo "[*] Using Python interpreter: ${TARGET_INTERPRETER_PATH} ✅"
 
-echo "Activating virtual environment..."
-# Activate the virtual environment
-. ./venv/bin/activate
+echo "[*] Setting up Python virtual environment in the current directory ⏳"
+"${TARGET_INTERPRETER_PATH}" -m venv ${SCRIPT_DIR}/venv
+echo "[*] Virtual environment enabled ✅"
 
-echo "Installing Python dependencies..."
-pip install -r requirements.txt 
+echo "[*] Activating virtual environment ⏳"
+. ${SCRIPT_DIR}/venv/bin/activate
+python -m ensurepip --upgrade >/dev/null
+python -m pip install --upgrade pip setuptools wheel -q
+echo "[*] Virtual environment activated ✅"
 
-if [ $? -ne 0 ]; then
-    echo "Error: Failed to install dependencies"
-    exit 1
-fi
+echo "[*] Installing Python dependencies ⏳"
+PIP_DISABLE_PIP_VERSION_CHECK=1 python -m pip install -r ${SCRIPT_DIR}/requirements.txt -q
+echo "[*] Dependencies installed successfully ✅"
 
-echo "Starting Python API sample..."
-"$pythonPath" main.py
+echo "[*] Starting Python API sample server ->"
+python ${SCRIPT_DIR}/main.py
