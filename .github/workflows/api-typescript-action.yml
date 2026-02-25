@@ -28,4 +28,4 @@ jobs:
         run: ./api-typescript/publish-sdk.ps1
         shell: pwsh
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.TEMP_NPM_TOKEN }}

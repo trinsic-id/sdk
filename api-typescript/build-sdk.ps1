@@ -1,5 +1,5 @@
 $additionalProperties = @{
-    npmName                   = "@trinsic/api"
+    npmName                   = "@trinsic/xray-beta"
     npmVersion                = "[VERSION]"
     supportsES6               = "true"
     withInterfaces            = "true"
@@ -16,7 +16,7 @@ try {
     $content = Get-Content -Path $packageJson -Raw | ConvertFrom-Json
 
     # Modify the description field
-    $content.description = "Trinsic API TypeScript library."
+    $content.description = "Internal, temporary fork"
     $content.repository.url = "https://github.com/trinsic-id/sdk"
     $content.author = "Trinsic"
 

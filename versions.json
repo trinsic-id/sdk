@@ -1,6 +1,6 @@
 {
   "backendVersion": "3.0",
-  "nodePatchVersion": "1",
+  "nodePatchVersion": "2-alpha1",
   "csharpPatchVersion": "1",
   "javaPatchVersion": "1",
   "goPatchVersion": "1",

@@ -5,7 +5,7 @@ Write-Host "Setting npm token"
 try {
     Set-Location "$PSScriptRoot/sdk/publish"
     Write-Host "Publishing packages"
-    foreach ($package in Get-ChildItem -Filter "trinsic-api-*.tgz") {
+    foreach ($package in Get-ChildItem -Filter "trinsic-xray-beta*.tgz") {
         Write-Host "Publishing $package"
         & npm publish $package.FullName  --yes --no-git-tag-version --access=public
         Write-Host "Published $package"
