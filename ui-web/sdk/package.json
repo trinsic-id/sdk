@@ -1,7 +1,7 @@
 {
-  "name": "@trinsic/web-ui",
+  "name": "@trinsic/zebra-alpine",
   "version": "0.0.1",
-  "description": "Trinsic's Web UI SDK to easily launch your verifications and capture the result",
+  "description": "Internal, temporary package",
   "author": "Trinsic",
   "repository": {
     "type": "git",

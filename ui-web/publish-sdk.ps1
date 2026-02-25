@@ -7,7 +7,7 @@ if ($LASTEXITCODE -ne 0) {
 try {
     Set-Location "$PSScriptRoot/sdk/publish"
     Write-Host "Publishing packages"
-    foreach ($package in Get-ChildItem -Filter "trinsic-web-ui-*.tgz") {
+    foreach ($package in Get-ChildItem -Filter "trinsic-zebra-alpine-*.tgz") {
         Write-Host "Publishing $package"
         & npm publish $package.FullName  --yes --no-git-tag-version --access=public
         if ($LASTEXITCODE -ne 0) {
