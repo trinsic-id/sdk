@@ -8,6 +8,7 @@ export class TrinsicPopup {
     private _hasInitialized: boolean = false;
     private _hasDisposed: boolean = false;
     private _hasReceivedFinalizationSignal: boolean = false;
+    private _finalizationSignalRedirectToken?: string = undefined;
     private _pollingIndicatedSuccess: boolean = false;
 
     constructor(popup: Window) {
@@ -149,7 +150,7 @@ export class TrinsicPopup {
             let hasCalledMaybeClosed = false;
 
             // Function to clean up event listeners and timers
-            const cleanupAndResolve = (code: TrinsicPopupResultCode) => {
+            const cleanupAndResolve = (code: TrinsicPopupResultCode, redirectToken?: string) => {
                 if (timeoutHandle) {
                     clearTimeout(timeoutHandle);
                     timeoutHandle = null;
@@ -167,7 +168,8 @@ export class TrinsicPopup {
 
                 resolve({
                     sessionId: this.sessionId!,
-                    code: code
+                    code: code,
+                    redirectToken: redirectToken
                 });
             };
 
@@ -223,7 +225,7 @@ export class TrinsicPopup {
 
                 // Poll for having received the finalization signal
                 if (this._hasReceivedFinalizationSignal) {
-                    cleanupAndResolve(TrinsicPopupResultCode.SignalReceived);
+                    cleanupAndResolve(TrinsicPopupResultCode.SignalReceived, this._finalizationSignalRedirectToken);
                 }
             }, 100);
         });
@@ -263,6 +265,7 @@ export class TrinsicPopup {
                 if (this._hasReceivedFinalizationSignal) return; // Debounce multiple messages
 
                 this._hasReceivedFinalizationSignal = true;
+                this._finalizationSignalRedirectToken = event.data?.redirectToken;
                 this.unbindEventListeners();
             };
         }
@@ -273,6 +276,7 @@ export class TrinsicPopup {
             if (this._hasReceivedFinalizationSignal) return; // Debounce multiple messages
 
             this._hasReceivedFinalizationSignal = true;
+            this._finalizationSignalRedirectToken = event.data?.redirectToken;
             this.unbindEventListeners();
         };
         window.addEventListener("message", this._messageListener);
@@ -339,6 +343,11 @@ export interface TrinsicPopupResult {
      * The code associated with this result.
      */
     code: TrinsicPopupResultCode;
+
+    /**
+     * The `redirectToken` from the final redirect of the user back to your application, if present.
+     */
+    redirectToken?: string;
 }
 
 export enum TrinsicPopupResultCode {

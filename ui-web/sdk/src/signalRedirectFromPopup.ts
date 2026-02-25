@@ -5,6 +5,11 @@ export interface SignalRedirectFromPopupOptions {
   sessionId: string;
 
   /**
+   * The `redirectToken`, if present in the query parameters on your current page.
+   */
+  redirectToken?: string;
+
+  /**
    * Whether to close the window after signaling completion.
    * 
    * Default value: true
