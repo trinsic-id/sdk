@@ -27,7 +27,12 @@ export function signalRedirectFromPopup(options: SignalRedirectFromPopupOptions)
   const message = {
     type: "TRINSIC_SESSION_SIGNAL",
     sessionId: options.sessionId,
+    redirectToken: options.redirectToken
   };
+
+  if(!options.redirectToken) {
+    delete message.redirectToken;
+  }
 
   // Send via BroadcastChannel first, which only works same-origin,
   // but can pierce a closed connection caused by a Cross-Origin-Opener-Policy on a page the popup visited during its journey.
