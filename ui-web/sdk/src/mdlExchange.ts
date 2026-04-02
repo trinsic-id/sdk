@@ -89,9 +89,9 @@ export async function performMdlExchange(
   // Perform the DC API exchange
   const response = await navigator.credentials.get(req);
 
-  // If a single credential cannot be unambiguously obtained, the promise resolves with null.
+  // `null` is returned by Chrome browsers which don't support the DC API
   if (response === null || response === undefined) {
-    throw new Error("Your wallet app was unable to find a suitable document.");
+    throw new Error("Your browser does not support this feature");
   }
 
   // We have to massage the response a bit to make it serializable.
@@ -120,17 +120,11 @@ export async function performMdlExchange(
  *
  * This can help determine which wallet options to display to the user.
  *
- * NOTE: This is a simple heuristic and is likely not 100% accurate at this time.
- *
  * @returns Whether the user is on an Apple Wallet-supporting browser
  */
 export function isUserOnEligibleAppleWalletBrowser(): boolean {
-  if (!navigator.credentials || !navigator.credentials.get) {
-    return false;
-  }
-
   const userAgents = detectUserAgents();
-  return (
+  return userAgents.supportsDigitalCredentialsApi && (
     userAgents.isIos ||
     userAgents.isSafari ||
     userAgents.isMacOs ||
@@ -143,15 +137,9 @@ export function isUserOnEligibleAppleWalletBrowser(): boolean {
  *
  * This can help determine which wallet options to display to the user.
  *
- * NOTE: This is a simple heuristic and is likely not 100% accurate at this time.
- *
  * @returns Whether the user is on a Google Wallet-supporting browser
  */
 export function isUserOnEligibleGoogleWalletBrowser(): boolean {
-  if (!navigator.credentials || !navigator.credentials.get) {
-    return false;
-  }
-
   const userAgents = detectUserAgents();
-  return userAgents.isAndroid && userAgents.isChrome;
+  return userAgents.supportsDigitalCredentialsApi && userAgents.isAndroid && userAgents.isChrome;
 }

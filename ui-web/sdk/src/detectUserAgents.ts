@@ -8,6 +8,7 @@ export interface UserAgents {
   isChrome: boolean;
   isSafari: boolean;
   isSSR: boolean;
+  supportsDigitalCredentialsApi: boolean;
 }
 export const detectUserAgents = (): UserAgents => {
   const userAgent = navigator.userAgent;
@@ -24,6 +25,7 @@ export const detectUserAgents = (): UserAgents => {
     return !!anyWindow.chrome;
   };
   const isChrome = (): boolean => Boolean(isChromium() && !isEdge() && !isOpera());
+  const supportsDigitalCredentialsApi = (): boolean => !!navigator.credentials && !!navigator.credentials.get && typeof (window as any).DigitalCredential !== "undefined";
 
   const isMobile = (): boolean =>
     Boolean(isAndroid() || isIos() || isOpera() || isWindowsMobile());
@@ -38,5 +40,6 @@ export const detectUserAgents = (): UserAgents => {
     isChromium: isChromium(),
     isChrome: Boolean(isChromium() && !isEdge() && !isOpera()),
     isSafari: isSafari(),
+    supportsDigitalCredentialsApi: supportsDigitalCredentialsApi()
   };
 };
