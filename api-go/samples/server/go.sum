@@ -17,8 +17,8 @@ github.com/mattn/go-runewidth v0.0.16/go.mod h1:Jdepj2loyihRzMpdS35Xk/zdY8IAYHsh
 github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
 github.com/rivo/uniseg v0.4.7 h1:WUdvkW8uEhrYfLC4ZzdpI2ztxP1I582+49Oc5Mq64VQ=
 github.com/rivo/uniseg v0.4.7/go.mod h1:FN3SvrM+Zdj16jyLfmOkMNblXMcoc8DfTHruCPUcx88=
-github.com/trinsic-id/sdk-go-api/v2 v2.2.0 h1:7LIE2pMZfDmUEWvwFc5WN6kz5/mSyanDkqqnqGNvIYE=
-github.com/trinsic-id/sdk-go-api/v2 v2.2.0/go.mod h1:zHTqXGtvxt33TfERBnZ4Bc4ltxOWRTYEjeD0R+ihtx8=
+github.com/trinsic-id/sdk-go-api/v3 v3.0.1 h1:Q3OlfFY4TVZPOtD2iSI7O0lpJsinL1jBjr2cH6Ck2UU=
+github.com/trinsic-id/sdk-go-api/v3 v3.0.1/go.mod h1:kbwR5ssYqLn5mJr/+gNtC9iA7QxpZVIMPmedl6nTFVM=
 github.com/valyala/bytebufferpool v1.0.0 h1:GqA5TC/0021Y/b9FG4Oi9Mr3q7XYx6KllzawFIhcdPw=
 github.com/valyala/bytebufferpool v1.0.0/go.mod h1:6bBcMArwyJ5K/AmCkWv1jt77kVWyCJ6HpOuEn7z0Csc=
 github.com/valyala/fasthttp v1.59.0 h1:Qu0qYHfXvPk1mSLNqcFtEk6DpxgA26hy6bmydotDpRI=

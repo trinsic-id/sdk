@@ -2,8 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends, Request
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from trinsic_api.api.sessions_api import SessionsApi, GetSessionResultRequest
-from trinsic_api.api.network_api import NetworkApi, RecommendRequest
-from trinsic_api.models import RecommendationInfo
+from trinsic_api.models import RecommendationInfo, RecommendProvidersRequest
 import os
 sharedRouter = APIRouter()
 
@@ -12,10 +11,11 @@ async def redirect(request: Request):
     return RedirectResponse(url=f"/redirect.html?{request.query_params}")
 
 @sharedRouter.get("/providers")
-async def get_providers(request: Request, network_api: NetworkApi = Depends()):
+async def get_providers(request: Request, sessions_api: SessionsApi = Depends()):
     ip_address = request.query_params.get("ipAddress")  # Get query param
-    req = RecommendRequest(recommendation_info=RecommendationInfo(ip_addresses=[ip_address]), verification_profile_id=os.getenv("TRINSIC_VERIFICATION_PROFILE_ID"))
-    data = network_api.recommend_providers(req)
+    ip_addresses = [ip_address] if ip_address else []
+    req = RecommendProvidersRequest(recommendation_info=RecommendationInfo(ip_addresses=ip_addresses), verification_profile_id=os.getenv("TRINSIC_VERIFICATION_PROFILE_ID"))
+    data = sessions_api.recommend_providers(req)
     return data
 
 class GetResultsRequest(BaseModel):

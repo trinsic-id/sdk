@@ -1,5 +1,5 @@
-import { NetworkApi, SessionsApi } from "@trinsic/api";
-import express, { Request, Response, NextFunction } from "express";
+import { SessionsApi } from "@trinsic/api";
+import { Request, Response, NextFunction } from "express";
 import type { Application } from "express"; // ✅ import the type explicitly
 
 import path from "path";
@@ -30,7 +30,6 @@ function serveStaticFileIfExists(staticDir: string) {
 
 export function sharedRoutes(
   app: Application,
-  networkApi: NetworkApi,
   sessionsApi: SessionsApi
 ) {
   // Use the middleware for a specific base path
@@ -43,10 +42,10 @@ export function sharedRoutes(
 
   app.get("/providers", async (req: any, res: any) => {
     const ipAddress = req.query.ipAddress;
-    const result = await networkApi.recommendProviders({
+    const result = await sessionsApi.recommendProviders({
       verificationProfileId: process.env.TRINSIC_VERIFICATION_PROFILE_ID!,
       recommendationInfo: {
-        ipAddresses: [ipAddress],
+        ipAddresses: ipAddress ? [ipAddress] : null,
       },
     });
     res.send(result);

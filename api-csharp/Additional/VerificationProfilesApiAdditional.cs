@@ -3,7 +3,7 @@ using Trinsic.Api.Client;
 
 namespace Trinsic.Api.Api;
 
-public partial interface IAttachmentsApi
+public partial interface IVerificationProfilesApi
 {
     /// <summary>
     /// Sets the auth token used for all requests made by this client.
@@ -11,7 +11,7 @@ public partial interface IAttachmentsApi
     public void SetAuthToken(string token);
 }
 
-public partial class AttachmentsApi
+public partial class VerificationProfilesApi
 {
     public void SetAuthToken(string token)
     {

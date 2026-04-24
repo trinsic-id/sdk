@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/gofiber/fiber/v2"
 	"os"
-	trinsic_api "github.com/trinsic-id/sdk-go-api/v2"
+	trinsic_api "github.com/trinsic-id/sdk-go-api/v3"
 )
 
 func HostedRoutes(app *fiber.App, api *trinsic_api.APIClient) {

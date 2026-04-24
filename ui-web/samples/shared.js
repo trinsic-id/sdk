@@ -2,7 +2,7 @@ window.exchangeResult = exchangeResult;
 window.getProviders = getProviders;
 window.ipAddress = async () => {
     try {
-        const data = await fetch("https://ipwhois.app/json/").then(r => jsonHandleError(r));
+        const data = await fetch("https://ipwhois.app/json/");
         const ip = data?.ip ?? null;
         return ip;
     } catch (error) {
@@ -15,24 +15,24 @@ export function catchErrorAlert(error) {
     let errorMessage = "";
     let errorDetails = "";
     // Check if the error is a Trinsic error
-    if(error.success === false){
+    if (error.success === false) {
         console.warn("Trinsic error:", error);
         errorMessage = `Message: ${error.msg}\nSession Id: ${error.sessionId}` || `An unknown error occurred.`;
     } else {
         console.error("Error:", error);
         errorMessage = error?.message || "An unknown error occurred.";
-    }    
+    }
     // Show error message after short timeout to not delay the popup closing
     setTimeout(() => {
         alert(errorMessage);
     }, 150);
-    
+
 }
 export async function jsonHandleError(response) {
     if (!response.ok) {
-        console.warn("Request failed: parsing to an alert", response);       
+        console.warn("Request failed: parsing to an alert", response);
 
-        let alertText = "Request failed: check the logs on the backend for more information.\nUrl: " + response.url;        
+        let alertText = "Request failed: check the logs on the backend for more information.\nUrl: " + response.url;
 
         // Show error message after short timeout to not delay the popup closing
         setTimeout(() => {
@@ -61,11 +61,16 @@ async function exchangeResult(response) {
 }
 
 async function getProviders(launchMethod) {
-    const ip = await window.ipAddress();
     let url = "/providers";
-    if (ip) {
-        url += `?ipAddress=${ip}`;
+
+    const doIp = document.getElementById("doRecommendation").checked === true;
+    if (doIp) {
+        const ip = await window.ipAddress();
+        if (ip) {
+            url += `?ipAddress=${ip}`;
+        }
     }
+
     const providers = await fetch(url, {
         method: "GET",
         headers: {
@@ -75,28 +80,13 @@ async function getProviders(launchMethod) {
     })
         .then(r => jsonHandleError(r));
 
-    for (let i = 0; i < providers.recognized.length; i++) {
+        console.log(providers);
 
-        document.getElementById(
-            "recognizedProviders"
-        ).innerHTML += `<li><button class="launch-button" style="padding: 10px; background-color: transparent;" onclick="${launchMethod}('${providers.recognized[i].providerId}')"> <img src="${providers.recognized[i].providerLogo}" /> <div class="launch-name"> Launch ${providers.recognized[i].providerDisplayName}</div>  <div class="chevron"></div></button></li>`;
+    const container = document.getElementById("recommendedProviders");
+    container.innerHTML = "";
+    for (let i = 0; i < providers.recommendedProviders.length; i++) {
 
-    }
-
-    for (let i = 0; i < providers.relevant.length; i++) {
-
-        document.getElementById(
-            "relevantProviders"
-        ).innerHTML += `<li><button class="launch-button" style="padding: 10px; background-color: transparent;" onclick="${launchMethod}('${providers.relevant[i].providerId}')"> <img src="${providers.relevant[i].providerLogo}" /> <div class="launch-name"> Launch ${providers.relevant[i].providerDisplayName}</div>  <div class="chevron"></div></button></li>`;
-
-    }
-
-    for (let i = 0; i < providers.remainder.length; i++) {
-
-        document.getElementById(
-            "remainderProviders"
-        ).innerHTML += `<li><button class="launch-button" style="padding: 10px; background-color: transparent;" onclick="${launchMethod}('${providers.remainder[i].providerId}')"> <img src="${providers.remainder[i].providerLogo}" /> <div class="launch-name"> Launch ${providers.remainder[i].providerDisplayName}</div>  <div class="chevron"></div></button></li>`;
-
+        container.innerHTML += `<li><button class="launch-button" style="padding: 10px; background-color: transparent;" onclick="${launchMethod}('${providers.recommendedProviders[i].id}')"> <img src="${providers.recommendedProviders[i].logoUrl}" /> <div class="launch-name"> Launch ${providers.recommendedProviders[i].name}</div>  <div class="chevron"></div></button></li>`;
     }
 }
 

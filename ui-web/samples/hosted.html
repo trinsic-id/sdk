@@ -15,7 +15,7 @@
   <h1>Trinsic Frontend Client Sample</h1>
   <p><a href="https://docs.trinsic.id/docs/integration-guide">Read more</a> in our integration guide about the different
     session launch modes.</p>
-    <a href="/"> &lt;-- Back</a>
+  <a href="/"> &lt;-- Back</a>
   <div style="border: 1px solid black;padding: 5px; margin: 5px;">
     <h3>Hosted Provider Session</h3>
     <p>
@@ -23,19 +23,22 @@
       <label>
         <input type="radio" name="hostedLaunch" value="popup" checked>
         Use a popup
-      </label>      
+      </label>
       <label>
         <input type="radio" name="hostedLaunch" value="redirect">
         Use a redirect
       </label>
     </p>
-    
-    <h4>Recognized providers</h4>
-    <ul id="recognizedProviders" class="listOptions"></ul>  
-    <h4>Relevant providers</h4>
-    <ul id="relevantProviders" class="listOptions"></ul>  
-    <h4>Remaining providers</h4>
-    <ul id="remainderProviders" class="listOptions"></ul>  
+
+    <p>
+      <label>
+        <b>Use IP to recommend Providers:</b>
+        <input type="checkbox" name="doRecommendation" id="doRecommendation" value="popup" onchange="getProviders('launchHostedProvider')">
+      </label>
+    </p>
+
+    <h4>Recommended providers</h4>
+    <ul id="recommendedProviders" class="listOptions"></ul>
   </div>
 
   <div class="modal micromodal-slide" id="results-modal" aria-hidden="true">
@@ -49,8 +52,8 @@
         </header>
         <main class="modal__content" id="modal-1-content">
           <p>
-            <b>Session ID:</b> <code id="session-id"></code> <br/>
-            <pre id="results">
+            <b>Session ID:</b> <code id="session-id"></code> <br />
+          <pre id="results">
 
             </pre>
           </p>

@@ -7,7 +7,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	_ "github.com/joho/godotenv/autoload"
-	trinsic_api "github.com/trinsic-id/sdk-go-api/v2"
+	trinsic_api "github.com/trinsic-id/sdk-go-api/v3"
 )
 
 var api *trinsic_api.APIClient

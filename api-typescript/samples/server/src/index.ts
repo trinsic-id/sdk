@@ -1,5 +1,5 @@
 import "express-async-errors"; // 👈 this must come before your routes
-import { SessionsApi, Configuration, NetworkApi } from "@trinsic/api";
+import { SessionsApi, Configuration } from "@trinsic/api";
 import { sharedRoutes } from "./shared";
 import { widgetRoutes } from "./widget";
 import { hostedRoutes } from "./hosted";
@@ -25,11 +25,10 @@ const newConfiguration = new Configuration({
   accessToken: process.env.TRINSIC_ACCESS_TOKEN!,
 });
 const sessionsApi = new SessionsApi(newConfiguration);
-const networkApi = new NetworkApi(newConfiguration);
 
 app.use(express.json());
 
-sharedRoutes(app, networkApi, sessionsApi);
+sharedRoutes(app, sessionsApi);
 widgetRoutes(app, sessionsApi);
 hostedRoutes(app, sessionsApi);
 directRoutes(app, sessionsApi);
