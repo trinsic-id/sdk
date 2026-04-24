@@ -22,7 +22,7 @@ namespace Trinsic.Api.Client
         /// <summary>
         /// Instantiates a ConstantTokenProvider.
         /// </summary>
-        public ConstantTokenProvider(TokenContainer<TTokenBase> tokenContainer) : base()
+        public ConstantTokenProvider(TokenContainer<TTokenBase> tokenContainer)
         {
             _token = tokenContainer.Tokens.First();
         }
