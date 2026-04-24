@@ -22,12 +22,12 @@ namespace Trinsic.Api.Client
         /// <summary>
         /// Instantiates a ConstantTokenProvider.
         /// </summary>
-        public ConstantTokenProvider(TokenContainer<TTokenBase> tokenContainer) : base(tokenContainer.Tokens)
+        public ConstantTokenProvider(TokenContainer<TTokenBase> tokenContainer) : base()
         {
             _token = tokenContainer.Tokens.First();
         }
 
-        internal override async System.Threading.Tasks.ValueTask<TTokenBase> GetAsync(string header = "", System.Threading.CancellationToken cancellation = default)
+        protected internal override async System.Threading.Tasks.ValueTask<TTokenBase> GetAsync(string header = "", System.Threading.CancellationToken cancellation = default)
         {
             return _token;
         }
