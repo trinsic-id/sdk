@@ -2,7 +2,7 @@ window.exchangeResult = exchangeResult;
 window.getProviders = getProviders;
 window.ipAddress = async () => {
     try {
-        const data = await fetch("https://ipwhois.app/json/").then(r => jsonHandleError(r));
+        const data = await fetch("https://ipwhois.app/json/");
         const ip = data?.ip ?? null;
         return ip;
     } catch (error) {
