@@ -15,13 +15,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v45
-        with:
-          files_yaml: |
-            sample_pubspec:
-              - ui-flutter/samples/pubspec.yaml
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -43,8 +36,6 @@ jobs:
             "expiration": 1570721159348
           }
           EOF
-      - name: Verify credentials
-        run: cat $XDG_CONFIG_HOME/dart/pub-credentials.json
       - name: Build SDK
         run: ./ui-flutter/build-sdk.ps1
         shell: pwsh
