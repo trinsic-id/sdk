@@ -24,15 +24,15 @@ jobs:
           distribution: "temurin"
           java-version: "21"
       - name: Build SDK
-        run: ./ui-android/build-sdk.ps1
-        shell: pwsh
+        run: ./ui-android/build-sdk.sh
+        shell: bash
       - name: Build sample
-        run: ./ui-android/build-samples.ps1
-        shell: pwsh
+        run: ./ui-android/build-samples.sh
+        shell: bash
       - name: Publish SDK
         if: inputs.publish == true
-        run: ./ui-android/publish-sdk.ps1
-        shell: pwsh
+        run: ./ui-android/publish-sdk.sh
+        shell: bash
         env:
           MEWMBA_GIT_PUBLISH_TOKEN: ${{ secrets.MEWMBA_GIT_PUBLISH_TOKEN }}
           SDK_REPOSITORY_PATH: ${{ github.repository }}
