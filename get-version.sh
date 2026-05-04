@@ -23,35 +23,30 @@ if [[ -z "$version_name" ]]; then
   exit 1
 fi
 
-version="$(
-  node - "$SCRIPT_DIR/versions.json" "$version_name" <<'NODE'
-const fs = require("fs");
-const file = process.argv[2];
-const versionName = process.argv[3];
-const json = JSON.parse(fs.readFileSync(file, "utf8"));
+if ! command -v jq >/dev/null 2>&1; then
+  echo "jq is required to read versions.json." >&2
+  exit 1
+fi
 
-function readCaseInsensitive(obj, key) {
-  const actual = Object.keys(obj).find((candidate) => candidate.toLowerCase() === key.toLowerCase());
-  return actual ? obj[actual] : undefined;
+read_version_value() {
+  local wanted_key="$1"
+  jq -er --arg wanted_key "$wanted_key" '
+    to_entries[]
+    | select(.key | ascii_downcase == ($wanted_key | ascii_downcase))
+    | .value
+  ' "$SCRIPT_DIR/versions.json"
 }
 
-const directVersion = readCaseInsensitive(json, versionName);
-if (directVersion !== undefined && directVersion !== null) {
-  process.stdout.write(String(directVersion));
-  process.exit(0);
-}
-
-const backendVersion = readCaseInsensitive(json, "backendVersion");
-const patchVersion = readCaseInsensitive(json, `${versionName}PatchVersion`);
-if (backendVersion === undefined || patchVersion === undefined) {
-  console.error(`No version found for ${versionName}.`);
-  process.exit(1);
-}
-
-console.error(`Package will be created with version ${backendVersion}.${patchVersion} from file based API Version ${backendVersion} and patchVersion ${patchVersion}`);
-process.stdout.write(`${backendVersion}.${patchVersion}`);
-NODE
-)"
+if version="$(read_version_value "$version_name")"; then
+  :
+else
+  if ! backend_version="$(read_version_value "backendVersion")" || ! patch_version="$(read_version_value "${version_name}PatchVersion")"; then
+    echo "No version found for $version_name." >&2
+    exit 1
+  fi
+  version="${backend_version}.${patch_version}"
+  echo "Package will be created with version $version from file based API Version $backend_version and patchVersion $patch_version" >&2
+fi
 
 if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
   echo "trinsic-package-version=$version" >> "$GITHUB_OUTPUT"

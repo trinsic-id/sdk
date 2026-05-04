@@ -17,42 +17,43 @@ tag_prefix="v"
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --source-location|-sourceLocation)
+      [[ $# -ge 2 ]] || { echo "$1 requires a value" >&2; exit 1; }
       source_location="$2"
-      shift 2
       ;;
     --destination-location|-destinationLocation)
+      [[ $# -ge 2 ]] || { echo "$1 requires a value" >&2; exit 1; }
       destination_location="$2"
-      shift 2
       ;;
     --github-pat|-githubPAT)
+      [[ $# -ge 2 ]] || { echo "$1 requires a value" >&2; exit 1; }
       github_pat="$2"
-      shift 2
       ;;
     --repository-path|-repositoryPath)
+      [[ $# -ge 2 ]] || { echo "$1 requires a value" >&2; exit 1; }
       repository_path="$2"
-      shift 2
       ;;
     --package-version|-packageVersion)
+      [[ $# -ge 2 ]] || { echo "$1 requires a value" >&2; exit 1; }
       package_version="$2"
-      shift 2
       ;;
     --name|-name)
+      [[ $# -ge 2 ]] || { echo "$1 requires a value" >&2; exit 1; }
       name="$2"
-      shift 2
       ;;
     --sdk-repository-path|-sdkRepositoryPath)
+      [[ $# -ge 2 ]] || { echo "$1 requires a value" >&2; exit 1; }
       sdk_repository_path="$2"
-      shift 2
       ;;
     --tag-prefix|-tagPrefix)
+      [[ $# -ge 2 ]] || { echo "$1 requires a value" >&2; exit 1; }
       tag_prefix="$2"
-      shift 2
       ;;
     *)
       echo "Unknown argument: $1" >&2
       exit 1
       ;;
   esac
+  shift 2
 done
 
 for required in source_location destination_location github_pat repository_path package_version name sdk_repository_path; do

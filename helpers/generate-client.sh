@@ -14,30 +14,31 @@ additional_properties=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --language|-language)
+      [[ $# -ge 2 ]] || { echo "$1 requires a value" >&2; exit 1; }
       language="$2"
-      shift 2
       ;;
     --version-name|-versionName)
+      [[ $# -ge 2 ]] || { echo "$1 requires a value" >&2; exit 1; }
       version_name="$2"
-      shift 2
       ;;
     --swagger-file-or-url|-swaggerFileOrUrl)
+      [[ $# -ge 2 ]] || { echo "$1 requires a value" >&2; exit 1; }
       swagger_file_or_url="$2"
-      shift 2
       ;;
     --output-folder|-outputFolder)
+      [[ $# -ge 2 ]] || { echo "$1 requires a value" >&2; exit 1; }
       output_folder="$2"
-      shift 2
       ;;
     --additional-property|--additional-properties|-additionalProperty|-additionalProperties)
+      [[ $# -ge 2 ]] || { echo "$1 requires a value" >&2; exit 1; }
       additional_properties+=("$2")
-      shift 2
       ;;
     *)
       echo "Unknown argument: $1" >&2
       exit 1
       ;;
   esac
+  shift 2
 done
 
 if [[ -z "$language" ]]; then
@@ -81,9 +82,7 @@ done
 
 concatenated_additional_properties=""
 if [[ ${#resolved_properties[@]} -gt 0 ]]; then
-  IFS=,
-  concatenated_additional_properties="${resolved_properties[*]}"
-  unset IFS
+  concatenated_additional_properties="$(IFS=,; printf '%s' "${resolved_properties[*]}")"
 fi
 
 echo "Generating $language SDK from $local_swagger_file_path in $output_folder with additional properties: $concatenated_additional_properties"
