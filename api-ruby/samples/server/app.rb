@@ -5,7 +5,6 @@ require 'sinatra/base'
 require 'sinatra/json'
 require 'trinsic_api'
 require_relative 'shared'
-require_relative 'widget'
 require_relative 'hosted'
 require_relative 'direct'
 
@@ -22,7 +21,6 @@ class MyApp < Sinatra::Base
   end
 
   register SharedRoutes
-  register WidgetRoutes
   register HostedRoutes
   register DirectRoutes
 

@@ -45,7 +45,6 @@ func main() {
 	app.Use("/", ServeFileIfExists("../../../ui-web/samples/dist"))
 
 	SharedRoutes(app, api)
-	WidgetRoutes(app, api)
 	HostedRoutes(app, api)
 	DirectRoutes(app, api)
 

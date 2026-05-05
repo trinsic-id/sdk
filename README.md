@@ -7,7 +7,7 @@ You can find our platform's documentation at [docs.trinsic.id](https://docs.trin
 ## Getting started
 
 > [!TIP]
-> Each backend sample wraps the `/ui-web/samples/` sample as the frontend, including Widget, Hosted and Direct sessions.
+> Each backend sample wraps the `/ui-web/samples/` sample as the frontend, including Hosted and Direct sessions.
 
 1. Retrieve your auth token and a verification profile ID from the Trinsic Dashboard
 1. Configure `localhost:3000` as an approved redirect url in your app's settings in the dashboard.

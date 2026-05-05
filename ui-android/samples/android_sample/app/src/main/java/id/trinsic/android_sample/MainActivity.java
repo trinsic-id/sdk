@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private static String MDL_REQUEST_OBJECT_BASE64URL = "";
 
     /**
-     * The TrinsicUI instance, which will be used to launch a Hosted or Widget session.
+     * The TrinsicUI instance, which will be used to launch a Hosted session.
      * <p>
      * Not used for Direct Sessions, or for mDL Exchanges.
      */

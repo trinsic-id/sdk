@@ -73,7 +73,6 @@ public class Main {
         });
 
         id.trinsic.Shared.SharedRoutes(app, session, verificationProfileId);
-        id.trinsic.Widget.WidgetRoutes(app, session, verificationProfileId);
         id.trinsic.Hosted.HostedRoutes(app, session, verificationProfileId);
         id.trinsic.Direct.DirectRoutes(app, session, verificationProfileId);
             
@@ -82,4 +81,3 @@ public class Main {
         app.start(3000);
     }
 }
-

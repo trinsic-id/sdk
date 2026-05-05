@@ -86,7 +86,7 @@ if [[ ${#resolved_properties[@]} -gt 0 ]]; then
 fi
 
 echo "Generating $language SDK from $local_swagger_file_path in $output_folder with additional properties: $concatenated_additional_properties"
-npx --yes openapi-generator-cli generate \
+npx --yes @openapitools/openapi-generator-cli generate \
   -i "$local_swagger_file_path" \
   -g "$language" \
   -o "$output_folder" \
