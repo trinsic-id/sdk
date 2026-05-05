@@ -8,7 +8,7 @@
   "phpPatchVersion": "0-preview1",
   "rubyPatchVersion": "0-preview1",
   "swiftUIVersion": "2.1.0-alpha4",
-  "androidUIVersion": "2.1.0-alpha2",
+  "androidUIVersion": "2.1.0",
   "flutterUIVersion": "2.0.0",
   "expoUIVersion": "2.0.1",
   "webUIVersion": "3.0.3"
