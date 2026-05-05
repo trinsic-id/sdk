@@ -59,6 +59,6 @@ require_env ORG_GRADLE_PROJECT_signingInMemoryKeyPassword
 
 # Publish to Maven
 (
-  # cd "$SCRIPT_DIR/sdk"
+  cd "$SCRIPT_DIR/sdk"
   ./gradlew publishToMavenCentral
 )
