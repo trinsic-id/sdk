@@ -26,9 +26,9 @@ jobs:
       - name: Build SDK
         run: ./ui-android/build-sdk.sh
         shell: bash
-      # - name: Build sample
-      #   run: ./ui-android/build-samples.sh
-      #   shell: bash
+      - name: Build sample
+        run: ./ui-android/build-samples.sh
+        shell: bash
       - name: Publish SDK
         if: inputs.publish == true
         run: ./ui-android/publish-sdk.sh
