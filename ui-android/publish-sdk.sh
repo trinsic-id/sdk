@@ -28,33 +28,33 @@ require_env ORG_GRADLE_PROJECT_signingInMemoryKeyPassword
   git checkout main
   git pull
 
-  echo "Adding files to git"
-  git add .
+  # echo "Adding files to git"
+  # git add .
 
-  package_version="$(get_version androidUIVersion)"
+  # package_version="$(get_version androidUIVersion)"
 
-  echo "Committing files"
-  git commit -m "Publishing latest ui-android package for version $package_version"
+  # echo "Committing files"
+  # git commit -m "Publishing latest ui-android package for version $package_version"
 
-  echo "Pushing to submodule repository"
-  git push origin main
+  # echo "Pushing to submodule repository"
+  # git push origin main
 
   # Don't tag so we don't trigger Jitpack (testing)
   # tag_name="$package_version"
   # git tag "$tag_name"
-  git push origin "$tag_name"
+  # git push origin "$tag_name"
 )
 
 # Push updated submodule ref to root repo
 (
-  cd "$REPO_ROOT"
-  remote_origin="https://$MEWMBA_GIT_PUBLISH_TOKEN@github.com/$SDK_REPOSITORY_PATH.git"
-  echo "Setting origin to $remote_origin"
-  git remote set-url origin "$remote_origin"
+  # cd "$REPO_ROOT"
+  # remote_origin="https://$MEWMBA_GIT_PUBLISH_TOKEN@github.com/$SDK_REPOSITORY_PATH.git"
+  # echo "Setting origin to $remote_origin"
+  # git remote set-url origin "$remote_origin"
 
-  git add "ui-android/sdk"
-  git commit -m "Update ui-android submodule reference to version $(get_version androidUIVersion)"
-  git push origin main
+  # git add "ui-android/sdk"
+  # git commit -m "Update ui-android submodule reference to version $(get_version androidUIVersion)"
+  # git push origin main
 )
 
 # Publish to Maven
