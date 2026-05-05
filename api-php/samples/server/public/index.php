@@ -130,9 +130,6 @@ $app->add(new \App\Middleware\StaticFileMiddleware($staticDir));
 $sharedRoutes = require __DIR__ . '/../src/shared.php';
 $sharedRoutes($app, $sessions);
 
-$widgetRoutes = require  __DIR__ . '/../src/widget.php';
-$widgetRoutes($app, $sessions);
-
 $hostedRoutes = require  __DIR__ . '/../src/hosted.php';
 $hostedRoutes($app, $sessions);
 

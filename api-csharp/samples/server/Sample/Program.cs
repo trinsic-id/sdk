@@ -27,7 +27,6 @@ var app = builder.Build();
 var sessionApi = app.Services.GetService<ISessionsApi>()!;
 app.UseMiddleware<JsonExceptionMiddleware>();
 app.MapSharedRoutes(sessionApi);
-app.MapWidgetSessionRoutes(sessionApi);
 app.MapHostedProviderSessionRoutes(sessionApi);
 app.MapDirectProviderSessionRoutes(sessionApi);
 

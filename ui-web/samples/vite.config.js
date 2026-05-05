@@ -8,7 +8,6 @@ export default {
       input: {
         main: resolve(__dirname, "index.html"),
         redirect: resolve(__dirname, "redirect.html"),
-        widget: resolve(__dirname, "widget.html"),
         hosted: resolve(__dirname, "hosted.html"),
         direct: resolve(__dirname, "direct.html"),
         directPopup: resolve(__dirname, "direct-popup.html"),
