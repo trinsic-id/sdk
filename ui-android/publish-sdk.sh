@@ -15,6 +15,8 @@ require_env ORG_GRADLE_PROJECT_signingInMemoryKeyPassword
 
 # Commit updated build.gradle.kts, tag the commit, and push
 (
+  cd "$SCRIPT_DIR/sdk"
+
   git config --global user.name "github-actions[bot]"
   git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
