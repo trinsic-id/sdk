@@ -31,8 +31,6 @@ const config = new Configuration({ accessToken: "your-access-token" });
 const attachments = new AttachmentsApi(config);
 const network = new NetworkApi(config);
 const sessions = new SessionsApi(config);
-
-const session = await sessionsApi.createWidgetSession();
 ```
 
 You can find a full TypeScript server example in the [samples](https://github.com/trinsic-id/sdk/tree/main/api-typescript/samples) folder.

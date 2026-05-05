@@ -14,11 +14,11 @@ For usage instructions, see our [sample app](https://github.com/trinsic-id/sdk/t
 
 ## Supported Use Cases
 
-### Widget and Hosted Provider Sessions
+### Hosted Provider Sessions
 
-This library supports launching both [Widget](https://docs.trinsic.id/docs/widget-session) and [Hosted Provider](https://docs.trinsic.id/docs/hosted-provider-session) Sessions.
+This library supports launching [Hosted Provider](https://docs.trinsic.id/docs/hosted-provider-session) Sessions.
 
-You _must_ specify a `redirectUrl` when creating either kind of Session, and that `redirectUrl` _must_ use a custom scheme which you register against your app (see below).
+You _must_ specify a `redirectUrl` when creating the Session, and that `redirectUrl` _must_ use a custom scheme which you register against your app (see below).
 
 ### Direct Provider Sessions
 
