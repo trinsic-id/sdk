@@ -46,7 +46,7 @@ require_env ORG_GRADLE_PROJECT_signingInMemoryKeyPassword
 )
 
 # Push updated submodule ref to root repo
-(
+# (
   # cd "$REPO_ROOT"
   # remote_origin="https://$MEWMBA_GIT_PUBLISH_TOKEN@github.com/$SDK_REPOSITORY_PATH.git"
   # echo "Setting origin to $remote_origin"
@@ -55,10 +55,10 @@ require_env ORG_GRADLE_PROJECT_signingInMemoryKeyPassword
   # git add "ui-android/sdk"
   # git commit -m "Update ui-android submodule reference to version $(get_version androidUIVersion)"
   # git push origin main
-)
+# )
 
 # Publish to Maven
 (
-  cd "$_SCRIPT_DIR/sdk"
+  # cd "$SCRIPT_DIR/sdk"
   ./gradlew publishToMavenCentral
 )
