@@ -36,3 +36,7 @@ jobs:
         env:
           MEWMBA_GIT_PUBLISH_TOKEN: ${{ secrets.MEWMBA_GIT_PUBLISH_TOKEN }}
           SDK_REPOSITORY_PATH: ${{ github.repository }}
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_PUBLISHING_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PUBLISHING_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.MAVEN_CENTRAL_SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.MAVEN_CENTRAL_SIGNING_KEY_PASSWORD }}
