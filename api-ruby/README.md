@@ -37,8 +37,6 @@ end
 attachments = TrinsicApi::AttachmentsApi.new
 network = TrinsicApi::NetworkApi.new
 sessions = TrinsicApi::SessionsApi.new
-
-sessions.create_widget_session({})
 ```
 
 You can find a full Ruby server example in the [samples](https://github.com/trinsic-id/sdk/tree/main/api-ruby/samples) folder.

@@ -10,7 +10,6 @@ from fastapi import FastAPI, Request, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 from shared import sharedRouter
-from widget import widgetRouter
 from hosted import hostedRouter
 from direct import directRouter
 from trinsic_api.exceptions import ApiException
@@ -35,7 +34,6 @@ def get_sessions_api():
 app = FastAPI()
 
 app.include_router(sharedRouter, dependencies=[Depends(get_sessions_api)])
-app.include_router(widgetRouter, dependencies=[Depends(get_sessions_api)])
 app.include_router(hostedRouter, dependencies=[Depends(get_sessions_api)])
 app.include_router(directRouter, dependencies=[Depends(get_sessions_api)])
 
