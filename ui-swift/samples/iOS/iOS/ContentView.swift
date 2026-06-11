@@ -13,6 +13,7 @@ let startUrl = "https://api.trinsic.id/api/mobiletest/create-session?redirectSch
 
 struct ContentView: View {
     @State private var isButtonEnabled = false
+    @State private var autoCancelAfter10s = false
     @State private var redirectedURL: URL?
     // Pick between our default one presentationContextProvider
     let trinsicUI = TrinsicUI()
@@ -20,11 +21,12 @@ struct ContentView: View {
     //let trinsicUI = TrinsicUI(presentationContextProvider: CustomContextProvider.init())
 
     var body: some View {
-        VStack {
+        VStack(spacing: 16) {
             Image(systemName: "globe")
                 .imageScale(.large)
                 .foregroundStyle(.tint)
             Text("Hello, world!")
+            Toggle("Auto-cancel after 10s", isOn: $autoCancelAfter10s)
             Button(action: {
                 Task {
                     await handleButtonClick()
@@ -49,13 +51,24 @@ struct ContentView: View {
         }
         .padding()
     }
-    
+
     func handleButtonClick() async {
         do {
             if let url = redirectedURL {
-                
+
                 print("Button clicked, opening: \(url)")
-                
+
+                var cancelTask: Task<Void, Never>?
+                if autoCancelAfter10s {
+                    cancelTask = Task {
+                        try? await Task.sleep(nanoseconds: 10 * 1_000_000_000)
+                        guard !Task.isCancelled else { return }
+                        print("Auto-cancel firing after 10s")
+                        trinsicUI.cancel()
+                    }
+                }
+                defer { cancelTask?.cancel() }
+
                 let result = try await trinsicUI.launchSession(launchUrl: url.absoluteString, callbackUrlScheme: sampleCallbackUrlScheme)
                 print("Success \(result.success)")
                 print("Canceled \(result.canceled)")
@@ -66,7 +79,7 @@ struct ContentView: View {
         catch {
             print("Error: \(error)")
         }
-        
+
     }
 }
 
