@@ -28,8 +28,8 @@ package_version="$(get_version swiftUIVersion)"
 
   podspec_path="TrinsicUI.podspec"
   perl -0pi \
-    -e "s/s\\.version\\s*=\\s*'[^']+'/s.version          = '$package_version'/g" \
-    -e "s/s\\.source\\s*=\\s*\\{ :git => '[^']+', :tag => '[^']+' \\}/s.source       = { :git => 'https:\\/\\/github.com\\/trinsic-id\\/sdk-swift-ui.git', :tag => '$package_version' }/g" \
+    -e "s{s\\.version\\s*=\\s*'[^']+'}{s.version          = '$package_version'}g" \
+    -e "s{s\\.source\\s*=\\s*\\{ :git => '[^']+', :tag => '[^']+' \\}}{s.source       = { :git => 'https://github.com/trinsic-id/sdk-swift-ui.git', :tag => '$package_version' }}g" \
     "$podspec_path"
   echo "Podspec file updated with version $package_version."
 
