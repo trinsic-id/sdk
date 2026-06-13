@@ -27,10 +27,28 @@ package_version="$(get_version swiftUIVersion)"
   git pull
 
   podspec_path="TrinsicUI.podspec"
-  perl -0pi \
-    -e "s{s\\.version\\s*=\\s*'[^']+'}{s.version          = '$package_version'}g" \
-    -e "s{s\\.source\\s*=\\s*\\{ :git => '[^']+', :tag => '[^']+' \\}}{s.source       = { :git => 'https://github.com/trinsic-id/sdk-swift-ui.git', :tag => '$package_version' }}g" \
-    "$podspec_path"
+  PACKAGE_VERSION="$package_version" ruby - "$podspec_path" <<'RUBY'
+path = ARGV.fetch(0)
+version = ENV.fetch("PACKAGE_VERSION")
+contents = File.read(path)
+
+replacements = {
+  "version" => [
+    /s\.version\s*=\s*'[^']+'/,
+    "s.version          = '#{version}'"
+  ],
+  "source" => [
+    /s\.source\s*=\s*\{ :git => '[^']+', :tag => '[^']+' \}/,
+    "s.source       = { :git => 'https://github.com/trinsic-id/sdk-swift-ui.git', :tag => '#{version}' }"
+  ]
+}
+
+replacements.each do |name, (pattern, replacement)|
+  abort "Unable to update #{name} in #{path}" unless contents.gsub!(pattern, replacement)
+end
+
+File.write(path, contents)
+RUBY
   echo "Podspec file updated with version $package_version."
 
   echo "Adding files to git"
