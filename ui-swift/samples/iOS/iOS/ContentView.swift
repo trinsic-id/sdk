@@ -9,7 +9,7 @@ import SwiftUI
 import TrinsicUI
 
 let sampleCallbackUrlScheme = "trinsic-ui-ios"
-let startUrl = "https://api.trinsic.id/api/mobiletest/create-session?redirectScheme=\(sampleCallbackUrlScheme)"
+let startUrl = "https://verify.trinsic.id/api/mobiletest/create-session?redirectScheme=\(sampleCallbackUrlScheme)"
 
 struct ContentView: View {
     @State private var isButtonEnabled = false
