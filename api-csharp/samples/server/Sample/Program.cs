@@ -21,6 +21,9 @@ builder.Services.AddTrinsicApi(options =>
 {
     // the type of token here depends on the api security specifications
     options.AddTokens(new BearerToken(EnvironmentHelper.GetAuthTokenOrThrow()));
+
+    // For EU data residency, point the SDK at the EU endpoint:
+    // options.AddTrinsicApiHttpClients(client => client.BaseAddress = new Uri("https://api.eu.trinsic.id"));
 });
 
 var app = builder.Build();

@@ -35,6 +35,22 @@ const sessions = new SessionsApi(config);
 
 You can find a full TypeScript server example in the [samples](https://github.com/trinsic-id/sdk/tree/main/api-typescript/samples) folder.
 
+### Data residency
+
+By default, the SDK communicates with `https://api.trinsic.id`. If you have a Verification Profile configured for EU data residency, set the SDK `basePath` to `https://api.eu.trinsic.id`.
+
+<!-- prettier-ignore -->
+```ts
+import { Configuration, SessionsApi } from "@trinsic/api";
+
+const config = new Configuration({
+  basePath: "https://api.eu.trinsic.id", // omit to use the default endpoint
+  accessToken: "your-access-token",
+});
+
+const sessions = new SessionsApi(config);
+```
+
 ## SDK Versioning
 
 Our SDKs follow the [Semantic Versioning](https://semver.org) ("SemVer") scheme.

@@ -43,6 +43,20 @@ var attachmentsApi = app.Services.GetService<IAttachmentsApi>()!;
 
 You can find a full C# example in the [samples](https://github.com/trinsic-id/sdk/tree/main/api-csharp/samples) folder.
 
+### Data residency
+
+By default, the SDK communicates with `https://api.trinsic.id`. If you have a Verification Profile configured for EU data residency, point the SDK at the EU endpoint by setting the HTTP client's base address when you register the API:
+
+```cs
+builder.Services.AddTrinsicApi(options =>
+{
+    options.AddTokens(new BearerToken(Environment.GetEnvironmentVariable("TRINSIC_ACCESS_TOKEN")));
+
+    // omit this call to use the default endpoint
+    options.AddTrinsicApiHttpClients(client => client.BaseAddress = new Uri("https://api.eu.trinsic.id"));
+});
+```
+
 ## SDK Versioning
 
 Our SDKs follow the [Semantic Versioning](https://semver.org) ("SemVer") scheme. 
