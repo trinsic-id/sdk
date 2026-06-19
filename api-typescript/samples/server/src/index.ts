@@ -21,6 +21,9 @@ const PORT = 3000;
 
 //We run with self-signed certificates on localhost :)
 const newConfiguration = new Configuration({
+  // For EU data residency, point the SDK at the EU endpoint.
+  // Contact Trinsic support to enable EU residency.
+  // basePath: "https://api.eu.trinsic.id",
   accessToken: process.env.TRINSIC_ACCESS_TOKEN!,
 });
 const sessionsApi = new SessionsApi(newConfiguration);

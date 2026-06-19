@@ -71,6 +71,18 @@ The following query parameters will be appended to the redirect URL:
 
 **Note:** These parameters can be set to arbitrary values by curious or malicious users simply by editing their browser URL bar. Don't implicitly trust the `success` parameter -- always fetch the Session results from your backend to confirm. Similarly, keep a record of the session ID you sent the user to, and correlate it against the `sessionId` query parameter.
 
+### Data residency
+
+If you are using a Verification Profile configured for EU data residency, the `launchUrl` created by the backend will automatically reflect this choice. When your backend uses the EU API (`https://api.eu.trinsic.id`) the returned `launchUrl` will point to the EU region.
+
+By default, `createPopup` and `createPopupAndWaitForResults` open `https://verify.trinsic.id/loading` while the `launchUrl` is being fetched. If you have a Verification Profile configured for EU data residency, set `initialUrl` to the EU loading page at `https://verify.eu.trinsic.id/loading`.
+
+```js
+const popup = createPopup({
+  initialUrl: "https://verify.eu.trinsic.id/loading", // omit to use the default endpoint
+});
+```
+
 ----
 
 ### Top-Level Redirect Flow
