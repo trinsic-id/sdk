@@ -39,7 +39,6 @@ You can find a full TypeScript server example in the [samples](https://github.co
 
 By default, the SDK communicates with `https://api.trinsic.id`. If you have a Verification Profile configured for EU data residency, set the SDK `basePath` to `https://api.eu.trinsic.id`.
 
-<!-- prettier-ignore -->
 ```ts
 import { Configuration, SessionsApi } from "@trinsic/api";
 

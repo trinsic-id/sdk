@@ -73,7 +73,7 @@ The following query parameters will be appended to the redirect URL:
 
 ### Data residency
 
-If you are using a Verification Profile configured for data residency, the `launchUrl` created by the backend will automatically reflect this choice. When your backend uses the EU API (`https://api.eu.trinsic.id`) the returned `launchUrl` will point to the EU region.
+If you are using a Verification Profile configured for EU data residency, the `launchUrl` created by the backend will automatically reflect this choice. When your backend uses the EU API (`https://api.eu.trinsic.id`) the returned `launchUrl` will point to the EU region.
 
 By default, `createPopup` and `createPopupAndWaitForResults` open `https://verify.trinsic.id/loading` while the `launchUrl` is being fetched. If you have a Verification Profile configured for EU data residency, set `initialUrl` to the EU loading page at `https://verify.eu.trinsic.id/loading`.
 
