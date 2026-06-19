@@ -32,7 +32,8 @@ async function launchHostedProvider(providerId) {
   switch (launchMode) {
     case 'popup':
       result = await createPopupAndWaitForResults({
-        // For EU data residency, point the popup at the EU loading page:
+        // For EU data residency, point the popup at the EU loading page.
+        // Contact Trinsic support to enable EU residency.
         // initialUrl: "https://verify.eu.trinsic.id/loading",
         sessionCreationFunction: async () => {
           const session = await createHostedSession(providerId);
