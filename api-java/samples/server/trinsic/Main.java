@@ -23,6 +23,11 @@ public class Main {
         }
 
         var apiClient = new ApiClient();
+
+        // For EU data residency, point the SDK at the EU endpoint.
+        // Contact Trinsic support to enable EU residency.
+        // apiClient.updateBaseUri("https://api.eu.trinsic.id");
+
         apiClient.setRequestInterceptor(interceptor -> {
             interceptor.setHeader("Authorization", "Bearer " + authToken);
         });
