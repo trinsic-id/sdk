@@ -39,6 +39,18 @@ $sessions = new SessionsApi(null, $config);
 
 You can find a full PHP example in the [samples](https://github.com/trinsic-id/sdk/tree/main/api-php/samples) folder.
 
+### Data residency
+
+By default, the SDK communicates with `https://api.trinsic.id`. If you have a Verification Profile configured for EU data residency, point the SDK at the EU endpoint by calling `setHost` on the `Configuration`.
+
+```php
+$config = new Configuration();
+$config->setHost("https://api.eu.trinsic.id"); // omit to use the default endpoint
+$config->setAccessToken("your-access-token");
+
+$sessions = new SessionsApi(null, $config);
+```
+
 ## SDK Versioning
 
 Our SDKs follow the [Semantic Versioning](https://semver.org) ("SemVer") scheme. 
