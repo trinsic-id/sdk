@@ -116,6 +116,9 @@ $app->add(function (Request $request, RequestHandler $handler) {
 $app->add(new JsonBodyParserMiddleware());
 
 $config = new Configuration();
+// For EU data residency, point the SDK at the EU endpoint.
+// Contact Trinsic support to enable EU residency.
+// $config->setHost("https://api.eu.trinsic.id");
 $config->setAccessToken($authToken);
 
 $sessions = new SessionsApi(null, $config);
