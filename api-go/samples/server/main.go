@@ -12,11 +12,14 @@ import (
 
 var api *trinsic_api.APIClient
 
-
-
 func main() {
 	authToken := os.Getenv("TRINSIC_ACCESS_TOKEN")
 	config := trinsic_api.NewConfiguration()
+	// For EU data residency, point the SDK at the EU endpoint.
+	// Contact Trinsic support to enable EU residency.
+	// config.Servers = trinsic_api.ServerConfigurations{
+	// 	{URL: "https://api.eu.trinsic.id"},
+	// }
 	config.AddDefaultHeader("Authorization", "Bearer "+authToken)
 	config.Debug = true
 	api = trinsic_api.NewAPIClient(config)
