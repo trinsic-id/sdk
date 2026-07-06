@@ -41,6 +41,19 @@ sessions = TrinsicApi::SessionsApi.new
 
 You can find a full Ruby server example in the [samples](https://github.com/trinsic-id/sdk/tree/main/api-ruby/samples) folder.
 
+### Data residency
+
+By default, the SDK communicates with `https://api.trinsic.id`. If you have a Verification Profile configured for EU data residency, point the SDK at the EU endpoint by setting the configuration `host`.
+
+```rb
+TrinsicApi.configure do |config|
+  config.host = 'https://api.eu.trinsic.id' # omit to use the default endpoint
+  config.access_token = 'your-access-token'
+end
+
+sessions = TrinsicApi::SessionsApi.new
+```
+
 ## SDK Versioning
 
 Our SDKs follow the [Semantic Versioning](https://semver.org) ("SemVer") scheme. 
