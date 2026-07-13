@@ -86,6 +86,21 @@ var sessions = new SessionsApi(apiClient);
 
 You can find a full Java example in the [samples](https://github.com/trinsic-id/sdk/tree/main/api-java/samples) folder.
 
+### Data residency
+
+By default, the SDK communicates with `https://api.trinsic.id`. If you have a Verification Profile configured for EU data residency, point the SDK at the EU endpoint by calling `updateBaseUri` on the `ApiClient`:
+
+```java
+var apiClient = new ApiClient();
+apiClient.updateBaseUri("https://api.eu.trinsic.id"); // omit to use the default endpoint
+
+apiClient.setRequestInterceptor(interceptor -> {
+    interceptor.setHeader("Authorization", "Bearer " + "your-access-token");
+});
+
+var sessions = new SessionsApi(apiClient);
+```
+
 ## SDK Versioning
 
 Our SDKs follow the [Semantic Versioning](https://semver.org) ("SemVer") scheme. 
