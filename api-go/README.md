@@ -40,6 +40,21 @@ func main() {
 
 You can find a full Go example in the [samples](https://github.com/trinsic-id/sdk/tree/main/api-go/samples) folder.
 
+### Data residency
+
+By default, the SDK communicates with `https://api.trinsic.id`. If you have a Verification Profile configured for EU data residency, point the SDK at the EU endpoint by setting the configuration `Servers`.
+
+```go
+config := trinsic_api.NewConfiguration()
+config.Servers = trinsic_api.ServerConfigurations{
+	{URL: "https://api.eu.trinsic.id"}, // omit to use the default endpoint
+}
+config.AddDefaultHeader("Authorization", "Bearer "+"your-access-token")
+
+api := trinsic_api.NewAPIClient(config)
+sessions := api.SessionsAPI
+```
+
 ## SDK Versioning
 
 Our SDKs follow the [Semantic Versioning](https://semver.org) ("SemVer") scheme. 
