@@ -43,6 +43,23 @@ sessions_api = SessionsApi(api_client)
 
 You can find a full Python server example in the [samples](https://github.com/trinsic-id/sdk/tree/main/api-python/samples) folder.
 
+### Data residency
+
+By default, the SDK communicates with `https://api.trinsic.id`. If you have a Verification Profile configured for EU data residency, point the SDK at the EU endpoint by setting the configuration `host`.
+
+```py
+from trinsic_api.api_client import ApiClient
+from trinsic_api.configuration import Configuration
+from trinsic_api.api.sessions_api import SessionsApi
+
+configuration = Configuration.get_default()
+configuration.host = "https://api.eu.trinsic.id"  # omit to use the default endpoint
+configuration.access_token = "your-access-token"
+
+api_client = ApiClient(configuration=configuration)
+sessions_api = SessionsApi(api_client)
+```
+
 ## SDK Versioning
 
 Our SDKs follow the [Semantic Versioning](https://semver.org) ("SemVer") scheme. 

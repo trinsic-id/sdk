@@ -20,6 +20,9 @@ from trinsic_api.api.sessions_api import SessionsApi
 token = os.getenv("TRINSIC_ACCESS_TOKEN") or ""
 auth_token = "Bearer " + token
 configuration = Configuration.get_default()
+# For EU data residency, point the SDK at the EU endpoint.
+# Contact Trinsic support to enable EU residency.
+# configuration.host = "https://api.eu.trinsic.id"
 # Set to true if you want debug request logging
 configuration.debug = False
 configuration.access_token = token
