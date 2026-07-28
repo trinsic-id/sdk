@@ -1,3 +1,5 @@
+import MicroModal from "micromodal";
+
 window.exchangeResult = exchangeResult;
 window.getProviders = getProviders;
 window.ipAddress = async () => {
@@ -22,7 +24,7 @@ export function catchErrorAlert(error) {
         console.error("Error:", error);
         errorMessage = error?.message || "An unknown error occurred.";
     }
-    // Show error message after short timeout to not delay the popup closing
+    // Defer the alert so errors are displayed after the current event completes.
     setTimeout(() => {
         alert(errorMessage);
     }, 150);
@@ -34,7 +36,7 @@ export async function jsonHandleError(response) {
 
         let alertText = "Request failed: check the logs on the backend for more information.\nUrl: " + response.url;
 
-        // Show error message after short timeout to not delay the popup closing
+        // Defer the alert so errors are displayed after the current event completes.
         setTimeout(() => {
             alert(alertText);
         }, 150);

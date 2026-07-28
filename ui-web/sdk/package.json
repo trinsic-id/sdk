@@ -31,9 +31,6 @@
     "esbuild": "0.23.0",
     "typescript": "5.5.4"
   },
-  "dependencies": {
-    "micromodal": "0.4.10"
-  },
   "homepage": "https://trinsic.id",
   "license": "MIT"
 }

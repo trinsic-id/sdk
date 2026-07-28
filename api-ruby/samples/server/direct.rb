@@ -6,10 +6,6 @@ module DirectRoutes
       send_file File.join(settings.public_folder, 'direct.html')
     end
 
-    app.get '/direct-popup' do
-      send_file File.join(settings.public_folder, 'direct-popup.html')
-    end
-
     app.post('/create-direct-session/:provider') do
       provider = params[:provider]
       redirectUrl = params[:redirectUrl]

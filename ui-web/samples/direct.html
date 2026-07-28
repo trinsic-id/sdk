@@ -56,7 +56,7 @@
         CaptureRedirect
       </label>
       <label>
-        <input type="checkbox" name="TrinsicCapabilities" value="PollResult" checked="true">
+        <input type="checkbox" name="TrinsicCapabilities" value="PollResult">
         PollResult
       </label>
       <label>
@@ -64,14 +64,14 @@
         PollAfterRedirect
       </label>
       <p style="margin-left: 20px; margin-top: 0px;"><small>Signal to our API what capabilities your frontend supports.
-          <br /> Our sample frontend supports all capabilities, but you can disable them to test the API
+          <br /> LaunchBrowser and PollResult are mutually exclusive in this redirect-only sample. Disable LaunchBrowser to exercise the top-level Direct-session handler.
           surface.</small></p>
     </div>
 
     <p>
       <label>
         <b>Use IP to recommend Providers:</b>
-        <input type="checkbox" name="doRecommendation" id="doRecommendation" value="popup" onchange="getProviders('launchDirectProvider')">
+        <input type="checkbox" name="doRecommendation" id="doRecommendation" value="ip" onchange="getProviders('launchDirectProvider')">
       </label>
     </p>
 
