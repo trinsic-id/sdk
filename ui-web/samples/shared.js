@@ -1,5 +1,3 @@
-import MicroModal from "micromodal";
-
 window.exchangeResult = exchangeResult;
 window.getProviders = getProviders;
 window.ipAddress = async () => {
@@ -58,8 +56,10 @@ async function exchangeResult(response) {
             resultsAccessKey: response.resultsAccessKey,
         }),
     }).then(r => jsonHandleError(r))
+    document.getElementById("session-id").innerText = response.sessionId;
     document.getElementById("results").innerText = JSON.stringify(result, null, 2);
-    MicroModal.show('results-modal');
+    document.getElementById("result-loading").hidden = true;
+    document.getElementById("result-card").hidden = false;
 }
 
 async function getProviders(launchMethod) {

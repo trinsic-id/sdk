@@ -1,7 +1,5 @@
 import { launchRedirect } from "@trinsic/web-ui";
 import { jsonHandleError, catchErrorAlert } from "./shared";
-import MicroModal from "micromodal";
-MicroModal.init();
 
 window.launchHostedProvider = launchHostedProvider;
 
