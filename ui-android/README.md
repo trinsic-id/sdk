@@ -167,3 +167,80 @@ Simply paste the following snippet next to where you pasted the above snippet, r
 If you specify a custom task affinity of `""` (an empty string), this library cannot function.
 
 This is because cross-task activity communication is not possible in the way this library requires, and an empty task affinity will cause one or more of the library's vital activities to launch in a separate task from your original activity.
+
+## Usage
+
+This library can be invoked in two ways:
+
+1. (Recommended) Using Android's Activity Result API
+2. Using `PendingIntent`
+
+### 1. Activity Result API
+
+This method is the simplest to implement, but requires that you can call the SDK *unconditionally* during `Activity` / `Fragment` initialization.
+
+Create `TrinsicUI` while your Activity or Fragment is initializing, then use that instance to launch a Session:
+
+```java
+private TrinsicUI trinsicUi;
+
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+
+    // You must ALWAYS instantiate TrinsicUI unconditionally during `onCreate`
+    trinsicUi = new TrinsicUI(this, result -> {
+        // This callback will be called when a launched Session completes or is canceled by the user
+        String sessionId = result.getSessionId();
+        boolean canceled = result.getCanceled();
+        
+        // Call your backend to handle Session results
+    });
+}
+
+private void launchSession(String launchUrl) {
+    trinsicUi.LaunchSession(this, launchUrl);
+}
+```
+
+### 2. PendingIntent API
+
+Use the `PendingIntent`-based API when you cannot instantiate `TrinsicUI` unconditionally during Activity/Fragment initialization.
+
+You will need some way to receive the callback, eg a `BroadcastReceiver` defined in your Manifest XML:
+
+```xml
+<receiver
+    android:name=".TrinsicResultReceiver"
+    android:exported="false" />
+```
+
+Define the Receiver class:
+```java
+public final class TrinsicResultReceiver extends BroadcastReceiver {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        AcceptanceSessionResult result = TrinsicPendingIntentHelper.GetAcceptanceSessionResult(intent);
+
+        if (result != null) {
+            String sessionId = result.getSessionId();
+            boolean canceled = result.getCanceled();
+            
+            // Handle results
+        }
+    }
+}
+```
+
+Finally, create a `PendingIntent` against the Receiver and the current Activity context when you need to launch a Trinsic session:
+
+```java
+PendingIntent callbackPendingIntent = PendingIntent.getBroadcast(
+        context,
+        0,
+        new Intent(context, TrinsicResultReceiver.class),
+        TrinsicPendingIntentHelper.GetCallbackPendingIntentFlags()
+);
+
+TrinsicUI.LaunchSessionWithPendingIntent(context, launchUrl, callbackPendingIntent);
+```
