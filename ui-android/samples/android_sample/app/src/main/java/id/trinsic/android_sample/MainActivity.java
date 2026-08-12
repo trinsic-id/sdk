@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
      * NOTE: The default value here points to a Trinsic-hosted mobile tester page, which provides simple functionality to easily test
      * your integration *without* having to use Trinsic's actual backend API. This does not create actual Sessions in Trinsic's platform.
      */
-    private static String BACKEND_CREATE_SESSION_ENDPOINT = "https://api.trinsic.id/api/mobiletest/create-session?redirectScheme=" + CUSTOM_REDIRECT_SCHEME;
+    private static String BACKEND_CREATE_SESSION_ENDPOINT = "https://verify.trinsic.id/api/mobiletest/create-session?redirectScheme=" + CUSTOM_REDIRECT_SCHEME;
 
 
     /**
@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
         /** Set up Trinsic Session Sample **/
 
+        // [Activity Result API]
         // Set up Trinsic SDK, specifying a callback which will be called when a launched Session is resolved.
         // This does not launch a Session; it only prepares the SDK to launch one.
         // NOTE: This registers an activity callback listener, so it *must always* be called by this method.
@@ -96,6 +97,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // [PendingIntent API]
+        // When the launch button for the PendingIntent flow is clicked, launch it
         binding.buttonLaunchPendingIntent.setOnClickListener((View v) -> {
             Log.d("OnClick", "Launching Trinsic with PendingIntent");
             String launchUrl;
@@ -106,14 +109,16 @@ public class MainActivity extends AppCompatActivity {
                 throw new RuntimeException(e);
             }
 
+            // Create a callback intent against the current context and our registered BroadcastReceiver
             Intent callbackIntent = new Intent(MainActivity.this, AcceptanceSessionResultReceiver.class);
             PendingIntent resultPendingIntent = PendingIntent.getBroadcast(
                     MainActivity.this,
                     0,
                     callbackIntent,
-                    TrinsicPendingIntentHelper.GetCallbackPendingIntentFlags()
+                    TrinsicPendingIntentHelper.GetCallbackPendingIntentFlags() // Use the recommended flags
             );
 
+            // Launch the session
             TrinsicUI.LaunchSessionWithPendingIntent(
                     MainActivity.this,
                     launchUrl,
