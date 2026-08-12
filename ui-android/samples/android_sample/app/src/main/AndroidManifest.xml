@@ -36,6 +36,10 @@
                 <data android:scheme="trinsic-android-ui-sample-redirect-scheme" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name=".MainActivity$AcceptanceSessionResultReceiver"
+            android:exported="false" />
     </application>
 
 </manifest>
