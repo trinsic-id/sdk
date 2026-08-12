@@ -1,5 +1,9 @@
 package id.trinsic.android_sample;
 
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,8 +12,10 @@ import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
 
+import id.trinsic.android.ui.TrinsicPendingIntentHelper;
 import id.trinsic.android.ui.TrinsicUI;
 import id.trinsic.android.ui.alpha.TrinsicMdl;
+import id.trinsic.android.ui.models.AcceptanceSessionResult;
 import id.trinsic.android_sample.databinding.ActivityMainBinding;
 
 import android.widget.Toast;
@@ -33,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
      * NOTE: The default value here points to a Trinsic-hosted mobile tester page, which provides simple functionality to easily test
      * your integration *without* having to use Trinsic's actual backend API. This does not create actual Sessions in Trinsic's platform.
      */
-    private static String BACKEND_CREATE_SESSION_ENDPOINT = "https://api.trinsic.id/api/mobiletest/create-session?redirectScheme=" + CUSTOM_REDIRECT_SCHEME;
+    private static String BACKEND_CREATE_SESSION_ENDPOINT = "https://verify.trinsic.id/api/mobiletest/create-session?redirectScheme=" + CUSTOM_REDIRECT_SCHEME;
 
 
     /**
@@ -62,22 +68,12 @@ public class MainActivity extends AppCompatActivity {
 
         /** Set up Trinsic Session Sample **/
 
+        // [Activity Result API]
         // Set up Trinsic SDK, specifying a callback which will be called when a launched Session is resolved.
         // This does not launch a Session; it only prepares the SDK to launch one.
         // NOTE: This registers an activity callback listener, so it *must always* be called by this method.
         // Do not conditionally call this.
-        trinsicUI = new TrinsicUI(this, (result) -> {
-            if (result.getCanceled()) {
-                // This happens if the user closed the Android Custom Tabs activity by hitting the "X" button or by hitting Back
-                Toast.makeText(MainActivity.this, "User canceled", Toast.LENGTH_SHORT).show();
-            } else if (!result.getSuccess()) {
-                // This happens if the flow fails for any other reason
-                Toast.makeText(MainActivity.this, "Failed", Toast.LENGTH_SHORT).show();
-            } else {
-                // This happens if the user's identity has been verified
-                Toast.makeText(MainActivity.this, "ResultsAccessKey: " + result.getResultsAccessKey(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        trinsicUI = new TrinsicUI(this, (result) -> showAcceptanceSessionResult(MainActivity.this, result));
 
         // When the "Launch Trinsic Session" button is tapped,
         // fetch a Session URL, and then invoke the Trinsic SDK with it
@@ -95,10 +91,39 @@ public class MainActivity extends AppCompatActivity {
                     // will be notified via the callback you specified when constructing a new TrinsicUI() above.
                     trinsicUI.LaunchSession(MainActivity.this, launchUrl);
                 } catch (Exception e) {
-                    Toast.makeText(MainActivity.this, "Failed to create launch URL: " + e.getMessage(), Toast.LENGTH_LONG);
+                    Toast.makeText(MainActivity.this, "Failed to create launch URL: " + e.getMessage(), Toast.LENGTH_LONG).show();
                     throw new RuntimeException(e);
                 }
             }
+        });
+
+        // [PendingIntent API]
+        // When the launch button for the PendingIntent flow is clicked, launch it
+        binding.buttonLaunchPendingIntent.setOnClickListener((View v) -> {
+            Log.d("OnClick", "Launching Trinsic with PendingIntent");
+            String launchUrl;
+            try {
+                launchUrl = createLaunchUrl();
+            } catch (Exception e) {
+                Toast.makeText(MainActivity.this, "Failed to create launch URL: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                throw new RuntimeException(e);
+            }
+
+            // Create a callback intent against the current context and our registered BroadcastReceiver
+            Intent callbackIntent = new Intent(MainActivity.this, AcceptanceSessionResultReceiver.class);
+            PendingIntent resultPendingIntent = PendingIntent.getBroadcast(
+                    MainActivity.this,
+                    0,
+                    callbackIntent,
+                    TrinsicPendingIntentHelper.GetCallbackPendingIntentFlags() // Use the recommended flags
+            );
+
+            // Launch the session
+            TrinsicUI.LaunchSessionWithPendingIntent(
+                    MainActivity.this,
+                    launchUrl,
+                    resultPendingIntent
+            );
         });
 
         /** Set up Trinsic mDL Exchange Sample */
@@ -118,6 +143,32 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             });
+        }
+    }
+
+    /**
+     * Receives results from sessions launched through the PendingIntent API.
+     */
+    public static class AcceptanceSessionResultReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            AcceptanceSessionResult result = TrinsicPendingIntentHelper.GetAcceptanceSessionResult(intent);
+            if (result == null) {
+                Toast.makeText(context, "Missing AcceptanceSessionResult", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            showAcceptanceSessionResult(context, result);
+        }
+    }
+
+    private static void showAcceptanceSessionResult(Context context, AcceptanceSessionResult result) {
+        if (result.getCanceled()) {
+            // This happens if the user closed the Android Custom Tabs activity by hitting the "X" button or by hitting Back
+            Toast.makeText(context, "User canceled", Toast.LENGTH_SHORT).show();
+        } else {
+            // This happens if the Session completed successfully or unsuccessfully
+            Toast.makeText(context, "Session completed: " + result.getSessionId(), Toast.LENGTH_SHORT).show();
         }
     }
 

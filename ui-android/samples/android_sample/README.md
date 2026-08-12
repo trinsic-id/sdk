@@ -12,12 +12,20 @@ See the [Trinsic docs](https://docs.trinsic.id/docs/) for more detailed informat
 > Once you have implemented your own backend, this sample can easily be configured to perform real verifications simply by changing the `BACKEND_CREATE_SESSION_ENDPOINT` constant in `MainActivity.java` to point to your backend's endpoint.
 
 This sample implements the Trinsic Android UI Library to the extent necessary to demonstrate the basic functionality of the library.
+It includes both supported session launch paths:
+
+1. (Recommended) Activity Result API
+2. `PendingIntent` API
+
+_See the [SDK Documentation](https://github.com/trinsic-id/sdk/tree/main/ui-android#usage-1) to better understand the differences between these two flows._
+
+
 
 The relevant files for this sample are:
 - [[....]/MainActivity.java](https://github.com/trinsic-id/sdk/blob/main/ui-android/samples/android_sample/app/src/main/java/id/trinsic/android_sample/MainActivity.java)
-  - Implements the Trinsic UI library and handles the session result callback
+  - Implements both Trinsic UI launch paths and handles session result callbacks
 - [app/src/main/AndroidManifest.xml](https://github.com/trinsic-id/sdk/blob/main/ui-android/samples/android_sample/app/src/main/AndroidManifest.xml)
-  - Registers the custom URL scheme used to handle redirect responses
+  - Registers the custom URL scheme used to handle redirect responses and the receiver used by the `PendingIntent` flow
 - [settings.gradle.kts](https://github.com/trinsic-id/sdk/blob/main/ui-android/samples/android_sample/settings.gradle.kts)
   - Adds jitpack as a Maven repository
 - [app/build.gradle.kts](https://github.com/trinsic-id/sdk/blob/main/ui-android/samples/android_sample/app/build.gradle.kts)
@@ -35,8 +43,9 @@ Follow the installation steps described in the [README](https://github.com/trins
 - Registering a custom URL scheme to handle redirect responses
 - Updating your `AndroidManifest.xml` to include the required activity declaration pointing to your custom scheme
 
-### 2. Prepare the Launch Activity
+### 2. Prepare the Launch Activity for Activity Result API
 
+**This step does not apply when using the `PendingIntent` API.**
 In the Activity class which will initiate a Trinsic Session (e.g., your "verify your identity" Activity), you’ll need to:
 
 #### a. Declare a `TrinsicUI` variable
@@ -76,12 +85,45 @@ Example flow:
 2. Your frontend makes a request to your backend.
 3. Your backend calls Trinsic to create a session, and returns the `launchUrl` to the frontend.
 
-### 4. Launch the Session
+### 4A. Launch the Session with Activity Result API
 
-Once you’ve received the launch URL from your backend, invoke the Trinsic SDK:
+If using the Activity Result API, invoke the Trinsic SDK:
 
 ```java
 trinsicUI.LaunchSession(MainActivity.this, launchUrl);
 ```
 
 This will launch an Android Custom Tab and guide the user through the identity verification flow. When complete, your previously defined callback will be triggered with the results.
+
+### 4B. Launch the Session with PendingIntent
+
+Use the `PendingIntent` API when you cannot instantiate `TrinsicUI` unconditionally during Activity or Fragment initialization.
+The sample demonstrates this with the `Launch Trinsic Session (PendingIntent)` button.
+
+Register a receiver in `AndroidManifest.xml`:
+
+```xml
+<receiver
+    android:name=".MainActivity$AcceptanceSessionResultReceiver"
+    android:exported="false" />
+```
+
+Create a broadcast `PendingIntent` and launch the session:
+
+```java
+Intent callbackIntent = new Intent(MainActivity.this, AcceptanceSessionResultReceiver.class);
+PendingIntent resultPendingIntent = PendingIntent.getBroadcast(
+        MainActivity.this,
+        0,
+        callbackIntent,
+        TrinsicPendingIntentHelper.GetCallbackPendingIntentFlags()
+);
+
+TrinsicUI.LaunchSessionWithPendingIntent(
+        MainActivity.this,
+        launchUrl,
+        resultPendingIntent
+);
+```
+
+In the receiver, extract the result with `TrinsicPendingIntentHelper.GetAcceptanceSessionResult(intent)` and handle it the same way as the Activity Result callback.
