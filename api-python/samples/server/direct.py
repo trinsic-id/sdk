@@ -2,11 +2,10 @@ from fastapi import Request, APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from trinsic_api.api.sessions_api import SessionsApi, CreateDirectProviderSessionRequest, GetSessionResultRequest, RefreshStepContentRequest
 import os
-from urllib.parse import urlencode
-from datetime import datetime, timezone
 from fastapi.responses import RedirectResponse
 import json
 from datetime import date, datetime
+from uuid import UUID
 
 directRouter = APIRouter()
 
@@ -30,6 +29,8 @@ async def launch(request: Request, provider_id: str, sessions_api: SessionsApi =
 
 def json_serial(obj):
     """JSON serializer for objects not serializable by default."""
+    if isinstance(obj, UUID):
+        return str(obj)
     if isinstance(obj, (datetime, date)):
         return obj.isoformat()
     raise TypeError(f"Type {type(obj)} not serializable")
