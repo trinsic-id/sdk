@@ -29,8 +29,14 @@ public static class DirectProviderSession
                 .Select(x => (IntegrationCapability)Enum.Parse(typeof(IntegrationCapability), x)).ToList();
 
             var request =
-                new CreateDirectProviderSessionRequest(capabilities, providerId, EnvironmentHelper.GetVerificationProfileIdOrThrow(),fallbackToTrinsicUI,  null,
-                    redirectUrl);
+                new CreateDirectProviderSessionRequest(
+                    capabilities: capabilities,
+                    provider: providerId,
+                    verificationProfileId: EnvironmentHelper.GetVerificationProfileIdOrThrow(),
+                    browserLanguages: null,
+                    fallbackToHostedUI: fallbackToTrinsicUI,
+                    providerInput: null,
+                    redirectUrl: redirectUrl);
             var response = await sessionApi.CreateDirectProviderSessionAsync(request);
             response.LogAndThrowIfError(app.Logger);
 
