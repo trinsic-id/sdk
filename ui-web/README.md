@@ -1,211 +1,51 @@
 # Trinsic Web UI Library
 
 [![Version](https://img.shields.io/npm/v/@trinsic/web-ui.svg)](https://www.npmjs.org/package/@trinsic/web-ui)
-[![Build Status](https://github.com/trinsic-id/sdk/actions/workflows/ui-web-release.yml/badge.svg)](https://github.com/trinsic-id/sdk/actions?query=branch%main)
 
-The Trinsic Web UI Library provides ways to launch verification sessions directly from your web frontend in the browser.
-
-This library must be paired with an [api library](https://github.com/trinsic-id/sdk#api-libraries) as part of a full integration.
-
-## Documentation
-
-See the [Trinsic docs](https://docs.trinsic.id/docs/) for more detailed information on how to start integrating with our identity acceptance network.
+`@trinsic/web-ui` launches Trinsic verification sessions from a browser and provides helpers for mDL exchanges. Pair it with a Trinsic API SDK to create sessions and retrieve their results.
 
 ## Installation
-
-Install the package with:
 
 ```sh
 npm install @trinsic/web-ui
 ```
 
-If you're using a CDN, for example unpkg, you can use the below source.
+With a bundler:
+
+```js
+import { launchRedirect } from "@trinsic/web-ui";
+```
+
+Or, from the global exposed by the IIFE build:
 
 ```html
-<script src="http://unpkg.com/@trinsic/web-ui"><script>
+<script src="https://unpkg.com/@trinsic/web-ui"></script>
+<script>TrinsicUI.launchRedirect(launchUrl);</script>
 ```
 
-## Setup
+## Redirect flow
 
-#### Bundler
-
-When using a module bundler import the functions as follows:
+Create the session on your server, including a `redirectUrl` controlled by your application. Save the session's results access key on the server and correlate it to the signed-in user. Then navigate the browser with the returned launch URL.
 
 ```js
-import { createPopup } from "@trinsic/web-ui";
+const session = await fetch("/create-session", { method: "POST" }).then((response) => response.json());
+await launchRedirect(session.launchUrl);
 ```
 
-#### Script Tag
+`launchRedirect` preserves the launch URL's host and query parameters, including EU regional URLs, while authoritatively setting `launchMode=redirect`. It rejects invalid URLs and calls made from inside an iframe; launch this flow only from the top-level browsing context.
 
-When using a direct script tag, you can access the methods via the global `TrinsicUI` variable:
+When Trinsic sends the browser back to `redirectUrl`, use the `sessionId` query parameter only to locate the server-side session record, then retrieve and validate the result through Trinsic's API. Do not trust `success` or other redirect query parameters as proof of a completed verification.
 
-```js
-await TrinsicUI.launchPopup(async () => CREATE_LAUNCH_URL);
-```
+## Migrating from v3
 
-## A Note on iFrames
+Version 4 removes the secondary-window APIs: `createPopup`, `createPopupAndWaitForResults`, `TrinsicPopup`, and `signalRedirectFromPopup`. There are no compatibility shims.
 
-If you are using this library to launch Trinsic sessions from within an iFrame, there are some additional complexities and requirements to be aware of:
+Move session creation before browser navigation, call `launchRedirect(session.launchUrl)`, and handle the completed session at its `redirectUrl`. Any result polling or post-redirect processing should run in that top-level page or on your backend.
 
-- **1. Popup flow is required**
-    - Due to browser security restrictions regarding cookies in iFrames, many Identity Providers' web flows do not support being launched in an iFrame.
-    - Therefore, if you are running within an iFrame, you **must** use the popup flow to launch sessions.
-- **2. Polling function is required with the popup flow**
-    - This library's popup flow primarily works via cross-window messaging between the popup window and the parent window. However, certain Identity Providers may use browser security headers (e.g. `Cross-Origin-Opener-Policy`) which prevent this cross-window messaging from working.
-      - Therefore, in certain circumstances, it may be impossible for the popup window to send the finalization signal to the parent window.
-    - As a consequence, you **must** provide a value for `pollingFunction` when awaiting a popup's completion.
-        - This function should hit your backend and query the status of the session.
-        - The library will only call `pollingFunction` if it detects that the browser has closed off cross-window communication with the popup.
+## mDL helpers
 
-## Usage
-### Redirect Query Parameters
-
-When using either flow below, the user will be redirected back to a URL controlled by your application when they are finished with a verification.
-
-The following query parameters will be appended to the redirect URL:
-
-| Parameter   | Description                                                           |
-| ----------- | --------------------------------------------------------------------- |
-| `success`   | Can be `true` or `false`. Whether the Session completed successfully. |
-| `sessionId` | The ID of the session that the user is redirecting back from.         |
-
-**Note:** These parameters can be set to arbitrary values by curious or malicious users simply by editing their browser URL bar. Don't implicitly trust the `success` parameter -- always fetch the Session results from your backend to confirm. Similarly, keep a record of the session ID you sent the user to, and correlate it against the `sessionId` query parameter.
-
-### Data residency
-
-If you are using a Verification Profile configured for EU data residency, the `launchUrl` created by the backend will automatically reflect this choice. When your backend uses the EU API (`https://api.eu.trinsic.id`) the returned `launchUrl` will point to the EU region.
-
-By default, `createPopup` and `createPopupAndWaitForResults` open `https://verify.trinsic.id/loading` while the `launchUrl` is being fetched. If you have a Verification Profile configured for EU data residency, set `initialUrl` to the EU loading page at `https://verify.eu.trinsic.id/loading`.
-
-```js
-const popup = createPopup({
-  initialUrl: "https://verify.eu.trinsic.id/loading", // omit to use the default endpoint
-});
-```
-
-----
-
-### Top-Level Redirect Flow
-
-Use this flow if you wish to redirect the user's entire browser window to perform a verification.
-
-#### 1. Create Session
-Create a Trinsic Session in your backend, then send the `launchUrl` to your frontend.
-
-#### 2. Call `launchRedirect(launchUrl)`
-
-From your frontend, call the `launchRedirect(launchUrl)` method, which will redirect the user's browser.
-
-#### 3. Handle Redirect
-
-When the user is redirected back to your application, hit Trinsic's API to fetch the Session status and results.
-
-----
-
-### Popup Redirect Flow
-
-Use this flow if you wish to launch the verification in a popup window, receiving a callback when the session is completed.
-
-#### 1. Call `createPopup`
-
-Call the `createPopup` method, which will return a `TrinsicPopup` instance.
-
-If the popup fails to open (such as if the browser blocks it), this method will throw.
-
-```js
-import { createPopup, TrinsicPopup } from "@trinsic/web-ui";
-
-let popup: TrinsicPopup;
-try {
-  popup = createPopup({
-    initialWindowTitle: "Test",
-  });
-} catch (e) {
-  console.error("Failed to create popup", e);
-  return;
-}
-```
-
-#### 2. Create Trinsic Session
-Once the popup has been created, call your backend to create a session via Trinsic's API. Pass a `redirectUrl` pointing back to your application, which will be hit in step 4.
-
-Return the `launchUrl` to your frontend. 
-
-#### 3. Initialize popup & await results
-Once your frontend has a `launchUrl`, call the `initialize` method on the `TrinsicPopup` instance. This will redirect the open popup window to the `launchUrl`.
-
-```js
-// Initialize popup with Launch URL for Session
-popup.initialize(launchUrl);
-
-// Await results
-const popupResult = await popup.waitForCompletion({
-  onWindowMaybeClosed: () => {
-    // OPTIONAL
-    //
-    // This function is called when the connection to the popup window is lost.
-    // This can occur if the popup is closed, but can also occur if the popup
-    // visits a page with a restrictive `Cross-Origin-Opener-Policy` header,
-    // thus causing the browser to sever the connection to the popup for security reasons.
-
-    // Because the popup may still be open and may still resolve successfully, you should not
-    // take an authoritative action here. Instead, use this callback to prompt your UI
-    // to display a prompt to the user, where they are given the opportunity to cancel out or retry.
-  },
-
-  pollingFunction: async () => {
-    // OPTIONAL unless running in an iFrame
-    //
-    // A function which will periodically be called to check if the session is complete.
-    // If this function returns `true`, the `waitForCompletion()` call will resolve.
-    //
-    // This MUST be specified if you are launching a popup from within an iFrame.
-  }
-});
-
-// `code` contains a response code indicating the reason the `waitForCompletion()` call resolved.
-const {sessionId, code} = popupResult.code;
-
-// To know if the Session was successful or unsuccessful, call your backend to hit Trinsic's API.
-```
-
-#### 4. Handle Redirect
-
-When the popup is redirected back to your application at your specified `redirectUrl`, use the `signalRedirectFromPopup` method to notify the original window that the session has completed.
-
-```js
-import { signalRedirectFromPopup } from "@trinsic/web-ui";
-
-const urlParams = new URLSearchParams(window.location.search);
-const sessionId = urlParams.get("sessionId");
-
-signalRedirectFromPopup(
-  {
-    sessionId: sessionId,
-    closeWindowAfterSignal: true
-  }
-);
-```
-
-This will immediately resolve the awaiting `waitForCompletion()` call in the original window.
-
-----
-
-## SDK Versioning
-
-Our SDKs follow the [Semantic Versioning](https://semver.org) ("SemVer") scheme.
-
-For example, the version number `1.13.0` has a major version of `1`, a minor version of `13`, and a patch version of `0`.
-
-Breaking changes are only introduced alongside a new major version.
+The mDL APIs remain available: `performMdlExchange`, `isUserOnEligibleAppleWalletBrowser`, `isUserOnEligibleGoogleWalletBrowser`, and the `MdlExchangeResult` type.
 
 ## Support
 
-Any issues, inquiries, and feature requests can be sent to [support@trinsic.id](mailto:support@trinsic.id), or feel free to open a GitHub issue [here](https://github.com/trinsic-id/sdk/issues).
-
-## More Information
-
-- [API Reference](https://docs.trinsic.id/reference)
-- [Developer Guide](https://docs.trinsic.id/docs/developer-tools)
-- [Our Blog](https://trinsic.id/blog/)
-- [Schedule a demo](https://trinsic.id/contact/)
+See the [Trinsic documentation](https://docs.trinsic.id/docs/) or contact [support@trinsic.id](mailto:support@trinsic.id).

@@ -1,3 +1,3 @@
-import { launchPopup } from "@trinsic/web-ui";
+import { launchRedirect } from "@trinsic/web-ui";
 
-launchPopup(() => Promise.resolve("https://google.com"));
+launchRedirect("https://verify.trinsic.id/example");

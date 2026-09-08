@@ -1,7 +1,5 @@
-import { launchRedirect, createPopupAndWaitForResults } from "@trinsic/web-ui";
+import { launchRedirect } from "@trinsic/web-ui";
 import { jsonHandleError, catchErrorAlert } from "./shared";
-import MicroModal from "micromodal";
-MicroModal.init();
 
 window.launchHostedProvider = launchHostedProvider;
 
@@ -24,35 +22,8 @@ async function createHostedSession(providerId) {
 }
 
 async function launchHostedProvider(providerId) {
-  let launchMode = document.querySelector('input[name="hostedLaunch"]:checked').value;
-
-  let result = null;
-  let sessionData = null;
-
-  switch (launchMode) {
-    case 'popup':
-      result = await createPopupAndWaitForResults({
-        // For EU data residency, point the popup at the EU loading page.
-        // Contact Trinsic support to enable EU residency.
-        // initialUrl: "https://verify.eu.trinsic.id/loading",
-        sessionCreationFunction: async () => {
-          const session = await createHostedSession(providerId);
-          sessionData = session;
-
-          return session.launchUrl;
-        }
-      }).catch(e => catchErrorAlert(e));
-
-      if (sessionData) {
-        await exchangeResult(sessionData);
-      }
-      break;
-    case 'redirect':
-      // Create a hosted session and redirect to it
-      const session = await createHostedSession(providerId);
-      await launchRedirect(session.launchUrl).catch(e => catchErrorAlert(e));
-      break;
-  }
+  const session = await createHostedSession(providerId);
+  await launchRedirect(session.launchUrl).catch(e => catchErrorAlert(e));
 }
 
 getProviders('launchHostedProvider');

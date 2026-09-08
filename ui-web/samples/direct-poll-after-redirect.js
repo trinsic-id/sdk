@@ -1,7 +1,4 @@
-import { signalRedirectFromPopup } from "@trinsic/web-ui";
 import { jsonHandleError } from './shared';
-
-window.exchangeResult = exchangeResult;
 
 async function startPollingAfterRedirect(sessionId, resultsAccessKey) {
   let result = null;
@@ -27,10 +24,7 @@ async function startPollingAfterRedirect(sessionId, resultsAccessKey) {
     if (result.session.done === true) {
       clearInterval(resultPollingInterval);
 
-      signalRedirectFromPopup({
-        sessionId: sessionId,
-        closeWindowAfterSignal: true
-      });
+      window.location.href = `${location.origin}/redirect?sessionId=${encodeURIComponent(sessionId)}`;
     }
   }, 1000);
 }
@@ -38,7 +32,7 @@ async function startPollingAfterRedirect(sessionId, resultsAccessKey) {
 async function initializePollAfterRedirect() {
   const urlSearchParams = new URLSearchParams(window.location.search);
   const sessionId = urlSearchParams.get('sessionId');
-  const resultsAccessKey = urlSearchParams.get('resultsAccessKey');
+  const resultsAccessKey = localStorage.getItem(`resultsAccessKey:${sessionId}`);
 
   document.getElementById("session-id").innerText = sessionId;
   document.getElementById("success").innerText = "false";

@@ -13,11 +13,6 @@ directRouter = APIRouter()
 async def direct():
     return RedirectResponse(url="/direct.html")
 
-@directRouter.get("/direct-popup")
-async def directPopup(request: Request):
-    return RedirectResponse(url=f"/direct-popup.html?{request.query_params}")
-
-
 @directRouter.post("/create-direct-session/{provider_id}")
 async def launch(request: Request, provider_id: str, sessions_api: SessionsApi = Depends()):
     fallbackToTrinsicUI = request.query_params.get("fallbackToTrinsicUI", "").strip().lower() == "true"

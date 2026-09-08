@@ -9,12 +9,6 @@ export function directRoutes(app: Express, sessionsApi: SessionsApi) {
     );
   });
 
-  app.get("/direct-popup", (req: any, res: any) => {
-    res.sendFile(
-      path.join(__dirname, "../../../../ui-web/samples/dist/direct-popup.html")
-    );
-  });
-
   app.post("/create-direct-session/:provider", async (req: any, res: any) => {
     const provider = req.params.provider;
     const redirectUrl = req.query.redirectUrl;

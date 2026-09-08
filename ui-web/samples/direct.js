@@ -1,7 +1,5 @@
-import MicroModal from "micromodal";
 import { catchErrorAlert, jsonHandleError } from "./shared";
-import { createPopupAndWaitForResults } from "@trinsic/web-ui";
-MicroModal.init();
+import { launchRedirect } from "@trinsic/web-ui";
 
 window.launchDirectProvider = launchDirectProvider;
 
@@ -31,33 +29,25 @@ async function createDirectSession(providerId) {
 }
 
 async function launchDirectProvider(providerId) {
-  let sessionData = null;
-
-  await createPopupAndWaitForResults({
-    // For EU data residency, point the popup at the EU loading page.
-    // Contact Trinsic support to enable EU residency.
-    // initialUrl: "https://verify.eu.trinsic.id/loading",
-    sessionCreationFunction: async () => {
-      const session = await createDirectSession(providerId);
-
-      sessionData = {
-        sessionId: session.sessionId,
-        resultsAccessKey: session.resultCollection?.resultsAccessKey
-      };
-
-      // If the next step is "LaunchBrowser", just return the next step's launch URL.
-      // If the next step is anything else, then we should return a URL that points to our direct-session-handling popup.
-      if (session.nextStep?.method === "LaunchBrowser") {
-        return session.nextStep.content;
-      } else {
-        return `${location.origin}/direct-popup?sessionId=${session.sessionId}&resultsAccessKey=${session.resultCollection?.resultsAccessKey}&nextStep=${session.nextStep?.method}&content=${encodeURIComponent(session.nextStep?.content || "")}&shouldRefresh=${(session.nextStep?.refresh != null).toString().toLowerCase()}&refreshAfter=${encodeURIComponent(session.nextStep?.refresh?.refreshAfter || "")}`
-      }
-    }
-  }).catch(e => catchErrorAlert(e));
-
-  if (sessionData) {
-    await exchangeResult(sessionData);
+  const capabilities = Array.from(document.querySelectorAll('input[name="TrinsicCapabilities"]:checked')).map(item => item.value);
+  if (capabilities.includes("LaunchBrowser") && capabilities.includes("PollResult")) {
+    catchErrorAlert(new Error("LaunchBrowser and PollResult cannot be selected together in a redirect flow."));
+    return;
   }
+
+  const session = await createDirectSession(providerId);
+  if (session.nextStep?.method === "LaunchBrowser") {
+    await launchRedirect(session.nextStep.content).catch(e => catchErrorAlert(e));
+    return;
+  }
+
+  const nextStepUrl = new URL(`${location.origin}/direct-session.html`);
+  nextStepUrl.searchParams.set("sessionId", session.sessionId);
+  nextStepUrl.searchParams.set("nextStep", session.nextStep?.method || "");
+  nextStepUrl.searchParams.set("content", session.nextStep?.content || "");
+  nextStepUrl.searchParams.set("shouldRefresh", String(session.nextStep?.refresh != null));
+  nextStepUrl.searchParams.set("refreshAfter", session.nextStep?.refresh?.refreshAfter || "");
+  window.location.href = nextStepUrl.toString();
 }
 
 getProviders('launchDirectProvider');

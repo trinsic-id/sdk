@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 	"strings"
-	
+
 	"github.com/gofiber/fiber/v2"
 	trinsic_api "github.com/trinsic-id/sdk-go-api/v3"
 )
@@ -11,11 +11,6 @@ import (
 func DirectRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 	app.Get("/direct", func(c *fiber.Ctx) error {
 		return c.Redirect("/direct.html")
-	})
-
-	app.Get("/direct-popup", func(c *fiber.Ctx) error {
-		queryParams := c.OriginalURL()[len(c.Path()):]
-		return c.Redirect("/direct-popup.html" + queryParams)
 	})
 
 	app.Post("/create-direct-session/:provider", func(c *fiber.Ctx) error {
@@ -32,10 +27,10 @@ func DirectRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 
 		// Create request
 		req := trinsic_api.CreateDirectProviderSessionRequest{
-			RedirectUrl:        *trinsic_api.NewNullableString(&redirectUrl),
-			Provider:           provider,
-			Capabilities:       integrationCapabilities,
-			FallbackToHostedUI: *trinsic_api.NewNullableBool(&fallbackToTrinsicUI),
+			RedirectUrl:           *trinsic_api.NewNullableString(&redirectUrl),
+			Provider:              provider,
+			Capabilities:          integrationCapabilities,
+			FallbackToHostedUI:    *trinsic_api.NewNullableBool(&fallbackToTrinsicUI),
 			VerificationProfileId: verificationProfileId,
 		}
 
@@ -48,7 +43,7 @@ func DirectRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 			return err
 		}
 
-		return c.JSON(result)		
+		return c.JSON(result)
 	})
 
 	app.Post("/refresh-content/:sessionId", func(c *fiber.Ctx) error {
