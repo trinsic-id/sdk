@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "testCases": [
+    {
+      "id": "api.sessions.recommend-providers",
+      "kind": "api-operation",
+      "operationId": "SessionsApi.recommendProviders",
+      "requiredLanguages": ["typescript", "python", "go"]
+    },
+    {
+      "id": "serialization.provider-output-round-trip",
+      "kind": "serialization",
+      "requiredLanguages": ["typescript", "python", "go"]
+    }
+  ]
+}

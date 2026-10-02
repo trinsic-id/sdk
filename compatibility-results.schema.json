@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://trinsic.id/schemas/sdk-compatibility-results-v1.json",
+  "title": "SDK Compatibility Results",
+  "type": "object",
+  "required": ["run", "schemaVersion", "suite", "testCatalog", "targets"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "run": {
+      "type": "object",
+      "required": ["generatedAt", "targetBaseUrl"],
+      "properties": {
+        "environment": { "type": "string" },
+        "generatedAt": { "type": "string", "format": "date-time" },
+        "targetBaseUrl": { "type": "string", "format": "uri" }
+      },
+      "additionalProperties": false
+    },
+    "suite": {
+      "type": "object",
+      "required": ["language"],
+      "properties": {
+        "language": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "testCatalog": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "kind", "requiredLanguages"],
+        "properties": {
+          "id": { "type": "string" },
+          "kind": { "type": "string" },
+          "operationId": { "type": "string" },
+          "requiredLanguages": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "targets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["isCurrent", "label", "testCases"],
+        "properties": {
+          "isCurrent": { "type": "boolean" },
+          "label": { "type": "string" },
+          "sdkVersion": { "type": "string" },
+          "setupFailure": { "type": "string" },
+          "testCases": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["durationMs", "id", "status"],
+              "properties": {
+                "advisory": {
+                  "type": "object",
+                  "required": ["code", "message"],
+                  "properties": {
+                    "code": { "type": "string" },
+                    "message": { "type": "string" }
+                  },
+                  "additionalProperties": false
+                },
+                "durationMs": { "type": "number", "minimum": 0 },
+                "failure": {
+                  "type": "object",
+                  "required": ["message", "name"],
+                  "properties": {
+                    "message": { "type": "string" },
+                    "name": { "type": "string" }
+                  },
+                  "additionalProperties": false
+                },
+                "id": { "type": "string" },
+                "parameters": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                },
+                "skipReason": { "type": "string" },
+                "status": { "enum": ["passed", "failed", "skipped"] }
+              },
+              "allOf": [
+                {
+                  "if": { "properties": { "status": { "const": "failed" } } },
+                  "then": { "required": ["failure"] }
+                },
+                {
+                  "if": { "properties": { "status": { "const": "skipped" } } },
+                  "then": { "required": ["skipReason"] }
+                }
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

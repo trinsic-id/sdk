@@ -1,0 +1,19 @@
+{
+  "name": "@trinsic/api-compatibility-tests",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test:matrix": "tsx src/run-matrix.ts",
+    "test:compatibility": "bash ./run-compatibility.sh",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "22.3.0",
+    "tsx": "4.23.0",
+    "typescript": "5.5.4"
+  }
+}
