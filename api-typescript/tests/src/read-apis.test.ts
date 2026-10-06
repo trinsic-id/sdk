@@ -40,8 +40,8 @@ test(`${targetLabel}: GetVerificationProfileById uses the configured profile`, (
     `/api/valpha/verification-profiles/${configuration.verificationProfileId}`,
     () => new sdk.VerificationProfilesApi(configurationWithCapture()).getVerificationProfileById(configuration.verificationProfileId),
     (result, response) => {
-      assert.equal(result.id, configuration.verificationProfileId);
-      assert.equal(result.id, response.id);
+      assert.equal(normalizeUuid(result.id), normalizeUuid(configuration.verificationProfileId));
+      assert.equal(normalizeUuid(result.id), normalizeUuid(response.id));
       assert.equal(result.alias, response.alias);
       assert.equal(result.brandName, response.brandName);
     },
@@ -184,4 +184,9 @@ function recordIds(records: JsonRecord[]): string[] {
     assert.equal(typeof record.id, "string", `response entry ${index} must have a string id`);
     return record.id as string;
   });
+}
+
+function normalizeUuid(value: unknown): string {
+  assert.equal(typeof value, "string", "verification profile ID must be a string");
+  return (value as string).toLowerCase();
 }
