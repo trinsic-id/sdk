@@ -30,6 +30,7 @@ fi
 
 test_base_url="${TRINSIC_TEST_BASE_URL%/}"
 test_swagger_url="$test_base_url/swagger/api/swagger.json"
+swagger_spec="$(mktemp "${TMPDIR:-/tmp}/trinsic-sdk-swagger.XXXXXX")"
 main_ref="${SDK_COMPATIBILITY_MAIN_REF:-origin/main}"
 origin_main_worktree="$(mktemp -d "${TMPDIR:-/tmp}/trinsic-sdk-origin-main.XXXXXX")"
 origin_main_tarball_directory="$(mktemp -d "${TMPDIR:-/tmp}/trinsic-sdk-origin-main-tarball.XXXXXX")"
@@ -37,11 +38,14 @@ origin_main_tarball_directory="$(mktemp -d "${TMPDIR:-/tmp}/trinsic-sdk-origin-m
 cleanup() {
   git -C "$REPO_ROOT" worktree remove --force "$origin_main_worktree" 2>/dev/null || true
   rm -rf "$origin_main_tarball_directory"
+  rm -f "$swagger_spec"
 }
 trap cleanup EXIT
 
+curl --fail --silent --show-error "$test_swagger_url" --output "$swagger_spec"
+
 "$REPO_ROOT/api-typescript/build-sdk.sh" \
-  --swagger-file-or-url "$test_swagger_url"
+  --swagger-file-or-url "$swagger_spec"
 
 if ! git -C "$REPO_ROOT" rev-parse --verify --quiet "$main_ref" >/dev/null; then
   if [[ "$main_ref" != "origin/main" ]]; then
@@ -62,7 +66,7 @@ git -C "$REPO_ROOT" worktree add --detach "$origin_main_worktree" "$main_ref" >/
 # worktree.
 cp "$REPO_ROOT/api-typescript/build-sdk.sh" "$origin_main_worktree/api-typescript/build-sdk.sh"
 "$origin_main_worktree/api-typescript/build-sdk.sh" \
-  --swagger-file-or-url "$test_swagger_url"
+  --swagger-file-or-url "$swagger_spec"
 
 origin_main_tarballs=("$origin_main_worktree"/api-typescript/sdk/publish/trinsic-api-*.tgz)
 if (( ${#origin_main_tarballs[@]} != 1 )) || [[ ! -f "${origin_main_tarballs[0]}" ]]; then
@@ -76,4 +80,5 @@ cp "${origin_main_tarballs[0]}" "$origin_main_tarball"
 cd "$SCRIPT_DIR"
 SDK_ORIGIN_MAIN_REVISION="$(git -C "$origin_main_worktree" rev-parse --short HEAD)" \
 SDK_ORIGIN_MAIN_TARBALL="$origin_main_tarball" \
+SDK_COMPATIBILITY_OPENAPI_SPEC="$swagger_spec" \
   npm run test:matrix

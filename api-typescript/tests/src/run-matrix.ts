@@ -49,8 +49,25 @@ interface TestCatalog {
   schemaVersion: 1;
   testCases: Array<{
     id: string;
+    kind?: string;
+    operationId?: string;
     requiredLanguages: string[];
   }>;
+}
+
+interface ApiOperationCoverage {
+  covered: boolean;
+  method: string;
+  operationId: string;
+  path: string;
+  testCaseIds: string[];
+}
+
+interface ApiCoverageReport {
+  covered: number;
+  operations: ApiOperationCoverage[];
+  total: number;
+  unmappedTestCaseIds: string[];
 }
 
 const testsRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -92,6 +109,7 @@ async function main(): Promise<void> {
   ];
 
   const catalog = await readTestCatalog(join(repositoryRoot, "compatibility-tests.json"));
+  const apiCoverage = await readApiCoverage(catalog);
   const targetResults: TargetResult[] = [];
 
   for (const target of targets) {
@@ -102,7 +120,7 @@ async function main(): Promise<void> {
     validateTargetCoverage(targetResult, catalog);
   }
 
-  const resultsPath = await writeAggregateResults(catalog, targetResults);
+  const resultsPath = await writeAggregateResults(catalog, targetResults, apiCoverage);
   console.log(`\nStructured compatibility results: ${resultsPath}`);
 
   const failedTargets = targetResults.filter(targetFailed);
@@ -298,6 +316,7 @@ async function readTestCatalog(path: string): Promise<TestCatalog> {
 async function writeAggregateResults(
   catalog: TestCatalog,
   targets: TargetResult[],
+  apiCoverage: ApiCoverageReport | undefined,
 ): Promise<string> {
   const path = resolve(
     process.env.SDK_COMPATIBILITY_RESULTS_PATH
@@ -319,6 +338,7 @@ async function writeAggregateResults(
         },
         suite: { language: "typescript" },
         testCatalog: catalog.testCases,
+        ...(apiCoverage ? { apiCoverage } : {}),
         targets,
       },
       null,
@@ -326,6 +346,68 @@ async function writeAggregateResults(
     )}\n`,
   );
   return path;
+}
+
+async function readApiCoverage(catalog: TestCatalog): Promise<ApiCoverageReport | undefined> {
+  const specPath = process.env.SDK_COMPATIBILITY_OPENAPI_SPEC;
+  if (!specPath) {
+    return undefined;
+  }
+
+  const parsed = JSON.parse(await readFile(specPath, "utf8")) as unknown;
+  if (!isRecord(parsed) || !isRecord(parsed.paths)) {
+    throw new Error(`OpenAPI specification at ${specPath} has no paths object.`);
+  }
+
+  const testCaseIdsByOperation = new Map<string, string[]>();
+  for (const testCase of catalog.testCases) {
+    if (testCase.kind !== "api-operation" || typeof testCase.operationId !== "string") {
+      continue;
+    }
+
+    const testCaseIds = testCaseIdsByOperation.get(testCase.operationId) ?? [];
+    testCaseIds.push(testCase.id);
+    testCaseIdsByOperation.set(testCase.operationId, testCaseIds);
+  }
+
+  const operationIds = new Set<string>();
+  const operations: ApiOperationCoverage[] = [];
+  for (const [path, pathItem] of Object.entries(parsed.paths)) {
+    if (!isRecord(pathItem)) {
+      continue;
+    }
+
+    for (const [method, operation] of Object.entries(pathItem)) {
+      if (!isHttpMethod(method) || !isRecord(operation) || typeof operation.operationId !== "string") {
+        continue;
+      }
+
+      const operationId = operation.operationId;
+      operationIds.add(operationId);
+      const testCaseIds = testCaseIdsByOperation.get(operationId) ?? [];
+      operations.push({
+        covered: testCaseIds.length > 0,
+        method: method.toUpperCase(),
+        operationId,
+        path,
+        testCaseIds,
+      });
+    }
+  }
+
+  operations.sort((left, right) =>
+    left.path.localeCompare(right.path) || left.method.localeCompare(right.method),
+  );
+
+  return {
+    covered: operations.filter((operation) => operation.covered).length,
+    operations,
+    total: operations.length,
+    unmappedTestCaseIds: catalog.testCases
+      .filter((testCase) => testCase.kind === "api-operation")
+      .filter((testCase) => !operationIds.has(testCase.operationId ?? ""))
+      .map((testCase) => testCase.id),
+  };
 }
 
 function targetFailed(target: TargetResult): boolean {
@@ -357,6 +439,14 @@ async function readInstalledSdkVersion(installRoot: string): Promise<string> {
 
 function npmCommand(): string {
   return process.platform === "win32" ? "npm.cmd" : "npm";
+}
+
+function isHttpMethod(value: string): boolean {
+  return ["delete", "get", "head", "options", "patch", "post", "put"].includes(value);
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 function runCommand(

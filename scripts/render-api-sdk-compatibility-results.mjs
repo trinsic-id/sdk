@@ -12,12 +12,22 @@ const suites = await Promise.all(
 );
 const summary = buildSummary(options.resultsDir, suites);
 const markdown = renderMarkdown(summary);
+const apiCoverageMarkdown = summary.apiCoverage
+  ? renderApiCoverageMarkdown(summary)
+  : undefined;
 
 await mkdir(options.resultsDir, { recursive: true });
-await Promise.all([
+const writes = [
   writeFile(join(options.resultsDir, "summary.json"), `${JSON.stringify(summary, null, 2)}\n`),
   writeFile(join(options.resultsDir, "summary.md"), markdown),
-]);
+];
+if (summary.apiCoverage && apiCoverageMarkdown) {
+  writes.push(
+    writeFile(join(options.resultsDir, "api-coverage.json"), `${JSON.stringify(summary.apiCoverage, null, 2)}\n`),
+    writeFile(join(options.resultsDir, "api-coverage.md"), apiCoverageMarkdown),
+  );
+}
+await Promise.all(writes);
 
 process.stdout.write(`\n${markdown}`);
 
@@ -81,6 +91,7 @@ async function readSuite(resultsDir, language, runnerExitCode) {
     const hasFailures = targets.some((target) => target.failed > 0 || target.setupFailure);
 
     return {
+      apiCoverage: readApiCoverage(report.apiCoverage),
       language,
       reportPath,
       runnerExitCode,
@@ -98,6 +109,34 @@ async function readSuite(resultsDir, language, runnerExitCode) {
       targets: [],
     };
   }
+}
+
+function readApiCoverage(value) {
+  if (!isRecord(value) || !Array.isArray(value.operations)) {
+    return undefined;
+  }
+
+  const operations = value.operations.filter((operation) =>
+    isRecord(operation)
+    && typeof operation.covered === "boolean"
+    && typeof operation.method === "string"
+    && typeof operation.operationId === "string"
+    && typeof operation.path === "string"
+    && Array.isArray(operation.testCaseIds)
+    && operation.testCaseIds.every((id) => typeof id === "string"),
+  );
+  if (operations.length !== value.operations.length) {
+    return undefined;
+  }
+
+  return {
+    covered: typeof value.covered === "number" ? value.covered : 0,
+    operations,
+    total: typeof value.total === "number" ? value.total : operations.length,
+    unmappedTestCaseIds: Array.isArray(value.unmappedTestCaseIds)
+      ? value.unmappedTestCaseIds.filter((id) => typeof id === "string")
+      : [],
+  };
 }
 
 function validateReport(report, reportPath) {
@@ -142,6 +181,25 @@ function summarizeTarget(target) {
         ? testCase.skipReason
         : "No skip reason was recorded.",
     }));
+  const providerOutputCases = testCases.filter((testCase) =>
+    isRecord(testCase)
+    && testCase.id === "serialization.provider-output-round-trip"
+    && isRecord(testCase.parameters)
+    && typeof testCase.parameters.providerId === "string",
+  );
+  const providerOutputs = {
+    failed: providerOutputCases.filter((testCase) => testCase.status === "failed").map((testCase) => ({
+      message: isRecord(testCase.failure) ? testCase.failure.message : "No failure message was recorded.",
+      providerId: testCase.parameters.providerId,
+      sdkModelName: testCase.parameters.sdkModelName,
+    })),
+    passed: providerOutputCases.filter((testCase) => testCase.status === "passed").length,
+    skipped: providerOutputCases.filter((testCase) => testCase.status === "skipped").map((testCase) => ({
+      providerId: testCase.parameters.providerId,
+      reason: typeof testCase.skipReason === "string" ? testCase.skipReason : "No skip reason was recorded.",
+      sdkModelName: testCase.parameters.sdkModelName,
+    })),
+  };
 
   return {
     advisories,
@@ -150,6 +208,7 @@ function summarizeTarget(target) {
     isCurrent: target.isCurrent === true,
     label: typeof target.label === "string" ? target.label : "unknown target",
     passed: testCases.filter((testCase) => isRecord(testCase) && testCase.status === "passed").length,
+    providerOutputs,
     sdkVersion: typeof target.sdkVersion === "string" ? target.sdkVersion : undefined,
     setupFailure: typeof target.setupFailure === "string" ? target.setupFailure : undefined,
     skipped: skippedCases.length,
@@ -166,8 +225,12 @@ function buildSummary(resultsDir, suites) {
       .map((suite) => suite.run?.targetBaseUrl)
       .filter((targetBaseUrl) => typeof targetBaseUrl === "string"),
   )];
+  const apiCoverage = suites
+    .map((suite) => suite.apiCoverage)
+    .find((coverage) => coverage !== undefined);
 
   return {
+    ...(apiCoverage ? { apiCoverage } : {}),
     generatedAt: new Date().toISOString(),
     result: hasErrors ? "error" : hasIssues ? "issues" : "passed",
     resultsDirectory: resultsDir,
@@ -213,6 +276,10 @@ function renderMarkdown(summary) {
     }
   }
 
+  if (summary.apiCoverage) {
+    lines.push("", ...renderApiCoverageLines(summary));
+  }
+
   const suiteErrors = summary.suites.filter((suite) => suite.result === "error");
   if (suiteErrors.length > 0) {
     lines.push("", "## Suite errors");
@@ -254,6 +321,101 @@ function renderMarkdown(summary) {
 
   lines.push("", `Artifacts: \`${summary.resultsDirectory}\``, "");
   return lines.join("\n");
+}
+
+function renderApiCoverageMarkdown(summary) {
+  return `${renderApiCoverageLines(summary).join("\n")}\n`;
+}
+
+function renderApiCoverageLines(summary) {
+  const { apiCoverage: coverage } = summary;
+  const coveredOperations = coverage.operations.filter((operation) => operation.covered);
+  const uncoveredOperations = coverage.operations.filter((operation) => !operation.covered);
+  const percentage = coverage.total === 0
+    ? "0.0"
+    : ((coverage.covered / coverage.total) * 100).toFixed(1);
+  const lines = [
+    "## API operation coverage",
+    "",
+    `> **${coverage.covered} of ${coverage.total} operations covered (${percentage}%).** Coverage is mapped from the compatibility-test catalog to the Swagger contract used for this run.`,
+    "",
+    "<details open>",
+    `<summary><strong>Covered operations</strong> — ${coveredOperations.length}</summary>`,
+    "",
+    "| Method | Path | Operation | Compatibility test |",
+    "| --- | --- | --- | --- |",
+  ];
+
+  for (const operation of coveredOperations) {
+    lines.push(
+      `| ${operation.method} | \`${operation.path}\` | \`${operation.operationId}\` | ${operation.testCaseIds.map((id) => `\`${id}\``).join(", ")} |`,
+    );
+  }
+  lines.push("", "</details>", "", "<details>", `<summary><strong>Untested operations</strong> — ${uncoveredOperations.length}</summary>`, "");
+
+  if (uncoveredOperations.length === 0) {
+    lines.push("All Swagger operations have a mapped compatibility test.");
+  } else {
+    lines.push("| Method | Path | Operation |", "| --- | --- | --- |");
+    for (const operation of uncoveredOperations) {
+      lines.push(`| ${operation.method} | \`${operation.path}\` | \`${operation.operationId}\` |`);
+    }
+  }
+  lines.push("", "</details>");
+
+  if (coverage.unmappedTestCaseIds.length > 0) {
+    lines.push(
+      "",
+      `> Catalog entries without a Swagger operation: ${coverage.unmappedTestCaseIds.map((id) => `\`${id}\``).join(", ")}.`,
+    );
+  }
+
+  const providerOutputTargets = summary.suites.flatMap((suite) =>
+    suite.targets
+      .filter((target) => target.providerOutputs)
+      .map((target) => ({ suite, target })),
+  );
+  if (providerOutputTargets.length > 0) {
+    lines.push(
+      "",
+      "## Provider-specific output coverage",
+      "",
+      "> Each public provider output fixture is deserialized by the SDK, serialized back to JSON, and checked for lost or incompatible fields. Non-public outputs and models unavailable in an older published SDK are skipped with an explicit reason.",
+      "",
+      "| Language | SDK target | Passed | Failed | Skipped |",
+      "| --- | --- | ---: | ---: | ---: |",
+    );
+    for (const { suite, target } of providerOutputTargets) {
+      const providerOutputs = target.providerOutputs;
+      lines.push(
+        `| ${suite.language} | ${targetLabel(target)} | ${providerOutputs.passed} | ${providerOutputs.failed.length} | ${providerOutputs.skipped.length} |`,
+      );
+    }
+
+    for (const { suite, target } of providerOutputTargets) {
+      const providerOutputs = target.providerOutputs;
+      if (providerOutputs.failed.length === 0) continue;
+
+      lines.push("", "<details open>", `<summary><strong>${targetLabel(target)}</strong> — ${providerOutputs.failed.length} PSO failures</summary>`, "");
+      for (const { message, providerId, sdkModelName } of providerOutputs.failed) {
+        lines.push(`- \`${providerId}\`${sdkModelName ? ` (${sdkModelName})` : ""}: ${firstLine(message)}`);
+      }
+      lines.push("", "</details>");
+    }
+
+    for (const { suite, target } of providerOutputTargets) {
+      const providerOutputs = target.providerOutputs;
+      if (providerOutputs.skipped.length === 0) continue;
+
+      lines.push("", "<details>", `<summary><strong>${targetLabel(target)}</strong> — ${providerOutputs.skipped.length} skipped PSO fixtures</summary>`, "");
+      for (const { providerId, reason, sdkModelName } of providerOutputs.skipped) {
+        lines.push(`- \`${providerId}\`${sdkModelName ? ` (${sdkModelName})` : ""}: ${firstLine(reason)}`);
+      }
+      lines.push("", "</details>");
+    }
+  }
+
+  return lines;
 }
 
 function renderTargetGroups(lines, heading, suites, includeTarget, renderDetails, options = {}) {
