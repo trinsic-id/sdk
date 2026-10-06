@@ -4,6 +4,7 @@
  * contract they actually expose.
  */
 export const MINIMUM_SDK_VERSION = {
+  getProvider: "3.1.0",
   recommendProvidersRemainder: "3.1.0",
 } as const;
 

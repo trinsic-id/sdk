@@ -57,6 +57,8 @@ const testsRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const apiTypescriptRoot = resolve(testsRoot, "..");
 const repositoryRoot = resolve(apiTypescriptRoot, "..");
 const testFiles: TestFile[] = [
+  { name: "read-apis", path: join(testsRoot, "src", "read-apis.test.ts") },
+  { name: "session-lifecycle", path: join(testsRoot, "src", "session-lifecycle.test.ts") },
   { name: "recommendations", path: join(testsRoot, "src", "recommendations.test.ts") },
   { name: "provider-outputs", path: join(testsRoot, "src", "provider-outputs.test.ts") },
 ];
@@ -77,11 +79,11 @@ async function main(): Promise<void> {
     {
       assertionProfile: "current",
       isCurrent: true,
-      label: "current generated SDK",
+      label: "current branch",
       packageSpecifier: currentTarball,
     },
     ...originMainTarget(),
-    ...publishedVersions.map((version) => ({
+    ...publishedVersions.toSorted(compareSdkVersionsDescending).map((version) => ({
       assertionProfile: "published" as const,
       isCurrent: false,
       label: `@trinsic/api@${version}`,
@@ -109,6 +111,10 @@ async function main(): Promise<void> {
       `${failedTargets.length} SDK compatibility target${failedTargets.length === 1 ? "" : "s"} failed.`,
     );
   }
+}
+
+function compareSdkVersionsDescending(left: string, right: string): number {
+  return right.localeCompare(left, undefined, { numeric: true });
 }
 
 function originMainTarget(): TestTarget[] {

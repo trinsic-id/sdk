@@ -133,6 +133,15 @@ function summarizeTarget(target) {
       message: testCase.advisory.message,
       parameters: isRecord(testCase.parameters) ? testCase.parameters : undefined,
     }));
+  const skippedCases = testCases
+    .filter((testCase) => isRecord(testCase) && testCase.status === "skipped")
+    .map((testCase) => ({
+      id: testCase.id,
+      parameters: isRecord(testCase.parameters) ? testCase.parameters : undefined,
+      reason: typeof testCase.skipReason === "string"
+        ? testCase.skipReason
+        : "No skip reason was recorded.",
+    }));
 
   return {
     advisories,
@@ -143,7 +152,8 @@ function summarizeTarget(target) {
     passed: testCases.filter((testCase) => isRecord(testCase) && testCase.status === "passed").length,
     sdkVersion: typeof target.sdkVersion === "string" ? target.sdkVersion : undefined,
     setupFailure: typeof target.setupFailure === "string" ? target.setupFailure : undefined,
-    skipped: testCases.filter((testCase) => isRecord(testCase) && testCase.status === "skipped").length,
+    skipped: skippedCases.length,
+    skippedCases,
   };
 }
 
@@ -165,22 +175,24 @@ function buildSummary(resultsDir, suites) {
     suites,
     targetBaseUrls,
     totals: {
-    failed: targets.reduce((total, target) => total + target.failed, 0),
-    passed: targets.reduce((total, target) => total + target.passed, 0),
-    skipped: targets.reduce((total, target) => total + target.skipped, 0),
-    warnings: targets.reduce((total, target) => total + target.advisories.length, 0),
+      failed: targets.reduce((total, target) => total + target.failed, 0),
+      passed: targets.reduce((total, target) => total + target.passed, 0),
+      skipped: targets.reduce((total, target) => total + target.skipped, 0),
+      warnings: targets.reduce((total, target) => total + target.advisories.length, 0),
     },
   };
 }
 
 function renderMarkdown(summary) {
   const lines = [
-    "# API SDK compatibility summary",
+    "# API SDK compatibility",
     "",
-    `Result: **${summary.result.toUpperCase()}**`,
+    `> **${summary.result.toUpperCase()}** — ${summary.totals.failed} failures, ${summary.totals.warnings} warnings, and ${summary.totals.skipped} skipped tests.`,
     ...(summary.targetBaseUrls.length > 0
-      ? [`Target${summary.targetBaseUrls.length === 1 ? "" : "s"}: ${summary.targetBaseUrls.join(", ")}`]
+      ? [`> Target${summary.targetBaseUrls.length === 1 ? "" : "s"}: ${summary.targetBaseUrls.map((url) => `\`${url}\``).join(", ")}`]
       : []),
+    "",
+    "## At a glance",
     "",
     "| Language | SDK target | Passed | Failed | Skipped | Warnings | Result |",
     "| --- | --- | ---: | ---: | ---: | ---: | --- |",
@@ -201,43 +213,94 @@ function renderMarkdown(summary) {
     }
   }
 
-  const failures = summary.suites.flatMap((suite) =>
-    suite.targets.flatMap((target) => target.failures.map((failure) => ({ ...failure, suite, target }))),
-  );
   const suiteErrors = summary.suites.filter((suite) => suite.result === "error");
-
-  if (failures.length > 0 || suiteErrors.length > 0) {
-    lines.push("", "## Failures");
+  if (suiteErrors.length > 0) {
+    lines.push("", "## Suite errors");
     for (const suiteError of suiteErrors) {
       lines.push(`- ${suiteError.language}: ${suiteError.error}`);
     }
-    for (const { failure: message, id, parameters: failureParameters, suite, target } of failures) {
-      const parameters = failureParameters
-        ? ` (${Object.entries(failureParameters).map(([key, value]) => `${key}=${value}`).join(", ")})`
-        : "";
-      lines.push(
-        `- ${suite.language} / ${target.label}${target.sdkVersion ? ` ${target.sdkVersion}` : ""} / ${id}${parameters}: ${firstLine(message)}`,
-      );
-    }
   }
 
-  const advisories = summary.suites.flatMap((suite) =>
-    suite.targets.flatMap((target) => target.advisories.map((advisory) => ({ ...advisory, suite, target }))),
+  renderTargetGroups(lines, "Failures", summary.suites,
+    (target) => target.failures.length > 0 || target.setupFailure,
+    (suite, target) => {
+      const details = [];
+      if (target.setupFailure) {
+        details.push(`- ${suite.language} / setup: ${firstLine(target.setupFailure)}`);
+      }
+      for (const { failure: message, id, parameters } of target.failures) {
+        details.push(`- ${suite.language} / ${id}${formatParameters(parameters)}: ${firstLine(message)}`);
+      }
+      return details;
+    },
+    { open: true, noun: "failure" },
   );
-  if (advisories.length > 0) {
-    lines.push("", "## Warnings");
-    for (const { code, id, message, parameters: advisoryParameters, suite, target } of advisories) {
-      const parameters = advisoryParameters
-        ? ` (${Object.entries(advisoryParameters).map(([key, value]) => `${key}=${value}`).join(", ")})`
-        : "";
-      lines.push(
-        `- ${suite.language} / ${target.label}${target.sdkVersion ? ` ${target.sdkVersion}` : ""} / ${id}${parameters} [${code}]: ${firstLine(message)}`,
-      );
-    }
-  }
+
+  renderTargetGroups(lines, "Warnings", summary.suites,
+    (target) => target.advisories.length > 0,
+    (suite, target) => target.advisories.map(({ code, id, message, parameters }) =>
+      `- ${suite.language} / ${id}${formatParameters(parameters)} [${code}]: ${firstLine(message)}`,
+    ),
+    { noun: "warning" },
+  );
+
+  renderTargetGroups(lines, "Skipped tests", summary.suites,
+    (target) => target.skippedCases.length > 0,
+    (suite, target) => target.skippedCases.map(({ id, parameters, reason }) =>
+      `- ${suite.language} / ${id}${formatParameters(parameters)}: ${firstLine(reason)}`,
+    ),
+    { noun: "skipped test" },
+  );
 
   lines.push("", `Artifacts: \`${summary.resultsDirectory}\``, "");
   return lines.join("\n");
+}
+
+function renderTargetGroups(lines, heading, suites, includeTarget, renderDetails, options = {}) {
+  const groups = groupTargets(suites, includeTarget);
+  if (groups.length === 0) return;
+
+  lines.push("", `## ${heading}`);
+  for (const group of groups) {
+    const count = group.targets.reduce((total, { target }) => {
+      if (heading === "Failures") return total + target.failures.length + Number(Boolean(target.setupFailure));
+      if (heading === "Warnings") return total + target.advisories.length;
+      return total + target.skippedCases.length;
+    }, 0);
+    const noun = count === 1 ? options.noun : `${options.noun}s`;
+    lines.push("", `<details${options.open ? " open" : ""}>`, `<summary><strong>${group.label}</strong> — ${count} ${noun}</summary>`, "");
+    for (const { suite, target } of group.targets) {
+      lines.push(...renderDetails(suite, target));
+    }
+    lines.push("", "</details>");
+  }
+}
+
+function groupTargets(suites, includeTarget) {
+  const groups = new Map();
+
+  for (const suite of suites) {
+    for (const target of suite.targets) {
+      if (!includeTarget(target)) continue;
+
+      const label = targetLabel(target);
+      const group = groups.get(label) ?? { label, targets: [] };
+      group.targets.push({ suite, target });
+      groups.set(label, group);
+    }
+  }
+
+  return [...groups.values()];
+}
+
+function targetLabel(target) {
+  return `${target.label}${target.sdkVersion ? ` (${target.sdkVersion})` : ""}`;
+}
+
+function formatParameters(parameters) {
+  return parameters
+    ? ` (${Object.entries(parameters).map(([key, value]) => `${key}=${value}`).join(", ")})`
+    : "";
 }
 
 function firstLine(value) {

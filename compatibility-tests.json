@@ -2,6 +2,84 @@
   "schemaVersion": 1,
   "testCases": [
     {
+      "id": "api.providers.list",
+      "kind": "api-operation",
+      "operationId": "ProvidersApi.listProviders",
+      "requiredLanguages": ["typescript", "python", "go"]
+    },
+    {
+      "id": "api.verification-profiles.get-by-id",
+      "kind": "api-operation",
+      "operationId": "VerificationProfilesApi.getVerificationProfileById",
+      "requiredLanguages": ["typescript", "python", "go"]
+    },
+    {
+      "id": "api.sessions.list",
+      "kind": "api-operation",
+      "operationId": "SessionsApi.listSessions",
+      "requiredLanguages": ["typescript", "python", "go"]
+    },
+    {
+      "id": "api.redirect-uris.list",
+      "kind": "api-operation",
+      "operationId": "RedirectUrisApi.list",
+      "requiredLanguages": ["typescript", "python", "go"]
+    },
+    {
+      "id": "api.verification-profiles.list",
+      "kind": "api-operation",
+      "operationId": "VerificationProfilesApi.listVerificationProfiles",
+      "requiredLanguages": ["typescript", "python", "go"]
+    },
+    {
+      "id": "api.providers.get",
+      "kind": "api-operation",
+      "operationId": "ProvidersApi.getProvider",
+      "requiredLanguages": ["typescript", "python", "go"]
+    },
+    {
+      "id": "api.sessions.create-direct-provider",
+      "kind": "api-operation",
+      "operationId": "SessionsApi.createDirectProviderSession",
+      "requiredLanguages": ["typescript", "python", "go"]
+    },
+    {
+      "id": "api.sessions.create-hosted-provider",
+      "kind": "api-operation",
+      "operationId": "SessionsApi.createHostedProviderSession",
+      "requiredLanguages": ["typescript", "python", "go"]
+    },
+    {
+      "id": "api.sessions.get",
+      "kind": "api-operation",
+      "operationId": "SessionsApi.getSession",
+      "requiredLanguages": ["typescript", "python", "go"]
+    },
+    {
+      "id": "api.sessions.cancel",
+      "kind": "api-operation",
+      "operationId": "SessionsApi.cancelSession",
+      "requiredLanguages": ["typescript", "python", "go"]
+    },
+    {
+      "id": "api.sessions.get-result",
+      "kind": "api-operation",
+      "operationId": "SessionsApi.getSessionResult",
+      "requiredLanguages": ["typescript", "python", "go"]
+    },
+    {
+      "id": "api.sessions.get-attachment",
+      "kind": "api-operation",
+      "operationId": "SessionsApi.getAttachment",
+      "requiredLanguages": ["typescript", "python", "go"]
+    },
+    {
+      "id": "api.sessions.redact",
+      "kind": "api-operation",
+      "operationId": "SessionsApi.redactSession",
+      "requiredLanguages": ["typescript", "python", "go"]
+    },
+    {
       "id": "api.sessions.recommend-providers",
       "kind": "api-operation",
       "operationId": "SessionsApi.recommendProviders",
