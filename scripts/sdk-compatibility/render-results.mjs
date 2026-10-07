@@ -160,6 +160,23 @@ function summarizeTarget(target) {
   }
 
   const testCases = target.testCases;
+  const outcomes = testCases
+    .filter((testCase) =>
+      isRecord(testCase)
+      && typeof testCase.id === "string"
+      && ["passed", "failed", "skipped"].includes(testCase.status)
+      && isComparableOutcome(testCase),
+    )
+    .map((testCase) => ({
+      detail: testCase.status === "failed"
+        ? (isRecord(testCase.failure) ? testCase.failure.message : "No failure message was recorded.")
+        : testCase.status === "skipped"
+          ? (typeof testCase.skipReason === "string" ? testCase.skipReason : "No skip reason was recorded.")
+          : undefined,
+      id: testCase.id,
+      parameters: isRecord(testCase.parameters) ? testCase.parameters : undefined,
+      status: testCase.status,
+    }));
   const failures = testCases
     .filter((testCase) => isRecord(testCase) && testCase.status === "failed")
     .map((testCase) => ({
@@ -210,6 +227,7 @@ function summarizeTarget(target) {
     failures,
     isCurrent: target.isCurrent === true,
     label: typeof target.label === "string" ? target.label : "unknown target",
+    outcomes,
     passed: testCases.filter((testCase) => isRecord(testCase) && testCase.status === "passed").length,
     providerOutputs,
     sdkVersion: typeof target.sdkVersion === "string" ? target.sdkVersion : undefined,
@@ -235,6 +253,7 @@ function buildSummary(resultsDir, suites) {
   return {
     apiCoverages,
     generatedAt: new Date().toISOString(),
+    languageComparisons: buildLanguageComparisons(suites),
     result: hasErrors ? "error" : hasIssues ? "issues" : "passed",
     resultsDirectory: resultsDir,
     schemaVersion: 1,
@@ -247,6 +266,83 @@ function buildSummary(resultsDir, suites) {
       warnings: targets.reduce((total, target) => total + target.advisories.length, 0),
     },
   };
+}
+
+function buildLanguageComparisons(suites) {
+  const comparisons = new Map();
+
+  for (const suite of suites) {
+    for (const target of suite.targets) {
+      const key = comparisonTargetKey(target);
+      const comparison = comparisons.get(key) ?? {
+        key,
+        label: comparisonTargetLabel(target),
+        languages: new Set(),
+        outcomes: new Map(),
+      };
+      comparison.languages.add(suite.language);
+      for (const outcome of target.outcomes) {
+        const outcomeKey = `${outcome.id}\u0000${stableParameters(outcome.parameters)}`;
+        const entries = comparison.outcomes.get(outcomeKey) ?? [];
+        entries.push({ language: suite.language, ...outcome });
+        comparison.outcomes.set(outcomeKey, entries);
+      }
+      comparisons.set(key, comparison);
+    }
+  }
+
+  return [...comparisons.values()]
+    .filter((comparison) => comparison.languages.size > 1)
+    .map((comparison) => {
+      const differences = [];
+      for (const entries of comparison.outcomes.values()) {
+        const statuses = new Set(entries.map((entry) => entry.status));
+        const details = new Set(
+          entries
+            .filter((entry) => entry.status === "failed")
+            .map((entry) => entry.detail)
+            .filter(Boolean),
+        );
+        const type = entries.length !== comparison.languages.size
+          ? "missing"
+          : statuses.size > 1
+            ? "status"
+            : details.size > 1
+              ? "detail"
+              : undefined;
+        if (type) differences.push({ entries, type });
+      }
+      return {
+        differences,
+        label: comparison.label,
+        languages: [...comparison.languages].sort(),
+      };
+    })
+    .filter((comparison) => comparison.differences.length > 0);
+}
+
+function comparisonTargetKey(target) {
+  if (!target.isCurrent) return `published:${target.sdkVersion ?? target.label}`;
+  if (target.label === "current branch") return "current-branch";
+  if (target.label.startsWith("origin/main")) return "origin-main";
+  return `current:${target.label}`;
+}
+
+function comparisonTargetLabel(target) {
+  if (!target.isCurrent) return `published SDK ${target.sdkVersion ?? target.label}`;
+  if (target.label === "current branch") return "current branch";
+  if (target.label.startsWith("origin/main")) return target.label;
+  return targetLabel(target);
+}
+
+function stableParameters(parameters) {
+  if (!parameters) return "";
+  return JSON.stringify(Object.entries(parameters).sort(([left], [right]) => left.localeCompare(right)));
+}
+
+function isComparableOutcome(testCase) {
+  if (testCase.id.startsWith("framework.")) return false;
+  return !isRecord(testCase.parameters) || testCase.parameters.scope !== "catalog";
 }
 
 function renderMarkdown(summary) {
@@ -283,6 +379,8 @@ function renderMarkdown(summary) {
     lines.push("", ...renderApiCoverageLines(summary));
   }
 
+  renderLanguageComparisons(lines, summary.languageComparisons);
+
   const suiteErrors = summary.suites.filter((suite) => suite.result === "error");
   if (suiteErrors.length > 0) {
     lines.push("", "## Suite errors");
@@ -296,10 +394,10 @@ function renderMarkdown(summary) {
     (suite, target) => {
       const details = [];
       if (target.setupFailure) {
-        details.push(`- ${suite.language} / setup: ${firstLine(target.setupFailure)}`);
+        details.push(`- setup: ${firstLine(target.setupFailure)}`);
       }
       for (const { failure: message, id, parameters } of target.failures) {
-        details.push(`- ${suite.language} / ${id}${formatParameters(parameters)}: ${firstLine(message)}`);
+        details.push(`- ${id}${formatParameters(parameters)}: ${firstLine(message)}`);
       }
       return details;
     },
@@ -309,7 +407,7 @@ function renderMarkdown(summary) {
   renderTargetGroups(lines, "Warnings", summary.suites,
     (target) => target.advisories.length > 0,
     (suite, target) => target.advisories.map(({ code, id, message, parameters }) =>
-      `- ${suite.language} / ${id}${formatParameters(parameters)} [${code}]: ${firstLine(message)}`,
+      `- ${id}${formatParameters(parameters)} [${code}]: ${firstLine(message)}`,
     ),
     { noun: "warning" },
   );
@@ -317,13 +415,44 @@ function renderMarkdown(summary) {
   renderTargetGroups(lines, "Skipped tests", summary.suites,
     (target) => target.skippedCases.length > 0,
     (suite, target) => target.skippedCases.map(({ id, parameters, reason }) =>
-      `- ${suite.language} / ${id}${formatParameters(parameters)}: ${firstLine(reason)}`,
+      `- ${id}${formatParameters(parameters)}: ${firstLine(reason)}`,
     ),
     { noun: "skipped test" },
   );
 
   lines.push("", `Artifacts: \`${summary.resultsDirectory}\``, "");
   return lines.join("\n");
+}
+
+function renderLanguageComparisons(lines, comparisons) {
+  if (comparisons.length === 0) return;
+
+  lines.push(
+    "",
+    "## Cross-SDK outcome differences",
+    "",
+    "> Equivalent targets are compared across SDK languages by test ID and parameters. Differences include a missing result, a different pass/fail/skip status, or different failure/skip details for the same status.",
+    "",
+    "| Target | Languages | Differences |",
+    "| --- | --- | ---: |",
+  );
+  for (const comparison of comparisons) {
+    lines.push(`| ${comparison.label} | ${comparison.languages.join(", ")} | ${comparison.differences.length} |`);
+  }
+
+  for (const comparison of comparisons) {
+    lines.push("", "<details open>", `<summary><strong>${comparison.label}</strong> — ${comparison.differences.length} differing outcomes</summary>`, "");
+    for (const difference of comparison.differences) {
+      const exemplar = difference.entries[0];
+      const label = `\`${exemplar.id}\`${formatParameters(exemplar.parameters)}`;
+      const entries = difference.entries
+        .map((entry) => `${entry.language}: **${entry.status}**${entry.detail ? ` — ${firstLine(entry.detail)}` : ""}`)
+        .join("; ");
+      const missingLanguages = comparison.languages.filter((language) => !difference.entries.some((entry) => entry.language === language));
+      lines.push(`- ${label}${difference.type === "missing" ? ` — missing from ${missingLanguages.join(", ")}; ` : " — "}${entries}`);
+    }
+    lines.push("", "</details>");
+  }
 }
 
 function renderApiCoverageMarkdown(summary) {
@@ -350,8 +479,6 @@ function renderApiCoverageLines(summary) {
       "",
       "## Provider-specific output coverage",
       "",
-      "> Each public provider output fixture is deserialized by the SDK, serialized back to JSON, and checked for lost or incompatible fields. Non-public outputs and models unavailable in an older published SDK are skipped with an explicit reason.",
-      "",
       "| Language | SDK target | Passed | Failed | Skipped |",
       "| --- | --- | ---: | ---: | ---: |",
     );
@@ -362,30 +489,110 @@ function renderApiCoverageLines(summary) {
       );
     }
 
-    for (const { suite, target } of providerOutputTargets) {
-      const providerOutputs = target.providerOutputs;
-      if (providerOutputs.failed.length === 0) continue;
+    for (const suite of summary.suites) {
+      const languageTargets = providerOutputTargets.filter(({ suite: targetSuite }) => targetSuite === suite);
+      if (languageTargets.length === 0) continue;
 
-      lines.push("", "<details open>", `<summary><strong>${targetLabel(target)}</strong> — ${providerOutputs.failed.length} PSO failures</summary>`, "");
-      for (const { message, providerId, sdkModelName } of providerOutputs.failed) {
-        lines.push(`- \`${providerId}\`${sdkModelName ? ` (${sdkModelName})` : ""}: ${firstLine(message)}`);
+      lines.push("", `### ${suite.language}`);
+      for (const { target } of languageTargets) {
+        const providerOutputs = target.providerOutputs;
+        if (providerOutputs.failed.length === 0) continue;
+
+        lines.push("", "<details open>", `<summary><strong>${targetLabel(target)}</strong> — ${providerOutputs.failed.length} PSO failures</summary>`, "");
+        const failureGroups = groupPsoFailures(providerOutputs.failed);
+        lines.push("| Failure type | Count |", "| --- | ---: |");
+        for (const group of failureGroups) {
+          lines.push(`| ${group.label} | ${group.failures.length} |`);
+        }
+        for (const group of failureGroups) {
+          lines.push("", `#### ${group.label} (${group.failures.length})`, "");
+          for (const { message, providerId, sdkModelName } of group.failures) {
+            lines.push(`- \`${providerId}\`${sdkModelName ? ` (${sdkModelName})` : ""}: ${firstLine(message)}`);
+          }
+        }
+        lines.push("", "</details>");
       }
-      lines.push("", "</details>");
-    }
 
-    for (const { suite, target } of providerOutputTargets) {
-      const providerOutputs = target.providerOutputs;
-      if (providerOutputs.skipped.length === 0) continue;
+      for (const { target } of languageTargets) {
+        const providerOutputs = target.providerOutputs;
+        if (providerOutputs.skipped.length === 0) continue;
 
-      lines.push("", "<details>", `<summary><strong>${targetLabel(target)}</strong> — ${providerOutputs.skipped.length} skipped PSO fixtures</summary>`, "");
-      for (const { providerId, reason, sdkModelName } of providerOutputs.skipped) {
-        lines.push(`- \`${providerId}\`${sdkModelName ? ` (${sdkModelName})` : ""}: ${firstLine(reason)}`);
+        lines.push("", "<details>", `<summary><strong>${targetLabel(target)}</strong> — ${providerOutputs.skipped.length} skipped PSO fixtures</summary>`, "");
+        for (const { providerId, reason, sdkModelName } of providerOutputs.skipped) {
+          lines.push(`- \`${providerId}\`${sdkModelName ? ` (${sdkModelName})` : ""}: ${firstLine(reason)}`);
+        }
+        lines.push("", "</details>");
       }
-      lines.push("", "</details>");
     }
   }
 
   return lines;
+}
+
+function groupPsoFailures(failures) {
+  const groups = new Map();
+  for (const failure of failures) {
+    const type = classifyPsoFailure(failure.message);
+    const group = groups.get(type.label) ?? { ...type, failures: [] };
+    group.failures.push(failure);
+    groups.set(type.label, group);
+  }
+  return [...groups.values()].sort((left, right) =>
+    left.order - right.order || left.label.localeCompare(right.label),
+  );
+}
+
+function classifyPsoFailure(message) {
+  const normalized = String(message).toLowerCase();
+
+  if (normalized.includes("does not export") || normalized.includes("does not expose")) {
+    return { label: "Missing public SDK model", order: 10 };
+  }
+  if (normalized.includes("returned http") || normalized.includes("test-support endpoint")) {
+    return { label: "Fixture retrieval failure", order: 20 };
+  }
+  if (
+    normalized.includes("validation error")
+    || normalized.includes("input should be")
+    || normalized.includes("cannot deserialize")
+  ) {
+    return { label: "Deserialization failure", order: 30 };
+  }
+  if (
+    normalized.includes("drops wire field")
+    || normalized.includes("field names differ")
+    || normalized.includes("emitted field")
+    || normalized.includes("missing field")
+  ) {
+    return { label: "Field mismatch", order: 50 };
+  }
+  if (
+    normalized.includes("as object but")
+    || normalized.includes("as an object but")
+    || normalized.includes("as an object, but")
+    || normalized.includes("as an array, but")
+    || normalized.includes("expected object")
+    || normalized.includes("expected array")
+    || normalized.includes("model shape")
+  ) {
+    return { label: "Model shape mismatch", order: 60 };
+  }
+  if (
+    normalized.includes("to_dict")
+    || normalized.includes("tojson")
+    || normalized.includes("serialize")
+    || normalized.includes("serialization")
+  ) {
+    return { label: "Serialization failure", order: 40 };
+  }
+  if (
+    normalized.includes("round-trip produced")
+    || normalized.includes("wire fixture contains")
+    || normalized.includes("value differs")
+  ) {
+    return { label: "Value mismatch", order: 70 };
+  }
+  return { label: "Other round-trip failure", order: 99 };
 }
 
 function renderSingleApiCoverageLines(coverage) {
@@ -432,40 +639,26 @@ function renderSingleApiCoverageLines(coverage) {
 }
 
 function renderTargetGroups(lines, heading, suites, includeTarget, renderDetails, options = {}) {
-  const groups = groupTargets(suites, includeTarget);
-  if (groups.length === 0) return;
+  const languageGroups = suites
+    .map((suite) => ({ suite, targets: suite.targets.filter(includeTarget) }))
+    .filter((group) => group.targets.length > 0);
+  if (languageGroups.length === 0) return;
 
   lines.push("", `## ${heading}`);
-  for (const group of groups) {
-    const count = group.targets.reduce((total, { target }) => {
-      if (heading === "Failures") return total + target.failures.length + Number(Boolean(target.setupFailure));
-      if (heading === "Warnings") return total + target.advisories.length;
-      return total + target.skippedCases.length;
-    }, 0);
-    const noun = count === 1 ? options.noun : `${options.noun}s`;
-    lines.push("", `<details${options.open ? " open" : ""}>`, `<summary><strong>${group.label}</strong> — ${count} ${noun}</summary>`, "");
-    for (const { suite, target } of group.targets) {
+  for (const { suite, targets } of languageGroups) {
+    lines.push("", `### ${suite.language}`);
+    for (const target of targets) {
+      const count = heading === "Failures"
+        ? target.failures.length + Number(Boolean(target.setupFailure))
+        : heading === "Warnings"
+          ? target.advisories.length
+          : target.skippedCases.length;
+      const noun = count === 1 ? options.noun : `${options.noun}s`;
+      lines.push("", `<details${options.open ? " open" : ""}>`, `<summary><strong>${targetLabel(target)}</strong> — ${count} ${noun}</summary>`, "");
       lines.push(...renderDetails(suite, target));
-    }
-    lines.push("", "</details>");
-  }
-}
-
-function groupTargets(suites, includeTarget) {
-  const groups = new Map();
-
-  for (const suite of suites) {
-    for (const target of suite.targets) {
-      if (!includeTarget(target)) continue;
-
-      const label = targetLabel(target);
-      const group = groups.get(label) ?? { label, targets: [] };
-      group.targets.push({ suite, target });
-      groups.set(label, group);
+      lines.push("", "</details>");
     }
   }
-
-  return [...groups.values()];
 }
 
 function targetLabel(target) {

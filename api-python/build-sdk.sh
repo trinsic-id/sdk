@@ -6,6 +6,22 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$REPO_ROOT/helpers/common.sh"
 
+swagger_file_or_url=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --swagger-file-or-url)
+      [[ $# -ge 2 ]] || { echo "$1 requires a value" >&2; exit 1; }
+      swagger_file_or_url="$2"
+      shift 2
+      ;;
+    *)
+      echo "Unknown argument: $1" >&2
+      exit 1
+      ;;
+  esac
+done
+
 find_python() {
   if command -v python >/dev/null 2>&1; then
     command -v python
@@ -17,13 +33,20 @@ find_python() {
   fi
 }
 
-"$REPO_ROOT/helpers/generate-client.sh" \
+generator_arguments=(
   --language python \
   --output-folder "$SCRIPT_DIR/sdk" \
   --additional-property "packageName=trinsic_api" \
   --additional-property "packageVersion=[VERSION]" \
   --additional-property "packageUrl=https://trinsic.id" \
   --additional-property "projectName=trinsic_api"
+)
+
+if [[ -n "$swagger_file_or_url" ]]; then
+  generator_arguments+=(--swagger-file-or-url "$swagger_file_or_url")
+fi
+
+"$REPO_ROOT/helpers/generate-client.sh" "${generator_arguments[@]}"
 
 cp "$SCRIPT_DIR/README.md" "$SCRIPT_DIR/sdk"
 cp "$REPO_ROOT/LICENSE" "$SCRIPT_DIR/sdk"

@@ -615,6 +615,7 @@ sdk-build
 
 api-csharp/sdk
 api-python/sdk
+api-python/tests/.results/
 api-ruby/sdk
 api-typescript/sdk
 
