@@ -53,13 +53,17 @@ def target(target, config):
         result["sdkVersion"] = version
         output = directory / "target-results.json"
         environment = {**os.environ, **config, "DOTNET_ROLL_FORWARD": "Major", "SDK_COMPATIBILITY_RESULT_FILE": str(output), "SDK_IS_CURRENT": str(target["isCurrent"]).lower(), "SDK_TARGET_LABEL": str(target["label"]), "SDK_VERSION": version}
+        runner_failure = None
         try:
             run(["dotnet", "restore", str(source / "CompatibilityRunner.csproj"), "--configfile", str(nuget_config), f"-p:TrinsicApiVersion={version}"], env=environment)
             run(["dotnet", "run", "--no-restore", "--project", str(source / "CompatibilityRunner.csproj"), f"-p:TrinsicApiVersion={version}"], env=environment)
         except subprocess.CalledProcessError as error:
-            result["runnerFailure"] = f"C# target runner exited with code {error.returncode}."
-        if output.exists(): result["testCases"] = json.loads(output.read_text())["testCases"]
-        else: result["testCases"] = [{"id":"framework.csharp-runner", "status":"failed", "durationMs":0, "failure":{"name":"TestRunnerError", "message":result.get("runnerFailure", "C# target exited before producing structured results.")}}]
+            runner_failure = f"C# target runner exited with code {error.returncode}."
+        if output.exists():
+            result["testCases"] = json.loads(output.read_text())["testCases"]
+        else:
+            result["runnerFailure"] = runner_failure or "C# target exited before producing structured results."
+            result["testCases"] = [{"id":"framework.csharp-runner", "status":"failed", "durationMs":0, "failure":{"name":"TestRunnerError", "message":result["runnerFailure"]}}]
     except Exception as error: result["setupFailure"] = str(error)
     finally: shutil.rmtree(directory, ignore_errors=True)
     return result

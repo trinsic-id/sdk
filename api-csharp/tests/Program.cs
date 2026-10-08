@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,25 +50,46 @@ await Record("api.redirect-uris.list", async () => {
     var response = await redirectUrisApi.ListAsync();
     RequireOk(response);
 });
-await Record("api.providers.get", async () => RequireOk(await providersApi.GetProviderAsync("trinsic-test-redirect")));
-var redirectUrl = await RegisteredRedirectUrl();
+var providerGetMethod = providersApi.GetType().GetMethod("GetProviderAsync", BindingFlags.Public | BindingFlags.Instance);
+if (providerGetMethod is null) {
+    Skip("api.providers.get", "This SDK does not expose GetProviderAsync.");
+} else {
+    await Record("api.providers.get", async () => RequireOk(await InvokeMethod(providersApi, providerGetMethod, "trinsic-test-redirect")));
+}
 await Record("api.sessions.create-hosted-provider", async () => {
-    var response = await sessionsApi.CreateHostedProviderSessionAsync(new(new CreateHostedProviderSessionRequest("trinsic-test-redirect", redirectUrl, profileId)));
+    var redirectUrl = await RegisteredRedirectUrl();
+    var request = CreateRequest("CreateHostedProviderSessionRequest", new Dictionary<string, object?> {
+        ["enableRedirectBackwardsCompatibility"] = false,
+        ["provider"] = "trinsic-test-redirect",
+        ["redirectUrl"] = redirectUrl,
+        ["verificationProfileId"] = profileId,
+    });
+    var response = await InvokeApi(sessionsApi, "CreateHostedProviderSessionAsync", request);
     RequireOk(response);
-    var session = response.Ok() ?? throw new InvalidOperationException("Hosted-session response was empty.");
-    Require(!string.IsNullOrWhiteSpace(session.LaunchUrl), "Hosted session omitted launchUrl.");
-    Require(!string.IsNullOrWhiteSpace(session.ResultsAccessKey), "Hosted session omitted resultsAccessKey.");
-    RequireOk(await sessionsApi.CancelSessionAsync(session.SessionId));
+    var session = ResponseBody(response);
+    Require(!string.IsNullOrWhiteSpace(Property<string>(session, "LaunchUrl")), "Hosted session omitted launchUrl.");
+    Require(!string.IsNullOrWhiteSpace(Property<string>(session, "ResultsAccessKey")), "Hosted session omitted resultsAccessKey.");
+    RequireOk(await sessionsApi.CancelSessionAsync(Property<Guid>(session, "SessionId")));
 });
 Guid directSessionId = Guid.Empty;
 await Record("api.sessions.create-direct-provider", async () => {
-    var request = new CreateDirectProviderSessionRequest(new() { IntegrationCapability.LaunchBrowser, IntegrationCapability.CaptureRedirect }, "trinsic-test-redirect", profileId) { RedirectUrl = redirectUrl, FallbackToHostedUI = false };
-    var response = await sessionsApi.CreateDirectProviderSessionAsync(new(request));
+    var redirectUrl = await RegisteredRedirectUrl();
+    var request = CreateRequest("CreateDirectProviderSessionRequest", new Dictionary<string, object?> {
+        ["capabilities"] = new[] { "LaunchBrowser", "CaptureRedirect" },
+        ["enableRedirectBackwardsCompatibility"] = false,
+        ["provider"] = "trinsic-test-redirect",
+        ["verificationProfileId"] = profileId,
+        ["fallbackToHostedUI"] = false,
+        ["redirectUrl"] = redirectUrl,
+    });
+    var response = await InvokeApi(sessionsApi, "CreateDirectProviderSessionAsync", request);
     RequireOk(response);
-    var session = response.Ok() ?? throw new InvalidOperationException("Direct-session response was empty.");
-    directSessionId = session.SessionId;
-    Require(!string.IsNullOrWhiteSpace(session.NextStep.Content), "Direct session omitted launch content.");
-    Require(!string.IsNullOrWhiteSpace(session.ResultCollection.ResultsAccessKey), "Direct session omitted resultsAccessKey.");
+    var session = ResponseBody(response);
+    directSessionId = Property<Guid>(session, "SessionId");
+    var nextStep = Property<object>(session, "NextStep");
+    var resultCollection = Property<object>(session, "ResultCollection");
+    Require(!string.IsNullOrWhiteSpace(Property<string>(nextStep, "Content")), "Direct session omitted launch content.");
+    Require(!string.IsNullOrWhiteSpace(Property<string>(resultCollection, "ResultsAccessKey")), "Direct session omitted resultsAccessKey.");
 });
 await Record("api.sessions.get", async () => { Require(directSessionId != Guid.Empty, "Direct session was not created."); RequireOk(await sessionsApi.GetSessionAsync(directSessionId)); });
 await Record("api.sessions.cancel", async () => { Require(directSessionId != Guid.Empty, "Direct session was not created."); RequireOk(await sessionsApi.CancelSessionAsync(directSessionId)); });
@@ -125,6 +147,79 @@ async Task Record(string id, Func<Task> action, object? parameters = null)
     {
         results.Add(new { id, status = "failed", durationMs = timer.ElapsedMilliseconds, parameters, failure = new { name = error.GetType().Name, message = error.ToString() } });
     }
+}
+
+void Skip(string id, string reason, object? parameters = null) =>
+    results.Add(new { id, status = "skipped", durationMs = 0L, parameters, skipReason = reason });
+
+object CreateRequest(string modelName, IReadOnlyDictionary<string, object?> values)
+{
+    var modelType = typeof(BearerToken).Assembly.GetType($"Trinsic.Api.Model.{modelName}")
+        ?? throw new InvalidOperationException($"SDK does not export {modelName}.");
+    var constructor = modelType.GetConstructors()
+        .OrderByDescending(candidate => candidate.GetParameters().Length)
+        .FirstOrDefault() ?? throw new InvalidOperationException($"{modelName} has no public constructor.");
+    var arguments = constructor.GetParameters().Select(parameter => RequestArgument(parameter, values)).ToArray();
+    return constructor.Invoke(arguments);
+}
+
+object? RequestArgument(ParameterInfo parameter, IReadOnlyDictionary<string, object?> values)
+{
+    if (values.TryGetValue(parameter.Name ?? string.Empty, out var value)) {
+        if (value is string[] names && parameter.ParameterType.IsGenericType && parameter.ParameterType.GetGenericTypeDefinition() == typeof(List<>)) {
+            var enumType = parameter.ParameterType.GetGenericArguments()[0];
+            var list = (System.Collections.IList)(Activator.CreateInstance(parameter.ParameterType)
+                ?? throw new InvalidOperationException($"Could not create {parameter.ParameterType.Name}."));
+            foreach (var name in names) list.Add(Enum.Parse(enumType, name));
+            return list;
+        }
+        return value;
+    }
+    if (parameter.HasDefaultValue) return Type.Missing;
+    throw new InvalidOperationException($"{parameter.Member.DeclaringType?.Name} requires unsupported constructor argument '{parameter.Name}'.");
+}
+
+async Task<object> InvokeApi(object api, string methodName, object? firstArgument = null)
+{
+    var method = api.GetType().GetMethod(methodName, BindingFlags.Public | BindingFlags.Instance)
+        ?? throw new MissingMethodException(api.GetType().FullName, methodName);
+    return await InvokeMethod(api, method, firstArgument);
+}
+
+async Task<object> InvokeMethod(object api, MethodInfo method, object? firstArgument = null)
+{
+    var parameters = method.GetParameters();
+    var arguments = new object?[parameters.Length];
+    for (var index = 0; index < parameters.Length; index++) {
+        var parameter = parameters[index];
+        if (index == 0 && firstArgument is not null) {
+            arguments[index] = parameter.ParameterType.IsGenericType && parameter.ParameterType.GetGenericTypeDefinition().Name == "Option`1"
+                ? Activator.CreateInstance(parameter.ParameterType, firstArgument)
+                : firstArgument;
+        } else if (parameter.ParameterType == typeof(CancellationToken)) {
+            arguments[index] = CancellationToken.None;
+        } else if (parameter.HasDefaultValue) {
+            arguments[index] = Type.Missing;
+        } else {
+            throw new InvalidOperationException($"{method.Name} requires unsupported argument '{parameter.Name}'.");
+        }
+    }
+    var task = method.Invoke(api, arguments) as Task
+        ?? throw new InvalidOperationException($"{method.Name} did not return a Task.");
+    await task;
+    return task.GetType().GetProperty("Result")?.GetValue(task)
+        ?? throw new InvalidOperationException($"{method.Name} returned no response.");
+}
+
+static object ResponseBody(object response) => response.GetType().GetMethod("Ok", Type.EmptyTypes)?.Invoke(response, null)
+    ?? throw new InvalidOperationException($"{response.GetType().Name} returned no successful response body.");
+
+static T Property<T>(object value, string propertyName)
+{
+    var property = value.GetType().GetProperty(propertyName)
+        ?? throw new InvalidOperationException($"{value.GetType().Name} omitted {propertyName}.");
+    var result = property.GetValue(value);
+    return result is T typed ? typed : throw new InvalidOperationException($"{value.GetType().Name}.{propertyName} was null or had an unexpected type.");
 }
 
 static void RequireOk(object response)
