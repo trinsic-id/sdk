@@ -460,13 +460,14 @@ function renderApiCoverageMarkdown(summary) {
 }
 
 function renderApiCoverageLines(summary) {
-  const lines = ["## API operation coverage"];
+  const lines = ["## API Coverage"];
 
   for (const { coverage, language } of summary.apiCoverages) {
     if (summary.apiCoverages.length > 1) {
       lines.push("", `### ${language}`);
     }
-    lines.push("", ...renderSingleApiCoverageLines(coverage));
+    const suite = summary.suites.find((candidate) => candidate.language === language);
+    lines.push("", ...renderSingleApiCoverageLines(coverage, suite));
   }
 
   const providerOutputTargets = summary.suites.flatMap((suite) =>
@@ -595,13 +596,24 @@ function classifyPsoFailure(message) {
   return { label: "Other round-trip failure", order: 99 };
 }
 
-function renderSingleApiCoverageLines(coverage) {
+function renderSingleApiCoverageLines(coverage, suite) {
   const coveredOperations = coverage.operations.filter((operation) => operation.covered);
   const uncoveredOperations = coverage.operations.filter((operation) => !operation.covered);
+  const operationOutcomes = coverage.operations.map((operation) => ({
+    operation,
+    status: operationCoverageStatus(operation, suite),
+  }));
+  const passed = operationOutcomes.filter(({ status }) => status === "passed").length;
+  const failed = operationOutcomes.filter(({ status }) => status === "failed").length;
+  const untested = operationOutcomes.filter(({ status }) => status === "untested").length;
   const percentage = coverage.total === 0
     ? "0.0"
     : ((coverage.covered / coverage.total) * 100).toFixed(1);
   const lines = [
+    "| Passed | Failed | Untested |",
+    "| ---: | ---: | ---: |",
+    `| ${passed} | ${failed} | ${untested} |`,
+    "",
     `> **${coverage.covered} of ${coverage.total} operations covered (${percentage}%).** Coverage is mapped from the compatibility-test catalog to the Swagger contract used for this run.`,
     "",
     "<details open>",
@@ -636,6 +648,16 @@ function renderSingleApiCoverageLines(coverage) {
   }
 
   return lines;
+}
+
+function operationCoverageStatus(operation, suite) {
+  if (!operation.covered || !suite) return "untested";
+  const statuses = suite.targets.flatMap((target) => target.outcomes)
+    .filter((outcome) => operation.testCaseIds.includes(outcome.id))
+    .map((outcome) => outcome.status);
+  if (statuses.includes("failed")) return "failed";
+  if (statuses.includes("passed")) return "passed";
+  return "untested";
 }
 
 function renderTargetGroups(lines, heading, suites, includeTarget, renderDetails, options = {}) {
