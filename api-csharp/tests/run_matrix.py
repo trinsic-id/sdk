@@ -52,7 +52,7 @@ def target(target, config):
         ) + "</packageSources></configuration>\n")
         result["sdkVersion"] = version
         output = directory / "target-results.json"
-        environment = {**os.environ, **config, "DOTNET_ROLL_FORWARD": "Major", "SDK_COMPATIBILITY_RESULT_FILE": str(output)}
+        environment = {**os.environ, **config, "DOTNET_ROLL_FORWARD": "Major", "SDK_COMPATIBILITY_RESULT_FILE": str(output), "SDK_IS_CURRENT": str(target["isCurrent"]).lower(), "SDK_TARGET_LABEL": str(target["label"]), "SDK_VERSION": version}
         try:
             run(["dotnet", "restore", str(source / "CompatibilityRunner.csproj"), "--configfile", str(nuget_config), f"-p:TrinsicApiVersion={version}"], env=environment)
             run(["dotnet", "run", "--no-restore", "--project", str(source / "CompatibilityRunner.csproj"), f"-p:TrinsicApiVersion={version}"], env=environment)
