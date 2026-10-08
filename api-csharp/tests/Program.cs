@@ -91,8 +91,13 @@ await Record("api.sessions.create-direct-provider", async () => {
     Require(!string.IsNullOrWhiteSpace(Property<string>(nextStep, "Content")), "Direct session omitted launch content.");
     Require(!string.IsNullOrWhiteSpace(Property<string>(resultCollection, "ResultsAccessKey")), "Direct session omitted resultsAccessKey.");
 });
-await Record("api.sessions.get", async () => { Require(directSessionId != Guid.Empty, "Direct session was not created."); RequireOk(await sessionsApi.GetSessionAsync(directSessionId)); });
-await Record("api.sessions.cancel", async () => { Require(directSessionId != Guid.Empty, "Direct session was not created."); RequireOk(await sessionsApi.CancelSessionAsync(directSessionId)); });
+if (directSessionId == Guid.Empty) {
+    Skip("api.sessions.get", "Direct-session setup failed.");
+    Skip("api.sessions.cancel", "Direct-session setup failed.");
+} else {
+    await Record("api.sessions.get", async () => RequireOk(await sessionsApi.GetSessionAsync(directSessionId)));
+    await Record("api.sessions.cancel", async () => RequireOk(await sessionsApi.CancelSessionAsync(directSessionId)));
+}
 await Record("api.sessions.recommend-providers", async () => RequireOk(await sessionsApi.RecommendProvidersAsync(new(new RecommendProvidersRequest(profileId) { Health = RecommendProviderHealthOption.All }))));
 
 var serializerOptions = provider.GetRequiredService<JsonSerializerOptionsProvider>().Options;
@@ -175,6 +180,10 @@ object CreateRequest(string modelName, IReadOnlyDictionary<string, object?> valu
 object? RequestArgument(ParameterInfo parameter, IReadOnlyDictionary<string, object?> values)
 {
     if (values.TryGetValue(parameter.Name ?? string.Empty, out var value)) {
+        if (parameter.ParameterType.IsGenericType && parameter.ParameterType.GetGenericTypeDefinition().Name == "Option`1") {
+            return Activator.CreateInstance(parameter.ParameterType, value)
+                ?? throw new InvalidOperationException($"Could not create {parameter.ParameterType.Name}.");
+        }
         if (value is string[] names && parameter.ParameterType.IsGenericType && parameter.ParameterType.GetGenericTypeDefinition() == typeof(List<>)) {
             var enumType = parameter.ParameterType.GetGenericArguments()[0];
             var list = (System.Collections.IList)(Activator.CreateInstance(parameter.ParameterType)
