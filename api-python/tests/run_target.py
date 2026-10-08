@@ -219,7 +219,9 @@ def assert_json_scalar_equivalent(actual: Any, expected: Any, path: str) -> None
 
 
 def provider_outputs() -> None:
-    catalog = http_json("/api/v1/providers/sample-json/outputs")
+    cache_path = os.environ.get("SDK_COMPATIBILITY_PSO_FIXTURES_PATH")
+    cache = json.loads(Path(cache_path).read_text()) if cache_path else None
+    catalog = cache["fixtures"] if cache else http_json("/api/v1/providers/sample-json/outputs")
     assert isinstance(catalog, list) and catalog
     import trinsic_api.models as models
     for fixture in catalog:
@@ -238,7 +240,8 @@ def provider_outputs() -> None:
             else:
                 skipped("serialization.provider-output-round-trip", "The published SDK does not expose this provider-output model.", parameters)
             continue
-        raw = http_json(f"/api/v1/providers/{urllib.parse.quote(provider_id, safe='')}/sample-json/output")
+        raw = fixture.get("output") if cache else http_json(f"/api/v1/providers/{urllib.parse.quote(provider_id, safe='')}/sample-json/output")
+        assert isinstance(raw, dict), f"cached fixture {provider_id} omitted output"
         def round_trip() -> None:
             serialized = model.from_dict(raw).to_dict()
             if CURRENT:

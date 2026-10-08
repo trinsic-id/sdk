@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import { readTestConfiguration } from "./config.js";
@@ -15,6 +16,7 @@ interface ProviderOutputFixture {
   hasPublicSdkModel: boolean;
   providerId: string;
   sdkModelName?: string;
+  output?: JsonRecord;
 }
 
 interface ProviderOutputConverters {
@@ -131,6 +133,8 @@ test(`${targetLabel}: provider-output fixtures round-trip through every supporte
 });
 
 async function fetchFixtureCatalog(): Promise<ProviderOutputFixture[]> {
+  const cached = await readCachedFixtures();
+  if (cached) return cached;
   const response = await globalThis.fetch(
     `${configuration.baseUrl}/api/v1/providers/sample-json/outputs`,
     { headers: authenticatedJsonHeaders() },
@@ -175,6 +179,9 @@ async function fetchFixtureCatalog(): Promise<ProviderOutputFixture[]> {
 }
 
 async function fetchFixture(providerId: string): Promise<JsonRecord> {
+  const cached = await readCachedFixtures();
+  const cachedOutput = cached?.find((fixture) => fixture.providerId === providerId)?.output;
+  if (cachedOutput) return cachedOutput;
   const response = await globalThis.fetch(
     `${configuration.baseUrl}/api/v1/providers/${encodeURIComponent(providerId)}/sample-json/output`,
     { headers: authenticatedJsonHeaders() },
@@ -187,6 +194,18 @@ async function fetchFixture(providerId: string): Promise<JsonRecord> {
     + "Verify that the provider is present in the target environment and the test token is authorized.",
   );
   return asRecord(await response.json(), `${providerId} fixture`);
+}
+
+let cachedFixtures: Promise<ProviderOutputFixture[] | undefined> | undefined;
+function readCachedFixtures(): Promise<ProviderOutputFixture[] | undefined> {
+  cachedFixtures ??= (async () => {
+    const path = process.env.SDK_COMPATIBILITY_PSO_FIXTURES_PATH;
+    if (!path) return undefined;
+    const body = asRecord(JSON.parse(await readFile(path, "utf8")), "PSO fixture cache");
+    assert.ok(Array.isArray(body.fixtures), "PSO fixture cache omitted fixtures.");
+    return body.fixtures.map((fixture, index) => asRecord(fixture, `cached fixture ${index}`) as unknown as ProviderOutputFixture);
+  })();
+  return cachedFixtures;
 }
 
 function authenticatedJsonHeaders(): Record<string, string> {

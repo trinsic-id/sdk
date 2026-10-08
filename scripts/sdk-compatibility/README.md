@@ -5,6 +5,10 @@ and aggregates their normalized results. Each language suite owns its test
 implementation and writes one `compatibility.json` file to the path supplied in
 `SDK_COMPATIBILITY_RESULTS_PATH`.
 
+`run.sh` fetches the provider-output fixtures once and shares that snapshot with
+every language target. Suites run in parallel by default; set
+`SDK_COMPATIBILITY_PARALLEL=false` to run them sequentially when debugging.
+
 `render-results.mjs` is language-agnostic. It validates the common envelope,
 aggregates all suite results into `summary.json` and `summary.md`, and renders
 optional API-operation and provider-specific-output coverage when a suite

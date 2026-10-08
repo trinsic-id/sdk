@@ -98,11 +98,15 @@ await Record("api.sessions.recommend-providers", async () => RequireOk(await ses
 var serializerOptions = provider.GetRequiredService<JsonSerializerOptionsProvider>().Options;
 using var fixtureClient = new HttpClient { BaseAddress = new Uri(targetBaseUrl) };
 fixtureClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-var catalogResponse = await fixtureClient.GetAsync("/api/v1/providers/sample-json/outputs");
-if (!catalogResponse.IsSuccessStatusCode) {
+var cachedFixturePath = Environment.GetEnvironmentVariable("SDK_COMPATIBILITY_PSO_FIXTURES_PATH");
+JsonArray? cachedCatalog = cachedFixturePath is { Length: > 0 }
+    ? JsonNode.Parse(await File.ReadAllTextAsync(cachedFixturePath))?["fixtures"]?.AsArray()
+    : null;
+var catalogResponse = cachedCatalog is null ? await fixtureClient.GetAsync("/api/v1/providers/sample-json/outputs") : null;
+if (cachedCatalog is null && !catalogResponse!.IsSuccessStatusCode) {
     await Record("serialization.provider-output-round-trip", () => throw new InvalidOperationException($"Provider-output fixture catalog returned HTTP {(int)catalogResponse.StatusCode}."), new { scope = "catalog" });
 } else {
-    var catalog = JsonNode.Parse(await catalogResponse.Content.ReadAsStringAsync())?.AsArray()
+    var catalog = cachedCatalog ?? JsonNode.Parse(await catalogResponse!.Content.ReadAsStringAsync())?.AsArray()
         ?? throw new InvalidOperationException("Provider-output fixture catalog was not an array.");
     foreach (var item in catalog) {
         var fixture = item?.AsObject() ?? throw new InvalidOperationException("Provider-output fixture was not an object.");
@@ -122,9 +126,14 @@ if (!catalogResponse.IsSuccessStatusCode) {
             continue;
         }
         await Record("serialization.provider-output-round-trip", async () => {
-            var response = await fixtureClient.GetAsync($"/api/v1/providers/{Uri.EscapeDataString(providerId)}/sample-json/output");
-            response.EnsureSuccessStatusCode();
-            var raw = JsonNode.Parse(await response.Content.ReadAsStringAsync()) ?? throw new InvalidOperationException("Fixture JSON was empty.");
+            JsonNode raw;
+            if (cachedCatalog is not null) {
+                raw = fixture["output"] ?? throw new InvalidOperationException($"Cached fixture {providerId} omitted output.");
+            } else {
+                var response = await fixtureClient.GetAsync($"/api/v1/providers/{Uri.EscapeDataString(providerId)}/sample-json/output");
+                response.EnsureSuccessStatusCode();
+                raw = JsonNode.Parse(await response.Content.ReadAsStringAsync()) ?? throw new InvalidOperationException("Fixture JSON was empty.");
+            }
             var model = JsonSerializer.Deserialize(raw.ToJsonString(), modelType, serializerOptions) ?? throw new InvalidOperationException($"{modelName} deserialized to null.");
             var serialized = JsonNode.Parse(JsonSerializer.Serialize(model, modelType, serializerOptions)) ?? throw new InvalidOperationException($"{modelName} serialized to empty JSON.");
             AssertJson(serialized, raw, providerId, isCurrent);
