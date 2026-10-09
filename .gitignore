@@ -617,6 +617,8 @@ api-csharp/sdk
 api-python/sdk
 api-python/tests/.results/
 api-csharp/tests/.results/
+api-php/tests/.results/
+api-ruby/tests/.results/
 api-ruby/sdk
 api-typescript/sdk
 
