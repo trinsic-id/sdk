@@ -27,6 +27,7 @@ generator_args=()
   --additional-property "developerOrganization=Trinsic" \
   --additional-property "developerOrganizationUrl=https://trinsic.id" \
   --additional-property "composerPackageName=trinsic/api" \
+  --model-name-mapping "Match=MatchModel" \
   --additional-property "licenseName=MIT"
 
 cp "$SCRIPT_DIR/README.md" "$output_folder"

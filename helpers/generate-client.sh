@@ -10,6 +10,7 @@ version_name=""
 swagger_file_or_url="https://api.trinsic.id/swagger/api/swagger.json"
 output_folder=""
 additional_properties=()
+model_name_mappings=()
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -32,6 +33,10 @@ while [[ $# -gt 0 ]]; do
     --additional-property|--additional-properties|-additionalProperty|-additionalProperties)
       [[ $# -ge 2 ]] || { echo "$1 requires a value" >&2; exit 1; }
       additional_properties+=("$2")
+      ;;
+    --model-name-mapping|--model-name-mappings)
+      [[ $# -ge 2 ]] || { echo "$1 requires a value" >&2; exit 1; }
+      model_name_mappings+=("$2")
       ;;
     *)
       echo "Unknown argument: $1" >&2
@@ -86,10 +91,14 @@ if [[ ${#resolved_properties[@]} -gt 0 ]]; then
 fi
 
 echo "Generating $language SDK from $local_swagger_file_path in $output_folder with additional properties: $concatenated_additional_properties"
-npx --yes @openapitools/openapi-generator-cli generate \
+generator_command=(npx --yes @openapitools/openapi-generator-cli generate \
   -i "$local_swagger_file_path" \
   -g "$language" \
   -o "$output_folder" \
-  --additional-properties="$concatenated_additional_properties" >/dev/null
+  --additional-properties="$concatenated_additional_properties")
+if [[ ${#model_name_mappings[@]} -gt 0 ]]; then
+  generator_command+=(--model-name-mappings "$(IFS=,; printf '%s' "${model_name_mappings[*]}")")
+fi
+"${generator_command[@]}" >/dev/null
 
 echo "Generated $language SDK $output_folder"

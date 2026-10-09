@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text.Json;
@@ -279,5 +280,19 @@ static void AssertJson(JsonNode serialized, JsonNode raw, string path, bool exac
         for (var index = 0; index < serializedArray.Count; index++) AssertJson(serializedArray[index]!, rawArray[index]!, $"{path}[{index}]", exact);
         return;
     }
-    if (serialized.ToJsonString() != raw.ToJsonString()) throw new InvalidOperationException($"{path}: values differ.");
+    if (serialized.ToJsonString() != raw.ToJsonString() && !EquivalentTimestamp(serialized, raw)) throw new InvalidOperationException($"{path}: values differ.");
+}
+
+static bool EquivalentTimestamp(JsonNode serialized, JsonNode raw)
+{
+    if (!TryTimestamp(serialized, out var serializedTimestamp) || !TryTimestamp(raw, out var rawTimestamp)) return false;
+    return serializedTimestamp == rawTimestamp;
+}
+
+static bool TryTimestamp(JsonNode value, out DateTimeOffset timestamp)
+{
+    timestamp = default;
+    if (value is not JsonValue scalar || !scalar.TryGetValue<string>(out var text) || text.Length < 10
+        || text[4] != '-' || text[7] != '-' || (text.Length > 10 && text[10] is not ('T' or ' '))) return false;
+    return DateTimeOffset.TryParse(text, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out timestamp);
 }

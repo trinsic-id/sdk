@@ -12,6 +12,8 @@ const suites = await Promise.all(
 );
 const summary = buildSummary(options.resultsDir, suites);
 const markdown = renderMarkdown(summary);
+const psoSummaryMarkdown = renderPsoSummaryMarkdown(summary);
+const psoChartVariationsMarkdown = renderPsoChartVariationsMarkdown(summary);
 const apiCoverageMarkdown = summary.apiCoverages.length > 0
   ? renderApiCoverageMarkdown(summary)
   : undefined;
@@ -20,6 +22,8 @@ await mkdir(options.resultsDir, { recursive: true });
 const writes = [
   writeFile(join(options.resultsDir, "summary.json"), `${JSON.stringify(summary, null, 2)}\n`),
   writeFile(join(options.resultsDir, "summary.md"), markdown),
+  writeFile(join(options.resultsDir, "pso-summary.md"), psoSummaryMarkdown),
+  writeFile(join(options.resultsDir, "pso-chart-variations.md"), psoChartVariationsMarkdown),
 ];
 if (summary.apiCoverages.length > 0 && apiCoverageMarkdown) {
   writes.push(
@@ -345,6 +349,235 @@ function isComparableOutcome(testCase) {
   return !isRecord(testCase.parameters) || testCase.parameters.scope !== "catalog";
 }
 
+function renderPsoSummaryMarkdown(summary) {
+  const providers = buildPsoProviderRollup(summary.suites);
+  const fence = String.fromCharCode(96).repeat(3);
+  const code = String.fromCharCode(96);
+  const lines = [];
+  if (providers.length === 0) return lines.concat(["", "No PSO failures were reported.", ""]).join("\n");
+
+  for (const [index, providerGroup] of splitProvidersForCharts(providers, providers.length).entries()) {
+    const start = index * providers.length + 1;
+    const end = start + providerGroup.length - 1;
+    lines.push(
+      fence + "echarts",
+      JSON.stringify(buildPsoFailureTypeChart(providerGroup, {
+        start,
+        end,
+        subtitle: providers.length + " providers; each segment is a failing language/SDK-target outcome",
+        title: "Provider Specific Output Summary",
+      }), null, 2),
+      fence,
+    );
+  }
+  for (const provider of providers) {
+    const affectedTargets = summarizeProviderTargets(provider.failures);
+    lines.push(
+      "",
+      "## " + code + provider.providerId + code,
+      "",
+      "**Failing outcomes:** " + provider.failureCount,
+      "",
+      "**SDK languages:** " + provider.languages.join(", "),
+      "",
+      "**Failure types:** " + provider.failureTypes.join(", "),
+      "",
+      "#### Affected targets",
+      "",
+      "| SDK language | SDK target | Failing outcomes |",
+      "| --- | --- | ---: |",
+      ...affectedTargets.map((target) => "| " + target.language + " | " + target.target + " | " + target.failureCount + " |"),
+    );
+    for (const failure of provider.failures) {
+      lines.push(
+        "",
+        "#### " + failure.language + " / " + failure.target,
+        "",
+        "**Failure type:** " + failure.type,
+        ...(failure.sdkModelName ? ["", "**SDK model:** " + code + failure.sdkModelName + code] : []),
+        "",
+        "**Summary:** " + summarizePsoMessage(failure.message),
+      );
+    }
+  }
+  lines.push("");
+  return lines.join("\n");
+}
+
+function summarizeProviderTargets(failures) {
+  const targets = new Map();
+  for (const failure of failures) {
+    const key = failure.language + "\u0000" + failure.target;
+    const target = targets.get(key) ?? { failureCount: 0, language: failure.language, target: failure.target };
+    target.failureCount += 1;
+    targets.set(key, target);
+  }
+  return [...targets.values()].sort((left, right) =>
+    left.language.localeCompare(right.language) || left.target.localeCompare(right.target),
+  );
+}
+
+function summarizePsoMessage(value) {
+  const message = String(value ?? "").replace(/\s+/g, " ").trim();
+  const summary = message.split(/\s+at\s+(?=[A-Z][A-Za-z0-9_.<])/)[0];
+  return summary.length > 280 ? summary.slice(0, 277) + "…" : summary;
+}
+
+function renderPsoChartVariationsMarkdown(summary) {
+  const providers = buildPsoProviderRollup(summary.suites);
+  const fence = String.fromCharCode(96).repeat(3);
+  const lines = [
+    "# Provider Specific Output Summary — Chart Variations",
+  ];
+  for (const [index, providerGroup] of splitProvidersForCharts(providers).entries()) {
+    const start = index * 20 + 1;
+    const end = start + providerGroup.length - 1;
+    lines.push(
+      "",
+      "## Failure count by provider — " + start + "–" + end,
+      "",
+      fence + "echarts",
+      JSON.stringify(buildProviderRankingChart(providerGroup, {
+        subtitle: "Failing language/SDK-target outcomes",
+        title: "PSO failures by provider",
+      }), null, 2),
+      fence,
+    );
+  }
+  for (const [index, providerGroup] of splitProvidersForCharts(providers).entries()) {
+    const start = index * 20 + 1;
+    const end = start + providerGroup.length - 1;
+    lines.push(
+      "",
+      "## Failure type breakdown — " + start + "–" + end,
+      "",
+      fence + "echarts",
+      JSON.stringify(buildPsoFailureTypeChart(providerGroup, { start, end }), null, 2),
+      fence,
+    );
+  }
+  lines.push("");
+  return lines.join("\n");
+}
+
+function splitProvidersForCharts(providers, groupSize = 20) {
+  const groups = [];
+  for (let index = 0; index < providers.length; index += groupSize) {
+    groups.push(providers.slice(index, index + groupSize));
+  }
+  return groups;
+}
+
+function buildProviderRankingChart(providers, { subtitle, title }) {
+  return {
+    width: 1100,
+    height: Math.max(880, providers.length * 42 + 180),
+    title: {
+      text: title,
+      subtext: subtitle,
+      left: 26,
+      top: 18,
+      textStyle: { color: "#1f2937", fontSize: 24 },
+      subtextStyle: { color: "#676f7e", fontSize: 15 },
+    },
+    color: ["#d1242f"],
+    grid: { left: 350, right: 100, top: 110, bottom: 44 },
+    xAxis: {
+      type: "value",
+      minInterval: 1,
+      axisLine: { lineStyle: { color: "#5b6b8c" } },
+      axisLabel: { color: "#676f7e", fontSize: 14 },
+      splitLine: { lineStyle: { color: "#5b6b8c" } },
+    },
+    yAxis: {
+      type: "category",
+      inverse: true,
+      data: providers.map((provider) => provider.providerId),
+      axisLine: { lineStyle: { color: "#5b6b8c" } },
+      axisTick: { show: false },
+      axisLabel: { color: "#1f2937", fontSize: 15, interval: 0 },
+    },
+    series: [{
+      name: "Failing outcomes",
+      type: "bar",
+      barWidth: "62%",
+      data: providers.map((provider) => provider.failureCount),
+      label: { show: true, position: "right", color: "#1f2937", fontSize: 15, formatter: "{c}" },
+    }],
+  };
+}
+
+function buildPsoFailureTypeChart(providers, { start, end, subtitle, title = "Failure types by provider" }) {
+  const failureTypes = [...new Set(providers.flatMap((provider) => provider.failures.map((failure) => failure.type)))].sort();
+  return {
+    width: 800,
+    height: 1080,
+    title: {
+      text: title,
+      subtext: subtitle ?? ("Providers " + start + "–" + end + "; each segment is a failing language/SDK-target outcome"),
+      left: 26,
+      top: 18,
+      textStyle: { color: "#1f2937", fontSize: 26 },
+      subtextStyle: { color: "#676f7e", fontSize: 16 },
+    },
+    color: ["#2b66c4", "#2f9e44", "#f3a33c", "#d1242f", "#7048e8", "#0f9b9b", "#c16f8a", "#7c5a3d"],
+    legend: { bottom: 28, itemWidth: 15, itemHeight: 15, textStyle: { color: "#1f2937", fontSize: 15 } },
+    grid: { left: 310, right: 42, top: 140, height: 780 },
+    xAxis: {
+      type: "value",
+      minInterval: 1,
+      axisLine: { lineStyle: { color: "#5b6b8c" } },
+      axisLabel: { color: "#676f7e", fontSize: 16 },
+      splitLine: { lineStyle: { color: "#5b6b8c" } },
+    },
+    yAxis: {
+      type: "category",
+      inverse: true,
+      data: providers.map((provider) => provider.providerId),
+      axisLine: { lineStyle: { color: "#5b6b8c" } },
+      axisTick: { show: false },
+      axisLabel: { color: "#1f2937", fontSize: providers.length > 25 ? 12 : 17, interval: 0 },
+    },
+    series: failureTypes.map((type) => ({
+      name: type,
+      type: "bar",
+      stack: "outcomes",
+      barWidth: "68%",
+      data: providers.map((provider) => provider.failures.filter((failure) => failure.type === type).length),
+    })),
+  };
+}
+
+function buildPsoProviderRollup(suites) {
+  const providers = new Map();
+  for (const suite of suites) {
+    for (const target of suite.targets) {
+      for (const failure of target.providerOutputs.failed) {
+        const provider = providers.get(failure.providerId) ?? {
+          failureCount: 0, failures: [], languages: new Set(), providerId: failure.providerId,
+          targets: new Set(), types: new Set(),
+        };
+        const type = classifyPsoFailure(failure.message).label;
+        provider.failureCount += 1;
+        provider.languages.add(suite.language);
+        provider.targets.add(suite.language + "/" + targetLabel(target));
+        provider.types.add(type);
+        provider.failures.push({
+          language: suite.language, message: failure.message, sdkModelName: failure.sdkModelName,
+          target: targetLabel(target), type,
+        });
+        providers.set(failure.providerId, provider);
+      }
+    }
+  }
+  return [...providers.values()].map((provider) => ({
+    ...provider,
+    failureTypes: [...provider.types].sort(),
+    languages: [...provider.languages].sort(),
+    targets: [...provider.targets].sort(),
+  })).sort((left, right) => right.failureCount - left.failureCount || left.providerId.localeCompare(right.providerId));
+}
+
 function renderMarkdown(summary) {
   const lines = [
     "# API SDK compatibility",
@@ -478,7 +711,7 @@ function renderApiCoverageLines(summary) {
   if (providerOutputTargets.length > 0) {
     lines.push(
       "",
-      "## Provider-specific output coverage",
+      "## PSO coverage",
       "",
       "| Language | SDK target | Passed | Failed | Skipped |",
       "| --- | --- | ---: | ---: | ---: |",
