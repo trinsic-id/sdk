@@ -42,6 +42,37 @@
         "additionalProperties": false
       }
     },
+    "apiCoverage": {
+      "type": "object",
+      "required": ["covered", "operations", "total", "unmappedTestCaseIds"],
+      "properties": {
+        "covered": { "type": "integer", "minimum": 0 },
+        "operations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["covered", "method", "operationId", "path", "testCaseIds"],
+            "properties": {
+              "covered": { "type": "boolean" },
+              "method": { "type": "string" },
+              "operationId": { "type": "string" },
+              "path": { "type": "string" },
+              "testCaseIds": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "total": { "type": "integer", "minimum": 0 },
+        "unmappedTestCaseIds": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
     "targets": {
       "type": "array",
       "items": {
