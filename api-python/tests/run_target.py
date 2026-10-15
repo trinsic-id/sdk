@@ -219,6 +219,7 @@ def assert_json_scalar_equivalent(actual: Any, expected: Any, path: str) -> None
 
 
 def provider_outputs() -> None:
+    allow_missing_pso_models = os.environ.get("SDK_COMPATIBILITY_ALLOW_MISSING_PSO_MODELS", "").lower() in {"1", "true"}
     cache_path = os.environ.get("SDK_COMPATIBILITY_PSO_FIXTURES_PATH")
     cache = json.loads(Path(cache_path).read_text()) if cache_path else None
     catalog = cache["fixtures"] if cache else http_json("/api/v1/providers/sample-json/outputs")
@@ -235,10 +236,10 @@ def provider_outputs() -> None:
         parameters["sdkModelName"] = model_name
         model = getattr(models, model_name, None)
         if model is None:
-            if CURRENT:
+            if CURRENT and not allow_missing_pso_models:
                 record("serialization.provider-output-round-trip", lambda: (_ for _ in ()).throw(AssertionError(f"Connect declares {provider_id}'s {model_name} output as public, but {TARGET} does not export {model_name}.")), parameters)
             else:
-                skipped("serialization.provider-output-round-trip", "The published SDK does not expose this provider-output model.", parameters)
+                skipped("serialization.provider-output-round-trip", "Missing public provider-output models are temporarily allowed by SDK_COMPATIBILITY_ALLOW_MISSING_PSO_MODELS." if CURRENT else "The published SDK does not expose this provider-output model.", parameters)
             continue
         raw = fixture.get("output") if cache else http_json(f"/api/v1/providers/{urllib.parse.quote(provider_id, safe='')}/sample-json/output")
         assert isinstance(raw, dict), f"cached fixture {provider_id} omitted output"

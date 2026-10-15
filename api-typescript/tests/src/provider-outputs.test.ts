@@ -27,6 +27,7 @@ interface ProviderOutputConverters {
 const installRoot = requiredEnvironment("SDK_INSTALL_ROOT");
 const isCurrentSdk = requiredEnvironment("SDK_IS_CURRENT") === "true";
 const targetLabel = requiredEnvironment("SDK_TARGET_LABEL");
+const allowMissingPsoModels = ["1", "true"].includes(process.env.SDK_COMPATIBILITY_ALLOW_MISSING_PSO_MODELS?.toLowerCase() ?? "");
 const configuration = readTestConfiguration();
 const sdk = loadSdk(installRoot);
 
@@ -62,7 +63,7 @@ test(`${targetLabel}: provider-output fixtures round-trip through every supporte
     const modelParameters = { ...parameters, sdkModelName: fixture.sdkModelName };
     const converters = findConverters(fixture);
     if (!converters) {
-      if (isCurrentSdk) {
+      if (isCurrentSdk && !allowMissingPsoModels) {
         try {
           await recordCompatibilityCase(
             "serialization.provider-output-round-trip",
@@ -82,7 +83,9 @@ test(`${targetLabel}: provider-output fixtures round-trip through every supporte
       } else {
         recordSkippedCompatibilityCase(
           "serialization.provider-output-round-trip",
-          "The published SDK does not expose this provider-output model.",
+          isCurrentSdk
+            ? "Missing public provider-output models are temporarily allowed by SDK_COMPATIBILITY_ALLOW_MISSING_PSO_MODELS."
+            : "The published SDK does not expose this provider-output model.",
           modelParameters,
         );
       }

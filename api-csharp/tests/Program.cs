@@ -105,6 +105,8 @@ var serializerOptions = provider.GetRequiredService<JsonSerializerOptionsProvide
 using var fixtureClient = new HttpClient { BaseAddress = new Uri(targetBaseUrl) };
 fixtureClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 var cachedFixturePath = Environment.GetEnvironmentVariable("SDK_COMPATIBILITY_PSO_FIXTURES_PATH");
+var allowMissingPsoModels = string.Equals(Environment.GetEnvironmentVariable("SDK_COMPATIBILITY_ALLOW_MISSING_PSO_MODELS"), "true", StringComparison.OrdinalIgnoreCase)
+    || Environment.GetEnvironmentVariable("SDK_COMPATIBILITY_ALLOW_MISSING_PSO_MODELS") == "1";
 JsonArray? cachedCatalog = cachedFixturePath is { Length: > 0 }
     ? JsonNode.Parse(await File.ReadAllTextAsync(cachedFixturePath))?["fixtures"]?.AsArray()
     : null;
@@ -127,8 +129,8 @@ if (cachedCatalog is null && !catalogResponse!.IsSuccessStatusCode) {
         }
         var modelType = typeof(BearerToken).Assembly.GetType($"Trinsic.Api.Model.{modelName}");
         if (modelType is null) {
-            if (isCurrent) await Record("serialization.provider-output-round-trip", () => throw new InvalidOperationException($"Connect declares {providerId}'s {modelName} output as public, but this SDK does not export {modelName}."), parameters);
-            else results.Add(new { id = "serialization.provider-output-round-trip", status = "skipped", durationMs = 0L, parameters, skipReason = "The published SDK does not expose this provider-output model." });
+            if (isCurrent && !allowMissingPsoModels) await Record("serialization.provider-output-round-trip", () => throw new InvalidOperationException($"Connect declares {providerId}'s {modelName} output as public, but this SDK does not export {modelName}."), parameters);
+            else results.Add(new { id = "serialization.provider-output-round-trip", status = "skipped", durationMs = 0L, parameters, skipReason = isCurrent ? "Missing public provider-output models are temporarily allowed by SDK_COMPATIBILITY_ALLOW_MISSING_PSO_MODELS." : "The published SDK does not expose this provider-output model." });
             continue;
         }
         await Record("serialization.provider-output-round-trip", async () => {

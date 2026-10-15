@@ -40,3 +40,29 @@ contract for that run. It contains `covered`, `total`, `operations`, and
 ID, and mapped compatibility-test IDs. A suite may report PSO outcomes through
 the standard `serialization.provider-output-round-trip` case ID with
 `providerId` and optional `sdkModelName` parameters.
+
+## Revision acknowledgements
+
+Use `compatibility.acknowledgements` in the repository-root
+`compatibility.json` to document a known, intentional incompatibility for one
+published SDK revision. The renderer applies an acknowledgement after the
+language suite writes its raw result: a failed matching test becomes skipped
+and is shown as an `acknowledged-compatibility-exception` warning. It therefore
+does not fail `SDK_COMPATIBILITY_FAIL_ON_FAILURE=true` runs, while its reason
+and original result remain in the generated report.
+
+```json
+{
+  "language": "go",
+  "sdkVersion": "3.0.0",
+  "testCaseId": "serialization.provider-output-round-trip",
+  "parameters": { "providerId": "example-provider" },
+  "reason": "The model shape changed intentionally in this release."
+}
+```
+
+`language`, `sdkVersion`, `testCaseId`, and `reason` are required. `parameters`
+is an optional exact, partial match for a case's string parameters; use it to
+scope a broad test case such as a PSO check to one provider. Set `mute: true`
+to suppress the resulting warning as well. An acknowledgement can also replace
+an existing advisory warning for the selected revision.

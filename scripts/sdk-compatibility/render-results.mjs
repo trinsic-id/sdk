@@ -2,16 +2,19 @@
 
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const options = readOptions(process.argv.slice(2));
+const acknowledgements = await readAcknowledgements();
 const suiteStatuses = await readSuiteStatuses(options.statusFile);
 const suites = await Promise.all(
   [...suiteStatuses.entries()].map(async ([language, runnerExitCode]) =>
-    readSuite(options.resultsDir, language, runnerExitCode),
+    readSuite(options.resultsDir, language, runnerExitCode, acknowledgements),
   ),
 );
 const summary = buildSummary(options.resultsDir, suites);
 const markdown = renderMarkdown(summary);
+const apiSummaryMarkdown = renderApiSummaryMarkdown(summary);
 const psoSummaryMarkdown = renderPsoSummaryMarkdown(summary);
 const psoChartVariationsMarkdown = renderPsoChartVariationsMarkdown(summary);
 const apiCoverageMarkdown = summary.apiCoverages.length > 0
@@ -22,6 +25,7 @@ await mkdir(options.resultsDir, { recursive: true });
 const writes = [
   writeFile(join(options.resultsDir, "summary.json"), `${JSON.stringify(summary, null, 2)}\n`),
   writeFile(join(options.resultsDir, "summary.md"), markdown),
+  writeFile(join(options.resultsDir, "api-summary.md"), apiSummaryMarkdown),
   writeFile(join(options.resultsDir, "pso-summary.md"), psoSummaryMarkdown),
   writeFile(join(options.resultsDir, "pso-chart-variations.md"), psoChartVariationsMarkdown),
 ];
@@ -88,13 +92,13 @@ async function readSuiteStatuses(statusFile) {
   return statuses;
 }
 
-async function readSuite(resultsDir, language, runnerExitCode) {
+async function readSuite(resultsDir, language, runnerExitCode, acknowledgements) {
   const reportPath = join(resultsDir, language, "compatibility.json");
 
   try {
     const report = JSON.parse(await readFile(reportPath, "utf8"));
     validateReport(report, reportPath);
-    const targets = report.targets.map((target) => summarizeTarget(target));
+    const targets = report.targets.map((target) => summarizeTarget(target, language, acknowledgements));
     const hasFailures = targets.some((target) => target.failed > 0 || target.setupFailure);
 
     return {
@@ -116,6 +120,33 @@ async function readSuite(resultsDir, language, runnerExitCode) {
       targets: [],
     };
   }
+}
+
+async function readAcknowledgements() {
+  const compatibilityPath = fileURLToPath(new URL("../../compatibility.json", import.meta.url));
+  const compatibility = JSON.parse(await readFile(compatibilityPath, "utf8"));
+  const entries = compatibility?.compatibility?.acknowledgements ?? [];
+
+  if (!Array.isArray(entries)) {
+    throw new Error("compatibility.acknowledgements must be an array.");
+  }
+
+  return entries.map((entry, index) => {
+    if (
+      !isRecord(entry)
+      || typeof entry.language !== "string"
+      || typeof entry.reason !== "string"
+      || typeof entry.sdkVersion !== "string"
+      || typeof entry.testCaseId !== "string"
+      || (entry.mute !== undefined && typeof entry.mute !== "boolean")
+      || (entry.parameters !== undefined && (!isRecord(entry.parameters)
+        || !Object.values(entry.parameters).every((value) => typeof value === "string")))
+    ) {
+      throw new Error(`Invalid compatibility acknowledgement at index ${index}.`);
+    }
+
+    return entry;
+  });
 }
 
 function readApiCoverage(value) {
@@ -158,12 +189,12 @@ function validateReport(report, reportPath) {
   }
 }
 
-function summarizeTarget(target) {
+function summarizeTarget(target, language, acknowledgements) {
   if (!isRecord(target) || !Array.isArray(target.testCases)) {
     throw new Error("Compatibility report target is invalid.");
   }
 
-  const testCases = target.testCases;
+  const testCases = applyAcknowledgements(target.testCases, target, language, acknowledgements);
   const outcomes = testCases
     .filter((testCase) =>
       isRecord(testCase)
@@ -239,6 +270,59 @@ function summarizeTarget(target) {
     skipped: skippedCases.length,
     skippedCases,
   };
+}
+
+function applyAcknowledgements(testCases, target, language, acknowledgements) {
+  return testCases.map((testCase) => {
+    if (!isRecord(testCase) || typeof testCase.id !== "string") return testCase;
+    if (testCase.status !== "failed" && !isRecord(testCase.advisory)) return testCase;
+
+    const matches = acknowledgements.filter((acknowledgement) =>
+      acknowledgement.language === language
+      && acknowledgement.sdkVersion === target.sdkVersion
+      && acknowledgement.testCaseId === testCase.id
+      && acknowledgementParametersMatch(acknowledgement.parameters, testCase.parameters),
+    );
+    if (matches.length === 0) return testCase;
+    if (matches.length > 1) {
+      throw new Error(`Multiple acknowledgements match ${language} ${target.sdkVersion ?? target.label} ${testCase.id}.`);
+    }
+
+    const acknowledgement = matches[0];
+    const originalMessage = testCase.status === "failed"
+      ? (isRecord(testCase.failure) && typeof testCase.failure.message === "string"
+        ? testCase.failure.message
+        : "No failure message was recorded.")
+      : (typeof testCase.advisory.message === "string"
+        ? testCase.advisory.message
+        : "No warning message was recorded.");
+    const advisory = {
+      code: "acknowledged-compatibility-exception",
+      message: `${acknowledgement.reason} Original result: ${originalMessage}`,
+    };
+
+    if (testCase.status === "failed") {
+      const { advisory: _advisory, failure: _failure, ...withoutFailure } = testCase;
+      return {
+        ...withoutFailure,
+        ...(acknowledgement.mute ? {} : { advisory }),
+        skipReason: `Acknowledged compatibility exception: ${acknowledgement.reason}`,
+        status: "skipped",
+      };
+    }
+
+    if (acknowledgement.mute) {
+      const { advisory: _advisory, ...withoutAdvisory } = testCase;
+      return withoutAdvisory;
+    }
+    return { ...testCase, advisory };
+  });
+}
+
+function acknowledgementParametersMatch(expected, actual) {
+  if (expected === undefined) return true;
+  if (!isRecord(actual)) return false;
+  return Object.entries(expected).every(([key, value]) => actual[key] === value);
 }
 
 function buildSummary(resultsDir, suites) {
@@ -370,6 +454,16 @@ function renderPsoSummaryMarkdown(summary) {
       fence,
     );
   }
+  lines.push(
+    "",
+    "## By provider",
+    "",
+    "| Provider | Failing outcomes | SDK languages | Failure types |",
+    "| --- | ---: | --- | --- |",
+    ...providers.map((provider) =>
+      "| " + code + provider.providerId + code + " | " + provider.failureCount + " | "
+      + provider.languages.join(", ") + " | " + provider.failureTypes.join(", ") + " |"),
+  );
   for (const provider of providers) {
     const affectedTargets = summarizeProviderTargets(provider.failures);
     lines.push(
@@ -395,6 +489,52 @@ function renderPsoSummaryMarkdown(summary) {
         "",
         "**Failure type:** " + failure.type,
         ...(failure.sdkModelName ? ["", "**SDK model:** " + code + failure.sdkModelName + code] : []),
+        "",
+        "**Summary:** " + summarizePsoMessage(failure.message),
+      );
+    }
+  }
+  lines.push("");
+  return lines.join("\n");
+}
+
+function renderApiSummaryMarkdown(summary) {
+  const operations = buildApiOperationRollup(summary.suites);
+  const fence = String.fromCharCode(96).repeat(3);
+  const code = String.fromCharCode(96);
+  const lines = ["# API Compatibility Summary"];
+
+  if (operations.length === 0) {
+    lines.push("", "No API-operation failures were reported.", "");
+    return lines.join("\n");
+  }
+
+  lines.push(
+    "",
+    fence + "echarts",
+    JSON.stringify(buildApiFailureChart(operations), null, 2),
+    fence,
+  );
+  for (const operation of operations) {
+    const affectedTargets = summarizeProviderTargets(operation.failures);
+    lines.push(
+      "",
+      "## " + code + operation.operationId + code,
+      "",
+      "**Failing outcomes:** " + operation.failureCount,
+      "",
+      "**SDK languages:** " + operation.languages.join(", "),
+      "",
+      "#### Affected targets",
+      "",
+      "| SDK language | SDK target | Failing outcomes |",
+      "| --- | --- | ---: |",
+      ...affectedTargets.map((target) => "| " + target.language + " | " + target.target + " | " + target.failureCount + " |"),
+    );
+    for (const failure of operation.failures) {
+      lines.push(
+        "",
+        "#### " + failure.language + " / " + failure.target,
         "",
         "**Summary:** " + summarizePsoMessage(failure.message),
       );
@@ -576,6 +716,71 @@ function buildPsoProviderRollup(suites) {
     languages: [...provider.languages].sort(),
     targets: [...provider.targets].sort(),
   })).sort((left, right) => right.failureCount - left.failureCount || left.providerId.localeCompare(right.providerId));
+}
+
+function buildApiOperationRollup(suites) {
+  const operations = new Map();
+  for (const suite of suites) {
+    for (const target of suite.targets) {
+      for (const failure of target.failures.filter((candidate) => candidate.id.startsWith("api."))) {
+        const operation = operations.get(failure.id) ?? {
+          failureCount: 0, failures: [], languages: new Set(), operationId: failure.id,
+        };
+        operation.failureCount += 1;
+        operation.languages.add(suite.language);
+        operation.failures.push({
+          language: suite.language,
+          message: failure.failure,
+          target: targetLabel(target),
+        });
+        operations.set(failure.id, operation);
+      }
+    }
+  }
+  return [...operations.values()].map((operation) => ({
+    ...operation,
+    languages: [...operation.languages].sort(),
+  })).sort((left, right) =>
+    right.failureCount - left.failureCount || left.operationId.localeCompare(right.operationId));
+}
+
+function buildApiFailureChart(operations) {
+  return {
+    width: 1100,
+    height: Math.max(1000, operations.length * 88 + 230),
+    title: {
+      text: "API Compatibility Summary",
+      subtext: "Failing language/SDK-target outcomes by compatibility operation",
+      left: 26,
+      top: 18,
+      textStyle: { color: "#1f2937", fontSize: 26 },
+      subtextStyle: { color: "#676f7e", fontSize: 16 },
+    },
+    color: ["#d1242f"],
+    grid: { left: 360, right: 100, top: 130, bottom: 72 },
+    xAxis: {
+      type: "value",
+      minInterval: 1,
+      axisLine: { lineStyle: { color: "#5b6b8c" } },
+      axisLabel: { color: "#676f7e", fontSize: 18 },
+      splitLine: { lineStyle: { color: "#5b6b8c" } },
+    },
+    yAxis: {
+      type: "category",
+      inverse: true,
+      data: operations.map((operation) => operation.operationId),
+      axisLine: { lineStyle: { color: "#5b6b8c" } },
+      axisTick: { show: false },
+      axisLabel: { color: "#1f2937", fontSize: 18, interval: 0 },
+    },
+    series: [{
+      name: "Failing outcomes",
+      type: "bar",
+      barWidth: "54%",
+      data: operations.map((operation) => operation.failureCount),
+      label: { show: true, position: "right", color: "#1f2937", fontSize: 18, formatter: "{c}" },
+    }],
+  };
 }
 
 function renderMarkdown(summary) {

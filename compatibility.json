@@ -7,6 +7,92 @@
       "php": ["3.0.0", "3.1.0", "3.2.1"],
       "ruby": ["3.0.0", "3.1.0", "3.2.1"],
       "go": ["3.0.0", "3.1.0", "3.2.1"]
-    }
+    },
+    "acknowledgements": [
+      {
+        "language": "csharp",
+        "sdkVersion": "3.0.0",
+        "testCaseId": "serialization.provider-output-round-trip",
+        "parameters": { "providerId": "france-identite-numerique", "sdkModelName": "FrenchNumeriqueProviderOutput" },
+        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName."
+      },
+      {
+        "language": "csharp",
+        "sdkVersion": "3.1.0",
+        "testCaseId": "serialization.provider-output-round-trip",
+        "parameters": { "providerId": "france-identite-numerique", "sdkModelName": "FrenchNumeriqueProviderOutput" },
+        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName."
+      },
+      {
+        "language": "go",
+        "sdkVersion": "3.0.0",
+        "testCaseId": "serialization.provider-output-round-trip",
+        "parameters": { "providerId": "france-identite-numerique", "sdkModelName": "FrenchNumeriqueProviderOutput" },
+        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName."
+      },
+      {
+        "language": "go",
+        "sdkVersion": "3.1.0",
+        "testCaseId": "serialization.provider-output-round-trip",
+        "parameters": { "providerId": "france-identite-numerique", "sdkModelName": "FrenchNumeriqueProviderOutput" },
+        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName."
+      },
+      {
+        "language": "php",
+        "sdkVersion": "3.0.0",
+        "testCaseId": "serialization.provider-output-round-trip",
+        "parameters": { "providerId": "france-identite-numerique", "sdkModelName": "FrenchNumeriqueProviderOutput" },
+        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName."
+      },
+      {
+        "language": "php",
+        "sdkVersion": "3.1.0",
+        "testCaseId": "serialization.provider-output-round-trip",
+        "parameters": { "providerId": "france-identite-numerique", "sdkModelName": "FrenchNumeriqueProviderOutput" },
+        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName."
+      },
+      {
+        "language": "python",
+        "sdkVersion": "3.0.0",
+        "testCaseId": "serialization.provider-output-round-trip",
+        "parameters": { "providerId": "france-identite-numerique", "sdkModelName": "FrenchNumeriqueProviderOutput" },
+        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName."
+      },
+      {
+        "language": "python",
+        "sdkVersion": "3.1.0",
+        "testCaseId": "serialization.provider-output-round-trip",
+        "parameters": { "providerId": "france-identite-numerique", "sdkModelName": "FrenchNumeriqueProviderOutput" },
+        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName."
+      },
+      {
+        "language": "ruby",
+        "sdkVersion": "3.0.0",
+        "testCaseId": "serialization.provider-output-round-trip",
+        "parameters": { "providerId": "france-identite-numerique", "sdkModelName": "FrenchNumeriqueProviderOutput" },
+        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName."
+      },
+      {
+        "language": "ruby",
+        "sdkVersion": "3.1.0",
+        "testCaseId": "serialization.provider-output-round-trip",
+        "parameters": { "providerId": "france-identite-numerique", "sdkModelName": "FrenchNumeriqueProviderOutput" },
+        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName."
+      },
+      {
+        "language": "typescript",
+        "sdkVersion": "3.0.0",
+        "testCaseId": "serialization.provider-output-round-trip",
+        "parameters": { "providerId": "france-identite-numerique", "sdkModelName": "FrenchNumeriqueProviderOutput" },
+        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName."
+      },
+      {
+        "language": "typescript",
+        "sdkVersion": "3.1.0",
+        "testCaseId": "serialization.provider-output-round-trip",
+        "parameters": { "providerId": "france-identite-numerique", "sdkModelName": "FrenchNumeriqueProviderOutput" },
+        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName."
+      }
+    ]
   }
 }

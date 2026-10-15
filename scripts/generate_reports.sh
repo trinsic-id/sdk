@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Regenerate the SDK compatibility reports and export the Provider Specific Output Summary as a PDF.
+# Regenerate the SDK compatibility reports and export focused API and PSO PDFs.
 # Usage: ./scripts/generate_reports.sh [results-directory]
 
 set -euo pipefail
@@ -31,28 +31,35 @@ node "$SCRIPT_DIR/sdk-compatibility/render-results.mjs" \
   --results-dir "$RESULTS_DIR" \
   --status-file "$RESULTS_DIR/suite-status.tsv"
 
-PSO_PDF_WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/pso-summary.XXXXXX")"
-trap 'rm -rf "$PSO_PDF_WORK_DIR"' EXIT
-npx --yes @markdown-viewer/documd \
-  "$RESULTS_DIR/pso-summary.md" \
-  "$PSO_PDF_WORK_DIR/pso-summary.html"
-node "$SCRIPT_DIR/sdk-compatibility/prepare-pso-pdf.mjs" \
-  "$PSO_PDF_WORK_DIR/pso-summary.html" \
-  "$PSO_PDF_WORK_DIR/pso-summary-print.html"
-if ! "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
-  --headless \
-  --disable-gpu \
-  --no-pdf-header-footer \
-  --print-to-pdf="$RESULTS_DIR/pso-summary.pdf" \
-  "file://$PSO_PDF_WORK_DIR/pso-summary-print.html" \
-  2>"$PSO_PDF_WORK_DIR/chrome.log"; then
-  cat "$PSO_PDF_WORK_DIR/chrome.log" >&2
-  exit 1
-fi
+PDF_WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/sdk-compatibility-report.XXXXXX")"
+trap 'rm -rf "$PDF_WORK_DIR"' EXIT
+render_pdf() {
+  local report_name="$1"
+  npx --yes @markdown-viewer/documd \
+    "$RESULTS_DIR/$report_name.md" \
+    "$PDF_WORK_DIR/$report_name.html"
+  node "$SCRIPT_DIR/sdk-compatibility/prepare-pso-pdf.mjs" \
+    "$PDF_WORK_DIR/$report_name.html" \
+    "$PDF_WORK_DIR/$report_name-print.html"
+  if ! "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+    --headless \
+    --disable-gpu \
+    --no-pdf-header-footer \
+    --print-to-pdf="$RESULTS_DIR/$report_name.pdf" \
+    "file://$PDF_WORK_DIR/$report_name-print.html" \
+    2>"$PDF_WORK_DIR/$report_name-chrome.log"; then
+    cat "$PDF_WORK_DIR/$report_name-chrome.log" >&2
+    exit 1
+  fi
+}
+
+render_pdf "api-summary"
+render_pdf "pso-summary"
 
 npx --yes @markdown-viewer/documd \
   "$RESULTS_DIR/pso-chart-variations.md" \
   "$RESULTS_DIR/pso-chart-variations.pdf"
 
+echo "API Compatibility Summary: $RESULTS_DIR/api-summary.pdf"
 echo "Provider Specific Output Summary: $RESULTS_DIR/pso-summary.pdf"
 echo "Chart variations: $RESULTS_DIR/pso-chart-variations.pdf"
