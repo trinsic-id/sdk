@@ -179,9 +179,11 @@ def completed_session(api: SessionsApi, redirects: RedirectUrisApi) -> tuple[Any
 def assert_equivalent(actual: Any, expected: Any, path: str) -> None:
     if isinstance(actual, dict):
         assert isinstance(expected, dict), f"{path}: SDK produced an object for {type(expected).__name__}"
-        assert set(actual) == set(expected), f"{path}: field names differ; SDK={sorted(actual)}, wire={sorted(expected)}"
+        missing = set(expected) - set(actual)
+        assert not missing, f"{path}: SDK omitted fixture fields: {sorted(missing)}"
         for key, item in actual.items():
-            assert_equivalent(item, expected[key], f"{path}.{key}")
+            if key in expected:
+                assert_equivalent(item, expected[key], f"{path}.{key}")
     elif isinstance(actual, list):
         assert isinstance(expected, list) and len(actual) == len(expected), f"{path}: array shape differs"
         for index, item in enumerate(actual):
@@ -194,8 +196,8 @@ def assert_subset(actual: Any, expected: Any, path: str) -> None:
     if isinstance(actual, dict):
         assert isinstance(expected, dict), f"{path}: SDK produced an object for {type(expected).__name__}"
         for key, item in actual.items():
-            assert key in expected, f"{path}: SDK emitted field {key!r} absent from the wire fixture"
-            assert_subset(item, expected[key], f"{path}.{key}")
+            if key in expected:
+                assert_subset(item, expected[key], f"{path}.{key}")
     elif isinstance(actual, list):
         assert isinstance(expected, list) and len(actual) == len(expected), f"{path}: array shape differs"
         for index, item in enumerate(actual):

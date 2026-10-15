@@ -269,12 +269,9 @@ function assertSerializedSubset(
   );
   const rawRecord = raw as JsonRecord;
   for (const [key, value] of Object.entries(serializedRecord)) {
-    assert.ok(
-      Object.hasOwn(rawRecord, key),
-      `${path}.${key}: this SDK emits a field that is absent from the current fixture. `
-      + "The provider-output wire contract no longer matches this SDK release.",
-    );
-    assertSerializedSubset(value, rawRecord[key], `${path}.${key}`);
+    if (Object.hasOwn(rawRecord, key)) {
+      assertSerializedSubset(value, rawRecord[key], `${path}.${key}`);
+    }
   }
 }
 
@@ -300,21 +297,16 @@ function assertJsonEquivalent(actual: unknown, expected: unknown, path: string):
   );
   const expectedRecord = expected as JsonRecord;
   const missingFields = Object.keys(expectedRecord).filter((key) => !Object.hasOwn(actualRecord, key));
-  const unexpectedFields = Object.keys(actualRecord).filter((key) => !Object.hasOwn(expectedRecord, key));
   assert.equal(
     missingFields.length,
     0,
     `${path}: SDK round-trip drops wire field(s): ${missingFields.join(", ")}. `
     + "The generated model must preserve every field from this current provider-output fixture.",
   );
-  assert.equal(
-    unexpectedFields.length,
-    0,
-    `${path}: SDK round-trip adds field(s) not present on the wire: ${unexpectedFields.join(", ")}. `
-    + "The generated model does not match this current provider-output fixture.",
-  );
   for (const [key, value] of Object.entries(actualRecord)) {
-    assertJsonEquivalent(value, expectedRecord[key], `${path}.${key}`);
+    if (Object.hasOwn(expectedRecord, key)) {
+      assertJsonEquivalent(value, expectedRecord[key], `${path}.${key}`);
+    }
   }
 }
 

@@ -9,8 +9,8 @@ def normalize_json(value); JSON.parse(JSON.generate(value)); end
 def equivalent_timestamp?(actual,expected); actual.match?(/^\d{4}-\d{2}-\d{2}[ T]/) && expected.match?(/^\d{4}-\d{2}-\d{2}[ T]/) && Time.parse(actual).utc.to_i == Time.parse(expected).utc.to_i rescue false; end
 def compare_json(actual,expected,path,exact)
   if actual.is_a?(Hash) && expected.is_a?(Hash)
-    actual.each{|key,value| raise "#{path}: SDK emitted field #{key.inspect} absent from fixture." unless expected.key?(key); compare_json(value,expected[key],"#{path}.#{key}",exact)}
-    raise "#{path}: field names differ; SDK=#{actual.keys.sort}, wire=#{expected.keys.sort}." if exact && actual.keys.sort != expected.keys.sort
+    actual.each{|key,value| compare_json(value,expected[key],"#{path}.#{key}",exact) if expected.key?(key)}
+    raise "#{path}: SDK omitted fixture fields: #{expected.keys - actual.keys}." if exact && !(expected.keys - actual.keys).empty?
   elsif actual.is_a?(Array) && expected.is_a?(Array)
     raise "#{path}: array lengths differ." if exact && actual.length != expected.length
     actual.each_with_index{|value,index| raise "#{path}[#{index}]: SDK emitted an array value absent from fixture." if index >= expected.length; compare_json(value,expected[index],"#{path}[#{index}]",exact)}

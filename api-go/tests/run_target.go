@@ -410,14 +410,18 @@ func compare(a, b any, p string, exact bool) error {
 		for k, v := range x {
 			w, ok := y[k]
 			if !ok {
-				return fmt.Errorf("%s: emitted field %s absent", p, k)
+				continue
 			}
 			if e := compare(v, w, p+"."+k, exact); e != nil {
 				return e
 			}
 		}
-		if exact && len(x) != len(y) {
-			return fmt.Errorf("%s: field names differ", p)
+		if exact {
+			for k := range y {
+				if _, ok := x[k]; !ok {
+					return fmt.Errorf("%s: omitted field %s from fixture", p, k)
+				}
+			}
 		}
 	case []any:
 		y, ok := b.([]any)

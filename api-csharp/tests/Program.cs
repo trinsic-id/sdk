@@ -270,11 +270,11 @@ static void AssertJson(JsonNode serialized, JsonNode raw, string path, bool exac
 {
     if (serialized is JsonObject serializedObject && raw is JsonObject rawObject) {
         foreach (var (name, value) in serializedObject) {
-            if (!rawObject.TryGetPropertyValue(name, out var rawValue)) throw new InvalidOperationException($"{path}: SDK emitted field absent from fixture: {name}.");
+            if (!rawObject.TryGetPropertyValue(name, out var rawValue)) continue;
             if (value is not null && rawValue is not null) AssertJson(value, rawValue, $"{path}.{name}", exact);
             else if (value?.ToJsonString() != rawValue?.ToJsonString()) throw new InvalidOperationException($"{path}.{name}: null mismatch.");
         }
-        if (exact && !serializedObject.Select(pair => pair.Key).Order().SequenceEqual(rawObject.Select(pair => pair.Key).Order())) throw new InvalidOperationException($"{path}: field names differ.");
+        if (exact && rawObject.Any(pair => !serializedObject.ContainsKey(pair.Key))) throw new InvalidOperationException($"{path}: SDK omitted field(s) from fixture.");
         return;
     }
     if (serialized is JsonArray serializedArray && raw is JsonArray rawArray) {

@@ -9,6 +9,13 @@ implementation and writes one `compatibility.json` file to the path supplied in
 every language target. Suites run in parallel by default; set
 `SDK_COMPATIBILITY_PARALLEL=false` to run them sequentially when debugging.
 
+The shared fixture collector filters each public provider-output JSON payload
+against that target's Swagger schema before caching it. This makes fixtures
+represent the SDK serialization contract: runtime-only fields, including
+`[SwaggerIgnore]` compatibility aliases, and Swagger `readOnly` response fields
+are not included in round-trip comparisons. It does not change Connect's
+production response serialization.
+
 `render-results.mjs` is language-agnostic. It validates the common envelope,
 aggregates all suite results into `summary.json` and `summary.md`, and renders
 optional API-operation and provider-specific-output coverage when a suite
