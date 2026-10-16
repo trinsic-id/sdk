@@ -17,8 +17,9 @@ fixture_cache="$RESULTS_DIR/pso-fixtures.json"
 if SDK_COMPATIBILITY_PSO_FIXTURES_PATH="$fixture_cache" node --use-system-ca "$SCRIPT_DIR/fetch-pso-fixtures.mjs"; then
   export SDK_COMPATIBILITY_PSO_FIXTURES_PATH="$fixture_cache"
 else
-  printf 'PSO fixture cache failed; suites will fetch fixtures directly.\n' >&2
+  printf 'PSO fixture cache failed; aborting so no SDK suite runs without PSO coverage.\n' >&2
   rm -f "$fixture_cache"
+  exit 1
 fi
 
 run_suite() {

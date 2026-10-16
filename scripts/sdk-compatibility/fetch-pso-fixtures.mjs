@@ -27,9 +27,13 @@ const fixtures = await Promise.all(catalog.map(async (fixture) => {
   const providerOutput = await response.json();
   if (!schema) {
     console.warn(`Swagger did not contain ${fixture.sdkModelName} for ${fixture.providerId}; keeping the unfiltered fixture so the missing-model check can report it.`);
-    return { ...fixture, output: providerOutput };
+    return { ...fixture, output: providerOutput, serializationOutput: providerOutput };
   }
-  return { ...fixture, output: filterToSchema(providerOutput, schema, swagger.components.schemas) };
+  return {
+    ...fixture,
+    output: filterToSchema(providerOutput, schema, swagger.components.schemas),
+    serializationOutput: filterToSchema(providerOutput, schema, swagger.components.schemas, { excludeReadOnly: true }),
+  };
 }));
 
 await writeFile(output, `${JSON.stringify({ schemaVersion: 1, targetBaseUrl: baseUrl, fixtures })}\n`);
@@ -41,22 +45,22 @@ function required(name) {
   return value;
 }
 
-function filterToSchema(value, schema, schemas) {
+function filterToSchema(value, schema, schemas, { excludeReadOnly = false } = {}) {
   const resolved = resolveSchema(schema, schemas);
   if (isUnconstrained(resolved)) return value;
 
   if (Array.isArray(value)) {
     const itemSchema = childSchema(resolved, "items", schemas);
-    return itemSchema === undefined ? value : value.map((item) => filterToSchema(item, itemSchema, schemas));
+    return itemSchema === undefined ? value : value.map((item) => filterToSchema(item, itemSchema, schemas, { excludeReadOnly }));
   }
 
   if (!isObject(value)) return value;
 
   return Object.fromEntries(Object.entries(value).flatMap(([key, child]) => {
     const propertySchema = propertySchemaFor(resolved, key, schemas);
-    return propertySchema === undefined || isReadOnly(propertySchema, schemas)
+    return propertySchema === undefined || (excludeReadOnly && isReadOnly(propertySchema, schemas))
       ? []
-      : [[key, filterToSchema(child, propertySchema, schemas)]];
+      : [[key, filterToSchema(child, propertySchema, schemas, { excludeReadOnly })]];
   }));
 }
 

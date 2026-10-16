@@ -17,6 +17,7 @@ interface ProviderOutputFixture {
   providerId: string;
   sdkModelName?: string;
   output?: JsonRecord;
+  serializationOutput?: JsonRecord;
 }
 
 interface ProviderOutputConverters {
@@ -97,12 +98,13 @@ test(`${targetLabel}: provider-output fixtures round-trip through every supporte
         "serialization.provider-output-round-trip",
         async () => {
           const rawOutput = await fetchFixture(fixture.providerId);
+          const serializationExpected = fixture.serializationOutput ?? rawOutput;
           const serializedOutput = jsonValue(converters.toJson(converters.fromJson(rawOutput)));
 
           if (isCurrentSdk) {
             assertJsonEquivalent(
               serializedOutput,
-              rawOutput,
+              serializationExpected,
               `${fixture.providerId} (${fixture.sdkModelName})`,
             );
             return;
@@ -110,14 +112,14 @@ test(`${targetLabel}: provider-output fixtures round-trip through every supporte
 
           assertSerializedSubset(
             serializedOutput,
-            rawOutput,
+            serializationExpected,
             `${fixture.providerId} (${fixture.sdkModelName})`,
           );
-          if (Object.keys(rawOutput).length > 0) {
+          if (Object.keys(serializationExpected).length > 0) {
             const serializedFields = Object.keys(asRecord(serializedOutput, fixture.providerId));
             assert.ok(serializedFields.length > 0,
               `${targetLabel}'s ${fixture.sdkModelName} converter drops every top-level field `
-              + `from the current ${fixture.providerId} fixture (${Object.keys(rawOutput).join(", ")}). `
+              + `from the current ${fixture.providerId} fixture (${Object.keys(serializationExpected).join(", ")}). `
               + "This published SDK cannot deserialize any supported portion of this provider output.",
             );
           }

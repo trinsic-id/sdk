@@ -144,7 +144,8 @@ if (cachedCatalog is null && !catalogResponse!.IsSuccessStatusCode) {
             }
             var model = JsonSerializer.Deserialize(raw.ToJsonString(), modelType, serializerOptions) ?? throw new InvalidOperationException($"{modelName} deserialized to null.");
             var serialized = JsonNode.Parse(JsonSerializer.Serialize(model, modelType, serializerOptions)) ?? throw new InvalidOperationException($"{modelName} serialized to empty JSON.");
-            AssertJson(serialized, raw, providerId, isCurrent);
+            JsonNode serializationExpected = cachedCatalog is null ? raw : fixture["serializationOutput"] ?? raw;
+            AssertJson(serialized, serializationExpected, providerId, isCurrent);
         }, parameters);
     }
 }

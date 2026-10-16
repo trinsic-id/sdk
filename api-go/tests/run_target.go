@@ -256,6 +256,11 @@ func pso() {
 		fixture := f
 		record("serialization.provider-output-round-trip", params, func() (any, error) {
 			wire, _ := json.Marshal(fixture["output"])
+			serializationOutput := fixture["output"]
+			if output, ok := fixture["serializationOutput"]; ok {
+				serializationOutput = output
+			}
+			expected, _ := json.Marshal(serializationOutput)
 			m := factory()
 			if e := json.Unmarshal(wire, m); e != nil {
 				return nil, e
@@ -266,7 +271,7 @@ func pso() {
 			}
 			var a, b any
 			json.Unmarshal(round, &a)
-			json.Unmarshal(wire, &b)
+			json.Unmarshal(expected, &b)
 			return nil, compare(a, b, fmt.Sprint(fixture["providerId"]), os.Getenv("SDK_IS_CURRENT") == "true")
 		})
 	}

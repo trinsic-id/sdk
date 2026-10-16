@@ -245,12 +245,14 @@ def provider_outputs() -> None:
             continue
         raw = fixture.get("output") if cache else http_json(f"/api/v1/providers/{urllib.parse.quote(provider_id, safe='')}/sample-json/output")
         assert isinstance(raw, dict), f"cached fixture {provider_id} omitted output"
+        serialization_expected = fixture.get("serializationOutput", raw) if cache else raw
+        assert isinstance(serialization_expected, dict), f"cached fixture {provider_id} omitted serializationOutput"
         def round_trip() -> None:
             serialized = model.from_dict(raw).to_dict()
             if CURRENT:
-                assert_equivalent(serialized, raw, f"{provider_id} ({model_name})")
+                assert_equivalent(serialized, serialization_expected, f"{provider_id} ({model_name})")
             else:
-                assert_subset(serialized, raw, f"{provider_id} ({model_name})")
+                assert_subset(serialized, serialization_expected, f"{provider_id} ({model_name})")
         record("serialization.provider-output-round-trip", round_trip, parameters)
 
 
