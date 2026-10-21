@@ -27,7 +27,7 @@ try {
   const output = join(directory, "target-results.json");
   const environment = childEnvironment({ DOTNET_ROLL_FORWARD: "Major", NUGET_PACKAGES: join(directory, "nuget-global-packages"), SDK_COMPATIBILITY_RESULT_FILE: output, SDK_VERSION: version });
   const restore = command("dotnet", ["restore", join(source, "CompatibilityRunner.csproj"), "--configfile", join(directory, "NuGet.Config"), `-p:TrinsicApiVersion=${version}`], { env: environment, check: false });
-  const execution = restore.status === 0 && command("dotnet", ["run", "--no-restore", "--project", join(source, "CompatibilityRunner.csproj"), `-p:TrinsicApiVersion=${version}`], { env: environment, check: false });
+  const execution = restore.status === 0 && command("dotnet", ["test", join(source, "CompatibilityRunner.csproj"), "--no-restore", `-p:TrinsicApiVersion=${version}`], { env: environment, check: false });
   return { sdkVersion: version, testCases: readTestCases(output) ?? failure("csharp", `C# target exited with code ${(execution || restore).status ?? "unknown"} before producing structured results.`) };
   });
 } catch (error) {
