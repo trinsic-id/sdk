@@ -6,20 +6,36 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$REPO_ROOT/helpers/common.sh"
 
-"$REPO_ROOT/helpers/generate-client.sh" \
-  --language csharp \
-  --output-folder "$SCRIPT_DIR/sdk" \
-  --additional-property "packageName=Trinsic.Api" \
-  --additional-property "packageVersion=[VERSION]" \
-  --additional-property "nullableReferenceTypes=true" \
-  --additional-property "modelPropertySorting=alphabetical" \
-  --additional-property "library=generichost" \
-  --additional-property "useDateTimeOffset=true" \
-  --additional-property "validatable=false" \
-  --additional-property "disallowAdditionalPropertiesIfNotPresent=false" \
-  --additional-property "licenseId=MIT" \
-  --additional-property "apiName=TrinsicApi" \
+swagger_file_or_url=""
+if [[ $# -gt 0 ]]; then
+  if [[ "$1" != "--swagger-file-or-url" || $# -ne 2 ]]; then
+    echo "Usage: $0 [--swagger-file-or-url <path-or-url>]" >&2
+    exit 1
+  fi
+  swagger_file_or_url="$2"
+fi
+
+generator_arguments=(
+  --language csharp
+  --output-folder "$SCRIPT_DIR/sdk"
+  --additional-property "packageName=Trinsic.Api"
+  --additional-property "packageVersion=[VERSION]"
+  --additional-property "nullableReferenceTypes=true"
+  --additional-property "modelPropertySorting=alphabetical"
+  --additional-property "library=generichost"
+  --additional-property "useDateTimeOffset=true"
+  --additional-property "validatable=false"
+  --additional-property "disallowAdditionalPropertiesIfNotPresent=false"
+  --additional-property "licenseId=MIT"
+  --additional-property "apiName=TrinsicApi"
   --additional-property "targetFramework=net8.0"
+)
+if [[ -n "$swagger_file_or_url" ]]; then
+  generator_arguments+=(--swagger-file-or-url "$swagger_file_or_url")
+fi
+
+"$REPO_ROOT/helpers/generate-client.sh" \
+  "${generator_arguments[@]}"
 
 apply_hotfix() {
   local target_line="$1"

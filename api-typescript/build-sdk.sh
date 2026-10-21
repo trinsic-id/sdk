@@ -5,7 +5,29 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
+swagger_file_or_url=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --swagger-file-or-url)
+      [[ $# -ge 2 ]] || { echo "$1 requires a value" >&2; exit 1; }
+      swagger_file_or_url="$2"
+      shift 2
+      ;;
+    *)
+      echo "Unknown argument: $1" >&2
+      exit 1
+      ;;
+  esac
+done
+
+generator_arguments=()
+if [[ -n "$swagger_file_or_url" ]]; then
+  generator_arguments+=(--swagger-file-or-url "$swagger_file_or_url")
+fi
+
 "$REPO_ROOT/helpers/generate-client.sh" \
+  "${generator_arguments[@]}" \
   --language typescript-fetch \
   --version-name node \
   --output-folder "$SCRIPT_DIR/sdk" \
