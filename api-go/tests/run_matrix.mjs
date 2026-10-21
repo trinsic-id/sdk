@@ -17,10 +17,11 @@ try {
     const packageDirectory = command("go", ["list", "-f", "{{.Dir}}", moduleName], { cwd: directory }).stdout.trim();
     const version = selected.version ?? "3.2.1";
     cpSync(join(tests, "run_target.go"), join(directory, "run_target.go"));
+    cpSync(join(tests, "compatibility_test.go"), join(directory, "compatibility_test.go"));
     writeFileSync(join(directory, "pso_models_gen.go"), providerOutputRegistry(packageDirectory));
     command("go", ["mod", "tidy"], { cwd: directory });
     const output = join(directory, "target-results.json");
-    const execution = command("go", ["run", "."], { cwd: directory, check: false, env: childEnvironment({ SDK_COMPATIBILITY_RESULT_FILE: output, SDK_VERSION: version }) });
+    const execution = command("go", ["test", "-count=1", "."], { cwd: directory, check: false, env: childEnvironment({ SDK_COMPATIBILITY_RESULT_FILE: output, SDK_VERSION: version }) });
     return { sdkVersion: version, testCases: readTestCases(output) ?? failure("go", `Go target exited with code ${execution.status ?? "unknown"} before producing structured results.`) };
   }));
 } catch (error) { testCases = failure("go", error instanceof Error ? error.message : String(error)); }
