@@ -16,7 +16,7 @@ try {
     } else command("go", ["get", `${moduleName}@v${selected.version}`], { cwd: directory });
     const packageDirectory = command("go", ["list", "-f", "{{.Dir}}", moduleName], { cwd: directory }).stdout.trim();
     const version = selected.version ?? "3.2.1";
-    cpSync(join(tests, "run_target.go"), join(directory, "run_target.go"));
+    cpSync(join(tests, "CompatibilitySupport.go"), join(directory, "CompatibilitySupport.go"));
     cpSync(join(tests, "compatibility_test.go"), join(directory, "compatibility_test.go"));
     writeFileSync(join(directory, "pso_models_gen.go"), providerOutputRegistry(packageDirectory));
     command("go", ["mod", "tidy"], { cwd: directory });

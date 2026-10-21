@@ -86,46 +86,76 @@ func TestSessionLifecycle(t *testing.T) {
 			return out, err
 		})
 	})
-	direct := runCase(t, "api.sessions.create-direct-provider", nil, func() (any, error) { return createDirect(c, profile) })
-	if direct == nil {
-		skip("api.sessions.get", "Direct-session setup failed.", nil)
-		skip("api.sessions.cancel", "Direct-session setup failed.", nil)
-		return
-	}
-	id := str(direct, "SessionId")
-	runCase(t, "api.sessions.get", nil, func() (any, error) { return execute(c, "SessionsAPI", "GetSession", []any{id}, nil) })
-	runCase(t, "api.sessions.cancel", nil, func() (any, error) { return execute(c, "SessionsAPI", "CancelSession", []any{id}, nil) })
+	t.Run("CreateDirect", func(t *testing.T) {
+		direct := runCase(t, "api.sessions.create-direct-provider", nil, func() (any, error) { return createDirect(c, profile) })
+		if direct != nil {
+			_, _ = execute(c, "SessionsAPI", "CancelSession", []any{str(direct, "SessionId")}, nil)
+		}
+	})
+	t.Run("GetDirect", func(t *testing.T) {
+		direct, err := createDirect(c, profile)
+		if err != nil {
+			skip("api.sessions.get", "Direct-session setup failed.", nil)
+			t.Skip("Direct-session setup failed.")
+		}
+		id := str(direct, "SessionId")
+		defer func() { _, _ = execute(c, "SessionsAPI", "CancelSession", []any{id}, nil) }()
+		runCase(t, "api.sessions.get", nil, func() (any, error) { return execute(c, "SessionsAPI", "GetSession", []any{id}, nil) })
+	})
+	t.Run("CancelDirect", func(t *testing.T) {
+		direct, err := createDirect(c, profile)
+		if err != nil {
+			skip("api.sessions.cancel", "Direct-session setup failed.", nil)
+			t.Skip("Direct-session setup failed.")
+		}
+		runCase(t, "api.sessions.cancel", nil, func() (any, error) {
+			return execute(c, "SessionsAPI", "CancelSession", []any{str(direct, "SessionId")}, nil)
+		})
+	})
 }
 
 func TestCompletedSession(t *testing.T) {
 	c, profile := clientForTest(t)
-	var session any
-	var key string
-	var output any
-	output = runCase(t, "api.sessions.get-result", nil, func() (any, error) {
-		s, token, accessKey, err := complete(c, profile)
-		if err != nil {
-			return nil, err
+	t.Run("GetResult", func(t *testing.T) {
+		runCase(t, "api.sessions.get-result", nil, func() (any, error) {
+			_, _, result, err := completedResult(c, profile)
+			return result, err
+		})
+	})
+	t.Run("GetAttachment", func(t *testing.T) {
+		session, key, result, err := completedResult(c, profile)
+		if err != nil || attachment(result) == "" {
+			skip("api.sessions.get-attachment", "Redirect-session setup or result retrieval failed.", nil)
+			t.Skip("Redirect-session setup or result retrieval failed.")
 		}
-		session, key = s, accessKey
-		r := trinsic_api.GetSessionResultRequest{}
-		set(&r, "RedirectToken", token)
-		set(&r, "ResultsAccessKey", accessKey)
-		return execute(c, "SessionsAPI", "GetSessionResult", []any{str(s, "SessionId")}, r)
+		runCase(t, "api.sessions.get-attachment", nil, func() (any, error) {
+			r := trinsic_api.GetAttachmentRequest{}
+			set(&r, "ResultsAccessKey", key)
+			return execute(c, "SessionsAPI", "GetAttachment", []any{str(session, "SessionId"), attachment(result)}, r)
+		})
 	})
-	if session == nil || output == nil || attachment(output) == "" {
-		skip("api.sessions.get-attachment", "Redirect-session setup or result retrieval failed.", nil)
-		skip("api.sessions.redact", "Redirect-session setup or result retrieval failed.", nil)
-		return
+	t.Run("Redact", func(t *testing.T) {
+		session, _, _, err := completedResult(c, profile)
+		if err != nil {
+			skip("api.sessions.redact", "Redirect-session setup or result retrieval failed.", nil)
+			t.Skip("Redirect-session setup or result retrieval failed.")
+		}
+		runCase(t, "api.sessions.redact", nil, func() (any, error) {
+			return execute(c, "SessionsAPI", "RedactSession", []any{str(session, "SessionId")}, nil)
+		})
+	})
+}
+
+func completedResult(c *trinsic_api.APIClient, profile string) (any, string, any, error) {
+	session, token, key, err := complete(c, profile)
+	if err != nil {
+		return nil, "", nil, err
 	}
-	runCase(t, "api.sessions.get-attachment", nil, func() (any, error) {
-		r := trinsic_api.GetAttachmentRequest{}
-		set(&r, "ResultsAccessKey", key)
-		return execute(c, "SessionsAPI", "GetAttachment", []any{str(session, "SessionId"), attachment(output)}, r)
-	})
-	runCase(t, "api.sessions.redact", nil, func() (any, error) {
-		return execute(c, "SessionsAPI", "RedactSession", []any{str(session, "SessionId")}, nil)
-	})
+	request := trinsic_api.GetSessionResultRequest{}
+	set(&request, "RedirectToken", token)
+	set(&request, "ResultsAccessKey", key)
+	result, err := execute(c, "SessionsAPI", "GetSessionResult", []any{str(session, "SessionId")}, request)
+	return session, key, result, err
 }
 
 func TestRecommendations(t *testing.T) {
