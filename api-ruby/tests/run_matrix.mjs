@@ -13,7 +13,7 @@ try {
     const output = join(directory, "target-results.json");
     const env = childEnvironment({ BUNDLE_GEMFILE: join(directory, "Gemfile"), SDK_COMPATIBILITY_RESULT_FILE: output, SDK_VERSION: selected.version ?? "3.2.1" });
     const installed = command("bundle", ["install", "--quiet"], { env, check: false });
-    cpSync(join(new URL(".", import.meta.url).pathname, "run_target.rb"), join(directory, "run_target.rb"));
+    cpSync(join(new URL(".", import.meta.url).pathname, "CompatibilitySupport.rb"), join(directory, "CompatibilitySupport.rb"));
     cpSync(join(new URL(".", import.meta.url).pathname, "compatibility_test.rb"), join(directory, "compatibility_test.rb"));
     if (installed.status === 0) command("bundle", ["exec", "ruby", join(directory, "compatibility_test.rb")], { env, check: false });
     return { sdkVersion: selected.version, testCases: readTestCases(output) ?? failure("ruby", installed.status === 0 ? "Ruby target exited before producing structured results." : "Bundler could not install this Ruby SDK target.") };
