@@ -16,6 +16,7 @@ try {
     const version = packageInfo.version;
     const output = join(directory, "target-results.json");
     cpSync(join(new URL(".", import.meta.url).pathname, "run_target.php"), join(directory, "run_target.php"));
+    cpSync(join(new URL(".", import.meta.url).pathname, "CompatibilitySupport.php"), join(directory, "CompatibilitySupport.php"));
     cpSync(join(new URL(".", import.meta.url).pathname, "CompatibilityTest.php"), join(directory, "CompatibilityTest.php"));
     command(join(directory, "vendor/bin/phpunit"), [join(directory, "CompatibilityTest.php")], { check: false, env: childEnvironment({ SDK_COMPATIBILITY_RESULT_FILE: output, SDK_VERSION: version }) });
     return { sdkVersion: version, testCases: readTestCases(output) ?? failure("php", "PHP target exited before producing structured results.") };
