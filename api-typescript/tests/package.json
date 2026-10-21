@@ -7,7 +7,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "test:matrix": "tsx src/run-matrix.ts",
+    "test:matrix": "node ./run_matrix.mjs",
     "test:compatibility": "bash ./run-compatibility.sh",
     "typecheck": "tsc --noEmit"
   },

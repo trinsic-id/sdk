@@ -77,8 +77,7 @@ fi
 origin_main_tarball="$origin_main_tarball_directory/$(basename "${origin_main_tarballs[0]}")"
 cp "${origin_main_tarballs[0]}" "$origin_main_tarball"
 
-cd "$SCRIPT_DIR"
-SDK_ORIGIN_MAIN_REVISION="$(git -C "$origin_main_worktree" rev-parse --short HEAD)" \
-SDK_ORIGIN_MAIN_TARBALL="$origin_main_tarball" \
-SDK_COMPATIBILITY_OPENAPI_SPEC="$swagger_spec" \
-  npm run test:matrix
+SDK_COMPATIBILITY_CURRENT_PACKAGE="$(find "$REPO_ROOT/api-typescript/sdk/publish" -maxdepth 1 -name 'trinsic-api-*.tgz' -print -quit)" \
+SDK_COMPATIBILITY_MAIN_PACKAGE="$origin_main_tarball" SDK_ORIGIN_MAIN_REVISION="$(git -C "$origin_main_worktree" rev-parse --short HEAD)" \
+SDK_COMPATIBILITY_OPENAPI_SPEC="$swagger_spec" SDK_COMPATIBILITY_PACKAGE_LABEL="@trinsic/api" SDK_COMPATIBILITY_VALIDATE_CATALOG=true \
+  node "$REPO_ROOT/scripts/sdk-compatibility/run-matrix.mjs" typescript node "$SCRIPT_DIR/run_matrix.mjs"

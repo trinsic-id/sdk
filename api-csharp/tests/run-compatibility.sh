@@ -32,5 +32,6 @@ main_package=("$main_worktree"/api-csharp/sdk/publish/Trinsic.Api.*.nupkg)
 [[ ${#main_package[@]} -eq 1 && -f "${main_package[0]}" ]] || { echo "Expected one $main_ref C# SDK package." >&2; exit 1; }
 main_nupkg="$main_package_directory/$(basename "${main_package[0]}")"
 cp "${main_package[0]}" "$main_nupkg"
-SDK_ORIGIN_MAIN_NUPKG="$main_nupkg" SDK_ORIGIN_MAIN_REVISION="$(git -C "$main_worktree" rev-parse --short HEAD)" SDK_COMPATIBILITY_OPENAPI_SPEC="$swagger_spec" \
-  python3 "$SCRIPT_DIR/run_matrix.py"
+SDK_COMPATIBILITY_CURRENT_PACKAGE="$(find "$REPO_ROOT/api-csharp/sdk/publish" -maxdepth 1 -name 'Trinsic.Api.*.nupkg' ! -name '*.snupkg' -print -quit)" \
+SDK_COMPATIBILITY_MAIN_PACKAGE="$main_nupkg" SDK_ORIGIN_MAIN_REVISION="$(git -C "$main_worktree" rev-parse --short HEAD)" SDK_COMPATIBILITY_OPENAPI_SPEC="$swagger_spec" SDK_COMPATIBILITY_PACKAGE_LABEL="Trinsic.Api" \
+  node "$REPO_ROOT/scripts/sdk-compatibility/run-matrix.mjs" csharp node "$SCRIPT_DIR/run_matrix.mjs"

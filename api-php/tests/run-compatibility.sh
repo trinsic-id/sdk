@@ -20,4 +20,4 @@ git -C "$REPO_ROOT" worktree add --detach "$main_worktree" "${SDK_COMPATIBILITY_
 cp "$REPO_ROOT/api-php/build-sdk.sh" "$main_worktree/api-php/build-sdk.sh"
 cp "$REPO_ROOT/helpers/generate-client.sh" "$main_worktree/helpers/generate-client.sh"
 "$main_worktree/api-php/build-sdk.sh" --swagger-file-or-url "$swagger_spec" --output-folder "$main_package"
-SDK_PHP_CURRENT_PACKAGE="$current_package" SDK_PHP_MAIN_PACKAGE="$main_package" SDK_ORIGIN_MAIN_REVISION="$(git -C "$main_worktree" rev-parse --short HEAD)" SDK_COMPATIBILITY_OPENAPI_SPEC="$swagger_spec" php "$SCRIPT_DIR/run_matrix.php"
+SDK_COMPATIBILITY_CURRENT_PACKAGE="$current_package" SDK_COMPATIBILITY_MAIN_PACKAGE="$main_package" SDK_ORIGIN_MAIN_REVISION="$(git -C "$main_worktree" rev-parse --short HEAD)" SDK_COMPATIBILITY_OPENAPI_SPEC="$swagger_spec" SDK_COMPATIBILITY_PACKAGE_LABEL="trinsic/api" node "$REPO_ROOT/scripts/sdk-compatibility/run-matrix.mjs" php node "$SCRIPT_DIR/run_matrix.mjs"

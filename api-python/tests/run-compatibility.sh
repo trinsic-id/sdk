@@ -58,7 +58,7 @@ fi
 main_wheel="$main_wheel_directory/$(basename "${main_wheels[0]}")"
 cp "${main_wheels[0]}" "$main_wheel"
 
-SDK_ORIGIN_MAIN_REVISION="$(git -C "$main_worktree" rev-parse --short HEAD)" \
-SDK_ORIGIN_MAIN_WHEEL="$main_wheel" \
-SDK_COMPATIBILITY_OPENAPI_SPEC="$swagger_spec" \
-  "$python_bin" "$SCRIPT_DIR/run_matrix.py"
+SDK_COMPATIBILITY_CURRENT_PACKAGE="$(find "$REPO_ROOT/api-python/sdk/publish" -maxdepth 1 -name 'trinsic_api-*.whl' -print -quit)" \
+SDK_COMPATIBILITY_MAIN_PACKAGE="$main_wheel" SDK_ORIGIN_MAIN_REVISION="$(git -C "$main_worktree" rev-parse --short HEAD)" \
+SDK_COMPATIBILITY_OPENAPI_SPEC="$swagger_spec" SDK_COMPATIBILITY_PACKAGE_LABEL="trinsic-api" SDK_COMPATIBILITY_VALIDATE_CATALOG=true \
+  node "$REPO_ROOT/scripts/sdk-compatibility/run-matrix.mjs" python node "$SCRIPT_DIR/run_matrix.mjs"

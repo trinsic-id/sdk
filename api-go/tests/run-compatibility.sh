@@ -30,8 +30,7 @@ git -C "$REPO_ROOT" worktree add --detach "$main_worktree" "$main_ref" >/dev/nul
 cp "$REPO_ROOT/api-go/build-sdk.sh" "$main_worktree/api-go/build-sdk.sh"
 "$main_worktree/api-go/build-sdk.sh" --swagger-file-or-url "$swagger_spec" --output-folder "$main_worktree/api-go/sdk-build"
 
-SDK_GO_CURRENT_PACKAGE="$current_package" \
-SDK_GO_MAIN_PACKAGE="$main_worktree/api-go/sdk-build" \
-SDK_ORIGIN_MAIN_REVISION="$(git -C "$main_worktree" rev-parse --short HEAD)" \
-SDK_COMPATIBILITY_OPENAPI_SPEC="$swagger_spec" \
-  node "$SCRIPT_DIR/run_matrix.mjs"
+SDK_COMPATIBILITY_CURRENT_PACKAGE="$current_package" SDK_COMPATIBILITY_MAIN_PACKAGE="$main_worktree/api-go/sdk-build" \
+SDK_ORIGIN_MAIN_REVISION="$(git -C "$main_worktree" rev-parse --short HEAD)" SDK_COMPATIBILITY_OPENAPI_SPEC="$swagger_spec" \
+SDK_COMPATIBILITY_PACKAGE_LABEL="github.com/trinsic-id/sdk-go-api/v3" SDK_COMPATIBILITY_VERSION_PREFIX=v SDK_COMPATIBILITY_VALIDATE_CATALOG=true \
+  node "$REPO_ROOT/scripts/sdk-compatibility/run-matrix.mjs" go node "$SCRIPT_DIR/run_matrix.mjs"
