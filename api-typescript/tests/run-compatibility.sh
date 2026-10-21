@@ -28,6 +28,10 @@ if (( ${#missing_variables[@]} > 0 )); then
   exit 1
 fi
 
+# The matrix executes TypeScript test files with the local `tsx` loader. Install
+# this test harness from its lockfile before invoking any target SDK tests.
+npm ci --ignore-scripts --no-audit --no-fund --prefix "$SCRIPT_DIR"
+
 test_base_url="${TRINSIC_TEST_BASE_URL%/}"
 test_swagger_url="$test_base_url/swagger/api/swagger.json"
 swagger_spec="$(mktemp "${TMPDIR:-/tmp}/trinsic-sdk-swagger.XXXXXX")"
