@@ -1,0 +1,11 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>id.trinsic.compatibility</groupId><artifactId>java-compatibility-tests</artifactId><version>1.0.0</version>
+  <properties><maven.compiler.release>21</maven.compiler.release><trinsic.api.version>3.2.1</trinsic.api.version><junit.version>5.11.4</junit.version></properties>
+  <repositories><repository><id>jitpack</id><url>https://jitpack.io</url></repository></repositories>
+  <dependencies>
+    <dependency><groupId>${trinsic.api.groupId}</groupId><artifactId>${trinsic.api.artifactId}</artifactId><version>${trinsic.api.version}</version></dependency>
+    <dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter</artifactId><version>${junit.version}</version><scope>test</scope></dependency>
+  </dependencies>
+  <build><plugins><plugin><artifactId>maven-surefire-plugin</artifactId><version>3.5.2</version></plugin></plugins></build>
+</project>

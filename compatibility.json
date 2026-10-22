@@ -6,7 +6,8 @@
       "csharp": ["3.0.0", "3.1.0", "3.2.1"],
       "php": ["3.0.0", "3.1.0", "3.2.1"],
       "ruby": ["3.0.0", "3.1.0", "3.2.1"],
-      "go": ["3.0.0", "3.1.0", "3.2.1"]
+      "go": ["3.0.0", "3.1.0", "3.2.1"],
+      "java": ["3.0.0", "3.1.0", "3.2.1"]
     },
     "acknowledgements": [
       {
@@ -288,6 +289,12 @@
         "sdkVersion": "3.2.1",
         "testCaseId": "api.sessions.get-result",
         "reason": "This published PHP SDK was generated with Match as an identifier, which is reserved syntax on its supported PHP 8.1+ runtime."
+      },
+      {
+        "language": "java",
+        "sdkVersion": "3.0.0",
+        "testCaseId": "api.providers.get",
+        "reason": "Java 3.0 predates the provider-by-ID operation and does not expose ProvidersApi.getProvider."
       }
     ]
   }
