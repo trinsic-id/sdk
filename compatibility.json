@@ -295,6 +295,62 @@
         "sdkVersion": "3.0.0",
         "testCaseId": "api.providers.get",
         "reason": "Java 3.0 predates the provider-by-ID operation and does not expose ProvidersApi.getProvider."
+      },
+      {
+        "language": "java",
+        "sdkVersion": "3.2.1",
+        "testCaseId": "serialization.provider-output-round-trip",
+        "parameters": { "providerId": "india-digilocker-aadhaar-fetch", "sdkModelName": "SignzyIndiaAadhaarFetchProviderOutput" },
+        "reason": "The generated Java model emits the legacy localizedClaims.languageName alias in addition to the current public fixture field."
+      },
+      {
+        "language": "java",
+        "sdkVersion": "3.2.1",
+        "testCaseId": "serialization.provider-output-round-trip",
+        "parameters": { "providerId": "indonesia-dukcapil-match", "sdkModelName": "IndonesiaDukcapilMatchProviderOutput" },
+        "reason": "The generated Java model serializes the integral outcome value as decimal 1.0 rather than JSON integer 1."
+      },
+      {
+        "language": "java",
+        "sdkVersion": "3.1.0",
+        "testCaseId": "serialization.provider-output-round-trip",
+        "parameters": { "providerId": "france-identite-numerique", "sdkModelName": "FrenchNumeriqueProviderOutput" },
+        "reason": "Java 3.1 models France Identité Numérique givenName as an object, while the current provider output is a string."
+      },
+      {
+        "language": "java",
+        "sdkVersion": "3.1.0",
+        "testCaseId": "serialization.provider-output-round-trip",
+        "parameters": { "providerId": "india-digilocker-aadhaar-fetch", "sdkModelName": "SignzyIndiaAadhaarFetchProviderOutput" },
+        "reason": "Java 3.1 emits the legacy localizedClaims.languageName alias in addition to the current public fixture field."
+      },
+      {
+        "language": "java",
+        "sdkVersion": "3.1.0",
+        "testCaseId": "serialization.provider-output-round-trip",
+        "parameters": { "providerId": "itsme", "sdkModelName": "ItsmeProviderOutput" },
+        "reason": "Java 3.1 serializes legacy required itsme name fields that are absent from the current provider output."
+      },
+      {
+        "language": "java",
+        "sdkVersion": "3.0.0",
+        "testCaseId": "serialization.provider-output-round-trip",
+        "parameters": { "providerId": "france-identite-numerique", "sdkModelName": "FrenchNumeriqueProviderOutput" },
+        "reason": "Java 3.0 models France Identité Numérique givenName as an object, while the current provider output is a string."
+      },
+      {
+        "language": "java",
+        "sdkVersion": "3.0.0",
+        "testCaseId": "serialization.provider-output-round-trip",
+        "parameters": { "providerId": "freja", "sdkModelName": "FrejaProviderOutput" },
+        "reason": "Java 3.0 serializes legacy required Freja name fields that are absent from the current provider output."
+      },
+      {
+        "language": "java",
+        "sdkVersion": "3.0.0",
+        "testCaseId": "serialization.provider-output-round-trip",
+        "parameters": { "providerId": "itsme", "sdkModelName": "ItsmeProviderOutput" },
+        "reason": "Java 3.0 serializes legacy required itsme name fields that are absent from the current provider output."
       }
     ]
   }
