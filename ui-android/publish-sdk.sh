@@ -57,8 +57,8 @@ require_env ORG_GRADLE_PROJECT_signingInMemoryKeyPassword
   # git push origin main
 # )
 
-# Publish to Maven
+# Release to Maven Central and wait for publication; upload-only leaves a manual deployment.
 (
   cd "$SCRIPT_DIR/sdk"
-  ./gradlew publishToMavenCentral
+  ./gradlew publishAndReleaseToMavenCentral -PmavenCentralDeploymentValidation=PUBLISHED
 )
