@@ -1,6 +1,6 @@
 # Trinsic Swift UI Library
 
-[![Swift UI Version](https://img.shields.io/cocoapods/v/TrinsicUI.svg)](<[https://cocoapods.org/pods/TrinsicUI](https://cocoapods.org/pods/TrinsicUI)>) [![Swift Build Status](https://github.com/trinsic-id/sdk/actions/workflows/ui-swift-release.yml/badge.svg)](https://github.com/trinsic-id/sdk/actions?query=branch%main)
+[![Swift UI Version](https://img.shields.io/github/v/tag/trinsic-id/sdk-swift-ui?label=git)](https://github.com/trinsic-id/sdk-swift-ui/tags) [![Swift Build Status](https://github.com/trinsic-id/sdk/actions/workflows/ui-swift-release.yml/badge.svg)](https://github.com/trinsic-id/sdk/actions?query=branch%main)
 
 The Trinsic Swift UI Library provides ways to launch verification sessions directly in your Swift and Objective-C projects.
 
@@ -33,14 +33,6 @@ All other interaction methods are not supported by this library and will require
 ### Swift package manager
 
 Add the Trinsic repository `https://github.com/trinsic-id/sdk-swift-ui` as a dependency.
-
-### CocoaPods
-
-Add a reference to the `TrinsicUI` pod to your `Podfile` with the latest version (see the shield at the top of the readme) and run `pod install`
-
-```
-pod 'TrinsicUI', '~> [latest version]'
-```
 
 ## Setup
 
