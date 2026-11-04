@@ -33,7 +33,7 @@ The relevant files for this sample are:
 
 ## Build the Sample
 
-The sample depends on `id.trinsic:sdk-android-ui:2.3.0-alpha2` from Maven Central once that release is published.
+The sample depends on `id.trinsic:sdk-android-ui` from Maven Central, using the version declared in [app/build.gradle.kts](app/build.gradle.kts).
 To build against the SDK commit pinned in this repository, including before publication, initialize the submodule and run the sample build script from the repository root:
 
 ```sh
@@ -52,7 +52,7 @@ Below is a step-by-step guide to understanding both A) what this sample does and
 
 Configure the SDK as shown in this sample, including:
 - Adding `google()` and `mavenCentral()` to your Gradle repositories
-- Including `implementation("id.trinsic:sdk-android-ui:2.3.0-alpha2")`
+- Including the `id.trinsic:sdk-android-ui` dependency with your chosen release version
 - Registering a custom URL scheme to handle redirect responses
 - Updating your `AndroidManifest.xml` to include the required activity declaration pointing to your custom scheme
 
@@ -90,6 +90,7 @@ trinsicUI = new TrinsicUI(this, (result) -> {
 
 This callback will be invoked once the user finishes a Session -- whether it succeeds, fails, or is cancelled.
 Use your backend's Trinsic API response for session status and its stored results access key; these are no longer fields on the SDK's session result.
+In Java, a `String` reference can hold `null`; all three string getters shown above are explicitly annotated `@Nullable` in the SDK, so callers must handle missing values.
 The session ID and redirect token can be `null` when absent or empty, and the callback URL is `null` when the browser is closed without a callback.
 
 ### 3. Obtain a Session Launch URL
