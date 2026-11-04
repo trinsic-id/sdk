@@ -27,9 +27,22 @@ The relevant files for this sample are:
 - [app/src/main/AndroidManifest.xml](https://github.com/trinsic-id/sdk/blob/main/ui-android/samples/android_sample/app/src/main/AndroidManifest.xml)
   - Registers the custom URL scheme used to handle redirect responses and the receiver used by the `PendingIntent` flow
 - [settings.gradle.kts](https://github.com/trinsic-id/sdk/blob/main/ui-android/samples/android_sample/settings.gradle.kts)
-  - Adds jitpack as a Maven repository
+  - Adds Google and Maven Central repositories and an optional local SDK dependency override
 - [app/build.gradle.kts](https://github.com/trinsic-id/sdk/blob/main/ui-android/samples/android_sample/app/build.gradle.kts)
   - Adds Trinsic Android SDK as a dependency
+
+## Build the Sample
+
+The sample depends on `id.trinsic:sdk-android-ui:2.3.0-alpha2` from Maven Central once that release is published.
+To build against the SDK commit pinned in this repository, including before publication, initialize the submodule and run the sample build script from the repository root:
+
+```sh
+git submodule update --init ui-android/sdk
+./ui-android/build-samples.sh
+```
+
+The script uses `-PuseLocalTrinsicSdk=true` to substitute the checked-out SDK library for the Maven dependency.
+You can also pass that flag to `./gradlew build` from the sample directory; without it, Gradle uses Maven Central.
 
 ## Implementation Guide
 
@@ -37,9 +50,9 @@ Below is a step-by-step guide to understanding both A) what this sample does and
 
 ### 1. Install and Configure the SDK
 
-Follow the installation steps described in the [README](https://github.com/trinsic-id/sdk/blob/main/ui-android/README.md), including:
-- Adding Jitpack to your Gradle repositories, if not present already
-- Including the `sdk-android-ui` dependency
+Configure the SDK as shown in this sample, including:
+- Adding `google()` and `mavenCentral()` to your Gradle repositories
+- Including `implementation("id.trinsic:sdk-android-ui:2.3.0-alpha2")`
 - Registering a custom URL scheme to handle redirect responses
 - Updating your `AndroidManifest.xml` to include the required activity declaration pointing to your custom scheme
 
@@ -64,21 +77,26 @@ You **must** call the constructor of `TrinsicUI` inside your `onCreate()` method
 trinsicUI = new TrinsicUI(this, (result) -> {
     if (result.getCanceled()) {
         // User exited the verification session
-    } else if (!result.getSuccess()) {
-        // Verification failed
     } else {
-        // Verification succeeded; result.getResultsAccessKey() contains your key
+        // The browser flow completed; verification may have succeeded or failed.
+        String sessionId = result.getSessionId();
+        String redirectToken = result.getRedirectToken();
+        String callbackUrl = result.getCallbackUrl();
+        // Send the session ID and redirect token to your backend for processing.
+        // The callback URL preserves the full redirect, including its query and fragment.
     }
 });
 ```
 
 This callback will be invoked once the user finishes a Session -- whether it succeeds, fails, or is cancelled.
+Use your backend's Trinsic API response for session status and its stored results access key; these are no longer fields on the SDK's session result.
+The session ID and redirect token can be `null` when absent or empty, and the callback URL is `null` when the browser is closed without a callback.
 
 ### 3. Obtain a Session Launch URL
 
 You’ll need to make a call to your backend to create a new Trinsic Session and retrieve its `launchUrl`.
 
-The sample app demonstrates this using a test-only endpoint (`https://api.trinsic.id/api/mobiletest/create-session`), but in production you'll want to use the [Trinsic API SDK](https://github.com/trinsic-id/sdk#api-libraries) on your backend to create a real Session and return the resulting `launchUrl` to your app.
+The sample app demonstrates this using a test-only endpoint (`https://verify.trinsic.id/api/mobiletest/create-session`), but in production you'll want to use the [Trinsic API SDK](https://github.com/trinsic-id/sdk#api-libraries) on your backend to create a real Session and return the resulting `launchUrl` to your app.
 
 Example flow:
 1. User taps a “Verify Identity” button.
