@@ -23,4 +23,12 @@ dependencyResolutionManagement {
 
 rootProject.name = "Trinsic Android Sample"
 include(":app")
- 
+
+// Validate unreleased SDK changes from this checkout when requested by CI or a developer.
+if (providers.gradleProperty("useLocalTrinsicSdk").orNull == "true") {
+    includeBuild("../../sdk") {
+        dependencySubstitution {
+            substitute(module("id.trinsic:sdk-android-ui")).using(project(":library"))
+        }
+    }
+}
