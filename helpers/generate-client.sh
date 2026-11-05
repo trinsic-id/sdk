@@ -92,4 +92,6 @@ npx --yes @openapitools/openapi-generator-cli generate \
   -o "$output_folder" \
   --additional-properties="$concatenated_additional_properties" >/dev/null
 
+node "$SCRIPT_DIR/inject-sdk-header.mjs" "$language" "$version" "$output_folder"
+
 echo "Generated $language SDK $output_folder"
