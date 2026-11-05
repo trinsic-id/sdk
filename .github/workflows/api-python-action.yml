@@ -23,6 +23,10 @@ jobs:
       - name: Build sample
         run: ./api-python/build-samples.sh
         shell: bash
+      - name: Test SDK request headers
+        run: npm run test:sdk-headers
+        env:
+          SDK_LANGUAGE: python
       - name: Publish SDK
         if: inputs.publish == true
         run: ./api-python/publish-sdk.sh
