@@ -1,12 +1,9 @@
 using Microsoft.AspNetCore.Rewrite;
-using Microsoft.Extensions.FileProviders;
 using Sample;
-using Trinsic.Api;
 using Trinsic.Api.Api;
 using Trinsic.Api.Client;
-using Trinsic.Api.Extensions;
 
-DotNetEnv.Env.Load();
+DotNetEnv.Env.NoClobber().Load();
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions()
 {
@@ -17,22 +14,19 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 {
     serverOptions.ListenAnyIP(3000);
 });
-builder.Services.AddTrinsicApi(options =>
-{
-    // the type of token here depends on the api security specifications
-    options.AddTokens(new BearerToken(EnvironmentHelper.GetAuthTokenOrThrow()));
-
-    // For EU data residency, point the SDK at the EU endpoint.
-    // Contact Trinsic support to enable EU residency.
-    // options.AddTrinsicApiHttpClients(client => client.BaseAddress = new Uri("https://api.eu.trinsic.id"));
-});
+builder.Services.AddHttpClient<ISessionsApi, SessionsApi>(httpClient =>
+    new SessionsApi(httpClient, new Configuration
+    {
+        AccessToken = EnvironmentHelper.GetAuthTokenOrThrow(),
+        // Set TRINSIC_API_BASE_URL=https://api.eu.trinsic.id for an EU profile.
+        BasePath = Environment.GetEnvironmentVariable("TRINSIC_API_BASE_URL") ?? "https://api.trinsic.id"
+    }));
 
 var app = builder.Build();
-var sessionApi = app.Services.GetService<ISessionsApi>()!;
 app.UseMiddleware<JsonExceptionMiddleware>();
-app.MapSharedRoutes(sessionApi);
-app.MapHostedProviderSessionRoutes(sessionApi);
-app.MapDirectProviderSessionRoutes(sessionApi);
+app.MapSharedRoutes();
+app.MapHostedProviderSessionRoutes();
+app.MapDirectProviderSessionRoutes();
 
 //Serve web sdk
 app.UseRewriter(new RewriteOptions()

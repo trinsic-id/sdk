@@ -1,5 +1,6 @@
 public class ExchangeResultRequest
 {
-    public string SessionId { get; set; }
-    public string ResultsAccessKey { get; set; }
+    public required string SessionId { get; set; }
+    public required string ResultsAccessKey { get; set; }
+    public string? RedirectToken { get; set; }
 }
