@@ -11,33 +11,21 @@
   <title>Trinsic UI sample</title>
 </head>
 
-<body class="friendly-text">
-  <div class="modal micromodal-slide is-open" id="direct-modal">
-    <div class="modal__overlay">
-      <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
-        <header class="modal__header">
-          <h2 class="modal__title" id="modal-1-title">
-            Poll After Redirect
-          </h2>
-        </header>
-        <main class="modal__content" id="direct-modal-content">
-          <p>
-            The results of the verification aren't yet available; we're now polling for results.<br/>
-            This is related to the `PollAfterRedirect` capability.<br/><br/>
-            <b>Session ID:</b> <code id="session-id"></code> <br/>
-            <b>Success:</b> <code id="success"></code> <br/>
-            <b>Done:</b> <code id="done"></code> <br/>
-            <b>Last polled:</b> <code id="last-polled"></code> <br/>
-            <b>Error code:</b> <code id="error-code"></code> <br/>
-          
-            </div>
-          </p>
-        </main>
-        <footer class="modal__footer">
-        </footer>
-      </div>
-    </div>
-  </div>
+<body class="friendly-text result-page">
+  <main class="result-layout">
+    <section class="result-card" aria-labelledby="poll-title">
+      <p class="eyebrow">Verification in progress</p>
+      <h1 id="poll-title">Polling for results</h1>
+      <p>The results of the verification aren't yet available. This is related to the <code>PollAfterRedirect</code> capability.</p>
+      <dl class="session-details">
+        <div><dt>Session ID</dt><dd><code id="session-id"></code></dd></div>
+        <div><dt>Success</dt><dd><code id="success"></code></dd></div>
+        <div><dt>Done</dt><dd><code id="done"></code></dd></div>
+        <div><dt>Last polled</dt><dd><code id="last-polled"></code></dd></div>
+        <div><dt>Error code</dt><dd><code id="error-code"></code></dd></div>
+      </dl>
+    </section>
+  </main>
 </body>
 
 </html>

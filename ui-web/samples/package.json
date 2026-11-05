@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "@trinsic/web-ui": "^3.0.0",
-    "micromodal": "^0.4.10",
     "qrcode": "^1.5.4"
   },
   "optionalDependencies": {

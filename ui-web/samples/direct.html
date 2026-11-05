@@ -56,7 +56,7 @@
         CaptureRedirect
       </label>
       <label>
-        <input type="checkbox" name="TrinsicCapabilities" value="PollResult" checked="true">
+        <input type="checkbox" name="TrinsicCapabilities" value="PollResult">
         PollResult
       </label>
       <label>
@@ -64,14 +64,14 @@
         PollAfterRedirect
       </label>
       <p style="margin-left: 20px; margin-top: 0px;"><small>Signal to our API what capabilities your frontend supports.
-          <br /> Our sample frontend supports all capabilities, but you can disable them to test the API
+          <br /> LaunchBrowser and PollResult are mutually exclusive in this redirect-only sample. Disable LaunchBrowser to exercise the top-level Direct-session handler.
           surface.</small></p>
     </div>
 
     <p>
       <label>
         <b>Use IP to recommend Providers:</b>
-        <input type="checkbox" name="doRecommendation" id="doRecommendation" value="popup" onchange="getProviders('launchDirectProvider')">
+        <input type="checkbox" name="doRecommendation" id="doRecommendation" value="ip" onchange="getProviders('launchDirectProvider')">
       </label>
     </p>
 
@@ -80,55 +80,6 @@
     <ul id="recommendedProviders" class="listOptions"></ul>
   </div>
 
-
-  <div class="modal micromodal-slide" id="direct-modal" aria-hidden="true">
-    <div class="modal__overlay" tabindex="-1" data-micromodal-close>
-      <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
-        <header class="modal__header">
-          <h2 class="modal__title" id="modal-1-title">
-            Direct Provider Session
-          </h2>
-          <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
-        </header>
-        <main class="modal__content" id="modal-1-content">
-          <p>
-            We've launched an direct provider session. We'll update this modal with the status of the session. <br />
-            <b>Session ID:</b> <code id="session-id"></code> <br />
-            <b>Next step:</b> <code id="next-step"></code> <br />
-            <b>Result collection:</b> <code id="result-collection"></code> <br />
-            <b>Content should be refreshed:</b> <code id="content-refresh"></code> <br />
-            <canvas id="qrcode-canvas"></canvas>
-          </p>
-        </main>
-        <footer class="modal__footer">
-          <button class="modal__btn" data-micromodal-close aria-label="Close this dialog window">Close</button>
-        </footer>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal micromodal-slide" id="results-modal" aria-hidden="true">
-    <div class="modal__overlay" tabindex="-1" data-micromodal-close>
-      <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
-        <header class="modal__header">
-          <h2 class="modal__title" id="modal-1-title">
-            Session Results
-          </h2>
-          <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
-        </header>
-        <main class="modal__content" id="modal-1-content">
-          <p>
-            <b>Session ID:</b> <code id="session-id"></code> <br />
-          <pre id="results">
-
-                </pre>
-          </p>
-        </main>
-        <footer class="modal__footer">
-          <button class="modal__btn" data-micromodal-close aria-label="Close this dialog window">Close</button>
-        </footer>
-      </div>
-    </div>
-</body>
+ </body>
 
 </html>

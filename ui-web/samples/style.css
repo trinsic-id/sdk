@@ -74,154 +74,97 @@ ul li button .launch-name {
   color: #262d35;
 }
 
-/**************************\
-  Basic Modal Styles
-\**************************/
-
-.modal {
-  font-family: -apple-system,BlinkMacSystemFont,avenir next,avenir,helvetica neue,helvetica,ubuntu,roboto,noto,segoe ui,arial,sans-serif;
-}
-
-.modal__overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal__container {
-  background-color: #fff;
-  padding: 30px;
-  max-width: 50vw;
-  max-height: 100vh;
-  border-radius: 4px;
-  overflow-y: auto;
-  box-sizing: border-box;
-}
-
-.modal__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.modal__title {
-  margin-top: 0;
-  margin-bottom: 0;
-  font-weight: 600;
-  font-size: 1.25rem;
-  line-height: 1.25;
-  color: #00449e;
-  box-sizing: border-box;
-}
-
-.modal__close {
-  background: transparent;
-  border: 0;
-}
-
-.modal__header .modal__close:before { content: "\2715"; }
-
-.modal__content {
-  margin-top: 2rem;
-  margin-bottom: 2rem;
-  line-height: 1.5;
-  color: rgba(0,0,0,.8);
-}
-
-.modal__btn {
-  font-size: .875rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  padding-top: .5rem;
-  padding-bottom: .5rem;
-  background-color: #e6e6e6;
-  color: rgba(0,0,0,.8);
-  border-radius: .25rem;
-  border-style: none;
-  border-width: 0;
-  cursor: pointer;
-  -webkit-appearance: button;
-  text-transform: none;
-  overflow: visible;
-  line-height: 1.15;
+.result-page {
+  min-height: 100vh;
   margin: 0;
-  will-change: transform;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
-  transition: -webkit-transform .25s ease-out;
-  transition: transform .25s ease-out;
-  transition: transform .25s ease-out,-webkit-transform .25s ease-out;
+  background: #f7f9fc;
 }
 
-.modal__btn:focus, .modal__btn:hover {
-  -webkit-transform: scale(1.05);
-  transform: scale(1.05);
+.result-layout {
+  width: min(100% - 2rem, 52rem);
+  margin: 0 auto;
+  padding: 3rem 0;
 }
 
-.modal__btn-primary {
-  background-color: #00449e;
-  color: #fff;
+.back-link {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  color: #00449e;
 }
 
-
-
-/**************************\
-  Demo Animation Style
-\**************************/
-@keyframes mmfadeIn {
-    from { opacity: 0; }
-      to { opacity: 1; }
+.result-loading {
+  color: #52606d;
+  font-size: 1.125rem;
 }
 
-@keyframes mmfadeOut {
-    from { opacity: 1; }
-      to { opacity: 0; }
+.result-card {
+  box-sizing: border-box;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  background: #fff;
+  border: 1px solid #d9e2ec;
+  border-radius: 0.75rem;
+  box-shadow: 0 1rem 2.5rem rgba(38, 45, 53, 0.08);
 }
 
-@keyframes mmslideIn {
-  from { transform: translateY(15%); }
-    to { transform: translateY(0); }
+.result-card h1 {
+  margin: 0.25rem 0 1.5rem;
+  color: #102a43;
+  font-size: clamp(1.5rem, 4vw, 2rem);
 }
 
-@keyframes mmslideOut {
-    from { transform: translateY(0); }
-    to { transform: translateY(-10%); }
+.eyebrow {
+  margin: 0;
+  color: #007a5e;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-.micromodal-slide {
-  display: none;
+.results-json {
+  box-sizing: border-box;
+  max-height: 55vh;
+  margin: 1.5rem 0 0;
+  padding: 1rem;
+  overflow: auto;
+  border-radius: 0.5rem;
+  background: #102a43;
+  color: #f0f4f8;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
-.micromodal-slide.is-open {
-  display: block;
+.session-details {
+  margin: 1.5rem 0 0;
 }
 
-.micromodal-slide[aria-hidden="false"] .modal__overlay {
-  animation: mmfadeIn .3s cubic-bezier(0.0, 0.0, 0.2, 1);
+.session-details div {
+  display: grid;
+  grid-template-columns: minmax(8rem, 1fr) 2fr;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid #d9e2ec;
 }
 
-.micromodal-slide[aria-hidden="false"] .modal__container {
-  animation: mmslideIn .3s cubic-bezier(0, 0, .2, 1);
+.session-details dt {
+  color: #52606d;
+  font-weight: 600;
 }
 
-.micromodal-slide[aria-hidden="true"] .modal__overlay {
-  animation: mmfadeOut .3s cubic-bezier(0.0, 0.0, 0.2, 1);
+.session-details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
 }
 
-.micromodal-slide[aria-hidden="true"] .modal__container {
-  animation: mmslideOut .3s cubic-bezier(0, 0, .2, 1);
-}
+@media (max-width: 34rem) {
+  .result-layout {
+    padding: 1.5rem 0;
+  }
 
-.micromodal-slide .modal__container,
-.micromodal-slide .modal__overlay {
-  will-change: transform;
+  .session-details div {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
 }

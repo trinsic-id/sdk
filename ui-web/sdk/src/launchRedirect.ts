@@ -6,6 +6,21 @@
  * await launchRedirect('https://');
  */
 export async function launchRedirect(launchUrl: string) {
-  launchUrl += "&launchMode=redirect";
-  window.location.href = launchUrl;
+  if (window.top !== window) {
+    throw new Error("launchRedirect must be called from the top-level browsing context");
+  }
+
+  let url: URL;
+  try {
+    url = new URL(launchUrl);
+  } catch {
+    throw new Error("Invalid Trinsic Session launch URL");
+  }
+
+  if (url.protocol !== "https:" && url.protocol !== "http:") {
+    throw new Error("Invalid Trinsic Session launch URL");
+  }
+
+  url.searchParams.set("launchMode", "redirect");
+  window.location.href = url.toString();
 }
