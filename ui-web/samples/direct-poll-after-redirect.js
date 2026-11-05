@@ -5,32 +5,47 @@ window.exchangeResult = exchangeResult;
 
 async function startPollingAfterRedirect(sessionId, resultsAccessKey) {
   let result = null;
+  const redirectTokenKey = `redirectToken:${sessionId}`;
+  let redirectToken = localStorage.getItem(redirectTokenKey);
+  let polling = false;
   let resultUrl = `/poll-results/${sessionId}`;
   let resultPollingInterval = setInterval(async () => {
-    result = await fetch(resultUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        resultsAccessKey: resultsAccessKey
+    // Do not overlap the initial token-bearing request with another poll.
+    if (polling) return;
+    polling = true;
+    try {
+      result = await fetch(resultUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          resultsAccessKey: resultsAccessKey,
+          redirectToken
+        })
       })
-    })
-      .then(r => jsonHandleError(r))
-      .then((r) => r);
+        .then(r => jsonHandleError(r))
+        .then((r) => r);
 
-    document.getElementById("last-polled").innerText = new Date().toLocaleTimeString();
-    document.getElementById("done").innerText = result.session.done;
-    document.getElementById("success").innerText = result.session.success;
-    document.getElementById("error-code").innerText = result.session.errorCode || "N/A";
+      // A successful first call validates the token, even if results are pending.
+      redirectToken = undefined;
+      localStorage.removeItem(redirectTokenKey);
 
-    if (result.session.done === true) {
-      clearInterval(resultPollingInterval);
+      document.getElementById("last-polled").innerText = new Date().toLocaleTimeString();
+      document.getElementById("done").innerText = result.session.done;
+      document.getElementById("success").innerText = result.session.success;
+      document.getElementById("error-code").innerText = result.session.errorCode || "N/A";
 
-      signalRedirectFromPopup({
-        sessionId: sessionId,
-        closeWindowAfterSignal: true
-      });
+      if (result.session.done === true) {
+        clearInterval(resultPollingInterval);
+
+        signalRedirectFromPopup({
+          sessionId: sessionId,
+          closeWindowAfterSignal: true
+        });
+      }
+    } finally {
+      polling = false;
     }
   }, 1000);
 }

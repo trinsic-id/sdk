@@ -5,18 +5,21 @@ namespace Sample;
 
 public static class HostedProviderSession
 {
-    public static void MapHostedProviderSessionRoutes(this WebApplication app, ISessionsApi sessionApi)
+    public static void MapHostedProviderSessionRoutes(this WebApplication app)
     {
-        app.MapPost("/create-hosted-session/{providerId}", async (HttpContext context, string providerId) =>
+        app.MapPost("/create-hosted-session/{providerId}", async (HttpContext context, string providerId, ISessionsApi sessionApi) =>
         {
             var redirectUrl = context.Request.Query["redirectUrl"].ToString();
 
-            var request = new CreateHostedProviderSessionRequest(providerId, redirectUrl, EnvironmentHelper.GetVerificationProfileIdOrThrow());
+            var request = new CreateHostedProviderSessionRequest(
+                enableRedirectBackwardsCompatibility: false,
+                provider: providerId,
+                redirectUrl: redirectUrl,
+                verificationProfileId: EnvironmentHelper.GetVerificationProfileIdOrThrow());
 
-            var response = await sessionApi.CreateHostedProviderSessionAsync(request);
-            response.LogAndThrowIfError(app.Logger);
+            var response = await sessionApi.CreateHostedProviderSessionAsync(request, cancellationToken: context.RequestAborted);
 
-            await context.Response.WriteAsJsonAsync(response.Ok());
+            return SdkJson.Result(response);
         });
     }
 }

@@ -1,19 +1,14 @@
-using Microsoft.Extensions.DependencyInjection;
 using Trinsic.Api.Api;
 using Trinsic.Api.Client;
-using Trinsic.Api.Extensions;
 
-var services = new ServiceCollection();
-services.AddLogging();
-services.AddTrinsicApi(options =>
+using var client = new HttpClient();
+client.DefaultRequestHeaders.Add("X-Test-Header", "preserved");
+var configuration = new Configuration
 {
-    options.AddTokens(new BearerToken("sdk-header-test-token"));
-    options.AddTrinsicApiHttpClients(client =>
-    {
-        client.BaseAddress = new Uri(Environment.GetEnvironmentVariable("SDK_TEST_URL")!);
-        client.DefaultRequestHeaders.Add("X-Test-Header", "preserved");
-    });
-});
-using var provider = services.BuildServiceProvider();
-await provider.GetRequiredService<IProvidersApi>().ListProvidersAsync();
-await provider.GetRequiredService<ISessionsApi>().CancelSessionAsync(Guid.Parse("00000000-0000-0000-0000-000000000001"));
+    AccessToken = "sdk-header-test-token",
+    BasePath = Environment.GetEnvironmentVariable("SDK_TEST_URL")!
+};
+using var providers = new ProvidersApi(client, configuration);
+using var sessions = new SessionsApi(client, configuration);
+await providers.ListProvidersAsync();
+await sessions.CancelSessionAsync(Guid.Parse("00000000-0000-0000-0000-000000000001"));

@@ -13,10 +13,9 @@ export function injectSdkHeader(language, version, outputFolder) {
   const value = JSON.stringify(`${sdkLanguage}/${version}`);
   const patches = {
     csharp: {
-      directory: "src/Trinsic.Api/Api",
-      filePattern: /^(?!IApi\.cs$).*Api\.cs$/,
-      anchor: "                using (HttpRequestMessage httpRequestMessageLocalVar = new HttpRequestMessage())\n                {",
-      addition: `\n                    httpRequestMessageLocalVar.Headers.Add("X-Trinsic-SDK", ${value});`,
+      file: "src/Trinsic.Api/Client/ApiClient.cs",
+      anchor: "            HttpRequestMessage request = new HttpRequestMessage(method, builder.GetFullUri());",
+      addition: `\n            request.Headers.Add("X-Trinsic-SDK", ${value});`,
     },
     go: {
       file: "client.go",
