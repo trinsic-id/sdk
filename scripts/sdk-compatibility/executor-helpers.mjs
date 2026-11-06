@@ -19,6 +19,21 @@ export function command(executable, args, { cwd, env = process.env, check = true
   return result;
 }
 export function childEnvironment(values) { return { ...process.env, ...values }; }
+export function acknowledgeFailures(testCases, target, language, acknowledgements = []) {
+  if (target.isCurrent !== false) return testCases;
+  return testCases.map((testCase) => {
+    if (testCase.status !== "failed" || testCase.id.startsWith("framework.")) return testCase;
+    const matches = acknowledgements.filter((entry) => entry.language === language
+      && entry.sdkVersion === target.sdkVersion && entry.testCaseId === testCase.id
+      && Object.entries(entry.parameters ?? {}).every(([key, value]) => testCase.parameters?.[key] === value));
+    if (matches.length > 1) throw new Error(`Multiple acknowledgements match ${language} ${target.sdkVersion} ${testCase.id}.`);
+    const match = matches[0];
+    if (!match?.reason || !Array.isArray(match.failureMessageIncludes) || !match.failureMessageIncludes.length
+      || !match.failureMessageIncludes.every((part) => typeof part === "string" && part.length > 0 && testCase.failure?.message?.includes(part))) return testCase;
+    const { failure, ...result } = testCase;
+    return { ...result, status: "skipped", skipReason: `Acknowledged compatibility exception: ${match.reason}`, acknowledgedFailure: failure };
+  });
+}
 export function readTestCases(path) {
   if (!existsSync(path)) return undefined;
   try { const parsed = JSON.parse(readFileSync(path)); return parsed.schemaVersion === 1 && Array.isArray(parsed.testCases) ? parsed.testCases : undefined; } catch { return undefined; }

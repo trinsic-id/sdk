@@ -33,12 +33,15 @@ run_suite() {
       const fs = require("node:fs"); const path = process.env.SDK_COMPATIBILITY_FALLBACK_RESULT_PATH;
       fs.writeFileSync(path, `${JSON.stringify({ $schema: "https://trinsic.id/schemas/sdk-compatibility-results-v1.json", schemaVersion: 1, run: { generatedAt: new Date().toISOString(), targetBaseUrl: process.env.SDK_COMPATIBILITY_FALLBACK_BASE_URL }, suite: { language: process.env.SDK_COMPATIBILITY_FALLBACK_LANGUAGE }, testCatalog: [], targets: [{ isCurrent: true, label: "suite startup", setupFailure: `Runner exited with code ${process.env.SDK_COMPATIBILITY_FALLBACK_EXIT_CODE} before writing a compatibility report. See the preceding suite output.`, testCases: [] }] }, null, 2)}\n`);
     '
+    # Even a zero exit is invalid if the runner did not produce its results.
+    if (( runner_exit_code == 0 )); then runner_exit_code=1; fi
   fi
   printf '%s\t%s\n' "$language" "$runner_exit_code" > "$status_path"
 }
 
 suite_count=0
 declare -a suite_pids=()
+declare -a suite_status_paths=()
 for runner in "$REPO_ROOT"/api-*/tests/run-compatibility.sh; do
   [[ -f "$runner" ]] || continue
 
@@ -52,6 +55,7 @@ for runner in "$REPO_ROOT"/api-*/tests/run-compatibility.sh; do
 
   printf '\n=== Starting %s API SDK compatibility suite ===\n' "$language"
   status_path="$RESULTS_DIR/$language/status.tsv"
+  suite_status_paths+=("$status_path")
   if [[ "$PARALLEL_MODE" == "true" || "$PARALLEL_MODE" == "1" ]]; then
     run_suite "$language" "$runner" "$result_path" "$status_path" & suite_pids+=("$!")
   else
@@ -60,20 +64,17 @@ for runner in "$REPO_ROOT"/api-*/tests/run-compatibility.sh; do
 done
 
 for pid in "${suite_pids[@]+${suite_pids[@]}}"; do wait "$pid" || true; done
-cat "$RESULTS_DIR"/*/status.tsv > "$STATUS_FILE"
 
 if (( suite_count == 0 )); then
   printf 'No API SDK compatibility suites were found.\n' >&2
   exit 1
 fi
 
-renderer_arguments=(
-  --results-dir "$RESULTS_DIR"
-  --status-file "$STATUS_FILE"
-)
-if [[ "$STRICT_MODE" == "true" || "$STRICT_MODE" == "1" ]]; then
-  renderer_arguments+=(--check)
-fi
-node "$SCRIPT_DIR/render-results.mjs" "${renderer_arguments[@]}"
-
+cat "${suite_status_paths[@]}" > "$STATUS_FILE"
+failed=0
+while IFS=$'\t' read -r language exit_code; do
+  printf '%s: exit %s\n' "$language" "$exit_code"
+  if (( exit_code != 0 )); then failed=1; fi
+done < "$STATUS_FILE"
 printf '\nCompatibility artifacts: %s\n' "$RESULTS_DIR"
+if [[ "$STRICT_MODE" == "true" || "$STRICT_MODE" == "1" ]]; then exit "$failed"; fi

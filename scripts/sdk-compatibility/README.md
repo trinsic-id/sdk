@@ -1,7 +1,7 @@
-# Shared SDK compatibility reporting
+# Shared SDK compatibility tests
 
 `run.sh` discovers `api-*/tests/run-compatibility.sh` suites, runs each suite,
-and aggregates their normalized results. Each language suite owns its test
+and fails if any suite exits unsuccessfully. Each language suite owns its test
 implementation and writes one `compatibility.json` file to the path supplied in
 `SDK_COMPATIBILITY_RESULTS_PATH`.
 
@@ -56,10 +56,8 @@ failures even when an SDK failure is acknowledged. Reading those native XML
 reports requires `python3` (standard library only). Ruby runs its local URL
 configuration regressions separately before compatibility tests.
 
-`render-results.mjs` is language-agnostic. It validates the common envelope,
-aggregates all suite results into `summary.json` and `summary.md`, and renders
-optional API-operation and provider-specific-output coverage when a suite
-supplies that evidence.
+Native test output is available in the job log. Each language's JSON results and
+`suite-status.tsv` are retained as CI artifacts. There is no separate report renderer.
 
 ## Result contract
 
@@ -78,8 +76,7 @@ Every suite must write a JSON document with these required fields:
 
 Each target has a label, optional SDK version, and `testCases`. A test case
 records its `id`, `status` (`passed`, `failed`, or `skipped`), and optional
-failure, advisory, parameter, or skip-reason details. The shared renderer does
-not prescribe how a language runs tests.
+failure, advisory, parameter, or skip-reason details.
 
 Suites may additionally include `apiCoverage`, derived from the shared Swagger
 contract for that run. It contains `covered`, `total`, `operations`, and
@@ -92,11 +89,9 @@ the standard `serialization.provider-output-round-trip` case ID with
 
 Use `compatibility.acknowledgements` in the repository-root
 `compatibility.json` to document a known, intentional incompatibility for one
-published SDK revision. The renderer applies an acknowledgement after the
-language suite writes its raw result: a failed matching test becomes skipped
-and is shown as an `acknowledged-compatibility-exception` warning. It therefore
-does not fail `SDK_COMPATIBILITY_FAIL_ON_FAILURE=true` runs, while its reason
-and original result remain in the generated report.
+published SDK revision. The matrix runner applies acknowledgements before
+choosing its exit code: a matching failure becomes skipped, with its reason in
+`skipReason` and original error retained as `acknowledgedFailure` in the JSON.
 Current-branch and `origin/main` targets never receive published-revision
 acknowledgements, even if they share the published package's version number.
 
@@ -115,9 +110,8 @@ acknowledgements, even if they share the published package's version number.
 acknowledged only when every string in the nonempty `failureMessageIncludes`
 array occurs in its message; another failure of the same case still fails CI. `parameters`
 is an optional exact, partial match for a case's string parameters; use it to
-scope a broad test case such as a PSO check to one provider. Set `mute: true`
-to suppress the resulting warning as well. An acknowledgement can also replace
-an existing advisory warning for the selected revision.
+scope a broad test case such as a PSO check to one provider. Framework failures
+are never acknowledged.
 
 ## Serialization-only diagnostics
 

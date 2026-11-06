@@ -4,7 +4,7 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
-import { readNativeTestCases, readProcessTestCases, temporaryDirectory } from "./executor-helpers.mjs";
+import { acknowledgeFailures, readNativeTestCases, readProcessTestCases, temporaryDirectory } from "./executor-helpers.mjs";
 import { targetFixtures, validateWireAliases } from "./target-fixtures.mjs";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
@@ -87,23 +87,17 @@ test("native reports preserve harness failures beside acknowledged SDK failures"
       ? `<TestRun xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010"><TestDefinitions><UnitTest id="1"><TestMethod className="CompatibilityTest" name="providerOutputs" /></UnitTest><UnitTest id="2"><TestMethod className="HarnessRegressionTests" name="regression" /></UnitTest></TestDefinitions><Results><UnitTestResult testId="1" testName="providerOutputs" outcome="Failed" />${extra ? '<UnitTestResult testId="2" testName="regression" outcome="Failed"><Output><ErrorInfo><Message>independent failure &amp; details</Message></ErrorInfo></Output></UnitTestResult>' : ''}</Results></TestRun>`
       : `<testsuite><testcase classname="CompatibilityTest" name="providerOutputs"><failure message="expected enum failure" /></testcase>${extra ? '<testcase classname="HarnessRegressionTests" name="regression"><error message="independent failure &amp; details" /></testcase>' : ''}</testsuite>`);
     const read = () => readNativeTestCases(output, { status: 1 }, language, language === "csharp" ? "trx" : "junit", nativePath);
-    const results = join(directory, language);
-    const render = (testCases) => {
-      write(join(results, language, "compatibility.json"), JSON.stringify({ schemaVersion: 1, suite: { language }, targets: [{ isCurrent: false, sdkVersion: acknowledgement.sdkVersion, testCases }] }));
-      const status = join(results, "suite-status.tsv");
-      write(status, `${language}\t1\n`);
-      return run(process.execPath, [join(scripts, "render-results.mjs"), "--results-dir", results, "--status-file", status, "--check"]);
-    };
+    const check = (testCases) => acknowledgeFailures(testCases, { isCurrent: false, sdkVersion: acknowledgement.sdkVersion }, language, [acknowledgement]);
     writeNative(false);
     assert.equal(read().length, 1);
-    succeeded(render(read()));
+    assert.equal(check(read())[0].status, "skipped");
     writeNative(true);
     const cases = read();
     assert.equal(cases.length, 2);
     assert.match(cases[1].failure.message, /HarnessRegressionTests.regression: independent failure & details/);
-    assert.equal(render(cases).status, 1, "an acknowledged enum error must not suppress the native harness regression");
+    assert.equal(check(cases).filter((entry) => entry.status === "failed").length, 1, "an acknowledged enum error must not suppress the native harness regression");
     write(nativeReport, "truncated XML");
-    assert.equal(render(read()).status, 1, "incomplete native reports must fail closed");
+    assert.ok(check(read()).some((entry) => entry.status === "failed"), "incomplete native reports must fail closed");
   }
 }));
 
@@ -161,30 +155,32 @@ test("current and main SDKs cannot satisfy required API coverage by skipping", (
   for (const target of json(output).targets) assert.equal(target.testCases[0].status, target.isCurrent ? "failed" : "skipped");
 }));
 
-test("acknowledgements apply only to published targets and cannot hide unrecorded suite failures", () => temporaryDirectory("compat-render-", (directory) => {
-  const status = join(directory, "suite-status.tsv");
-  const report = join(directory, "php/compatibility.json");
-  const render = () => run(process.execPath, [join(scripts, "render-results.mjs"), "--results-dir", directory, "--status-file", status, "--check"]);
+test("matrix exits reflect scoped acknowledgements without a separate reporting step", () => temporaryDirectory("compat-acknowledgements-", (directory) => {
+  const executor = join(directory, "executor.mjs"), cache = join(directory, "fixtures.json"), output = join(directory, "results.json");
   const acknowledgement = json(join(root, "compatibility.json")).compatibility.acknowledgements.find((entry) => entry.language === "php" && entry.testCaseId === "api.sessions.get-result");
-  assert.ok(acknowledgement);
-  const target = { sdkVersion: acknowledgement.sdkVersion, testCases: [{ ...failed, id: acknowledgement.testCaseId, failure: { name: "Error", message: acknowledgement.failureMessageIncludes.join(" ") } }] };
-  const envelope = { schemaVersion: 1, suite: { language: "php" }, targets: [] };
-  write(status, "php\t1\n");
-  write(report, JSON.stringify({ ...envelope, targets: [{ ...target, isCurrent: false, label: "published" }] }));
-  succeeded(render());
-  assert.equal(json(join(directory, "summary.json")).totals.skipped, 1);
-  write(report, JSON.stringify({ ...envelope, targets: [
-    { ...target, isCurrent: false, label: "published" },
-    { ...target, isCurrent: true, label: "current branch" },
-    { ...target, isCurrent: true, label: "origin/main" },
-  ] }));
-  assert.equal(render().status, 1);
-  assert.equal(json(join(directory, "summary.json")).totals.failed, 2);
-  write(report, JSON.stringify({ ...envelope, targets: [{ ...target, isCurrent: false, testCases: [{ ...failed, id: acknowledgement.testCaseId }] }] }));
-  assert.equal(render().status, 1, "a different failure of an acknowledged case must still fail");
-  write(report, JSON.stringify({ ...envelope, targets: [{ ...target, isCurrent: true, testCases: [passed] }] }));
-  assert.equal(render().status, 1);
-  assert.match(json(join(directory, "summary.json")).suites[0].error, /without recording a failure/);
+  const entry = { ...failed, id: acknowledgement.testCaseId, failure: { name: "Error", message: acknowledgement.failureMessageIncludes.join(" ") } };
+  write(cache, JSON.stringify({ fixtures: [{ providerId: "test", hasPublicSdkModel: false }] }));
+  write(executor, `import { writeFileSync } from 'node:fs';
+    const entry = ${JSON.stringify(entry)};
+    if (process.env.SDK_IS_CURRENT === 'true' && process.env.TEST_MODE !== 'current-failure') entry.status = 'passed';
+    if (process.env.TEST_MODE === 'different-failure') entry.failure.message = 'Unrelated failure';
+    const testCases = [entry];
+    if (process.env.TEST_MODE === 'framework-failure') testCases.push({ ...entry, id: 'framework.php-runner', status: 'failed' });
+    writeFileSync(process.env.SDK_COMPATIBILITY_RESULT_FILE, JSON.stringify({ schemaVersion: 1,
+      sdkVersion: process.env.SDK_COMPATIBILITY_TARGET_VERSION || '3.2.1', testCases }));`);
+  const execute = (mode) => run(process.execPath, [join(scripts, "run-matrix.mjs"), "php", process.execPath, executor], { env: {
+    ...configuration, TEST_MODE: mode, SDK_COMPATIBILITY_CURRENT_PACKAGE: directory, SDK_COMPATIBILITY_MAIN_PACKAGE: directory,
+    SDK_COMPATIBILITY_PSO_FIXTURES_PATH: cache, SDK_COMPATIBILITY_VALIDATE_CATALOG: "false", SDK_COMPATIBILITY_RESULTS_PATH: output,
+  } });
+  succeeded(execute("acknowledged"));
+  for (const target of json(output).targets) {
+    const actual = target.testCases[0];
+    assert.equal(actual.status, target.isCurrent ? "passed" : "skipped");
+    if (!target.isCurrent) assert.deepEqual(actual.acknowledgedFailure, entry.failure);
+  }
+  for (const mode of ["current-failure", "different-failure", "framework-failure"]) assert.equal(execute(mode).status, 1, mode);
+  const target = { isCurrent: false, sdkVersion: acknowledgement.sdkVersion };
+  assert.equal(acknowledgeFailures([entry], target, "php", [{ ...acknowledgement, failureMessageIncludes: [] }])[0].status, "failed");
 }));
 
 test("fixture cache keeps wire aliases and filters only serialization expectations", () => temporaryDirectory("compat-fixtures-", (directory) => {
@@ -206,16 +202,6 @@ test("fixture cache keeps wire aliases and filters only serialization expectatio
   const { responseOnly, ...legacy } = payload;
   assert.deepEqual(fixture.legacySerializationOutput, legacy);
   assert.deepEqual(fixture.serializationOutput, expected);
-}));
-
-test("cross-language comparisons treat empty and omitted parameters equally", () => temporaryDirectory("compat-parameters-", (directory) => {
-  const status = join(directory, "suite-status.tsv");
-  write(status, "typescript\t0\nruby\t0\n");
-  for (const language of ["typescript", "ruby"]) {
-    write(join(directory, `${language}/compatibility.json`), JSON.stringify({ schemaVersion: 1, suite: { language }, targets: [{ label: "current branch", isCurrent: true, testCases: [{ ...passed, ...(language === "ruby" ? { parameters: {} } : {}) }] }] }));
-  }
-  succeeded(run(process.execPath, [join(scripts, "render-results.mjs"), "--results-dir", directory, "--status-file", status, "--check"]));
-  assert.deepEqual(json(join(directory, "summary.json")).languageComparisons, []);
 }));
 
 test("default build wrappers reach the generator with empty argument arrays on Bash 3.2", () => temporaryDirectory("compat-bash-", (directory) => {
@@ -315,7 +301,6 @@ test("sequential aggregate runs work without background process IDs", () => temp
   mkdirSync(dirname(script), { recursive: true });
   copyFileSync(join(scripts, "run.sh"), script);
   write(join(directory, "scripts/sdk-compatibility/fetch-pso-fixtures.mjs"), 'import { writeFileSync } from "node:fs"; writeFileSync(process.env.SDK_COMPATIBILITY_PSO_FIXTURES_PATH, "{}");');
-  write(join(directory, "scripts/sdk-compatibility/render-results.mjs"), 'if (!process.argv.includes("--check")) process.exitCode = 91;');
   write(join(directory, "api-example/tests/run-compatibility.sh"), '#!/bin/bash\nprintf "{}" > "$SDK_COMPATIBILITY_RESULTS_PATH"\n');
   const results = join(directory, "results");
   succeeded(run("/bin/bash", [script], { env: { SDK_COMPATIBILITY_PARALLEL: "false", SDK_COMPATIBILITY_RESULTS_DIR: results } }));
@@ -323,17 +308,14 @@ test("sequential aggregate runs work without background process IDs", () => temp
   assert.ok(existsSync(join(results, "example/compatibility.json")));
 }));
 
-test("aggregate reruns cannot reuse a stale acknowledged report after startup failure", () => temporaryDirectory("compat-rerun-", (directory) => {
+test("aggregate reruns cannot reuse stale reports after startup failure", () => temporaryDirectory("compat-rerun-", (directory) => {
   const script = join(directory, "scripts/sdk-compatibility/run.sh");
   mkdirSync(dirname(script), { recursive: true });
   copyFileSync(join(scripts, "run.sh"), script);
-  copyFileSync(join(scripts, "render-results.mjs"), join(dirname(script), "render-results.mjs"));
-  copyFileSync(join(root, "compatibility.json"), join(directory, "compatibility.json"));
   write(join(dirname(script), "fetch-pso-fixtures.mjs"), 'import { writeFileSync } from "node:fs"; writeFileSync(process.env.SDK_COMPATIBILITY_PSO_FIXTURES_PATH, "{}");');
-  const acknowledgement = json(join(root, "compatibility.json")).compatibility.acknowledgements.find((entry) => entry.language === "csharp");
-  const old = { schemaVersion: 1, suite: { language: "csharp" }, targets: [{ isCurrent: false, sdkVersion: acknowledgement.sdkVersion, testCases: [{ ...failed, id: acknowledgement.testCaseId, parameters: acknowledgement.parameters, failure: { message: acknowledgement.failureMessageIncludes.join(" ") } }] }] };
+  const old = { schemaVersion: 1, suite: { language: "csharp" }, targets: [{ isCurrent: true, testCases: [passed] }] };
   const stale = join(directory, "old.json"); write(stale, JSON.stringify(old));
-  write(join(directory, "api-csharp/tests/run-compatibility.sh"), '#!/bin/bash\nif [[ "$TEST_STARTUP_FAILURE" == "true" ]]; then exit 42; fi\ncp "$TEST_OLD_REPORT" "$SDK_COMPATIBILITY_RESULTS_PATH"\nexit 1\n');
+  write(join(directory, "api-csharp/tests/run-compatibility.sh"), '#!/bin/bash\nif [[ "$TEST_STARTUP_FAILURE" == "true" ]]; then exit "${TEST_EXIT:-42}"; fi\ncp "$TEST_OLD_REPORT" "$SDK_COMPATIBILITY_RESULTS_PATH"\nexit 0\n');
   const results = join(directory, "results");
   for (const parallel of ["false", "true"]) {
     const env = { SDK_COMPATIBILITY_PARALLEL: parallel, SDK_COMPATIBILITY_RESULTS_DIR: results, SDK_COMPATIBILITY_FAIL_ON_FAILURE: "true", TEST_OLD_REPORT: stale };
@@ -341,6 +323,8 @@ test("aggregate reruns cannot reuse a stale acknowledged report after startup fa
     assert.equal(run("/bin/bash", [script], { env: { ...env, TEST_STARTUP_FAILURE: "true" } }).status, 1);
     assert.match(json(join(results, "csharp/compatibility.json")).targets[0].setupFailure, /code 42/);
     assert.equal(readFileSync(join(results, "suite-status.tsv"), "utf8"), "csharp\t42\n");
+    assert.equal(run("/bin/bash", [script], { env: { ...env, TEST_STARTUP_FAILURE: "true", TEST_EXIT: "0" } }).status, 1, "success without a report must fail");
+    succeeded(run("/bin/bash", [script], { env: { ...env, TEST_STARTUP_FAILURE: "true", SDK_COMPATIBILITY_FAIL_ON_FAILURE: "false" } }));
   }
 }));
 

@@ -12,7 +12,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { targetFixtures, validateWireAliases } from "./target-fixtures.mjs";
-import { preserveProcessFailure } from "./executor-helpers.mjs";
+import { acknowledgeFailures, preserveProcessFailure } from "./executor-helpers.mjs";
 
 const [language, executor, ...executorArguments] = process.argv.slice(2);
 if (!language || !executor) {
@@ -60,6 +60,9 @@ if (process.env.SDK_COMPATIBILITY_VALIDATE_CATALOG !== "false") {
   }
 }
 
+for (const target of results) {
+  target.testCases = acknowledgeFailures(target.testCases, target, language, matrix.compatibility.acknowledgements);
+}
 const report = {
   $schema: "https://trinsic.id/schemas/sdk-compatibility-results-v1.json",
   schemaVersion: 1,
