@@ -4,7 +4,7 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
-import { readProcessTestCases, temporaryDirectory } from "./executor-helpers.mjs";
+import { readNativeTestCases, readProcessTestCases, temporaryDirectory } from "./executor-helpers.mjs";
 import { targetFixtures, validateWireAliases } from "./target-fixtures.mjs";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
@@ -63,13 +63,48 @@ test("process failures survive partial reports without duplicating recorded fail
     const cases = readProcessTestCases(output, execution, "test");
     assert.deepEqual(cases[0], passed);
     assert.equal(cases[1].status, "failed");
-    assert.match(cases[1].failure.message, /without recording a failure/);
+    assert.match(cases[1].failure.message, /without a complete accounting/);
   }
   write(output, JSON.stringify({ schemaVersion: 1, testCases: [failed] }));
   assert.deepEqual(readProcessTestCases(output, { status: 1 }, "test"), [failed]);
+  assert.deepEqual(readProcessTestCases(output, { status: 2 }, "php"), [failed], "PHPUnit reports test errors with exit 2");
+  assert.equal(readProcessTestCases(output, { status: 42 }, "test").length, 2, "a recorded assertion must not hide an abnormal exit");
   write(output, "invalid JSON");
   assert.equal(readProcessTestCases(output, { status: 0 }, "test")[0].status, "failed");
   assert.equal(readProcessTestCases(join(directory, "missing"), { status: 1 }, "test")[0].status, "failed");
+}));
+
+test("native reports preserve harness failures beside acknowledged SDK failures", () => temporaryDirectory("compat-native-", (directory) => {
+  for (const language of ["csharp", "java"]) {
+    const acknowledgement = json(join(root, "compatibility.json")).compatibility.acknowledgements.find((entry) => entry.language === language && entry.testCaseId === "serialization.unknown-enum");
+    const nativeTest = "CompatibilityTest.providerOutputs";
+    const output = join(directory, `${language}-target.json`);
+    const entry = { ...failed, id: acknowledgement.testCaseId, parameters: acknowledgement.parameters, nativeTest, failure: { name: "Error", message: acknowledgement.failureMessageIncludes.join(" ") } };
+    write(output, JSON.stringify({ schemaVersion: 1, testCases: [entry] }));
+    const nativePath = language === "csharp" ? join(directory, "native.trx") : join(directory, "surefire");
+    const nativeReport = language === "csharp" ? nativePath : join(nativePath, "TEST-example.xml");
+    const writeNative = (extra) => write(nativeReport, language === "csharp"
+      ? `<TestRun xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010"><TestDefinitions><UnitTest id="1"><TestMethod className="CompatibilityTest" name="providerOutputs" /></UnitTest><UnitTest id="2"><TestMethod className="HarnessRegressionTests" name="regression" /></UnitTest></TestDefinitions><Results><UnitTestResult testId="1" testName="providerOutputs" outcome="Failed" />${extra ? '<UnitTestResult testId="2" testName="regression" outcome="Failed"><Output><ErrorInfo><Message>independent failure &amp; details</Message></ErrorInfo></Output></UnitTestResult>' : ''}</Results></TestRun>`
+      : `<testsuite><testcase classname="CompatibilityTest" name="providerOutputs"><failure message="expected enum failure" /></testcase>${extra ? '<testcase classname="HarnessRegressionTests" name="regression"><error message="independent failure &amp; details" /></testcase>' : ''}</testsuite>`);
+    const read = () => readNativeTestCases(output, { status: 1 }, language, language === "csharp" ? "trx" : "junit", nativePath);
+    const results = join(directory, language);
+    const render = (testCases) => {
+      write(join(results, language, "compatibility.json"), JSON.stringify({ schemaVersion: 1, suite: { language }, targets: [{ isCurrent: false, sdkVersion: acknowledgement.sdkVersion, testCases }] }));
+      const status = join(results, "suite-status.tsv");
+      write(status, `${language}\t1\n`);
+      return run(process.execPath, [join(scripts, "render-results.mjs"), "--results-dir", results, "--status-file", status, "--check"]);
+    };
+    writeNative(false);
+    assert.equal(read().length, 1);
+    succeeded(render(read()));
+    writeNative(true);
+    const cases = read();
+    assert.equal(cases.length, 2);
+    assert.match(cases[1].failure.message, /HarnessRegressionTests.regression: independent failure & details/);
+    assert.equal(render(cases).status, 1, "an acknowledged enum error must not suppress the native harness regression");
+    write(nativeReport, "truncated XML");
+    assert.equal(render(read()).status, 1, "incomplete native reports must fail closed");
+  }
 }));
 
 test("matrix coordinator rejects a successful report from a failed executor", () => temporaryDirectory("compat-matrix-", (directory) => {
@@ -286,6 +321,27 @@ test("sequential aggregate runs work without background process IDs", () => temp
   succeeded(run("/bin/bash", [script], { env: { SDK_COMPATIBILITY_PARALLEL: "false", SDK_COMPATIBILITY_RESULTS_DIR: results } }));
   assert.equal(readFileSync(join(results, "suite-status.tsv"), "utf8"), "example\t0\n");
   assert.ok(existsSync(join(results, "example/compatibility.json")));
+}));
+
+test("aggregate reruns cannot reuse a stale acknowledged report after startup failure", () => temporaryDirectory("compat-rerun-", (directory) => {
+  const script = join(directory, "scripts/sdk-compatibility/run.sh");
+  mkdirSync(dirname(script), { recursive: true });
+  copyFileSync(join(scripts, "run.sh"), script);
+  copyFileSync(join(scripts, "render-results.mjs"), join(dirname(script), "render-results.mjs"));
+  copyFileSync(join(root, "compatibility.json"), join(directory, "compatibility.json"));
+  write(join(dirname(script), "fetch-pso-fixtures.mjs"), 'import { writeFileSync } from "node:fs"; writeFileSync(process.env.SDK_COMPATIBILITY_PSO_FIXTURES_PATH, "{}");');
+  const acknowledgement = json(join(root, "compatibility.json")).compatibility.acknowledgements.find((entry) => entry.language === "csharp");
+  const old = { schemaVersion: 1, suite: { language: "csharp" }, targets: [{ isCurrent: false, sdkVersion: acknowledgement.sdkVersion, testCases: [{ ...failed, id: acknowledgement.testCaseId, parameters: acknowledgement.parameters, failure: { message: acknowledgement.failureMessageIncludes.join(" ") } }] }] };
+  const stale = join(directory, "old.json"); write(stale, JSON.stringify(old));
+  write(join(directory, "api-csharp/tests/run-compatibility.sh"), '#!/bin/bash\nif [[ "$TEST_STARTUP_FAILURE" == "true" ]]; then exit 42; fi\ncp "$TEST_OLD_REPORT" "$SDK_COMPATIBILITY_RESULTS_PATH"\nexit 1\n');
+  const results = join(directory, "results");
+  for (const parallel of ["false", "true"]) {
+    const env = { SDK_COMPATIBILITY_PARALLEL: parallel, SDK_COMPATIBILITY_RESULTS_DIR: results, SDK_COMPATIBILITY_FAIL_ON_FAILURE: "true", TEST_OLD_REPORT: stale };
+    succeeded(run("/bin/bash", [script], { env: { ...env, TEST_STARTUP_FAILURE: "false" } }));
+    assert.equal(run("/bin/bash", [script], { env: { ...env, TEST_STARTUP_FAILURE: "true" } }).status, 1);
+    assert.match(json(join(results, "csharp/compatibility.json")).targets[0].setupFailure, /code 42/);
+    assert.equal(readFileSync(join(results, "suite-status.tsv"), "utf8"), "csharp\t42\n");
+  }
 }));
 
 test("TypeScript-only entry point prepares raw fixtures and preserves a supplied cache", () => temporaryDirectory("compat-typescript-", (directory) => {

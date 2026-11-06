@@ -1,5 +1,13 @@
 require 'json'; require 'net/http'; require 'time'; require 'trinsic_api'; require 'uri'
 $compatibility_results = []
+def configure_base_url(config, base_url)
+  uri = URI(base_url)
+  raise 'TRINSIC_TEST_BASE_URL must be an absolute HTTP(S) URL.' unless uri.is_a?(URI::HTTP) && uri.host
+  config.scheme = uri.scheme
+  config.host = uri.host + (uri.port == uri.default_port ? '' : ":#{uri.port}")
+  config.base_path = uri.path
+  config.server_index = nil
+end
 def record(id, params = {})
   started = Process.clock_gettime(Process::CLOCK_MONOTONIC); value = yield
   $compatibility_results << { 'id' => id, 'status' => 'passed', 'durationMs' => ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started) * 1000).to_i, 'parameters' => params }; value

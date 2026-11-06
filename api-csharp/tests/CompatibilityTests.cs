@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Net.Http.Headers;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 #if LEGACY_SDK
@@ -162,16 +163,16 @@ public sealed class CompatibilityFixture : IAsyncLifetime, IDisposable
 #endif
     }
 
-    public async Task Check(string id, Func<Task> action, object? parameters = null)
+    public async Task Check(string id, Func<Task> action, object? parameters = null, [CallerMemberName] string nativeTest = "")
     {
-        var error = await Record(id, action, parameters);
+        var error = await Record(id, action, parameters, nativeTest);
         if (error is not null) throw new Xunit.Sdk.XunitException(error.Message);
     }
     public void Skip(string id, string reason, object? parameters = null) => results.Add(new { id, status = "skipped", durationMs = 0L, parameters, skipReason = reason });
 
     public object ResultsRequest(string name, string key, string token) => CreateRequest(name, new Dictionary<string, object?> { ["resultsAccessKey"] = key, ["redirectToken"] = token });
 
-    public Task WithCompletedSession(string id, Func<Guid, string, string, Task> action) => Check(id, async () =>
+    public Task WithCompletedSession(string id, Func<Guid, string, string, Task> action, [CallerMemberName] string nativeTest = "") => Check(id, async () =>
     {
         Guid sessionId = Guid.Empty;
         try
@@ -200,7 +201,7 @@ public sealed class CompatibilityFixture : IAsyncLifetime, IDisposable
         {
             if (sessionId != Guid.Empty) { try { await InvokeApi(Sessions, "CancelSessionAsync", sessionId); } catch { /* Redaction may already have removed the session. */ } }
         }
-    });
+    }, nativeTest: nativeTest);
 
     private static string QueryValue(Uri uri, string name) => System.Web.HttpUtility.ParseQueryString(uri.Query)[name] ?? throw new InvalidOperationException($"Redirect omitted {name}.");
     private static async Task<Uri> FollowRedirect(HttpClient browser, Uri uri)
@@ -242,7 +243,7 @@ public sealed class CompatibilityFixture : IAsyncLifetime, IDisposable
         if (failureCount > failuresBefore) throw new Xunit.Sdk.XunitException($"{failureCount - failuresBefore} serialization cases failed; see the structured report.");
     }
 
-    private async Task<Exception?> Record(string id, Func<Task> action, object? parameters = null) { var timer = Stopwatch.StartNew(); try { await action(); results.Add(new { id, status = "passed", durationMs = timer.ElapsedMilliseconds, parameters }); return null; } catch (Exception error) { failureCount++; results.Add(new { id, status = "failed", durationMs = timer.ElapsedMilliseconds, parameters, failure = new { name = error.GetType().Name, message = error.ToString() } }); return error; } }
+    private async Task<Exception?> Record(string id, Func<Task> action, object? parameters = null, string nativeTest = "ProviderOutputFixturesRoundTrip") { var timer = Stopwatch.StartNew(); try { await action(); results.Add(new { id, status = "passed", durationMs = timer.ElapsedMilliseconds, parameters }); return null; } catch (Exception error) { failureCount++; results.Add(new { id, status = "failed", durationMs = timer.ElapsedMilliseconds, parameters, nativeTest = $"CompatibilityTests.{nativeTest}", failure = new { name = error.GetType().Name, message = error.ToString() } }); return error; } }
     public object CreateRequest(string modelName, IReadOnlyDictionary<string, object?> values)
     {
         var type = SdkAssembly.GetType($"Trinsic.Api.Model.{modelName}") ?? throw new InvalidOperationException($"SDK does not export {modelName}.");
@@ -278,9 +279,13 @@ public sealed class CompatibilityFixture : IAsyncLifetime, IDisposable
         if (response.GetType().GetProperty("IsSuccessStatusCode")?.GetValue(response) is bool success)
         {
             if (!success) throw new InvalidOperationException($"SDK response was {response.GetType().GetProperty("StatusCode")?.GetValue(response)} {response.GetType().GetProperty("ReasonPhrase")?.GetValue(response)}.");
-            return;
+            if (Convert.ToInt32(response.GetType().GetProperty("StatusCode")?.GetValue(response)) == 204) return;
         }
         if (response.GetType().GetProperty("IsOk")?.GetValue(response) is false) throw new InvalidOperationException($"SDK response was not successful: {response.GetType().Name}.");
+        // Legacy wrappers defer deserialization until Ok() is called. A 200
+        // alone does not establish that the SDK can consume the response body.
+        if (response.GetType().GetMethod("Ok", Type.EmptyTypes) is { } materialize && materialize.Invoke(response, null) is null)
+            throw new InvalidOperationException("SDK returned no successful response body.");
     }
     public void Require(bool value, string message) { if (!value) throw new InvalidOperationException(message); }
     public async Task<string> RegisteredRedirectUrl()

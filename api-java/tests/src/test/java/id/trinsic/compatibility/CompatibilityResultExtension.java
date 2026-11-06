@@ -16,6 +16,7 @@ import org.junit.jupiter.api.extension.TestWatcher;
 final class CompatibilityResultExtension implements BeforeAllCallback, BeforeTestExecutionCallback, TestWatcher, AfterAllCallback {
   private static final List<Map<String, Object>> RESULTS = new ArrayList<>();
   private static final Map<String, Long> STARTED = new LinkedHashMap<>();
+  private static String nativeTest;
 
   @Override public void beforeAll(ExtensionContext context) {
     synchronized (CompatibilityResultExtension.class) {
@@ -24,7 +25,10 @@ final class CompatibilityResultExtension implements BeforeAllCallback, BeforeTes
     }
   }
 
-  @Override public void beforeTestExecution(ExtensionContext context) { STARTED.put(context.getUniqueId(), System.nanoTime()); }
+  @Override public void beforeTestExecution(ExtensionContext context) {
+    nativeTest = context.getRequiredTestClass().getName() + "." + context.getRequiredTestMethod().getName();
+    STARTED.put(context.getUniqueId(), System.nanoTime());
+  }
   @Override public void testSuccessful(ExtensionContext context) { record(context, "passed", null); }
   @Override public void testFailed(ExtensionContext context, Throwable cause) { record(context, "failed", cause); }
   @Override public void testAborted(ExtensionContext context, Throwable cause) { record(context, "skipped", cause); }
@@ -32,6 +36,7 @@ final class CompatibilityResultExtension implements BeforeAllCallback, BeforeTes
   private static synchronized void record(ExtensionContext context, String status, Throwable error) {
     CompatibilityCase annotation = context.getRequiredTestMethod().getAnnotation(CompatibilityCase.class);
     if (annotation == null) return;
+    nativeTest = context.getRequiredTestClass().getName() + "." + context.getRequiredTestMethod().getName();
     record(annotation.value(), status, error, null, STARTED.getOrDefault(context.getUniqueId(), System.nanoTime()));
   }
 
@@ -54,6 +59,7 @@ final class CompatibilityResultExtension implements BeforeAllCallback, BeforeTes
   private static synchronized void record(String id, String status, Throwable error, Map<String, String> parameters, long started) {
     Map<String, Object> result = new LinkedHashMap<>();
     result.put("id", id); result.put("status", status);
+    result.put("nativeTest", nativeTest);
     result.put("durationMs", (System.nanoTime() - started) / 1_000_000);
     if (parameters != null && !parameters.isEmpty()) result.put("parameters", parameters);
     if ("failed".equals(status)) result.put("failure", Map.of("name", error.getClass().getName(), "message", String.valueOf(error.getMessage())));

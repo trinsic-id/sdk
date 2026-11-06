@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { cpSync, existsSync, mkdirSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { childEnvironment, command, failure, readProcessTestCases, target, temporaryDirectory, writeExecutorResult } from "../../scripts/sdk-compatibility/executor-helpers.mjs";
+import { childEnvironment, command, failure, readNativeTestCases, target, temporaryDirectory, writeExecutorResult } from "../../scripts/sdk-compatibility/executor-helpers.mjs";
 
 const tests = new URL(".", import.meta.url).pathname;
 const selected = target();
@@ -27,7 +27,7 @@ try {
     const output = join(directory, "target-results.json");
     const env = childEnvironment({ SDK_COMPATIBILITY_RESULT_FILE: output, SDK_VERSION: version, MAVEN_OPTS: `-Dmaven.repo.local=${repository}` });
     const execution = command("mvn", ["-q", ...(process.env.SDK_COMPATIBILITY_TEST_SCOPE === "serialization" ? ["-Dtest=CompatibilityTest#providerOutputRoundTrips,CompatibilityHarnessTest"] : []), `-Dmaven.repo.local=${repository}`, "-f", join(source, "pom.xml"), "test", `-Dtrinsic.api.groupId=${groupId}`, `-Dtrinsic.api.artifactId=${artifactId}`, `-Dtrinsic.api.version=${version}`], { env, check: false });
-    return { sdkVersion: version, testCases: readProcessTestCases(output, execution, "java") };
+    return { sdkVersion: version, testCases: readNativeTestCases(output, execution, "java", "junit", join(source, "target/surefire-reports")) };
   });
 } catch (error) { result = { testCases: failure("java", error instanceof Error ? error.message : String(error)) }; }
 writeExecutorResult(result);

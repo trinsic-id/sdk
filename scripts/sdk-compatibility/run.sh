@@ -46,6 +46,8 @@ for runner in "$REPO_ROOT"/api-*/tests/run-compatibility.sh; do
   language="${api_directory#api-}"
   result_path="$RESULTS_DIR/$language/compatibility.json"
   mkdir -p "$(dirname "$result_path")"
+  # A failed build must never reuse a report from an earlier invocation.
+  rm -f "$result_path" "$RESULTS_DIR/$language/status.tsv"
   suite_count=$((suite_count + 1))
 
   printf '\n=== Starting %s API SDK compatibility suite ===\n' "$language"

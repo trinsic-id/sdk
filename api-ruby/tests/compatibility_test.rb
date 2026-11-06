@@ -4,7 +4,7 @@ Minitest.after_run { write_results }
 
 class CompatibilityTest < Minitest::Test
   def setup
-    config = TrinsicApi::Configuration.default; config.host = ENV.fetch('TRINSIC_TEST_BASE_URL'); config.access_token = ENV.fetch('TRINSIC_TEST_ACCESS_TOKEN')
+    config = TrinsicApi::Configuration.default; configure_base_url(config, ENV.fetch('TRINSIC_TEST_BASE_URL')); config.access_token = ENV.fetch('TRINSIC_TEST_ACCESS_TOKEN')
     @profile = ENV.fetch('TRINSIC_TEST_VERIFICATION_PROFILE_ID'); @providers = TrinsicApi::ProvidersApi.new; @profiles = TrinsicApi::VerificationProfilesApi.new; @sessions = TrinsicApi::SessionsApi.new; @redirects = TrinsicApi::RedirectUrisApi.new
   end
   def run_case(id, params = {}, &action)

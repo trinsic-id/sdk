@@ -8,6 +8,8 @@ implementation and writes one `compatibility.json` file to the path supplied in
 `run.sh` fetches the provider-output fixtures once and shares that snapshot with
 every language target. Suites run in parallel by default; set
 `SDK_COMPATIBILITY_PARALLEL=false` to run them sequentially when debugging.
+Each invocation removes the previous per-language report before starting its
+runner, so a build failure cannot reuse an earlier successful report.
 
 The collector retains the complete API response in `output`. SDK deserializers
 therefore see unknown fields and legacy aliases exactly as clients do.
@@ -48,6 +50,11 @@ node --test scripts/sdk-compatibility/harness.test.mjs
 
 The native test projects also include `CompatibilityHarnessTest` (Java) and
 `HarnessRegressionTests` (C#) for callback handling and JSON comparison regressions.
+C# and Java reconcile their TRX/Surefire failures against the native test that
+emitted each compatibility failure. Unrecorded native failures remain framework
+failures even when an SDK failure is acknowledged. Reading those native XML
+reports requires `python3` (standard library only). Ruby runs its local URL
+configuration regressions separately before compatibility tests.
 
 `render-results.mjs` is language-agnostic. It validates the common envelope,
 aggregates all suite results into `summary.json` and `summary.md`, and renders

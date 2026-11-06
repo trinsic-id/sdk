@@ -2,7 +2,7 @@
 // Single-target executor for the shared SDK compatibility matrix coordinator.
 import { cpSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
-import { childEnvironment, command, failure, readProcessTestCases, target, temporaryDirectory, writeExecutorResult } from "../../scripts/sdk-compatibility/executor-helpers.mjs";
+import { childEnvironment, command, failure, readNativeTestCases, target, temporaryDirectory, writeExecutorResult } from "../../scripts/sdk-compatibility/executor-helpers.mjs";
 
 const tests = new URL(".", import.meta.url).pathname;
 const selected = target();
@@ -32,8 +32,8 @@ try {
   const assets = restore.status === 0 && JSON.parse(readFileSync(join(source, "obj/project.assets.json")));
   const sdk = assets && Object.values(assets.targets).flatMap(Object.entries).find(([name]) => name.toLowerCase() === `trinsic.api/${version}`.toLowerCase())?.[1];
   const legacy = Boolean(sdk?.dependencies?.["Microsoft.Extensions.Hosting"]);
-  const execution = restore.status === 0 && command("dotnet", ["test", join(source, "CompatibilityRunner.csproj"), ...(process.env.SDK_COMPATIBILITY_TEST_SCOPE === "serialization" ? ["--filter", "FullyQualifiedName~ProviderOutputFixturesRoundTrip|FullyQualifiedName~HarnessRegressionTests"] : []), "--no-restore", `-p:TrinsicApiVersion=${version}`, `-p:LegacySdk=${legacy}`], { env: environment, check: false });
-  return { sdkVersion: version, testCases: readProcessTestCases(output, execution || restore, "csharp") };
+  const execution = restore.status === 0 && command("dotnet", ["test", join(source, "CompatibilityRunner.csproj"), ...(process.env.SDK_COMPATIBILITY_TEST_SCOPE === "serialization" ? ["--filter", "FullyQualifiedName~ProviderOutputFixturesRoundTrip|FullyQualifiedName~HarnessRegressionTests"] : []), "--logger", "trx;LogFileName=native.trx", "--results-directory", directory, "--no-restore", `-p:TrinsicApiVersion=${version}`, `-p:LegacySdk=${legacy}`], { env: environment, check: false });
+  return { sdkVersion: version, testCases: readNativeTestCases(output, execution || restore, "csharp", "trx", join(directory, "native.trx")) };
   });
 } catch (error) {
   result = { testCases: failure("csharp", error instanceof Error ? error.message : String(error)) };

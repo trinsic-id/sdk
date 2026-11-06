@@ -100,7 +100,9 @@ function runTarget(target) {
     try {
       const parsed = JSON.parse(readFileSync(resultFile));
       if (parsed.schemaVersion === 1 && Array.isArray(parsed.testCases)) {
-        result.testCases = [...preserveProcessFailure(parsed.testCases, execution, language, `${language} executor`), ...aliasResults];
+        // Executors return outcomes in JSON and exit zero even for test failures.
+        // Any nonzero executor exit is an additional framework failure.
+        result.testCases = [...preserveProcessFailure(parsed.testCases, execution, language, `${language} executor`, []), ...aliasResults];
         if (target.isCurrent) result.testCases = result.testCases.map((testCase) => {
           if (testCase.status !== "skipped" || !testCase.id.startsWith("api.")) return testCase;
           const { skipReason, ...test } = testCase;
