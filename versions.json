@@ -5,7 +5,6 @@
   "javaPatchVersion": "1",
   "goPatchVersion": "1",
   "pythonPatchVersion": "1",
-  "phpPatchVersion": "1",
   "rubyPatchVersion": "1",
   "swiftUIVersion": "2.3.0-alpha5",
   "androidUIVersion": "2.3.0-alpha4",

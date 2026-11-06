@@ -619,7 +619,6 @@ api-typescript/sdk
 go-sample
 
 ui-web/samples/dist
-api-php/samples/server/composer.phar
 
 # SDK contract-test outputs
 test-results/

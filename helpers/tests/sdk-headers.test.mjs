@@ -36,18 +36,18 @@ async function temporaryDirectory(t) {
 
 test("generation rejects missing injection points without partially patching APIs", async (t) => {
   const directory = await temporaryDirectory(t);
-  const apiDirectory = join(directory, "lib/Api");
+  const apiDirectory = join(directory, "src/main/java/id/trinsic/api");
   await mkdir(apiDirectory, { recursive: true });
-  const original = "        $defaultHeaders = [];\n";
-  await writeFile(join(apiDirectory, "FirstApi.php"), original);
-  await writeFile(join(apiDirectory, "SecondApi.php"), "changed generator output");
-  assert.throws(() => injectSdkHeader("php", "1.2.3-beta.1", directory), /injection point/);
-  assert.equal(await readFile(join(apiDirectory, "FirstApi.php"), "utf8"), original);
+  const original = "    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();\n";
+  await writeFile(join(apiDirectory, "FirstApi.java"), original);
+  await writeFile(join(apiDirectory, "SecondApi.java"), "changed generator output");
+  assert.throws(() => injectSdkHeader("java", "1.2.3-beta.1", directory), /injection point/);
+  assert.equal(await readFile(join(apiDirectory, "FirstApi.java"), "utf8"), original);
   assert.throws(() => injectSdkHeader("swift", "1.2.3", directory), /not configured/);
-  assert.throws(() => injectSdkHeader("php", "1.2.3\r\nInjected: value", directory), /Invalid SDK version/);
+  assert.throws(() => injectSdkHeader("java", "1.2.3\r\nInjected: value", directory), /Invalid SDK version/);
 });
 
-for (const language of ["csharp", "go", "java", "php", "python", "ruby", "typescript"]) {
+for (const language of ["csharp", "go", "java", "python", "ruby", "typescript"]) {
   test(`${language} sends SDK identity, authentication, and custom headers`, {
     skip: process.env.SDK_LANGUAGE && process.env.SDK_LANGUAGE !== language,
     timeout: 240_000,
@@ -58,12 +58,7 @@ for (const language of ["csharp", "go", "java", "php", "python", "ruby", "typesc
     const server = createServer((request, response) => {
       requests.push({ method: request.method, url: request.url, headers: request.headers });
       request.resume();
-      // PHP's generated response decoder requires JSON even for an empty response.
-      if (language === "php") {
-        response.writeHead(200, { "Content-Type": "application/json" }).end("{}");
-      } else {
-        response.writeHead(204).end();
-      }
+      response.writeHead(204).end();
     });
     server.listen(0, "127.0.0.1");
     await once(server, "listening");
@@ -87,20 +82,6 @@ for (const language of ["csharp", "go", "java", "php", "python", "ruby", "typesc
       case "ruby":
         await run("ruby", ["-I", join(root, "api-ruby/sdk/lib"), join(probes, "ruby.rb")], { env });
         break;
-      case "php": {
-        // Keep Composer's vendor directory and lockfile out of the published SDK.
-        const sdk = join(root, "api-php/sdk-build");
-        const composer = JSON.parse(await readFile(join(sdk, "composer.json"), "utf8"));
-        await writeFile(join(directory, "composer.json"), JSON.stringify({
-          require: composer.require,
-          autoload: { "psr-4": { "Trinsic\\Api\\": `${sdk}/lib/` } },
-        }));
-        await run("composer", ["install", "--no-dev", "--no-interaction"], { cwd: directory, env });
-        await run("php", [join(probes, "php.php")], {
-          env: { ...env, SDK_TEST_PHP_AUTOLOAD: join(directory, "vendor/autoload.php") },
-        });
-        break;
-      }
       case "go": {
         const sdk = join(root, "api-go/sdk-build");
         const module = (await readFile(join(sdk, "go.mod"), "utf8")).match(/^module (.+)$/m)[1];
