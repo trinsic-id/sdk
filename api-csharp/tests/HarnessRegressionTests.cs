@@ -44,6 +44,15 @@ public sealed class HarnessRegressionTests
     }
 
     [Theory]
+    [InlineData("true", "1")]
+    [InlineData("false", "0")]
+    [InlineData("[]", "{}")]
+    [InlineData("[]", "[1]")]
+    [InlineData("{\"child\":{}}", "{\"child\":{\"name\":\"Ada\"}}")]
+    public void InvalidTypesAndDroppedFieldsFail(string actual, string expected) =>
+        Assert.Throws<InvalidOperationException>(() => Compare(JsonNode.Parse(actual), JsonNode.Parse(expected), "fixture", true));
+
+    [Theory]
     [InlineData("null")]
     [InlineData("{\"name\":null}")]
     [InlineData("[null,{\"nested\":[null]}]")]

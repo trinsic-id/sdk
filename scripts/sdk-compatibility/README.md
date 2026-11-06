@@ -29,6 +29,11 @@ Live tests create hosted/direct sessions through each real SDK. They exercise
 reads, cancellation, results, attachments, redaction, and recommendations. The
 redirect test provider supplies synthetic verification data. HTTP redirect
 helpers perform the browser portion; SDK operations still use SDK serializers.
+API assertions check requested IDs, session completion/success state, launch
+URLs and access keys, recommendation/page shapes, and decoded PNG attachment
+contents. Transport checks verify pagination, provider/profile IDs, capabilities,
+and explicit `false` request values. Native regressions inject invalid values and
+dropped fields to prove these checks fail.
 Tests attempt cancellation during cleanup, including after assertion failures;
 completed/redacted sessions may no longer be cancellable.
 Each live case records its own outcome. TypeScript shares browser-completed
@@ -42,8 +47,19 @@ wire payloads once, then shares them across the six suites. SDK deserializers
 receive those payloads unchanged. Serialization comparisons omit read-only
 fields and retain legacy aliases; they compare the fields the old model exposes,
 while synthetic fixtures require their expected fields to survive exactly.
+The installed model metadata determines which fields must survive decoding,
+including nested objects, arrays, dictionaries, and read-only properties.
+Round-trip checks require supported fields rather than only comparing the fields
+that happen to remain. Scalar checks distinguish booleans from numbers;
+Ruby timestamp equality retains fractional seconds.
 The suite also exercises unknown fields, nested model
 dictionaries, and the Singpass legacy wire alias.
+
+TypeScript and Java also check required fields against the installed release's
+model metadata before decoding provider fixtures, including nested objects,
+arrays, and dictionaries. Missing required fields remain raw compatibility
+failures; optional fields and unknown response fields remain allowed. A field
+required by one release may be optional in another release's snapshot.
 
 Future enum values are deferred to a separate phase. First investigate improving
 the SDK generators/serializers to tolerate unknown enum values while preserving

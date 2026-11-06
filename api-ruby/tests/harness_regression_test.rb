@@ -2,6 +2,7 @@ require 'minitest/autorun'
 require_relative 'CompatibilitySupport'
 require 'socket'
 require 'timeout'
+require 'ostruct'
 
 class HarnessRegressionTest < Minitest::Test
   def test_a_read_failure_does_not_suppress_other_read_cases
@@ -9,12 +10,15 @@ class HarnessRegressionTest < Minitest::Test
     $compatibility_results = []
     client = Object.new
     client.define_singleton_method(:list_providers) { raise 'injected provider failure' }
-    %i[get_verification_profile_by_id list_verification_profiles list_sessions list get_provider].each do |method|
-      client.define_singleton_method(method) { |*_args| nil }
+    client.define_singleton_method(:last_request) { OpenStruct.new(options: { params: { Page: 1, PageSize: 1, page: 1, pageSize: 1 } }) }
+    client.define_singleton_method(:get_verification_profile_by_id) { |id| OpenStruct.new(id: id) }
+    client.define_singleton_method(:get_provider) { |id| OpenStruct.new(provider: OpenStruct.new(id: id)) }
+    { list_verification_profiles: :verification_profiles, list_sessions: :sessions, list: :uris }.each do |method, field|
+      client.define_singleton_method(method) { |*_args| OpenStruct.new(field => [], more: false) }
     end
     %w[test_list_providers test_get_profile test_list_profiles test_list_sessions test_list_redirects test_get_provider].each do |name|
       instance = CompatibilityTest.new(name)
-      instance.define_singleton_method(:setup) { @providers = @profiles = @sessions = @redirects = client; @profile = 'profile' }
+      instance.define_singleton_method(:setup) { @providers = @profiles = @sessions = @redirects = @client = client; @profile = 'profile' }
       instance.define_singleton_method(:teardown) {}
       result = instance.run
       assert_equal(name == 'test_list_providers' ? 1 : 0, result.failures.length)
@@ -33,6 +37,29 @@ class HarnessRegressionTest < Minitest::Test
       compare_json([nil, 1], [nil, 1], 'items', exact)
     end
     compare_json([{ 'name' => 'Ada' }], [{ 'name' => 'Ada', 'new' => true }], 'items', false)
+  end
+
+  def test_scalar_types_and_timestamp_precision_are_preserved
+    [[true, 1], [false, 0], [[], {}], ['2026-08-14T12:00:00.100Z', '2026-08-14T12:00:00.900Z']].each do |actual, expected|
+      assert_raises(RuntimeError) { compare_json(actual, expected, 'field', true) }
+    end
+    compare_json(1, 1.0, 'number', true)
+  end
+
+  def test_supported_fields_cannot_disappear_and_unknown_fields_are_allowed
+    wire = { 'method' => 'LaunchBrowser', 'content' => 'https://example.test', 'future' => true }
+    model = TrinsicApi::IntegrationStep.build_from_hash(wire)
+    expected = model_fields(model, wire)
+    refute expected.key?('future')
+    compare_json(model_fields(model, wire, true), expected, 'step', true)
+    assert_raises(RuntimeError) { compare_json({ 'method' => 'LaunchBrowser' }, expected, 'step', true) }
+    assert_raises(RuntimeError) { model_fields({}, { 'key' => true }, true) }
+    assert_equal({ 'key' => false }, model_fields({ 'key' => false }, { 'key' => false }, true))
+  end
+
+  def test_wrong_session_and_empty_attachment_are_rejected
+    assert_raises(RuntimeError) { assert_session(OpenStruct.new(session: OpenStruct.new(id: 'wrong', done: true, success: true)), 'expected', true, true) }
+    assert_raises(RuntimeError) { assert_attachment(OpenStruct.new(content_type: 'image/png', content: '')) }
   end
 
   def test_native_reporter_preserves_independent_errors_beside_recorded_sdk_failures

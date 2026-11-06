@@ -79,6 +79,21 @@ class CompatibilityHarnessTest {
     } finally { server.stop(0); }
   }
 
+  @Test void comparatorsRejectDroppedFieldsWrongContainersAndBooleanNumbers() throws Exception {
+    var mapper = new ApiClient().getObjectMapper();
+    for (String[] pair : new String[][] { {"[]", "{}"}, {"true", "1"}, {"false", "0"}, {"[]", "[1]"}, {"{\"child\":{}}", "{\"child\":{\"name\":\"Ada\"}}"} }) {
+      var actual = mapper.readTree(pair[0]); var expected = mapper.readTree(pair[1]);
+      assertThrows(AssertionError.class, () -> CompatibilityTest.compareJson(actual, expected, "value", true));
+    }
+    CompatibilityTest compatibility = new CompatibilityTest(); setField(compatibility, "client", new ApiClient());
+    var raw = mapper.readTree("{\"method\":\"LaunchBrowser\",\"content\":\"https://example.test\",\"future\":true}");
+    var model = mapper.treeToValue(raw, id.trinsic.api.models.IntegrationStep.class);
+    var expected = compatibility.modelFields(model, raw, false);
+    org.junit.jupiter.api.Assertions.assertFalse(expected.has("future"));
+    model.setContent(null);
+    assertThrows(AssertionError.class, () -> CompatibilityTest.compareJson(compatibility.modelFields(model, raw, true), expected, "step", true));
+  }
+
   private static void setField(Object target, String name, Object value) throws Exception {
     var field = CompatibilityTest.class.getDeclaredField(name);
     field.setAccessible(true);

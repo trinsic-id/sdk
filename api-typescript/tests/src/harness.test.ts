@@ -17,13 +17,13 @@ test("Lifecycle failures retain their own cases and do not suppress later operat
       sdk.ProvidersApi.prototype.getProvider = async () => ({ provider: { id: "trinsic-test-redirect", name: "test" } });
       sdk.RedirectUrisApi.prototype.list = async () => ({ uris: [{ uri: base + "/app" }] });
       sdk.SessionsApi.prototype.createHostedProviderSession = async () => ({ sessionId: id, launchUrl: base + "/start", resultsAccessKey: "key" });
-      sdk.SessionsApi.prototype.createDirectProviderSession = async () => ({ sessionId: id, nextStep: { method: "LaunchBrowser", content: base + "/start" }, resultCollection: { method: "CaptureRedirect", resultsAccessKey: "key" } });
       sdk.SessionsApi.prototype.getSession = async () => { throw new Error("injected get failure"); };
       sdk.SessionsApi.prototype.getSessionResult = async () => { throw new Error("injected result decoder failure"); };
       sdk.SessionsApi.prototype.cancelSession = async () => ({ session: { id, done: true, success: false } });
       sdk.SessionsApi.prototype.redactSession = async () => undefined;
       globalThis.fetch = async input => {
         const url = new URL(input);
+        if (url.pathname === "/api/v1/sessions/provider/direct") return Response.json({ sessionId: id, nextStep: { method: "LaunchBrowser", content: base + "/start" }, resultCollection: { method: "CaptureRedirect", resultsAccessKey: "key" } });
         const location = url.pathname === "/start" ? base + "/integrations/trinsic-test-redirect?redirectUrl=" + encodeURIComponent(base + "/callback")
           : url.pathname === "/callback" ? base + "/verification"
           : url.pathname === "/verification" ? base + "/completion"

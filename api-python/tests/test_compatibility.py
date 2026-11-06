@@ -61,13 +61,17 @@ def test_profile_list_accepts_a_page_without_the_configured_profile() -> None:
 @pytest.mark.compatibility("api.sessions.list")
 def test_list_sessions(apis) -> None:
     *_, sessions, _ = apis
-    sessions.list_sessions(str(support.PROFILE_ID), page_size=1, page=1)
+    response = sessions.list_sessions(str(support.PROFILE_ID), page_size=1, page=1)
+    support.assert_page(response, "sessions")
+    assert isinstance(response.total, int) and not isinstance(response.total, bool) and response.total >= 0
+    support.assert_request(sessions, query={"Page": 1, "PageSize": 1})
 
 
 @pytest.mark.compatibility("api.redirect-uris.list")
 def test_list_redirect_uris(apis) -> None:
     *_, redirects = apis
-    redirects.list(page=1, page_size=1)
+    support.assert_page(redirects.list(page=1, page_size=1), "uris")
+    support.assert_request(redirects, query={"page": 1, "pageSize": 1})
 
 
 @pytest.mark.compatibility("api.providers.get")
@@ -79,30 +83,27 @@ def test_get_provider(apis) -> None:
 @pytest.mark.compatibility("api.sessions.create-hosted-provider")
 def test_create_hosted_provider_session(apis) -> None:
     *_, sessions, redirects = apis
-    hosted = support.create_hosted_session(sessions, redirects)
-    sessions.cancel_session(hosted.session_id)
+    support.create_hosted_session(sessions, redirects)
 
 
 @pytest.mark.compatibility("api.sessions.create-direct-provider")
 def test_create_direct_provider_session(apis) -> None:
     *_, sessions, redirects = apis
-    session = support.direct_session(sessions, redirects)
-    sessions.cancel_session(session.session_id)
+    support.direct_session(sessions, redirects)
 
 
 @pytest.mark.compatibility("api.sessions.get")
 def test_get_direct_session(apis) -> None:
     *_, sessions, redirects = apis
     session = support.direct_session(sessions, redirects)
-    support.assert_session_id(sessions.get_session(session.session_id), session.session_id)
-    sessions.cancel_session(session.session_id)
+    support.assert_session(sessions.get_session(session.session_id), session.session_id, False, False)
 
 
 @pytest.mark.compatibility("api.sessions.cancel")
 def test_cancel_direct_session(apis) -> None:
     *_, sessions, redirects = apis
     session = support.direct_session(sessions, redirects)
-    sessions.cancel_session(session.session_id)
+    support.assert_session(sessions.cancel_session(session.session_id), session.session_id, True, False)
 
 
 def completed_result(apis):
@@ -114,8 +115,10 @@ def completed_result(apis):
 
 @pytest.mark.compatibility("api.sessions.get-result")
 def test_get_session_result(apis) -> None:
-    _sessions, _session, _access_key, result = completed_result(apis)
-    assert result is not None
+    _sessions, session, _access_key, result = completed_result(apis)
+    support.assert_session(result, session.session_id, True, True)
+    assert result.identity_data.originating_provider_id == support.TEST_PROVIDER
+    assert result.identity_data.attachments
 
 
 @pytest.mark.compatibility("api.sessions.get-attachment")
@@ -123,7 +126,7 @@ def test_get_session_attachment(apis) -> None:
     sessions, session, access_key, result = completed_result(apis)
     attachments = result.identity_data.attachments if result.identity_data else []
     assert attachments, "Completed redirect session did not return an attachment."
-    sessions.get_attachment(session.session_id, attachments[0].id, support.GetAttachmentRequest(results_access_key=access_key))
+    support.assert_attachment(sessions.get_attachment(session.session_id, attachments[0].id, support.GetAttachmentRequest(results_access_key=access_key)))
 
 
 @pytest.mark.compatibility("api.sessions.redact")
@@ -136,7 +139,8 @@ def test_redact_session(apis) -> None:
 @pytest.mark.compatibility("api.sessions.recommend-providers")
 def test_recommend_providers(apis) -> None:
     *_, sessions, _ = apis
-    sessions.recommend_providers(support.RecommendProvidersRequest(verification_profile_id=str(support.PROFILE_ID)))
+    support.assert_recommendations(sessions.recommend_providers(support.RecommendProvidersRequest(verification_profile_id=str(support.PROFILE_ID))))
+    support.assert_request(sessions, body={"verificationProfileId": str(support.PROFILE_ID)})
 
 
 def provider_fixtures():
@@ -168,5 +172,45 @@ def test_provider_output_round_trip(fixture) -> None:
         pytest.skip("Model is not exported by this SDK release.")
     raw = fixture["output"]
     expected = fixture.get("serializationOutput", raw)
-    serialized = model.from_dict(raw).to_dict()
-    support.assert_equivalent(serialized, expected, f"{provider_id} ({model_name})", bool(fixture.get("testCaseId")))
+    decoded = model.from_dict(raw)
+    support.assert_equivalent(support.model_fields(decoded, raw, decoded=True), support.model_fields(decoded, raw), provider_id, True)
+    serialized = decoded.to_dict()
+    expected = expected if fixture.get("testCaseId") else support.model_fields(decoded, expected, omit_optional_nulls=True)
+    support.assert_equivalent(serialized, expected, f"{provider_id} ({model_name})", True)
+
+
+@pytest.mark.parametrize("actual,expected", [(True, 1), (False, 0), (1, True), (0, False)])
+def test_provider_output_boolean_number_mismatch(actual, expected):
+    with pytest.raises(AssertionError, match="boolean/number"):
+        support.assert_equivalent(actual, expected, "value", True)
+
+
+def test_provider_output_dropped_known_fields_and_dictionary_entries():
+    from pydantic import BaseModel
+    class Child(BaseModel):
+        name: str | None = None
+    class Parent(BaseModel):
+        child: Child
+        entries: dict[str, Child]
+    raw = {"child": {"name": "Ada", "future": True}, "entries": {"one": {"name": "Bob"}}}
+    good = Parent.model_validate(raw)
+    support.assert_equivalent(support.model_fields(good, raw, True), support.model_fields(good, raw), "provider", True)
+    good.child.name = None
+    with pytest.raises(AssertionError):
+        support.assert_equivalent(support.model_fields(good, raw, True), support.model_fields(good, raw), "provider", True)
+    good.entries.clear()
+    with pytest.raises(AssertionError, match="dictionary keys"):
+        support.model_fields(good, raw, True)
+
+
+def test_semantic_assertions_reject_wrong_session_and_empty_attachment():
+    from types import SimpleNamespace as Obj
+    with pytest.raises(AssertionError):
+        support.assert_session(Obj(session=Obj(id="wrong", done=True, success=True)), "expected", True, True)
+    with pytest.raises(AssertionError):
+        support.assert_attachment(Obj(content_type="image/png", content=""))
+
+
+@pytest.mark.parametrize("actual,expected", [(1, 1.0), (True, True), (False, False), (None, None)])
+def test_provider_output_equal_scalars(actual, expected):
+    support.assert_equivalent(actual, expected, "value", True)

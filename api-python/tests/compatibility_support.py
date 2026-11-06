@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import os
+import base64
+import json
 import urllib.error
 import urllib.parse
 import urllib.request
 from datetime import date, datetime
 from typing import Any
 from uuid import UUID
+from pydantic import BaseModel
 
 from trinsic_api.api_client import ApiClient
 from trinsic_api.configuration import Configuration
@@ -33,7 +36,81 @@ TEST_PROVIDER = "trinsic-test-redirect"
 def client() -> ApiClient:
     configuration = Configuration(host=BASE_URL)
     configuration.access_token = TOKEN
-    return ApiClient(configuration)
+    return CapturingClient(configuration)
+
+
+class CapturingClient(ApiClient):
+    """Observe the real SDK transport; retain the response used by its decoder."""
+    last_response = None
+
+    def call_api(self, method, url, header_params=None, body=None, *args, **kwargs):
+        self.last_request = (method, url, body)
+        response = super().call_api(method, url, header_params, body, *args, **kwargs)
+        self.last_response = json.loads(response.read()) if response.read() else None
+        return response
+
+    def response_deserialize(self, response_data, response_types_map):
+        response = super().response_deserialize(response_data, response_types_map)
+        if response.data is not None and self.last_response is not None:
+            assert_equivalent(model_fields(response.data, self.last_response, decoded=True),
+                              model_fields(response.data, self.last_response), "response", True)
+        return response
+
+
+def assert_request(api, *, body=None, query=None):
+    method, url, sent = api.api_client.last_request
+    if body is not None:
+        assert method == "POST"
+        assert isinstance(sent, dict)
+        for key, value in body.items(): assert_equivalent(sent[key], value, f"request.{key}", True)
+    if query is not None:
+        parsed = dict(urllib.parse.parse_qsl(urllib.parse.urlparse(url).query))
+        for key, value in query.items(): assert parsed[key] == str(value)
+
+
+def model_fields(model, wire, decoded=False, omit_optional_nulls=False):
+    """Project wire keys using the installed model, including nested dictionaries."""
+    if isinstance(model, BaseModel) and isinstance(wire, dict):
+        return {field.alias or name: model_fields(getattr(model, name), wire[field.alias or name], decoded, omit_optional_nulls)
+                for name, field in type(model).model_fields.items() if (field.alias or name) in wire
+                and (not omit_optional_nulls or field.is_required() or wire[field.alias or name] is not None)}
+    if isinstance(wire, list):
+        if decoded and (not isinstance(model, list) or len(model) != len(wire)):
+            raise AssertionError("SDK changed array shape")
+        return [model_fields(model[index] if isinstance(model, list) and index < len(model) else None, item, decoded, omit_optional_nulls)
+                for index, item in enumerate(wire)]
+    if isinstance(wire, dict) and isinstance(model, dict):
+        if decoded: assert set(model) == set(wire), "SDK changed dictionary keys"
+        return {key: model_fields(model.get(key), item, decoded, omit_optional_nulls) for key, item in wire.items()}
+    return model if decoded else wire
+
+
+def assert_session(response, session_id, done, success):
+    assert_session_id(response, session_id)
+    assert response.session.done is done
+    assert response.session.success is success
+
+
+def assert_attachment(response):
+    assert response.content_type == "image/png"
+    assert base64.b64decode(response.content, validate=True).startswith(b"\x89PNG\r\n\x1a\n"), "Attachment must contain PNG bytes"
+
+
+def assert_page(response, field):
+    assert isinstance(getattr(response, field), list)
+    assert isinstance(response.more, bool)
+    for item in getattr(response, field):
+        assert item.id
+
+
+def assert_recommendations(response):
+    assert response.recommended_providers or response.remainder
+    for provider in [*response.recommended_providers, *response.remainder]:
+        for field in ("id", "name", "logo_url", "subtext", "health"):
+            assert isinstance(getattr(provider, field), str)
+        for field in ("regions", "countries", "subdivisions"):
+            assert isinstance(getattr(provider, field), list)
+            assert all(isinstance(item, str) for item in getattr(provider, field))
 
 
 def value(model: Any, field: str) -> Any:
@@ -83,8 +160,15 @@ def direct_session(api: SessionsApi, redirects: RedirectUrisApi):
     )
     response = api.create_direct_provider_session(request)
     CREATED_SESSIONS.append((api, response.session_id))
+    assert_request(api, body={"provider": TEST_PROVIDER, "verificationProfileId": str(PROFILE_ID),
+                             "capabilities": ["LaunchBrowser", "CaptureRedirect"], "fallbackToHostedUI": False})
     assert response.session_id
+    UUID(str(response.session_id))
+    assert response.next_step.method == "LaunchBrowser"
+    assert response.result_collection.method == "CaptureRedirect"
+    assert response.result_collection.results_access_key
     assert response.next_step.content
+    assert urllib.parse.urlparse(response.next_step.content).scheme in {"http", "https"}
     return response
 
 
@@ -158,6 +242,7 @@ def assert_json_scalar_equivalent(actual: Any, expected: Any, path: str) -> None
     if isinstance(actual, date) and isinstance(expected, str):
         assert actual.isoformat() == expected, f"{path}: SDK produced {actual!r}, wire has {expected!r}"
         return
+    assert isinstance(actual, bool) == isinstance(expected, bool), f"{path}: boolean/number type mismatch: {actual!r} vs {expected!r}"
     assert actual == expected, f"{path}: SDK produced {actual!r}, wire has {expected!r}"
 
 
@@ -166,7 +251,7 @@ def assert_nonempty(candidate: Any, label: str) -> None:
 
 
 def assert_profile_page(response: Any) -> None:
-    assert isinstance(response.verification_profiles, list)
+    assert_page(response, "verification_profiles")
     for profile in response.verification_profiles:
         UUID(str(profile.id))
 
@@ -187,4 +272,7 @@ def create_hosted_session(api: SessionsApi, redirects: RedirectUrisApi) -> Any:
     arguments = {"provider": TEST_PROVIDER, "verification_profile_id": str(PROFILE_ID), "redirect_url": redirect_url(redirects)}
     response = api.create_hosted_provider_session(CreateHostedProviderSessionRequest(**arguments))
     CREATED_SESSIONS.append((api, response.session_id))
+    UUID(str(response.session_id))
+    assert urllib.parse.urlparse(response.launch_url).scheme in {"http", "https"}
+    assert response.results_access_key
     return response

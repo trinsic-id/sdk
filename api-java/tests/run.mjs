@@ -11,7 +11,7 @@ try {
     const repository = join(directory, "m2"); mkdirSync(repository);
     const output = join(directory, "target-results.json");
     const env = childEnvironment({ SDK_COMPATIBILITY_RESULT_FILE: output, SDK_VERSION, MAVEN_OPTS: `-Dmaven.repo.local=${repository}` });
-    const execution = command("mvn", ["-q", ...(process.env.SDK_COMPATIBILITY_TEST_SCOPE === "serialization" ? ["-Dtest=CompatibilityTest#providerOutputRoundTrips,CompatibilityHarnessTest"] : []), `-Dmaven.repo.local=${repository}`, "-f", join(source, "pom.xml"), "test"], { env, check: false });
+    const execution = command("mvn", ["-q", ...(process.env.SDK_COMPATIBILITY_TEST_SCOPE === "serialization" ? ["-Dtest=CompatibilityTest#providerOutputRoundTrips,CompatibilityHarnessTest,RequiredFieldValidatorTest"] : []), `-Dmaven.repo.local=${repository}`, "-f", join(source, "pom.xml"), "test"], { env, check: false });
     return { sdkVersion: SDK_VERSION, testCases: readNativeTestCases(output, execution, "java", "junit", join(source, "target/surefire-reports")) };
   });
 } catch (error) { result = { testCases: failure("java", error instanceof Error ? error.message : String(error)) }; }
