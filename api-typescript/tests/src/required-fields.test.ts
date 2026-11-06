@@ -85,3 +85,54 @@ test("Permissive converters cannot return numbers as declared boolean or string 
   assert.throws(() => modelFields("IntegrationStep", { content: 1 }, { content: 1 }), /scalar type must be string/);
   assert.deepEqual(modelFields("IntegrationStep", { method: "FutureMethod" }, { method: "FutureMethod" }), { method: "FutureMethod" });
 });
+
+const session = { id: "00000000-0000-4000-8000-000000000001", done: false, success: false, created: 1, updated: 1 };
+const provider = {
+  id: "provider", name: "Provider", logoUrl: "https://example.test/logo", subtext: "Description", health: "Healthy",
+  regions: [], countries: ["US"], subdivisions: [],
+  subProviders: [{ id: "sub", name: "Sub", subtext: "Description", logoUrl: "https://example.test/sub" }],
+};
+
+function compareResponse(modelName: string, wire: unknown, decoded: unknown) {
+  assert.deepEqual(modelFields(modelName, wire, decoded), modelFields(modelName, wire));
+}
+
+for (const sessions of [[], [session]]) {
+  test(`Published session model preserves a page with ${sessions.length} entries`, () => {
+    const wire = { sessions, total: sessions.length, more: false, futureField: "ignored" };
+    compareResponse("ListSessionsResponse", wire, sdk.ListSessionsResponseFromJSON(wire));
+  });
+}
+
+for (const mutation of ["truncate", "id", "total", "more"] as const) {
+  test(`Published session model rejects changed ${mutation}`, () => {
+    const wire = { sessions: [session], total: 1, more: false };
+    const decoded = sdk.ListSessionsResponseFromJSON(wire);
+    compareResponse("ListSessionsResponse", wire, decoded);
+    switch (mutation) {
+      case "truncate": decoded.sessions.length = 0; break;
+      case "id": decoded.sessions[0].id = "00000000-0000-4000-8000-000000000002"; break;
+      case "total": decoded.total = 2; break;
+      case "more": decoded.more = true; break;
+    }
+    assert.throws(() => compareResponse("ListSessionsResponse", wire, decoded), assert.AssertionError);
+  });
+}
+
+for (const field of ["recommendedProviders", "remainder"] as const) {
+  for (const mutation of ["unchanged", "provider", "country", "subprovider"] as const) {
+    test(`Published recommendation model checks ${field}: ${mutation}`, () => {
+      const wire = { recommendedProviders: [provider], remainder: [provider], futureField: "ignored" };
+      // Converters can retain scalar arrays; keep the reference wire payload independent.
+      const decoded = sdk.RecommendProvidersResponseFromJSON(structuredClone(wire));
+      compareResponse("RecommendProvidersResponse", wire, decoded);
+      switch (mutation) {
+        case "unchanged": return;
+        case "provider": decoded[field].length = 0; break;
+        case "country": decoded[field][0].countries.length = 0; break;
+        case "subprovider": decoded[field][0].subProviders![0].name = "Changed"; break;
+      }
+      assert.throws(() => compareResponse("RecommendProvidersResponse", wire, decoded), assert.AssertionError);
+    });
+  }
+}

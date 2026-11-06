@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	trinsic_api "github.com/trinsic-id/sdk-go-api/v3"
 	"net/http"
@@ -10,6 +11,90 @@ import (
 	"strings"
 	"testing"
 )
+
+const harnessSessionJSON = `{"id":"00000000-0000-4000-8000-000000000001","done":false,"success":false,"created":1,"updated":1}`
+const harnessProviderJSON = `{"id":"provider","name":"Provider","logoUrl":"https://example.test/logo","subtext":"Description","health":"Healthy",
+	"regions":[],"countries":["US"],"subdivisions":[],
+	"subProviders":[{"id":"sub","name":"Sub","subtext":"Description","logoUrl":"https://example.test/sub"}]}`
+
+// Exercise the same captured-response comparison used by live SDK calls.
+func harnessResponse(t *testing.T, raw string, decoded any) *http.Response {
+	t.Helper()
+	if err := json.Unmarshal([]byte(raw), decoded); err != nil {
+		t.Fatal(err)
+	}
+	var wire any
+	if err := json.Unmarshal([]byte(raw), &wire); err != nil {
+		t.Fatal(err)
+	}
+	response := &http.Response{StatusCode: http.StatusOK}
+	capturedWire[response] = wire
+	t.Cleanup(func() { delete(capturedWire, response) })
+	if _, err := sdkResult(decoded, response, nil); err != nil {
+		t.Fatalf("unchanged SDK response failed: %v", err)
+	}
+	return response
+}
+
+func TestHarnessPublishedSessionPages(t *testing.T) {
+	for _, count := range []int{0, 1} {
+		t.Run(fmt.Sprintf("entries_%d", count), func(t *testing.T) {
+			sessions := ""
+			if count == 1 {
+				sessions = harnessSessionJSON
+			}
+			var decoded trinsic_api.ListSessionsResponse
+			harnessResponse(t, fmt.Sprintf(`{"sessions":[%s],"total":%d,"more":false,"futureField":"ignored"}`, sessions, count), &decoded)
+		})
+	}
+	for _, mutation := range []string{"truncate", "id", "total", "more"} {
+		t.Run(mutation, func(t *testing.T) {
+			var decoded trinsic_api.ListSessionsResponse
+			response := harnessResponse(t, `{"sessions":[`+harnessSessionJSON+`],"total":1,"more":false}`, &decoded)
+			switch mutation {
+			case "truncate":
+				decoded.Sessions = decoded.Sessions[:0]
+			case "id":
+				decoded.Sessions[0].Id = "00000000-0000-4000-8000-000000000002"
+			case "total":
+				decoded.Total = 2
+			case "more":
+				decoded.More = true
+			}
+			if _, err := sdkResult(&decoded, response, nil); err == nil {
+				t.Fatalf("changed %s passed the response comparison", mutation)
+			}
+		})
+	}
+}
+
+func TestHarnessPublishedRecommendations(t *testing.T) {
+	for _, field := range []string{"recommendedProviders", "remainder"} {
+		for _, mutation := range []string{"unchanged", "provider", "country", "subprovider"} {
+			t.Run(field+"/"+mutation, func(t *testing.T) {
+				var decoded trinsic_api.RecommendProvidersResponse
+				response := harnessResponse(t, `{"recommendedProviders":[`+harnessProviderJSON+`],"remainder":[`+harnessProviderJSON+`],"futureField":"ignored"}`, &decoded)
+				providers := &decoded.RecommendedProviders
+				if field == "remainder" {
+					providers = &decoded.Remainder
+				}
+				switch mutation {
+				case "unchanged":
+					return
+				case "provider":
+					*providers = (*providers)[:0]
+				case "country":
+					(*providers)[0].Countries = []string{}
+				case "subprovider":
+					(*providers)[0].SubProviders[0].Name = "Changed"
+				}
+				if _, err := sdkResult(&decoded, response, nil); err == nil {
+					t.Fatalf("changed %s in %s passed the response comparison", mutation, field)
+				}
+			})
+		}
+	}
+}
 
 func TestMain(m *testing.M) {
 	code := m.Run()

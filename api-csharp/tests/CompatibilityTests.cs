@@ -147,6 +147,9 @@ public sealed class CompatibilityFixture : IAsyncLifetime
         Assert.True(response.Content.AsSpan().StartsWith(new byte[] { 137, 80, 78, 71, 13, 10, 26, 10 }), "Attachment must contain PNG bytes");
     }
     public JsonNode? ModelFields(object? model, JsonNode? wire, bool decoded = false)
+        => ModelFields(model, wire, decoded, serializerOptions);
+
+    internal static JsonNode? ModelFields(object? model, JsonNode? wire, bool decoded, JsonSerializerOptions serializerOptions)
     {
         if (model is not null && wire is JsonObject fields)
         {
@@ -157,7 +160,7 @@ public sealed class CompatibilityFixture : IAsyncLifetime
                 foreach (var property in properties)
                 {
                     var name = property.GetCustomAttribute<JsonPropertyNameAttribute>()!.Name;
-                    if (fields.ContainsKey(name)) output[name] = ModelFields(property.GetValue(model), fields[name], decoded);
+                    if (fields.ContainsKey(name)) output[name] = ModelFields(property.GetValue(model), fields[name], decoded, serializerOptions);
                 }
                 return output;
             }
@@ -165,14 +168,14 @@ public sealed class CompatibilityFixture : IAsyncLifetime
             {
                 if (decoded) Assert.Equal(fields.Select(p => p.Key).Order(), dictionary.Keys.Cast<string>().Order());
                 var output = new JsonObject();
-                foreach (var (key, value) in fields) output[key] = ModelFields(dictionary[key], value, decoded);
+                foreach (var (key, value) in fields) output[key] = ModelFields(dictionary[key], value, decoded, serializerOptions);
                 return output;
             }
         }
         if (model is IList list && wire is JsonArray array)
         {
             Assert.Equal(array.Count, list.Count);
-            return new JsonArray(array.Select((value, index) => ModelFields(list[index], value, decoded)).ToArray());
+            return new JsonArray(array.Select((value, index) => ModelFields(list[index], value, decoded, serializerOptions)).ToArray());
         }
         return decoded ? JsonSerializer.SerializeToNode(model, model?.GetType() ?? typeof(object), serializerOptions) : wire?.DeepClone();
     }

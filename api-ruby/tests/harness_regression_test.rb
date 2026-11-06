@@ -5,6 +5,58 @@ require 'timeout'
 require 'ostruct'
 
 class HarnessRegressionTest < Minitest::Test
+  SESSION = { 'id' => '00000000-0000-4000-8000-000000000001', 'done' => false, 'success' => false, 'created' => 1, 'updated' => 1 }.freeze
+  PROVIDER = {
+    'id' => 'provider', 'name' => 'Provider', 'logoUrl' => 'https://example.test/logo', 'subtext' => 'Description', 'health' => 'Healthy',
+    'regions' => [], 'countries' => ['US'], 'subdivisions' => [],
+    'subProviders' => [{ 'id' => 'sub', 'name' => 'Sub', 'subtext' => 'Description', 'logoUrl' => 'https://example.test/sub' }]
+  }.freeze
+
+  def compare_response(decoded, wire)
+    compare_json(model_fields(decoded, wire, true), model_fields(decoded, wire), 'response', true)
+  end
+
+  [0, 1].each do |count|
+    define_method("test_published_session_model_preserves_#{count}_entries") do
+      wire = { 'sessions' => [SESSION].take(count), 'total' => count, 'more' => false, 'futureField' => 'ignored' }
+      decoded = TrinsicApi::ListSessionsResponse.build_from_hash(wire)
+      compare_response(decoded, wire)
+    end
+  end
+
+  %w[truncate id total more].each do |mutation|
+    define_method("test_published_session_model_rejects_changed_#{mutation}") do
+      wire = { 'sessions' => [SESSION], 'total' => 1, 'more' => false }
+      decoded = TrinsicApi::ListSessionsResponse.build_from_hash(wire)
+      compare_response(decoded, wire)
+      case mutation
+      when 'truncate' then decoded.sessions = []
+      when 'id' then decoded.sessions[0].id = '00000000-0000-4000-8000-000000000002'
+      when 'total' then decoded.total = 2
+      when 'more' then decoded.more = true
+      end
+      assert_raises(RuntimeError) { compare_response(decoded, wire) }
+    end
+  end
+
+  %i[recommended_providers remainder].each do |field|
+    %w[unchanged provider country subprovider].each do |mutation|
+      define_method("test_published_recommendation_model_#{field}_#{mutation}") do
+        wire = { 'recommendedProviders' => [PROVIDER], 'remainder' => [PROVIDER], 'futureField' => 'ignored' }
+        decoded = TrinsicApi::RecommendProvidersResponse.build_from_hash(wire)
+        compare_response(decoded, wire)
+        next if mutation == 'unchanged'
+        providers = decoded.public_send(field)
+        case mutation
+        when 'provider' then providers.clear
+        when 'country' then providers[0].countries = []
+        when 'subprovider' then providers[0].sub_providers[0].name = 'Changed'
+        end
+        assert_raises(RuntimeError) { compare_response(decoded, wire) }
+      end
+    end
+  end
+
   def test_a_read_failure_does_not_suppress_other_read_cases
     previous = $compatibility_results
     $compatibility_results = []

@@ -8,7 +8,7 @@ by the capturing SDK client. Unknown wire fields are ignored; list lengths,
 pagination, and nested recommendation fields must survive deserialization.
 Session tests also check launch URLs, access keys, state, identity data, and attachment content.
 
-Run the offline harness regressions with the published `trinsic-api==3.2.0`
+Run the offline harness regressions with the published `trinsic-api==3.2.1`
 and `pytest` installed:
 
 ```sh

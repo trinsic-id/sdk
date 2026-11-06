@@ -11,6 +11,8 @@ import id.trinsic.api.models.CreateDirectProviderSessionResponse;
 import id.trinsic.api.models.GetSessionResultRequest;
 import id.trinsic.api.models.GetSessionResultResponse;
 import id.trinsic.api.models.ListRedirectUrisResponse;
+import id.trinsic.api.models.ListSessionsResponse;
+import id.trinsic.api.models.RecommendProvidersResponse;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -18,6 +20,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -26,6 +31,62 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** Local regressions for the compatibility harness; no Connect credentials needed. */
 class CompatibilityHarnessTest {
+  private static final String SESSION = """
+      {"id":"00000000-0000-4000-8000-000000000001","done":false,"success":false,"created":1,"updated":1}
+      """;
+  private static final String PROVIDER = """
+      {"id":"provider","name":"Provider","logoUrl":"https://example.test/logo","subtext":"Description","health":"Healthy",
+       "regions":[],"countries":["US"],"subdivisions":[],
+       "subProviders":[{"id":"sub","name":"Sub","subtext":"Description","logoUrl":"https://example.test/sub"}]}
+      """;
+
+  private static void compareResponse(Object decoded, com.fasterxml.jackson.databind.JsonNode wire) throws Exception {
+    CompatibilityTest compatibility = new CompatibilityTest();
+    setField(compatibility, "client", new ApiClient());
+    CompatibilityTest.compareJson(compatibility.modelFields(decoded, wire, true), compatibility.modelFields(decoded, wire, false), "response", true);
+  }
+
+  @ParameterizedTest @ValueSource(booleans = {false, true})
+  void publishedSessionModelPreservesEmptyAndNonemptyPages(boolean populated) throws Exception {
+    var mapper = new ApiClient().getObjectMapper();
+    var wire = mapper.readTree("{\"sessions\":[" + (populated ? SESSION : "") + "],\"total\":" + (populated ? 1 : 0) + ",\"more\":false,\"futureField\":\"ignored\"}");
+    compareResponse(mapper.treeToValue(wire, ListSessionsResponse.class), wire);
+  }
+
+  @ParameterizedTest @ValueSource(strings = {"truncate", "id", "total", "more"})
+  void publishedSessionModelRejectsChangedFields(String mutation) throws Exception {
+    var mapper = new ApiClient().getObjectMapper();
+    var wire = mapper.readTree("{\"sessions\":[" + SESSION + "],\"total\":1,\"more\":false}");
+    var decoded = mapper.treeToValue(wire, ListSessionsResponse.class);
+    compareResponse(decoded, wire);
+    switch (mutation) {
+      case "truncate" -> decoded.getSessions().clear();
+      case "id" -> decoded.getSessions().get(0).setId("00000000-0000-4000-8000-000000000002");
+      case "total" -> decoded.setTotal(2);
+      case "more" -> decoded.setMore(true);
+      default -> throw new IllegalArgumentException(mutation);
+    }
+    assertThrows(AssertionError.class, () -> compareResponse(decoded, wire));
+  }
+
+  @ParameterizedTest @CsvSource({"recommended,unchanged", "recommended,provider", "recommended,country", "recommended,subprovider",
+      "remainder,unchanged", "remainder,provider", "remainder,country", "remainder,subprovider"})
+  void publishedRecommendationModelPreservesNestedFields(String field, String mutation) throws Exception {
+    var mapper = new ApiClient().getObjectMapper();
+    var wire = mapper.readTree("{\"recommendedProviders\":[" + PROVIDER + "],\"remainder\":[" + PROVIDER + "],\"futureField\":\"ignored\"}");
+    var decoded = mapper.treeToValue(wire, RecommendProvidersResponse.class);
+    compareResponse(decoded, wire);
+    var providers = field.equals("recommended") ? decoded.getRecommendedProviders() : decoded.getRemainder();
+    switch (mutation) {
+      case "unchanged" -> { return; }
+      case "provider" -> providers.clear();
+      case "country" -> providers.get(0).getCountries().clear();
+      case "subprovider" -> providers.get(0).getSubProviders().get(0).setName("Changed");
+      default -> throw new IllegalArgumentException(mutation);
+    }
+    assertThrows(AssertionError.class, () -> compareResponse(decoded, wire));
+  }
+
   @Test void queryValuesAndRawPathAreEncodedOnce() throws Exception {
     var method = CompatibilityTest.class.getDeclaredMethod("withQuery", URI.class, String.class, String.class);
     method.setAccessible(true);
