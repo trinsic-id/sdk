@@ -13,7 +13,7 @@ try {
     const output = join(directory, "target-results.json");
     const native = join(directory, "native.xml");
     const tests = new URL(".", import.meta.url).pathname;
-    const execution = command(python, ["-m", "pytest", "-q", "--rootdir", tests, "--junitxml", native, ...(process.env.SDK_COMPATIBILITY_TEST_SCOPE === "serialization" ? ["-k", "provider_output"] : []), join(tests, "test_compatibility.py")], { check: false, env: childEnvironment({ SDK_COMPATIBILITY_RESULT_FILE: output, SDK_VERSION: version }) });
+    const execution = command(python, ["-m", "pytest", "-q", "--rootdir", tests, "--junitxml", native, ...(process.env.SDK_COMPATIBILITY_TEST_SCOPE === "serialization" ? ["-k", "provider_output"] : []), join(tests, "test_compatibility.py"), join(tests, "test_harness.py")], { check: false, env: childEnvironment({ SDK_COMPATIBILITY_RESULT_FILE: output, SDK_VERSION: version }) });
     return { sdkVersion: version, testCases: readNativeTestCases(output, execution, "python", "junit", native) };
   }));
 } catch (error) { testCases = failure("python", error instanceof Error ? error.message : String(error)); }
