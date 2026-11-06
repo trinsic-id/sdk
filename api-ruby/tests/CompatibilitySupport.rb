@@ -13,7 +13,6 @@ def as_hash(value) = value.respond_to?(:to_hash) ? value.to_hash : value
 def response_body(value) = value.is_a?(Array) && value.length == 3 && value.last.is_a?(Hash) ? value[0] : value
 def normalize_json(value) = JSON.parse(JSON.generate(value))
 def supports_attribute?(model_name, attribute) = TrinsicApi.const_get(model_name).attribute_map.key?(attribute)
-def allow_missing_pso_models? = %w[1 true].include?(ENV.fetch('SDK_COMPATIBILITY_ALLOW_MISSING_PSO_MODELS', '').downcase)
 def equivalent_timestamp?(actual, expected); actual.match?(/^\d{4}-\d{2}-\d{2}[ T]/) && expected.match?(/^\d{4}-\d{2}-\d{2}[ T]/) && Time.parse(actual).utc.to_i == Time.parse(expected).utc.to_i; rescue StandardError; false; end
 def compare_json(actual, expected, path, exact)
   if actual.is_a?(Hash) && expected.is_a?(Hash)

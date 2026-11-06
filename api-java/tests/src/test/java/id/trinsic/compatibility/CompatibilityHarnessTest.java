@@ -67,6 +67,9 @@ class CompatibilityHarnessTest {
       setField(compatibility, "sessions", new SessionsApi() {
         @Override public CreateDirectProviderSessionResponse createDirectProviderSession(CreateDirectProviderSessionRequest request) { return session; }
         @Override public GetSessionResultResponse getSessionResult(UUID id, GetSessionResultRequest request) throws ApiException {
+          try { assertEquals("complete", request.getClass().getMethod("getRedirectToken").invoke(request)); }
+          catch (NoSuchMethodException ignored) { /* Older SDKs use the backwards-compatible redirect flow. */ }
+          catch (ReflectiveOperationException error) { throw new AssertionError(error); }
           assertEquals(sessionId, id);
           assertEquals("key", request.getResultsAccessKey());
           throw regression;

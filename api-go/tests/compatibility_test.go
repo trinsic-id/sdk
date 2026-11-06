@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 	"testing"
 
 	trinsic_api "github.com/trinsic-id/sdk-go-api/v3"
@@ -95,8 +96,8 @@ func TestSessionLifecycle(t *testing.T) {
 	t.Run("GetDirect", func(t *testing.T) {
 		direct, err := createDirect(c, profile)
 		if err != nil {
-			skip("api.sessions.get", "Direct-session setup failed.", nil)
-			t.Skip("Direct-session setup failed.")
+			runCase(t, "api.sessions.get", nil, func() (any, error) { return nil, err })
+			return
 		}
 		id := str(direct, "SessionId")
 		defer func() { _, _ = execute(c, "SessionsAPI", "CancelSession", []any{id}, nil) }()
@@ -105,8 +106,8 @@ func TestSessionLifecycle(t *testing.T) {
 	t.Run("CancelDirect", func(t *testing.T) {
 		direct, err := createDirect(c, profile)
 		if err != nil {
-			skip("api.sessions.cancel", "Direct-session setup failed.", nil)
-			t.Skip("Direct-session setup failed.")
+			runCase(t, "api.sessions.cancel", nil, func() (any, error) { return nil, err })
+			return
 		}
 		runCase(t, "api.sessions.cancel", nil, func() (any, error) {
 			return execute(c, "SessionsAPI", "CancelSession", []any{str(direct, "SessionId")}, nil)
@@ -125,8 +126,11 @@ func TestCompletedSession(t *testing.T) {
 	t.Run("GetAttachment", func(t *testing.T) {
 		session, key, result, err := completedResult(c, profile)
 		if err != nil || attachment(result) == "" {
-			skip("api.sessions.get-attachment", "Redirect-session setup or result retrieval failed.", nil)
-			t.Skip("Redirect-session setup or result retrieval failed.")
+			if err == nil {
+				err = fmt.Errorf("Completed redirect session did not return an attachment")
+			}
+			runCase(t, "api.sessions.get-attachment", nil, func() (any, error) { return nil, err })
+			return
 		}
 		runCase(t, "api.sessions.get-attachment", nil, func() (any, error) {
 			r := trinsic_api.GetAttachmentRequest{}
@@ -135,10 +139,10 @@ func TestCompletedSession(t *testing.T) {
 		})
 	})
 	t.Run("Redact", func(t *testing.T) {
-		session, _, _, err := completedResult(c, profile)
+		session, _, _, err := complete(c, profile)
 		if err != nil {
-			skip("api.sessions.redact", "Redirect-session setup or result retrieval failed.", nil)
-			t.Skip("Redirect-session setup or result retrieval failed.")
+			runCase(t, "api.sessions.redact", nil, func() (any, error) { return nil, err })
+			return
 		}
 		runCase(t, "api.sessions.redact", nil, func() (any, error) {
 			return execute(c, "SessionsAPI", "RedactSession", []any{str(session, "SessionId")}, nil)
@@ -171,11 +175,18 @@ func TestProviderOutputs(t *testing.T) {
 	// pso records one compatibility outcome per provider, preserving acknowledgement metadata.
 	pso()
 	for _, result := range results {
-		if result.Status == "failed" && result.ID == "serialization.provider-output-round-trip" {
-			// The shared matrix applies acknowledgement policy to these outcomes.
-			// Keep the detail in normal go-test output without preventing it from
-			// producing the complete result envelope for that policy to inspect.
-			t.Log(fmt.Sprintf("%v", result.Failure))
+		if result.Status == "failed" && strings.HasPrefix(result.ID, "serialization.") {
+			t.Errorf("%s: %v", result.ID, result.Failure)
 		}
+	}
+}
+
+func TestHarnessNullableIdentityAttachments(t *testing.T) {
+	identity := trinsic_api.IdentityData{Attachments: []trinsic_api.AttachmentInfo{{Id: "attachment-id"}}}
+	result := struct {
+		IdentityData trinsic_api.NullableIdentityData
+	}{IdentityData: *trinsic_api.NewNullableIdentityData(&identity)}
+	if got := attachment(result); got != "attachment-id" {
+		t.Fatalf("attachment through nullable identity = %q", got)
 	}
 }

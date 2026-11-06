@@ -143,11 +143,6 @@ final class CompatibilitySupport
         return is_string($id) && $id !== '' ? $id : null;
     }
 
-    public function allowMissingPsoModels(): bool
-    {
-        return in_array(strtolower((string) getenv('SDK_COMPATIBILITY_ALLOW_MISSING_PSO_MODELS')), ['1', 'true'], true);
-    }
-
     public function compareJson(mixed $actual, mixed $expected, string $path, bool $exact): void
     {
         if (is_array($actual) && is_array($expected)) {

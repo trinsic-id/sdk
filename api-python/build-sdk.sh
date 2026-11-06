@@ -48,6 +48,8 @@ fi
 
 "$REPO_ROOT/helpers/generate-client.sh" "${generator_arguments[@]}"
 
+node "$REPO_ROOT/helpers/make-enums-forward-compatible.mjs" python "$SCRIPT_DIR/sdk"
+
 cp "$SCRIPT_DIR/README.md" "$SCRIPT_DIR/sdk"
 cp "$REPO_ROOT/LICENSE" "$SCRIPT_DIR/sdk"
 

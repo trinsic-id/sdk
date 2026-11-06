@@ -15,13 +15,14 @@ try {
       command("go", ["mod", "edit", `-replace=${moduleName}=${selected.packagePath}`], { cwd: directory });
     } else command("go", ["get", `${moduleName}@v${selected.version}`], { cwd: directory });
     const packageDirectory = command("go", ["list", "-f", "{{.Dir}}", moduleName], { cwd: directory }).stdout.trim();
-    const version = selected.version ?? "3.2.1";
+    const version = selected.version ?? readFileSync(join(packageDirectory, "configuration.go"), "utf8").match(/UserAgent:\s*"OpenAPI-Generator\/([^/]+)\/go"/)?.[1];
+    if (!version) throw new Error("Generated Go SDK did not declare its package version.");
     cpSync(join(tests, "CompatibilitySupport.go"), join(directory, "CompatibilitySupport.go"));
     cpSync(join(tests, "compatibility_test.go"), join(directory, "compatibility_test.go"));
     writeFileSync(join(directory, "pso_models_gen.go"), providerOutputRegistry(packageDirectory));
     command("go", ["mod", "tidy"], { cwd: directory });
     const output = join(directory, "target-results.json");
-    const execution = command("go", ["test", "-count=1", "."], { cwd: directory, check: false, env: childEnvironment({ SDK_COMPATIBILITY_RESULT_FILE: output, SDK_VERSION: version }) });
+    const execution = command("go", ["test", "-count=1", ...(process.env.SDK_COMPATIBILITY_TEST_SCOPE === "serialization" ? ["-run", "TestProviderOutputs|TestHarness"] : []), "."], { cwd: directory, check: false, env: childEnvironment({ SDK_COMPATIBILITY_RESULT_FILE: output, SDK_VERSION: version }) });
     return { sdkVersion: version, testCases: readProcessTestCases(output, execution, "go") };
   }));
 } catch (error) { testCases = failure("go", error instanceof Error ? error.message : String(error)); }

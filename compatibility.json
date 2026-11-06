@@ -1,356 +1,746 @@
 {
   "compatibility": {
     "sdkVersions": {
-      "typescript": ["3.0.0", "3.1.0", "3.2.1"],
-      "python": ["3.0.0", "3.1.0", "3.2.1"],
-      "csharp": ["3.0.0", "3.1.0", "3.2.1"],
-      "php": ["3.0.0", "3.1.0", "3.2.1"],
-      "ruby": ["3.0.0", "3.1.0", "3.2.1"],
-      "go": ["3.0.0", "3.1.0", "3.2.1"],
-      "java": ["3.0.0", "3.1.0", "3.2.1"]
+      "typescript": [
+        "3.0.0",
+        "3.1.0",
+        "3.2.1"
+      ],
+      "python": [
+        "3.0.0",
+        "3.1.0",
+        "3.2.1"
+      ],
+      "csharp": [
+        "3.0.0",
+        "3.1.0",
+        "3.2.1"
+      ],
+      "php": [
+        "3.0.0",
+        "3.1.0",
+        "3.2.1"
+      ],
+      "ruby": [
+        "3.0.0",
+        "3.1.0",
+        "3.2.1"
+      ],
+      "go": [
+        "3.0.0",
+        "3.1.0",
+        "3.2.1"
+      ],
+      "java": [
+        "3.0.0",
+        "3.1.0",
+        "3.2.1"
+      ]
     },
     "acknowledgements": [
       {
         "language": "csharp",
         "sdkVersion": "3.0.0",
         "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "france-identite-numerique", "sdkModelName": "FrenchNumeriqueProviderOutput" },
-        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName."
+        "parameters": {
+          "providerId": "france-identite-numerique",
+          "sdkModelName": "FrenchNumeriqueProviderOutput"
+        },
+        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName.",
+        "failureMessageIncludes": [
+          "FrenchNumeriqueGivenName"
+        ]
       },
       {
         "language": "csharp",
         "sdkVersion": "3.1.0",
         "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "france-identite-numerique", "sdkModelName": "FrenchNumeriqueProviderOutput" },
-        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName."
+        "parameters": {
+          "providerId": "france-identite-numerique",
+          "sdkModelName": "FrenchNumeriqueProviderOutput"
+        },
+        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName.",
+        "failureMessageIncludes": [
+          "FrenchNumeriqueGivenName"
+        ]
       },
       {
         "language": "go",
         "sdkVersion": "3.0.0",
         "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "france-identite-numerique", "sdkModelName": "FrenchNumeriqueProviderOutput" },
-        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName."
+        "parameters": {
+          "providerId": "france-identite-numerique",
+          "sdkModelName": "FrenchNumeriqueProviderOutput"
+        },
+        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName.",
+        "failureMessageIncludes": [
+          "FrenchNumeriqueGivenName"
+        ]
       },
       {
         "language": "go",
         "sdkVersion": "3.1.0",
         "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "france-identite-numerique", "sdkModelName": "FrenchNumeriqueProviderOutput" },
-        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName."
+        "parameters": {
+          "providerId": "france-identite-numerique",
+          "sdkModelName": "FrenchNumeriqueProviderOutput"
+        },
+        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName.",
+        "failureMessageIncludes": [
+          "FrenchNumeriqueGivenName"
+        ]
       },
       {
         "language": "php",
         "sdkVersion": "3.0.0",
         "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "france-identite-numerique", "sdkModelName": "FrenchNumeriqueProviderOutput" },
-        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName."
+        "parameters": {
+          "providerId": "france-identite-numerique",
+          "sdkModelName": "FrenchNumeriqueProviderOutput"
+        },
+        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName.",
+        "failureMessageIncludes": [
+          "givenName"
+        ]
       },
       {
         "language": "php",
         "sdkVersion": "3.1.0",
         "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "france-identite-numerique", "sdkModelName": "FrenchNumeriqueProviderOutput" },
-        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName."
+        "parameters": {
+          "providerId": "france-identite-numerique",
+          "sdkModelName": "FrenchNumeriqueProviderOutput"
+        },
+        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName.",
+        "failureMessageIncludes": [
+          "givenName"
+        ]
       },
       {
         "language": "python",
         "sdkVersion": "3.0.0",
         "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "france-identite-numerique", "sdkModelName": "FrenchNumeriqueProviderOutput" },
-        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName."
+        "parameters": {
+          "providerId": "france-identite-numerique",
+          "sdkModelName": "FrenchNumeriqueProviderOutput"
+        },
+        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName.",
+        "failureMessageIncludes": [
+          "FrenchNumeriqueGivenName"
+        ]
       },
       {
         "language": "python",
         "sdkVersion": "3.1.0",
         "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "france-identite-numerique", "sdkModelName": "FrenchNumeriqueProviderOutput" },
-        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName."
+        "parameters": {
+          "providerId": "france-identite-numerique",
+          "sdkModelName": "FrenchNumeriqueProviderOutput"
+        },
+        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName.",
+        "failureMessageIncludes": [
+          "FrenchNumeriqueGivenName"
+        ]
       },
       {
         "language": "ruby",
         "sdkVersion": "3.0.0",
         "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "france-identite-numerique", "sdkModelName": "FrenchNumeriqueProviderOutput" },
-        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName."
+        "parameters": {
+          "providerId": "france-identite-numerique",
+          "sdkModelName": "FrenchNumeriqueProviderOutput"
+        },
+        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName.",
+        "failureMessageIncludes": [
+          "givenName"
+        ]
       },
       {
         "language": "ruby",
         "sdkVersion": "3.1.0",
         "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "france-identite-numerique", "sdkModelName": "FrenchNumeriqueProviderOutput" },
-        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName."
+        "parameters": {
+          "providerId": "france-identite-numerique",
+          "sdkModelName": "FrenchNumeriqueProviderOutput"
+        },
+        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName.",
+        "failureMessageIncludes": [
+          "givenName"
+        ]
       },
       {
         "language": "typescript",
         "sdkVersion": "3.0.0",
         "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "france-identite-numerique", "sdkModelName": "FrenchNumeriqueProviderOutput" },
-        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName."
+        "parameters": {
+          "providerId": "france-identite-numerique",
+          "sdkModelName": "FrenchNumeriqueProviderOutput"
+        },
+        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName.",
+        "failureMessageIncludes": [
+          "givenName"
+        ]
       },
       {
         "language": "typescript",
         "sdkVersion": "3.1.0",
         "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "france-identite-numerique", "sdkModelName": "FrenchNumeriqueProviderOutput" },
-        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName."
-      },
-      {
-        "language": "csharp",
-        "sdkVersion": "3.0.0",
-        "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "freja", "sdkModelName": "FrejaProviderOutput" },
-        "reason": "Connect reassigned FrejaProviderOutput from the legacy a-freja-eid-login integration to the incompatible direct freja provider contract."
+        "parameters": {
+          "providerId": "france-identite-numerique",
+          "sdkModelName": "FrenchNumeriqueProviderOutput"
+        },
+        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName.",
+        "failureMessageIncludes": [
+          "givenName"
+        ]
       },
       {
         "language": "go",
         "sdkVersion": "3.0.0",
         "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "freja", "sdkModelName": "FrejaProviderOutput" },
-        "reason": "Connect reassigned FrejaProviderOutput from the legacy a-freja-eid-login integration to the incompatible direct freja provider contract."
+        "parameters": {
+          "providerId": "apple-wallet",
+          "sdkModelName": "AppleWalletProviderOutput"
+        },
+        "reason": "Connect added countryCode to nested mDL certificate data; Go 3.0's strict generated deserializer rejects the added public field.",
+        "failureMessageIncludes": [
+          "unknown field"
+        ]
       },
       {
-        "language": "php",
+        "language": "go",
         "sdkVersion": "3.0.0",
         "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "freja", "sdkModelName": "FrejaProviderOutput" },
-        "reason": "Connect reassigned FrejaProviderOutput from the legacy a-freja-eid-login integration to the incompatible direct freja provider contract."
+        "parameters": {
+          "providerId": "google-wallet",
+          "sdkModelName": "GoogleWalletProviderOutput"
+        },
+        "reason": "Connect added countryCode to nested mDL certificate data; Go 3.0's strict generated deserializer rejects the added public field.",
+        "failureMessageIncludes": [
+          "unknown field"
+        ]
+      },
+      {
+        "language": "go",
+        "sdkVersion": "3.0.0",
+        "testCaseId": "serialization.provider-output-round-trip",
+        "parameters": {
+          "providerId": "samsung-wallet",
+          "sdkModelName": "SamsungWalletProviderOutput"
+        },
+        "reason": "Connect added countryCode to nested mDL certificate data; Go 3.0's strict generated deserializer rejects the added public field.",
+        "failureMessageIncludes": [
+          "unknown field"
+        ]
       },
       {
         "language": "python",
         "sdkVersion": "3.0.0",
         "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "freja", "sdkModelName": "FrejaProviderOutput" },
-        "reason": "Connect reassigned FrejaProviderOutput from the legacy a-freja-eid-login integration to the incompatible direct freja provider contract."
-      },
-      {
-        "language": "ruby",
-        "sdkVersion": "3.0.0",
-        "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "freja", "sdkModelName": "FrejaProviderOutput" },
-        "reason": "Connect reassigned FrejaProviderOutput from the legacy a-freja-eid-login integration to the incompatible direct freja provider contract."
-      },
-      {
-        "language": "typescript",
-        "sdkVersion": "3.0.0",
-        "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "freja", "sdkModelName": "FrejaProviderOutput" },
-        "reason": "Connect reassigned FrejaProviderOutput from the legacy a-freja-eid-login integration to the incompatible direct freja provider contract."
-      },
-      {
-        "language": "csharp",
-        "sdkVersion": "3.0.0",
-        "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "itsme", "sdkModelName": "ItsmeProviderOutput" },
-        "reason": "Connect reassigned ItsmeProviderOutput from the legacy a-itsme-login integration to the incompatible direct itsme provider contract."
-      },
-      {
-        "language": "csharp",
-        "sdkVersion": "3.1.0",
-        "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "itsme", "sdkModelName": "ItsmeProviderOutput" },
-        "reason": "Connect reassigned ItsmeProviderOutput from the legacy a-itsme-login integration to the incompatible direct itsme provider contract."
-      },
-      {
-        "language": "go",
-        "sdkVersion": "3.0.0",
-        "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "itsme", "sdkModelName": "ItsmeProviderOutput" },
-        "reason": "Connect reassigned ItsmeProviderOutput from the legacy a-itsme-login integration to the incompatible direct itsme provider contract."
-      },
-      {
-        "language": "go",
-        "sdkVersion": "3.1.0",
-        "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "itsme", "sdkModelName": "ItsmeProviderOutput" },
-        "reason": "Connect reassigned ItsmeProviderOutput from the legacy a-itsme-login integration to the incompatible direct itsme provider contract."
+        "parameters": {
+          "providerId": "apple-wallet",
+          "sdkModelName": "AppleWalletProviderOutput"
+        },
+        "reason": "Python 3.0's generated mDL model cannot serialize nested nameSpaces maps: its generated to_dict calls to_dict on an inner dictionary.",
+        "failureMessageIncludes": [
+          "'dict' object has no attribute 'to_dict'"
+        ]
       },
       {
         "language": "python",
         "sdkVersion": "3.0.0",
         "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "itsme", "sdkModelName": "ItsmeProviderOutput" },
-        "reason": "Connect reassigned ItsmeProviderOutput from the legacy a-itsme-login integration to the incompatible direct itsme provider contract."
-      },
-      {
-        "language": "python",
-        "sdkVersion": "3.1.0",
-        "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "itsme", "sdkModelName": "ItsmeProviderOutput" },
-        "reason": "Connect reassigned ItsmeProviderOutput from the legacy a-itsme-login integration to the incompatible direct itsme provider contract."
-      },
-      {
-        "language": "ruby",
-        "sdkVersion": "3.0.0",
-        "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "itsme", "sdkModelName": "ItsmeProviderOutput" },
-        "reason": "Connect reassigned ItsmeProviderOutput from the legacy a-itsme-login integration to the incompatible direct itsme provider contract."
-      },
-      {
-        "language": "ruby",
-        "sdkVersion": "3.1.0",
-        "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "itsme", "sdkModelName": "ItsmeProviderOutput" },
-        "reason": "Connect reassigned ItsmeProviderOutput from the legacy a-itsme-login integration to the incompatible direct itsme provider contract."
-      },
-      {
-        "language": "go",
-        "sdkVersion": "3.0.0",
-        "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "apple-wallet", "sdkModelName": "AppleWalletProviderOutput" },
-        "reason": "Connect added countryCode to nested mDL certificate data; Go 3.0's strict generated deserializer rejects the added public field."
-      },
-      {
-        "language": "go",
-        "sdkVersion": "3.0.0",
-        "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "google-wallet", "sdkModelName": "GoogleWalletProviderOutput" },
-        "reason": "Connect added countryCode to nested mDL certificate data; Go 3.0's strict generated deserializer rejects the added public field."
-      },
-      {
-        "language": "go",
-        "sdkVersion": "3.0.0",
-        "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "samsung-wallet", "sdkModelName": "SamsungWalletProviderOutput" },
-        "reason": "Connect added countryCode to nested mDL certificate data; Go 3.0's strict generated deserializer rejects the added public field."
+        "parameters": {
+          "providerId": "google-wallet",
+          "sdkModelName": "GoogleWalletProviderOutput"
+        },
+        "reason": "Python 3.0's generated mDL model cannot serialize nested nameSpaces maps: its generated to_dict calls to_dict on an inner dictionary.",
+        "failureMessageIncludes": [
+          "'dict' object has no attribute 'to_dict'"
+        ]
       },
       {
         "language": "python",
         "sdkVersion": "3.0.0",
         "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "apple-wallet", "sdkModelName": "AppleWalletProviderOutput" },
-        "reason": "Python 3.0's generated mDL model cannot serialize nested nameSpaces maps: its generated to_dict calls to_dict on an inner dictionary."
-      },
-      {
-        "language": "python",
-        "sdkVersion": "3.0.0",
-        "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "google-wallet", "sdkModelName": "GoogleWalletProviderOutput" },
-        "reason": "Python 3.0's generated mDL model cannot serialize nested nameSpaces maps: its generated to_dict calls to_dict on an inner dictionary."
-      },
-      {
-        "language": "python",
-        "sdkVersion": "3.0.0",
-        "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "samsung-wallet", "sdkModelName": "SamsungWalletProviderOutput" },
-        "reason": "Python 3.0's generated mDL model cannot serialize nested nameSpaces maps: its generated to_dict calls to_dict on an inner dictionary."
+        "parameters": {
+          "providerId": "samsung-wallet",
+          "sdkModelName": "SamsungWalletProviderOutput"
+        },
+        "reason": "Python 3.0's generated mDL model cannot serialize nested nameSpaces maps: its generated to_dict calls to_dict on an inner dictionary.",
+        "failureMessageIncludes": [
+          "'dict' object has no attribute 'to_dict'"
+        ]
       },
       {
         "language": "go",
         "sdkVersion": "3.0.0",
         "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "philippines-digital-national-id-qr", "sdkModelName": "PhilippinesDigitalNidProviderOutput" },
-        "reason": "Connect added public Philippine National ID fields after Go 3.0; its strict generated deserializer rejects those additional fields."
+        "parameters": {
+          "providerId": "philippines-digital-national-id-qr",
+          "sdkModelName": "PhilippinesDigitalNidProviderOutput"
+        },
+        "reason": "Connect added public Philippine National ID fields after Go 3.0; its strict generated deserializer rejects those additional fields.",
+        "failureMessageIncludes": [
+          "unknown field"
+        ]
       },
       {
         "language": "go",
         "sdkVersion": "3.0.0",
         "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "philippines-physical-national-id-qr", "sdkModelName": "PhilippinesPhysicalNidProviderOutput" },
-        "reason": "Connect added public Philippine National ID fields after Go 3.0; its strict generated deserializer rejects those additional fields."
+        "parameters": {
+          "providerId": "philippines-physical-national-id-qr",
+          "sdkModelName": "PhilippinesPhysicalNidProviderOutput"
+        },
+        "reason": "Connect added public Philippine National ID fields after Go 3.0; its strict generated deserializer rejects those additional fields.",
+        "failureMessageIncludes": [
+          "unknown field"
+        ]
       },
       {
         "language": "go",
         "sdkVersion": "3.0.0",
         "testCaseId": "api.providers.list",
-        "reason": "Connect added localizedDisplayNames to provider responses after Go 3.0; its strict generated deserializer rejects the added field."
+        "reason": "Connect added localizedDisplayNames to provider responses after Go 3.0; its strict generated deserializer rejects the added field.",
+        "failureMessageIncludes": [
+          "unknown field"
+        ]
       },
       {
         "language": "go",
         "sdkVersion": "3.0.0",
         "testCaseId": "api.verification-profiles.get-by-id",
-        "reason": "Connect added externalId to verification profile responses after Go 3.0; its strict generated deserializer rejects the added field."
+        "reason": "Connect added externalId to verification profile responses after Go 3.0; its strict generated deserializer rejects the added field.",
+        "failureMessageIncludes": [
+          "unknown field"
+        ]
       },
       {
         "language": "go",
         "sdkVersion": "3.0.0",
         "testCaseId": "api.verification-profiles.list",
-        "reason": "Connect added externalId to verification profile responses after Go 3.0; its strict generated deserializer rejects the added field."
+        "reason": "Connect added externalId to verification profile responses after Go 3.0; its strict generated deserializer rejects the added field.",
+        "failureMessageIncludes": [
+          "unknown field"
+        ]
       },
       {
         "language": "go",
         "sdkVersion": "3.0.0",
         "testCaseId": "api.sessions.recommend-providers",
-        "reason": "Connect added remainder to provider recommendation responses after Go 3.0; its strict generated deserializer rejects the added field."
+        "reason": "Connect added remainder to provider recommendation responses after Go 3.0; its strict generated deserializer rejects the added field.",
+        "failureMessageIncludes": [
+          "unknown field"
+        ]
       },
       {
         "language": "php",
         "sdkVersion": "3.0.0",
         "testCaseId": "api.sessions.get-result",
-        "reason": "This published PHP SDK was generated with Match as an identifier, which is reserved syntax on its supported PHP 8.1+ runtime."
+        "reason": "This published PHP SDK was generated with Match as an identifier, which is reserved syntax on its supported PHP 8.1+ runtime.",
+        "failureMessageIncludes": [
+          "match"
+        ]
       },
       {
         "language": "php",
         "sdkVersion": "3.1.0",
         "testCaseId": "api.sessions.get-result",
-        "reason": "This published PHP SDK was generated with Match as an identifier, which is reserved syntax on its supported PHP 8.1+ runtime."
+        "reason": "This published PHP SDK was generated with Match as an identifier, which is reserved syntax on its supported PHP 8.1+ runtime.",
+        "failureMessageIncludes": [
+          "match"
+        ]
       },
       {
         "language": "php",
         "sdkVersion": "3.2.1",
         "testCaseId": "api.sessions.get-result",
-        "reason": "This published PHP SDK was generated with Match as an identifier, which is reserved syntax on its supported PHP 8.1+ runtime."
+        "reason": "This published PHP SDK was generated with Match as an identifier, which is reserved syntax on its supported PHP 8.1+ runtime.",
+        "failureMessageIncludes": [
+          "match"
+        ]
       },
       {
         "language": "java",
         "sdkVersion": "3.0.0",
         "testCaseId": "api.providers.get",
-        "reason": "Java 3.0 predates the provider-by-ID operation and does not expose ProvidersApi.getProvider."
+        "reason": "Java 3.0 predates the provider-by-ID operation and does not expose ProvidersApi.getProvider.",
+        "failureMessageIncludes": [
+          "getProvider"
+        ]
       },
       {
         "language": "java",
         "sdkVersion": "3.2.1",
         "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "india-digilocker-aadhaar-fetch", "sdkModelName": "SignzyIndiaAadhaarFetchProviderOutput" },
-        "reason": "The generated Java model emits the legacy localizedClaims.languageName alias in addition to the current public fixture field."
+        "parameters": {
+          "providerId": "india-digilocker-aadhaar-fetch",
+          "sdkModelName": "SignzyIndiaAadhaarFetchProviderOutput"
+        },
+        "reason": "The generated Java model emits the legacy localizedClaims.languageName alias in addition to the current public fixture field.",
+        "failureMessageIncludes": [
+          "getProvider"
+        ]
+      },
+      {
+        "language": "java",
+        "sdkVersion": "3.1.0",
+        "testCaseId": "serialization.provider-output-round-trip",
+        "parameters": {
+          "providerId": "france-identite-numerique",
+          "sdkModelName": "FrenchNumeriqueProviderOutput"
+        },
+        "reason": "Java 3.1 models France Identité Numérique givenName as an object, while the current provider output is a string.",
+        "failureMessageIncludes": [
+          "FrenchNumeriqueGivenName"
+        ]
+      },
+      {
+        "language": "java",
+        "sdkVersion": "3.1.0",
+        "testCaseId": "serialization.provider-output-round-trip",
+        "parameters": {
+          "providerId": "india-digilocker-aadhaar-fetch",
+          "sdkModelName": "SignzyIndiaAadhaarFetchProviderOutput"
+        },
+        "reason": "Java 3.1 emits the legacy localizedClaims.languageName alias in addition to the current public fixture field.",
+        "failureMessageIncludes": [
+          "getProvider"
+        ]
+      },
+      {
+        "language": "java",
+        "sdkVersion": "3.0.0",
+        "testCaseId": "serialization.provider-output-round-trip",
+        "parameters": {
+          "providerId": "france-identite-numerique",
+          "sdkModelName": "FrenchNumeriqueProviderOutput"
+        },
+        "reason": "Java 3.0 models France Identité Numérique givenName as an object, while the current provider output is a string.",
+        "failureMessageIncludes": [
+          "FrenchNumeriqueGivenName"
+        ]
+      },
+      {
+        "language": "python",
+        "sdkVersion": "3.0.0",
+        "testCaseId": "serialization.unknown-enum",
+        "parameters": {
+          "sdkModelName": "IntegrationStep"
+        },
+        "failureMessageIncludes": [
+          "ValidationError",
+          "FutureSdkTestMethod"
+        ],
+        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
+      },
+      {
+        "language": "python",
+        "sdkVersion": "3.1.0",
+        "testCaseId": "serialization.unknown-enum",
+        "parameters": {
+          "sdkModelName": "IntegrationStep"
+        },
+        "failureMessageIncludes": [
+          "ValidationError",
+          "FutureSdkTestMethod"
+        ],
+        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
+      },
+      {
+        "language": "python",
+        "sdkVersion": "3.2.1",
+        "testCaseId": "serialization.unknown-enum",
+        "parameters": {
+          "sdkModelName": "IntegrationStep"
+        },
+        "failureMessageIncludes": [
+          "ValidationError",
+          "FutureSdkTestMethod"
+        ],
+        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
+      },
+      {
+        "language": "go",
+        "sdkVersion": "3.0.0",
+        "testCaseId": "serialization.unknown-enum",
+        "parameters": {
+          "sdkModelName": "IntegrationStep"
+        },
+        "failureMessageIncludes": [
+          "FutureSdkTestMethod is not a valid IntegrationLaunchMethod"
+        ],
+        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
+      },
+      {
+        "language": "go",
+        "sdkVersion": "3.1.0",
+        "testCaseId": "serialization.unknown-enum",
+        "parameters": {
+          "sdkModelName": "IntegrationStep"
+        },
+        "failureMessageIncludes": [
+          "FutureSdkTestMethod is not a valid IntegrationLaunchMethod"
+        ],
+        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
+      },
+      {
+        "language": "go",
+        "sdkVersion": "3.2.1",
+        "testCaseId": "serialization.unknown-enum",
+        "parameters": {
+          "sdkModelName": "IntegrationStep"
+        },
+        "failureMessageIncludes": [
+          "FutureSdkTestMethod is not a valid IntegrationLaunchMethod"
+        ],
+        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
+      },
+      {
+        "language": "csharp",
+        "sdkVersion": "3.0.0",
+        "testCaseId": "serialization.unknown-enum",
+        "parameters": {
+          "sdkModelName": "IntegrationStep"
+        },
+        "failureMessageIncludes": [
+          "Property is not nullable for class IntegrationStep",
+          "'method'"
+        ],
+        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
+      },
+      {
+        "language": "csharp",
+        "sdkVersion": "3.1.0",
+        "testCaseId": "serialization.unknown-enum",
+        "parameters": {
+          "sdkModelName": "IntegrationStep"
+        },
+        "failureMessageIncludes": [
+          "Property is not nullable for class IntegrationStep",
+          "'method'"
+        ],
+        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
+      },
+      {
+        "language": "csharp",
+        "sdkVersion": "3.2.1",
+        "testCaseId": "serialization.unknown-enum",
+        "parameters": {
+          "sdkModelName": "IntegrationStep"
+        },
+        "failureMessageIncludes": [
+          "Property is not nullable for class IntegrationStep",
+          "'method'"
+        ],
+        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
+      },
+      {
+        "language": "php",
+        "sdkVersion": "3.0.0",
+        "testCaseId": "serialization.unknown-enum",
+        "parameters": {
+          "sdkModelName": "IntegrationStep"
+        },
+        "failureMessageIncludes": [
+          "Invalid value for enum",
+          "IntegrationLaunchMethod"
+        ],
+        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
+      },
+      {
+        "language": "php",
+        "sdkVersion": "3.1.0",
+        "testCaseId": "serialization.unknown-enum",
+        "parameters": {
+          "sdkModelName": "IntegrationStep"
+        },
+        "failureMessageIncludes": [
+          "Invalid value for enum",
+          "IntegrationLaunchMethod"
+        ],
+        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
+      },
+      {
+        "language": "php",
+        "sdkVersion": "3.2.1",
+        "testCaseId": "serialization.unknown-enum",
+        "parameters": {
+          "sdkModelName": "IntegrationStep"
+        },
+        "failureMessageIncludes": [
+          "Invalid value for enum",
+          "IntegrationLaunchMethod"
+        ],
+        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
+      },
+      {
+        "language": "ruby",
+        "sdkVersion": "3.0.0",
+        "testCaseId": "serialization.unknown-enum",
+        "parameters": {
+          "sdkModelName": "IntegrationStep"
+        },
+        "failureMessageIncludes": [
+          "Invalid ENUM value FutureSdkTestMethod"
+        ],
+        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
+      },
+      {
+        "language": "ruby",
+        "sdkVersion": "3.1.0",
+        "testCaseId": "serialization.unknown-enum",
+        "parameters": {
+          "sdkModelName": "IntegrationStep"
+        },
+        "failureMessageIncludes": [
+          "Invalid ENUM value FutureSdkTestMethod"
+        ],
+        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
+      },
+      {
+        "language": "ruby",
+        "sdkVersion": "3.2.1",
+        "testCaseId": "serialization.unknown-enum",
+        "parameters": {
+          "sdkModelName": "IntegrationStep"
+        },
+        "failureMessageIncludes": [
+          "Invalid ENUM value FutureSdkTestMethod"
+        ],
+        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
+      },
+      {
+        "language": "java",
+        "sdkVersion": "3.0.0",
+        "testCaseId": "serialization.unknown-enum",
+        "parameters": {
+          "sdkModelName": "IntegrationStep"
+        },
+        "failureMessageIncludes": [
+          "Unexpected value 'FutureSdkTestMethod'"
+        ],
+        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
+      },
+      {
+        "language": "java",
+        "sdkVersion": "3.1.0",
+        "testCaseId": "serialization.unknown-enum",
+        "parameters": {
+          "sdkModelName": "IntegrationStep"
+        },
+        "failureMessageIncludes": [
+          "Unexpected value 'FutureSdkTestMethod'"
+        ],
+        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
       },
       {
         "language": "java",
         "sdkVersion": "3.2.1",
-        "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "indonesia-dukcapil-match", "sdkModelName": "IndonesiaDukcapilMatchProviderOutput" },
-        "reason": "The generated Java model serializes the integral outcome value as decimal 1.0 rather than JSON integer 1."
+        "testCaseId": "serialization.unknown-enum",
+        "parameters": {
+          "sdkModelName": "IntegrationStep"
+        },
+        "failureMessageIncludes": [
+          "Unexpected value 'FutureSdkTestMethod'"
+        ],
+        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
       },
       {
-        "language": "java",
-        "sdkVersion": "3.1.0",
-        "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "france-identite-numerique", "sdkModelName": "FrenchNumeriqueProviderOutput" },
-        "reason": "Java 3.1 models France Identité Numérique givenName as an object, while the current provider output is a string."
+        "language": "go",
+        "sdkVersion": "3.0.0",
+        "testCaseId": "serialization.unknown-fields",
+        "parameters": {
+          "sdkModelName": "IntegrationStep"
+        },
+        "failureMessageIncludes": [
+          "json: unknown field \"futureField\""
+        ],
+        "reason": "Go 3.0 rejects additional JSON fields; later releases disable this restriction."
       },
       {
-        "language": "java",
-        "sdkVersion": "3.1.0",
-        "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "india-digilocker-aadhaar-fetch", "sdkModelName": "SignzyIndiaAadhaarFetchProviderOutput" },
-        "reason": "Java 3.1 emits the legacy localizedClaims.languageName alias in addition to the current public fixture field."
+        "language": "python",
+        "sdkVersion": "3.0.0",
+        "testCaseId": "serialization.nested-model-dictionaries",
+        "parameters": {
+          "sdkModelName": "MdlOutput"
+        },
+        "failureMessageIncludes": [
+          "'dict' object has no attribute 'to_dict'"
+        ],
+        "reason": "Python 3.0 calls to_dict on a nested namespace dictionary. The current generator handles both dictionary levels; the regression case must pass on current/main."
       },
       {
-        "language": "java",
-        "sdkVersion": "3.1.0",
-        "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "itsme", "sdkModelName": "ItsmeProviderOutput" },
-        "reason": "Java 3.1 serializes legacy required itsme name fields that are absent from the current provider output."
-      },
-      {
-        "language": "java",
+        "language": "go",
         "sdkVersion": "3.0.0",
         "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "france-identite-numerique", "sdkModelName": "FrenchNumeriqueProviderOutput" },
-        "reason": "Java 3.0 models France Identité Numérique givenName as an object, while the current provider output is a string."
+        "parameters": {
+          "providerId": "a-itsme-login",
+          "sdkModelName": "ItsmeProviderOutput"
+        },
+        "failureMessageIncludes": [
+          "json: unknown field \"address\""
+        ],
+        "reason": "The correctly mapped indirect itsme model in Go 3.0 rejects the subsequently added address field. Later Go SDKs permit additional fields."
       },
       {
-        "language": "java",
+        "language": "php",
         "sdkVersion": "3.0.0",
-        "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "freja", "sdkModelName": "FrejaProviderOutput" },
-        "reason": "Java 3.0 serializes legacy required Freja name fields that are absent from the current provider output."
+        "testCaseId": "api.sessions.get-attachment",
+        "reason": "PHP releases through 3.2.1 use the reserved Match class name; parsing the completed result needed to locate an attachment fails on supported PHP 8 runtimes. The current generator maps Match to MatchModel.",
+        "failureMessageIncludes": [
+          "match"
+        ]
       },
       {
-        "language": "java",
-        "sdkVersion": "3.0.0",
-        "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": { "providerId": "itsme", "sdkModelName": "ItsmeProviderOutput" },
-        "reason": "Java 3.0 serializes legacy required itsme name fields that are absent from the current provider output."
+        "language": "php",
+        "sdkVersion": "3.1.0",
+        "testCaseId": "api.sessions.get-attachment",
+        "reason": "PHP releases through 3.2.1 use the reserved Match class name; parsing the completed result needed to locate an attachment fails on supported PHP 8 runtimes. The current generator maps Match to MatchModel.",
+        "failureMessageIncludes": [
+          "match"
+        ]
+      },
+      {
+        "language": "php",
+        "sdkVersion": "3.2.1",
+        "testCaseId": "api.sessions.get-attachment",
+        "reason": "PHP releases through 3.2.1 use the reserved Match class name; parsing the completed result needed to locate an attachment fails on supported PHP 8 runtimes. The current generator maps Match to MatchModel.",
+        "failureMessageIncludes": [
+          "match"
+        ]
+      }
+    ],
+    "providerMappings": {
+      "3.0.0": {
+        "a-itsme-login": {
+          "sdkModelName": "ItsmeProviderOutput"
+        },
+        "itsme": {
+          "unsupportedReason": "The direct itsme provider was introduced after SDK 3.0.0; ItsmeProviderOutput in this release describes a-itsme-login, which is tested separately."
+        },
+        "a-freja-eid-login": {
+          "sdkModelName": "FrejaProviderOutput"
+        },
+        "freja": {
+          "unsupportedReason": "The direct Freja provider was introduced after SDK 3.0.0; FrejaProviderOutput in this release describes a-freja-eid-login, which is tested separately."
+        }
+      },
+      "3.1.0": {
+        "a-itsme-login": {
+          "sdkModelName": "ItsmeProviderOutput"
+        },
+        "itsme": {
+          "unsupportedReason": "The direct itsme provider was introduced after SDK 3.1.0; ItsmeProviderOutput in this release describes a-itsme-login, which is tested separately."
+        }
+      }
+    },
+    "wireAliases": [
+      {
+        "providerId": "singpass-myinfo",
+        "legacyPath": "personInfo.houseDevelopmenetBoardType",
+        "currentPath": "personInfo.houseDevelopmentBoardType"
       }
     ]
   }

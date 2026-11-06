@@ -18,6 +18,8 @@ interface ProviderOutputFixture {
   sdkModelName?: string;
   output?: JsonRecord;
   serializationOutput?: JsonRecord;
+  unsupportedReason?: string;
+  testCaseId?: string;
 }
 
 interface ProviderOutputConverters {
@@ -28,7 +30,6 @@ interface ProviderOutputConverters {
 const installRoot = requiredEnvironment("SDK_INSTALL_ROOT");
 const isCurrentSdk = requiredEnvironment("SDK_IS_CURRENT") === "true";
 const targetLabel = requiredEnvironment("SDK_TARGET_LABEL");
-const allowMissingPsoModels = ["1", "true"].includes(process.env.SDK_COMPATIBILITY_ALLOW_MISSING_PSO_MODELS?.toLowerCase() ?? "");
 const configuration = readTestConfiguration();
 const sdk = loadSdk(installRoot);
 
@@ -43,13 +44,14 @@ test(`${targetLabel}: provider-output fixtures round-trip through every supporte
   const failures: Error[] = [];
 
   for (const fixture of fixtures) {
+    const caseId = fixture.testCaseId ?? "serialization.provider-output-round-trip";
     const parameters = {
       providerId: fixture.providerId,
     };
 
     if (!fixture.hasPublicSdkModel) {
       recordSkippedCompatibilityCase(
-        "serialization.provider-output-round-trip",
+        caseId,
         "Provider has no public Swagger provider-specific output model.",
         parameters,
         {
@@ -62,12 +64,16 @@ test(`${targetLabel}: provider-output fixtures round-trip through every supporte
 
     assert.ok(fixture.sdkModelName, `${fixture.providerId} is marked as public but has no SDK model name`);
     const modelParameters = { ...parameters, sdkModelName: fixture.sdkModelName };
+    if (fixture.unsupportedReason) {
+      recordSkippedCompatibilityCase(caseId, fixture.unsupportedReason, modelParameters);
+      continue;
+    }
     const converters = findConverters(fixture);
     if (!converters) {
-      if (isCurrentSdk && !allowMissingPsoModels) {
+      if (isCurrentSdk || fixture.testCaseId) {
         try {
           await recordCompatibilityCase(
-            "serialization.provider-output-round-trip",
+            caseId,
             async () => {
               assert.fail(
                 `Connect declares ${fixture.providerId}'s ${fixture.sdkModelName} output as public, `
@@ -83,10 +89,8 @@ test(`${targetLabel}: provider-output fixtures round-trip through every supporte
         }
       } else {
         recordSkippedCompatibilityCase(
-          "serialization.provider-output-round-trip",
-          isCurrentSdk
-            ? "Missing public provider-output models are temporarily allowed by SDK_COMPATIBILITY_ALLOW_MISSING_PSO_MODELS."
-            : "The published SDK does not expose this provider-output model.",
+          caseId,
+          "The published SDK does not expose this provider-output model.",
           modelParameters,
         );
       }
@@ -95,13 +99,13 @@ test(`${targetLabel}: provider-output fixtures round-trip through every supporte
 
     try {
       await recordCompatibilityCase(
-        "serialization.provider-output-round-trip",
+        caseId,
         async () => {
           const rawOutput = await fetchFixture(fixture.providerId);
           const serializationExpected = fixture.serializationOutput ?? rawOutput;
           const serializedOutput = jsonValue(converters.toJson(converters.fromJson(rawOutput)));
 
-          if (isCurrentSdk) {
+          if (isCurrentSdk || fixture.testCaseId) {
             assertJsonEquivalent(
               serializedOutput,
               serializationExpected,

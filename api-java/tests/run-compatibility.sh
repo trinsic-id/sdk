@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-JAVA_21_HOME="${SDK_COMPATIBILITY_JAVA_HOME:-/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home}"
+JAVA_21_HOME="${SDK_COMPATIBILITY_JAVA_HOME:-${JAVA_HOME:-}}"
+if [[ -z "$JAVA_21_HOME" ]]; then
+  JAVA_21_HOME="$(java -XshowSettings:properties -version 2>&1 | sed -n 's/^[[:space:]]*java.home = //p')"
+fi
 [[ -x "$JAVA_21_HOME/bin/java" ]] || { echo "JDK 21 was not found at $JAVA_21_HOME. Set SDK_COMPATIBILITY_JAVA_HOME to a JDK 21 home." >&2; exit 1; }
 [[ "$("$JAVA_21_HOME/bin/java" -version 2>&1 | head -n1)" == *'"21.'* ]] || { echo "SDK_COMPATIBILITY_JAVA_HOME must select JDK 21: $JAVA_21_HOME" >&2; exit 1; }
 command -v mvn >/dev/null || { echo "Maven is required to run Java compatibility tests." >&2; exit 1; }

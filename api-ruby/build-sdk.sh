@@ -18,6 +18,7 @@ generator_args=()
 
 "$REPO_ROOT/helpers/generate-client.sh" \
   --language ruby \
+  --additional-property "enumUnknownDefaultCase=true" \
   --output-folder "$output_folder" \
   "${generator_args[@]+${generator_args[@]}}" \
   --additional-property "gemAuthor=Trinsic" \
@@ -30,6 +31,8 @@ generator_args=()
   --additional-property "moduleName=TrinsicApi"
 
 cp "$REPO_ROOT/LICENSE" "$output_folder/"
+node "$REPO_ROOT/helpers/make-enums-forward-compatible.mjs" ruby "$output_folder"
+
 cp "$SCRIPT_DIR/README.md" "$output_folder/"
 
 spec_file="$output_folder/trinsic_api.gemspec"

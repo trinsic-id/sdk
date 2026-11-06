@@ -30,50 +30,48 @@ class CompatibilityTest < Minitest::Test
     session = run_case('api.sessions.create-direct-provider') { create_direct }; @sessions.cancel_session(session.session_id) if session
   end
   def test_get_direct
-    session = create_direct
-  rescue StandardError
-    record_skip('api.sessions.get', 'Direct-session setup failed.'); skip 'Direct-session setup failed.'
-  else
-    run_case('api.sessions.get') { @sessions.get_session(session.session_id) }
-    @sessions.cancel_session(session.session_id)
+    run_case('api.sessions.get') do
+      session = create_direct
+      begin; @sessions.get_session(session.session_id)
+      ensure; @sessions.cancel_session(session.session_id)
+      end
+    end
   end
   def test_cancel_direct
-    session = create_direct
-  rescue StandardError
-    record_skip('api.sessions.cancel', 'Direct-session setup failed.'); skip 'Direct-session setup failed.'
-  else
-    run_case('api.sessions.cancel') { @sessions.cancel_session(session.session_id) }
+    run_case('api.sessions.cancel') { session = create_direct; @sessions.cancel_session(session.session_id) }
   end
   def test_get_result
     run_case('api.sessions.get-result') { completed_result.last }
   end
   def test_get_attachment
-    session, key, result = completed_result; attachment = attachment_id(result); raise 'Completed redirect session did not return an attachment.' unless attachment
-  rescue StandardError
-    record_skip('api.sessions.get-attachment', 'Redirect-session setup or result retrieval failed.'); skip 'Redirect-session setup or result retrieval failed.'
-  else
-    run_case('api.sessions.get-attachment') { @sessions.get_attachment(session.session_id, attachment, get_attachment_request: model('GetAttachmentRequest', results_access_key: key)) }
+    run_case('api.sessions.get-attachment') do
+      session, key, result = completed_result
+      attachment = attachment_id(result)
+      raise 'Completed redirect session did not return an attachment.' unless attachment
+      @sessions.get_attachment(session.session_id, attachment, get_attachment_request: model('GetAttachmentRequest', results_access_key: key))
+    end
   end
   def test_redact
-    session, = completed_result
-  rescue StandardError
-    record_skip('api.sessions.redact', 'Redirect-session setup or result retrieval failed.'); skip 'Redirect-session setup or result retrieval failed.'
-  else
-    run_case('api.sessions.redact') { @sessions.redact_session(session.session_id) }
+    run_case('api.sessions.redact') { session = create_direct; completed_redirect_session(session); @sessions.redact_session(session.session_id) }
   end
   def test_recommendations
     run_case('api.sessions.recommend-providers') { @sessions.recommend_providers(recommend_providers_request: model('RecommendProvidersRequest', verification_profile_id: @profile, health: 'All')) }
   end
   def test_provider_outputs
     cache = ENV['SDK_COMPATIBILITY_PSO_FIXTURES_PATH']; unless cache && File.file?(cache); record_skip('serialization.provider-output-round-trip', 'No shared PSO fixture cache was available.'); return; end
+    first_result = $compatibility_results.length
     JSON.parse(File.read(cache))['fixtures'].each do |fixture|
+      case_id = fixture['testCaseId'] || 'serialization.provider-output-round-trip'
       params = { 'providerId' => fixture['providerId'] }; name = fixture['sdkModelName']; params['sdkModelName'] = name if name
-      if !fixture['hasPublicSdkModel']; record_skip('serialization.provider-output-round-trip', 'Provider has no public Swagger provider-specific output model.', params)
+      if fixture['unsupportedReason']; record_skip(case_id, fixture['unsupportedReason'], params)
+      elsif !fixture['hasPublicSdkModel']; record_skip(case_id, 'Provider has no public Swagger provider-specific output model.', params)
       elsif !name || !TrinsicApi.const_defined?(name)
-        ENV['SDK_IS_CURRENT'] == 'true' && !allow_missing_pso_models? ? record('serialization.provider-output-round-trip', params) { raise "Connect declares #{fixture['providerId']}'s #{name} output as public, but this SDK does not expose #{name}." } : record_skip('serialization.provider-output-round-trip', ENV['SDK_IS_CURRENT'] == 'true' ? 'Missing public provider-output models are temporarily allowed by SDK_COMPATIBILITY_ALLOW_MISSING_PSO_MODELS.' : 'The published SDK does not expose this provider-output model.', params)
-      elsif !TrinsicApi.const_get(name).respond_to?(:build_from_hash); record_skip('serialization.provider-output-round-trip', 'The SDK does not expose a wire-JSON deserializer for this provider-output model.', params)
-      else; record('serialization.provider-output-round-trip', params) { raise 'fixture omitted output' unless fixture['output']; compare_json(normalize_json(TrinsicApi.const_get(name).build_from_hash(fixture['output']).to_hash), fixture['serializationOutput'] || fixture['output'], fixture['providerId'], ENV['SDK_IS_CURRENT'] == 'true') }
+        ENV['SDK_IS_CURRENT'] == 'true' ? record(case_id, params) { raise "Connect declares #{fixture['providerId']}'s #{name} output as public, but this SDK does not expose #{name}." } : record_skip(case_id, 'The published SDK does not expose this provider-output model.', params)
+      elsif !TrinsicApi.const_get(name).respond_to?(:build_from_hash); record_skip(case_id, 'The SDK does not expose a wire-JSON deserializer for this provider-output model.', params)
+      else; record(case_id, params) { raise 'fixture omitted output' unless fixture['output']; compare_json(normalize_json(TrinsicApi.const_get(name).build_from_hash(fixture['output']).to_hash), fixture['serializationOutput'] || fixture['output'], fixture['providerId'], ENV['SDK_IS_CURRENT'] == 'true' || !!fixture['testCaseId']) }
       end
     end
+    failures = $compatibility_results.drop(first_result).select { |result| result['status'] == 'failed' }
+    assert_empty failures, 'Serialization cases failed; see the structured report.'
   end
 end

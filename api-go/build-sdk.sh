@@ -34,6 +34,8 @@ fi
   --additional-property "disallowAdditionalPropertiesIfNotPresent=false" \
   --additional-property "enumClassPrefix=true"
 
+node "$REPO_ROOT/helpers/make-enums-forward-compatible.mjs" go "$output_folder"
+
 cp "$SCRIPT_DIR/README.md" "$output_folder"
 cp "$REPO_ROOT/LICENSE" "$output_folder"
 perl -0pi -e "s{/GIT_USER_ID/GIT_REPO_ID}{/trinsic-id/sdk-go-api$main_version}g" "$output_folder/go.mod"

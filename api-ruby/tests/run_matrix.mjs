@@ -13,10 +13,12 @@ try {
     const output = join(directory, "target-results.json");
     const env = childEnvironment({ BUNDLE_GEMFILE: join(directory, "Gemfile"), SDK_COMPATIBILITY_RESULT_FILE: output, SDK_VERSION: selected.version ?? "3.2.1" });
     const installed = command("bundle", ["install", "--quiet"], { env, check: false });
+    const version = installed.status === 0 ? command("bundle", ["exec", "ruby", "-r", "trinsic_api", "-e", "puts TrinsicApi::VERSION"], { env }).stdout.trim() : selected.version;
+    if (version) env.SDK_VERSION = version;
     cpSync(join(new URL(".", import.meta.url).pathname, "CompatibilitySupport.rb"), join(directory, "CompatibilitySupport.rb"));
     cpSync(join(new URL(".", import.meta.url).pathname, "compatibility_test.rb"), join(directory, "compatibility_test.rb"));
-    const execution = installed.status === 0 ? command("bundle", ["exec", "ruby", join(directory, "compatibility_test.rb")], { env, check: false }) : installed;
-    return { sdkVersion: selected.version, testCases: readProcessTestCases(output, execution, "ruby", installed.status === 0 ? "Ruby target" : "Bundler install") };
+    const execution = installed.status === 0 ? command("bundle", ["exec", "ruby", join(directory, "compatibility_test.rb"), ...(process.env.SDK_COMPATIBILITY_TEST_SCOPE === "serialization" ? ["--name", "/provider_outputs/"] : [])], { env, check: false }) : installed;
+    return { sdkVersion: version, testCases: readProcessTestCases(output, execution, "ruby", installed.status === 0 ? "Ruby target" : "Bundler install") };
   }));
 } catch (error) { testCases = failure("ruby", error instanceof Error ? error.message : String(error)); }
 writeExecutorResult({ sdkVersion, testCases });

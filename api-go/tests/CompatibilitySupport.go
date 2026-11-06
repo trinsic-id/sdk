@@ -150,28 +150,36 @@ func pso() {
 	}
 	for _, raw := range d["fixtures"].([]any) {
 		f := raw.(map[string]any)
+		caseID, synthetic := f["testCaseId"].(string)
+		if !synthetic {
+			caseID = "serialization.provider-output-round-trip"
+		}
 		name, _ := f["sdkModelName"].(string)
 		params := map[string]any{"providerId": fmt.Sprint(f["providerId"])}
 		if name != "" {
 			params["sdkModelName"] = name
 		}
 		if f["hasPublicSdkModel"] != true {
-			skip("serialization.provider-output-round-trip", "Provider has no public Swagger provider-specific output model.", params)
+			skip(caseID, "Provider has no public Swagger provider-specific output model.", params)
+			continue
+		}
+		if reason, ok := f["unsupportedReason"].(string); ok {
+			skip(caseID, reason, params)
 			continue
 		}
 		factory, ok := providerOutputFactories[name]
 		if !ok {
-			if os.Getenv("SDK_IS_CURRENT") == "true" && os.Getenv("SDK_COMPATIBILITY_ALLOW_MISSING_PSO_MODELS") != "true" && os.Getenv("SDK_COMPATIBILITY_ALLOW_MISSING_PSO_MODELS") != "1" {
-				record("serialization.provider-output-round-trip", params, func() (any, error) {
+			if os.Getenv("SDK_IS_CURRENT") == "true" {
+				record(caseID, params, func() (any, error) {
 					return nil, fmt.Errorf("Connect declares %v's %s output as public, but this SDK does not expose %s.", f["providerId"], name, name)
 				})
 			} else {
-				skip("serialization.provider-output-round-trip", map[bool]string{true: "Missing public provider-output models are temporarily allowed by SDK_COMPATIBILITY_ALLOW_MISSING_PSO_MODELS.", false: "The published SDK does not expose this provider-output model."}[os.Getenv("SDK_IS_CURRENT") == "true"], params)
+				skip(caseID, "The published SDK does not expose this provider-output model.", params)
 			}
 			continue
 		}
 		fixture := f
-		record("serialization.provider-output-round-trip", params, func() (any, error) {
+		record(caseID, params, func() (any, error) {
 			wire, _ := json.Marshal(fixture["output"])
 			serializationOutput := fixture["output"]
 			if output, ok := fixture["serializationOutput"]; ok {
@@ -189,7 +197,7 @@ func pso() {
 			var a, b any
 			json.Unmarshal(round, &a)
 			json.Unmarshal(expected, &b)
-			return nil, compare(a, b, fmt.Sprint(fixture["providerId"]), os.Getenv("SDK_IS_CURRENT") == "true")
+			return nil, compare(a, b, fmt.Sprint(fixture["providerId"]), os.Getenv("SDK_IS_CURRENT") == "true" || synthetic)
 		})
 	}
 }
@@ -251,14 +259,28 @@ func set(x any, n string, v any) {
 		}
 	}
 }
-func val(x any, n string) any {
-	v := reflect.ValueOf(x)
-	for v.IsValid() && v.Kind() == reflect.Pointer {
-		if v.IsNil() {
-			return nil
+func unwrap(v reflect.Value) reflect.Value {
+	for v.IsValid() {
+		if v.Kind() == reflect.Pointer || v.Kind() == reflect.Interface {
+			if v.IsNil() {
+				return reflect.Value{}
+			}
+			v = v.Elem()
+			continue
 		}
-		v = v.Elem()
+		if v.Kind() == reflect.Struct && strings.HasPrefix(v.Type().Name(), "Nullable") {
+			get := v.MethodByName("Get")
+			if get.IsValid() && get.Type().NumIn() == 0 && get.Type().NumOut() == 1 {
+				v = get.Call(nil)[0]
+				continue
+			}
+		}
+		break
 	}
+	return v
+}
+func val(x any, n string) any {
+	v := unwrap(reflect.ValueOf(x))
 	if !v.IsValid() || v.Kind() != reflect.Struct {
 		return nil
 	}
@@ -268,6 +290,7 @@ func val(x any, n string) any {
 	}
 	return f.Interface()
 }
+
 func str(x any, n string) string {
 	if s, ok := val(x, n).(string); ok {
 		return s

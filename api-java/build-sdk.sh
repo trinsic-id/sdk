@@ -17,6 +17,7 @@ done
 
 "$REPO_ROOT/helpers/generate-client.sh" \
   --language java \
+  --additional-property "enumUnknownDefaultCase=true" \
   --swagger-file-or-url "$swagger_file_or_url" \
   --output-folder "$output_folder" \
   --additional-property "apiPackage=id.trinsic.api" \

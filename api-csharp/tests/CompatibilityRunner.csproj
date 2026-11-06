@@ -3,6 +3,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <DefineConstants Condition="'$(LegacySdk)' == 'true'">$(DefineConstants);LEGACY_SDK</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Trinsic.Api" Version="$(TrinsicApiVersion)" />

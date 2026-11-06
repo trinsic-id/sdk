@@ -17,7 +17,7 @@ try {
     const output = join(directory, "target-results.json");
     cpSync(join(new URL(".", import.meta.url).pathname, "CompatibilitySupport.php"), join(directory, "CompatibilitySupport.php"));
     cpSync(join(new URL(".", import.meta.url).pathname, "CompatibilityTest.php"), join(directory, "CompatibilityTest.php"));
-    const execution = command(join(directory, "vendor/bin/phpunit"), [join(directory, "CompatibilityTest.php")], { check: false, env: childEnvironment({ SDK_COMPATIBILITY_RESULT_FILE: output, SDK_VERSION: version }) });
+    const execution = command(join(directory, "vendor/bin/phpunit"), [join(directory, "CompatibilityTest.php"), ...(process.env.SDK_COMPATIBILITY_TEST_SCOPE === "serialization" ? ["--filter", "testProviderOutputRoundTrip"] : [])], { check: false, env: childEnvironment({ SDK_COMPATIBILITY_RESULT_FILE: output, SDK_VERSION: version }) });
     return { sdkVersion: version, testCases: readProcessTestCases(output, execution, "php") };
   }));
 } catch (error) { testCases = failure("php", error instanceof Error ? error.message : String(error)); }

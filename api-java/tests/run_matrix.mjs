@@ -26,7 +26,7 @@ try {
     if (!version) throw new Error(`Java target ${selected.label} did not provide an SDK version.`);
     const output = join(directory, "target-results.json");
     const env = childEnvironment({ SDK_COMPATIBILITY_RESULT_FILE: output, SDK_VERSION: version, MAVEN_OPTS: `-Dmaven.repo.local=${repository}` });
-    const execution = command("mvn", ["-q", `-Dmaven.repo.local=${repository}`, "-f", join(source, "pom.xml"), "test", `-Dtrinsic.api.groupId=${groupId}`, `-Dtrinsic.api.artifactId=${artifactId}`, `-Dtrinsic.api.version=${version}`], { env, check: false });
+    const execution = command("mvn", ["-q", ...(process.env.SDK_COMPATIBILITY_TEST_SCOPE === "serialization" ? ["-Dtest=CompatibilityTest#providerOutputRoundTrips,CompatibilityHarnessTest"] : []), `-Dmaven.repo.local=${repository}`, "-f", join(source, "pom.xml"), "test", `-Dtrinsic.api.groupId=${groupId}`, `-Dtrinsic.api.artifactId=${artifactId}`, `-Dtrinsic.api.version=${version}`], { env, check: false });
     return { sdkVersion: version, testCases: readProcessTestCases(output, execution, "java") };
   });
 } catch (error) { result = { testCases: failure("java", error instanceof Error ? error.message : String(error)) }; }

@@ -106,14 +106,14 @@ def test_get_session_result(apis) -> None:
 def test_get_session_attachment(apis) -> None:
     sessions, session, access_key, result = completed_result(apis)
     attachments = result.identity_data.attachments if result.identity_data else []
-    if not attachments:
-        pytest.skip("Completed redirect session did not return an attachment.")
+    assert attachments, "Completed redirect session did not return an attachment."
     sessions.get_attachment(session.session_id, attachments[0].id, support.GetAttachmentRequest(results_access_key=access_key))
 
 
 @pytest.mark.compatibility("api.sessions.redact")
 def test_redact_session(apis) -> None:
-    sessions, session, _access_key, _result = completed_result(apis)
+    *_, sessions, redirects = apis
+    session, _token, _access_key = support.completed_session(sessions, redirects)
     sessions.redact_session(session.session_id)
 
 
@@ -137,7 +137,7 @@ def provider_parameters():
         advisory = None
         if not fixture["hasPublicSdkModel"]:
             advisory = {"code": "missing-public-provider-output", "message": f"{fixture['providerId']} does not declare a public provider-specific output model for API SDKs."}
-        values.append(pytest.param(fixture, marks=pytest.mark.compatibility("serialization.provider-output-round-trip", parameters=parameters, advisory=advisory), id=fixture["providerId"]))
+        values.append(pytest.param(fixture, marks=pytest.mark.compatibility(fixture.get("testCaseId", "serialization.provider-output-round-trip"), parameters=parameters, advisory=advisory), id=fixture["providerId"]))
     return values
 
 
@@ -146,17 +146,19 @@ def test_provider_output_round_trip(fixture) -> None:
     provider_id = fixture["providerId"]
     if not fixture["hasPublicSdkModel"]:
         pytest.skip("Provider has no public Swagger provider-specific output model.")
+    if fixture.get("unsupportedReason"):
+        pytest.skip(fixture["unsupportedReason"])
     model_name = fixture["sdkModelName"]
     import trinsic_api.models as models
     model = getattr(models, model_name, None)
     if model is None:
-        if support.CURRENT and os.environ.get("SDK_COMPATIBILITY_ALLOW_MISSING_PSO_MODELS", "").lower() not in {"1", "true"}:
+        if support.CURRENT:
             raise AssertionError(f"Connect declares {provider_id}'s {model_name} output as public, but {support.TARGET} does not export {model_name}.")
         pytest.skip("The published SDK does not expose this provider-output model.")
     raw = fixture.get("output") if "output" in fixture else support.http_json(f"/api/v1/providers/{urllib.parse.quote(provider_id, safe='')}/sample-json/output")
     expected = fixture.get("serializationOutput", raw)
     serialized = model.from_dict(raw).to_dict()
-    if support.CURRENT:
+    if support.CURRENT or fixture.get("testCaseId"):
         support.assert_equivalent(serialized, expected, f"{provider_id} ({model_name})")
     else:
         support.assert_subset(serialized, expected, f"{provider_id} ({model_name})")

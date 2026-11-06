@@ -46,7 +46,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 /** Native JUnit coverage for the Java compatibility catalog. */
 @ExtendWith(CompatibilityResultExtension.class)
 class CompatibilityTest {
-  private static final String REDIRECT_SETUP_SKIP = "The direct-provider redirect workflow could not be completed.";
   private ProvidersApi providers;
   private VerificationProfilesApi profiles;
   private SessionsApi sessions;
@@ -92,11 +91,11 @@ class CompatibilityTest {
     assertNotNull(sessions.recommendProviders(request));
   }
   @Test @CompatibilityCase("api.sessions.get-result") void getResult() throws Exception {
-    CompletedSession completed = completeOrAbort();
+    CompletedSession completed = completeSession();
     try { assertNotNull(sessionResult(completed)); } finally { cancelQuietly(completed.session().getSessionId()); }
   }
   @Test @CompatibilityCase("api.sessions.get-attachment") void getAttachment() throws Exception {
-    CompletedSession completed = completeOrAbort();
+    CompletedSession completed = completeSession();
     try {
       var result = sessionResult(completed);
       assertFalse(result.getIdentityData().getAttachments().isEmpty(), "test provider returned no attachments");
@@ -105,7 +104,7 @@ class CompatibilityTest {
     } finally { cancelQuietly(completed.session().getSessionId()); }
   }
   @Test @CompatibilityCase("api.sessions.redact") void redact() throws Exception {
-    CompletedSession completed = completeOrAbort();
+    CompletedSession completed = completeSession();
     try { sessions.redactSession(completed.session().getSessionId()); } finally { cancelQuietly(completed.session().getSessionId()); }
   }
 
@@ -120,28 +119,33 @@ class CompatibilityTest {
     if (!fixtures.isArray()) fail("Shared PSO fixture cache omitted fixtures.");
     boolean allPassed = true;
     for (JsonNode fixture : fixtures) {
+      String caseId = fixture.path("testCaseId").asText("serialization.provider-output-round-trip");
       String providerId = fixture.path("providerId").asText();
       Map<String, String> parameters = new LinkedHashMap<>(); parameters.put("providerId", providerId);
       if (fixture.hasNonNull("sdkModelName")) parameters.put("sdkModelName", fixture.get("sdkModelName").asText());
       if (!fixture.path("hasPublicSdkModel").asBoolean()) {
-        CompatibilityResultExtension.recordSkipped("serialization.provider-output-round-trip", "Provider has no public Swagger provider-specific output model.", parameters);
+        CompatibilityResultExtension.recordSkipped(caseId, "Provider has no public Swagger provider-specific output model.", parameters);
+        continue;
+      }
+      if (fixture.hasNonNull("unsupportedReason")) {
+        CompatibilityResultExtension.recordSkipped(caseId, fixture.get("unsupportedReason").asText(), parameters);
         continue;
       }
       String modelName = fixture.path("sdkModelName").asText();
       Class<?> model = providerModel(modelName);
       if (model == null) {
-        if (isCurrent() && !allowMissingModels()) {
-          allPassed &= CompatibilityResultExtension.recordCase("serialization.provider-output-round-trip", parameters, () -> fail("Connect declares " + providerId + "'s " + modelName + " output as public, but " + targetLabel() + " does not export " + modelName + "."));
+        if (isCurrent()) {
+          allPassed &= CompatibilityResultExtension.recordCase(caseId, parameters, () -> fail("Connect declares " + providerId + "'s " + modelName + " output as public, but " + targetLabel() + " does not export " + modelName + "."));
         } else {
-          CompatibilityResultExtension.recordSkipped("serialization.provider-output-round-trip", isCurrent() ? "Missing public provider-output models are temporarily allowed by SDK_COMPATIBILITY_ALLOW_MISSING_PSO_MODELS." : "The published SDK does not expose this provider-output model.", parameters);
+          CompatibilityResultExtension.recordSkipped(caseId, "The published SDK does not expose this provider-output model.", parameters);
         }
         continue;
       }
       JsonNode output = fixture.path("output");
       JsonNode expected = fixture.has("serializationOutput") ? fixture.get("serializationOutput") : output;
-      allPassed &= CompatibilityResultExtension.recordCase("serialization.provider-output-round-trip", parameters, () -> {
+      allPassed &= CompatibilityResultExtension.recordCase(caseId, parameters, () -> {
         Object decoded = client.getObjectMapper().treeToValue(output, model);
-        compareJson(client.getObjectMapper().valueToTree(decoded), expected, providerId + " (" + modelName + ")", isCurrent());
+        compareJson(client.getObjectMapper().valueToTree(decoded), expected, providerId + " (" + modelName + ")", isCurrent() || fixture.has("testCaseId"));
       });
     }
     if (!allPassed) fail("One or more provider-output fixtures failed; see the structured compatibility report.");
@@ -161,7 +165,7 @@ class CompatibilityTest {
   }
   private String redirectUrl() throws Exception { return redirects.callList(1, 100).getUris().getFirst().getUri(); }
 
-  private CompletedSession completeOrAbort() throws Exception {
+  private CompletedSession completeSession() throws Exception {
     CreateDirectProviderSessionResponse session = null;
     try {
       session = sessions.createDirectProviderSession(directRequest());
@@ -173,16 +177,16 @@ class CompatibilityTest {
       URI application = redirect(browser, completion);
       String redirectToken = query(application, "redirectToken");
       if (redirectToken.isBlank()) throw new IllegalStateException("Application redirect omitted redirectToken.");
-      // The token proves the browser flow reached the application redirect. The
-      // generated SDK request is keyed by resultsAccessKey on supported releases.
-      return new CompletedSession(session, session.getResultCollection().getResultsAccessKey());
+      return new CompletedSession(session, session.getResultCollection().getResultsAccessKey(), redirectToken);
     } catch (Exception error) {
       if (session != null) cancelQuietly(session.getSessionId());
-      throw new TestAbortedException(REDIRECT_SETUP_SKIP, error);
+      throw error;
     }
   }
   private id.trinsic.api.models.GetSessionResultResponse sessionResult(CompletedSession completed) throws Exception {
     GetSessionResultRequest request = new GetSessionResultRequest(); request.setResultsAccessKey(completed.resultsAccessKey());
+    try { request.getClass().getMethod("setRedirectToken", String.class).invoke(request, completed.redirectToken()); }
+    catch (NoSuchMethodException ignored) { /* Published SDKs without redirectToken use the server's backwards-compatible session flow. */ }
     return sessions.getSessionResult(completed.session().getSessionId(), request);
   }
   private URI redirect(HttpClient browser, URI uri) throws Exception {
@@ -221,20 +225,19 @@ class CompatibilityTest {
   private static void compareJson(JsonNode actual, JsonNode expected, String path, boolean exactFields) {
     if (actual.isObject()) {
       if (!expected.isObject()) fail(path + ": SDK produced an object for " + expected.getNodeType());
-      if (exactFields) assertEquals(expected.size(), actual.size(), path + ": object field count differs");
       Iterator<String> names = exactFields ? expected.fieldNames() : actual.fieldNames();
-      while (names.hasNext()) { String name = names.next(); if (!actual.has(name)) fail(path + ": SDK omitted fixture field " + name); if (!expected.has(name)) fail(path + ": SDK emitted unexpected field " + name); compareJson(actual.get(name), expected.get(name), path + "." + name, exactFields); }
+      while (names.hasNext()) { String name = names.next(); if (!actual.has(name)) fail(path + ": SDK omitted fixture field " + name); if (!expected.has(name)) continue; compareJson(actual.get(name), expected.get(name), path + "." + name, exactFields); }
       return;
     }
     if (actual.isArray()) { assertEquals(expected.size(), actual.size(), path + ": array shape differs"); for (int index = 0; index < actual.size(); index++) compareJson(actual.get(index), expected.get(index), path + "[" + index + "]", exactFields); return; }
     if (actual.isTextual() && expected.isTextual() && timestampsEqual(actual.asText(), expected.asText())) return;
+    if (actual.isNumber() && expected.isNumber() && actual.decimalValue().compareTo(expected.decimalValue()) == 0) return;
     assertEquals(expected, actual, path + ": SDK serialization differs from fixture");
   }
   private static boolean timestampsEqual(String left, String right) { try { return Instant.parse(left).equals(Instant.parse(right)); } catch (Exception ignored) { try { return OffsetDateTime.parse(left).toInstant().equals(OffsetDateTime.parse(right).toInstant()); } catch (Exception notTimestamp) { return false; } } }
   private void cancelQuietly(UUID sessionId) { if (sessionId != null) try { sessions.cancelSession(sessionId); } catch (Exception ignored) { } }
   private static boolean isCurrent() { return "true".equals(System.getenv("SDK_IS_CURRENT")); }
-  private static boolean allowMissingModels() { String value = System.getenv("SDK_COMPATIBILITY_ALLOW_MISSING_PSO_MODELS"); return "1".equals(value) || "true".equalsIgnoreCase(value); }
   private static String targetLabel() { return System.getenv().getOrDefault("SDK_TARGET_LABEL", "this SDK target"); }
   private static String required(String name) { String value = System.getenv(name); if (value == null || value.isBlank()) throw new IllegalStateException(name + " is required"); return value; }
-  private record CompletedSession(CreateDirectProviderSessionResponse session, String resultsAccessKey) { }
+  private record CompletedSession(CreateDirectProviderSessionResponse session, String resultsAccessKey, String redirectToken) { }
 }

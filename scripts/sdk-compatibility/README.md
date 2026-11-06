@@ -9,18 +9,31 @@ implementation and writes one `compatibility.json` file to the path supplied in
 every language target. Suites run in parallel by default; set
 `SDK_COMPATIBILITY_PARALLEL=false` to run them sequentially when debugging.
 
-The shared fixture collector filters each public provider-output JSON payload
-against that target's Swagger schema before caching it. It writes two forms:
-`output`, the public wire payload used for deserialization (including Swagger
-`readOnly` response fields), and `serializationOutput`, the expected
-round-trip result with `readOnly` fields removed. This removes runtime-only
-fields, including `[SwaggerIgnore]` compatibility aliases, without asking an
-SDK serializer to emit response-only properties. It does not change Connect's
-production response serialization.
+The collector retains the complete API response in `output`. SDK deserializers
+therefore see unknown fields and legacy aliases exactly as clients do.
+`serializationOutput` contains current Swagger fields excluding `readOnly`
+properties; `legacySerializationOutput` also retains aliases absent from today's
+Swagger, for published SDKs. No filtering is applied to deserialization input.
 
-The TypeScript-only entry point also prepares this filtered cache when
-`SDK_COMPATIBILITY_PSO_FIXTURES_PATH` is not supplied. Both entry points use the
-repository's release generator configuration.
+The coordinator applies `compatibility.providerMappings` by published version.
+An old model name is matched to its original provider; an explicitly unsupported
+new provider is reported separately. Current and mainline targets never inherit
+historical mappings. `compatibility.wireAliases` checks retained aliases against
+their replacement fields, so removing an alias from the server fails the suite.
+
+Every target also receives synthetic fixtures for unknown fields, future enum
+values, and nested model dictionaries (including mDL namespaces). Enum tests
+require the response to parse and preserve known fields; a language may preserve
+the new enum string or return an explicit unknown sentinel.
+
+All seven languages must report the shared test catalog. The aggregate command
+fails on unexpected compatibility or setup failures by default. Explicitly set
+`SDK_COMPATIBILITY_FAIL_ON_FAILURE=false` only for a report-only diagnostic run.
+Missing public model exports fail current/main targets; there is no exemption.
+
+Every standalone language entry point prepares the same raw cache when
+`SDK_COMPATIBILITY_PSO_FIXTURES_PATH` is not supplied. Missing or empty caches
+fail setup. All entry points use the repository's release generator configuration.
 
 Baseline targets run the selected revision's build wrapper and generator helper
 from its detached worktree, preserving that revision's options and post-processing.
@@ -86,12 +99,25 @@ acknowledgements, even if they share the published package's version number.
   "sdkVersion": "3.0.0",
   "testCaseId": "serialization.provider-output-round-trip",
   "parameters": { "providerId": "example-provider" },
-  "reason": "The model shape changed intentionally in this release."
+  "reason": "The model shape changed intentionally in this release.",
+  "failureMessageIncludes": ["givenName"]
 }
 ```
 
-`language`, `sdkVersion`, `testCaseId`, and `reason` are required. `parameters`
+`language`, `sdkVersion`, `testCaseId`, and `reason` are required. A failure is
+acknowledged only when every string in the nonempty `failureMessageIncludes`
+array occurs in its message; another failure of the same case still fails CI. `parameters`
 is an optional exact, partial match for a case's string parameters; use it to
 scope a broad test case such as a PSO check to one provider. Set `mute: true`
 to suppress the resulting warning as well. An acknowledgement can also replace
 an existing advisory warning for the selected revision.
+
+## Serialization-only diagnostics
+
+Set `SDK_COMPATIBILITY_TEST_SCOPE=serialization` when invoking a language's
+single-target `run_matrix.mjs` executor to exercise codecs without API operations.
+Provide a fixture cache plus the normal target/result environment variables.
+This is a partial diagnostic run, not a replacement for the full CI catalog.
+The C# executor detects the installed package's client architecture and exercises
+its own HTTP codec (System.Text.Json for historical generichost packages,
+CustomJsonCodec/Newtonsoft for httpclient packages).

@@ -146,6 +146,9 @@ async function readAcknowledgements() {
       || typeof entry.sdkVersion !== "string"
       || typeof entry.testCaseId !== "string"
       || (entry.mute !== undefined && typeof entry.mute !== "boolean")
+      || (entry.failureMessageIncludes !== undefined && (!Array.isArray(entry.failureMessageIncludes)
+        || entry.failureMessageIncludes.length === 0
+        || !entry.failureMessageIncludes.every((value) => typeof value === "string" && value.length > 0)))
       || (entry.parameters !== undefined && (!isRecord(entry.parameters)
         || !Object.values(entry.parameters).every((value) => typeof value === "string")))
     ) {
@@ -304,6 +307,9 @@ function applyAcknowledgements(testCases, target, language, acknowledgements) {
       : (typeof testCase.advisory.message === "string"
         ? testCase.advisory.message
         : "No warning message was recorded.");
+    // A historical exception must describe the observed failure, not every
+    // possible future failure of the same test/provider/version.
+    if (testCase.status === "failed" && !acknowledgement.failureMessageIncludes?.every((part) => originalMessage.includes(part))) return testCase;
     const advisory = {
       code: "acknowledged-compatibility-exception",
       message: `${acknowledgement.reason} Original result: ${originalMessage}`,
@@ -432,7 +438,7 @@ function comparisonTargetLabel(target) {
 }
 
 function stableParameters(parameters) {
-  if (!parameters) return "";
+  if (!parameters || Object.keys(parameters).length === 0) return "";
   return JSON.stringify(Object.entries(parameters).sort(([left], [right]) => left.localeCompare(right)));
 }
 

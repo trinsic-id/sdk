@@ -5,7 +5,7 @@ import { childEnvironment, command, failure, readProcessTestCases, target, tempo
 
 const tests = new URL(".", import.meta.url).pathname;
 const selected = target();
-const files = ["read-apis", "session-lifecycle", "recommendations", "provider-outputs"];
+const files = process.env.SDK_COMPATIBILITY_TEST_SCOPE === "serialization" ? ["provider-outputs"] : ["read-apis", "session-lifecycle", "recommendations", "provider-outputs"];
 let sdkVersion, testCases;
 try {
   ({ sdkVersion, testCases } = temporaryDirectory("trinsic-typescript-compat-", (directory) => {

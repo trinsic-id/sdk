@@ -5,7 +5,6 @@ use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 require_once __DIR__ . '/CompatibilitySupport.php';
 use Trinsic\Compatibility\CompatibilitySupport;
-use Trinsic\Compatibility\SkippedCompatibilityCase;
 
 final class CompatibilityTest extends TestCase
 {
@@ -77,18 +76,19 @@ final class CompatibilityTest extends TestCase
 
     public function testGetSessionAttachment(): void
     {
-        $this->skippableCase('api.sessions.get-attachment', function (): void {
-            [$session, $accessKey, $result] = $this->completedSessionResultOrSkip();
+        $this->case('api.sessions.get-attachment', function (): void {
+            [$session, $accessKey, $result] = $this->completedSessionResult();
             $attachmentId = self::$support->attachmentId($result);
-            if (!$attachmentId) self::$support->skipFromCase('The redirect test session did not produce an attachment.');
+            self::assertNotNull($attachmentId, 'The redirect test session did not produce an attachment.');
             self::$support->invoke(self::$support->sessions, 'getAttachment', [$this->sessionId($session), $attachmentId, self::$support->model('GetAttachmentRequest', ['results_access_key' => $accessKey])]);
         });
     }
 
     public function testRedactSession(): void
     {
-        $this->skippableCase('api.sessions.redact', function (): void {
-            [$session] = $this->completedSessionResultOrSkip();
+        $this->case('api.sessions.redact', function (): void {
+            $session = $this->createDirectSession();
+            self::$support->completedRedirectSession($session);
             self::$support->invoke(self::$support->sessions, 'redactSession', [$this->sessionId($session)]);
         });
     }
@@ -105,24 +105,25 @@ final class CompatibilityTest extends TestCase
     public function testProviderOutputRoundTrip(?array $fixture): void
     {
         if ($fixture === null) $this->skipCase('serialization.provider-output-round-trip', 'No shared PSO fixture cache was available.');
+        $caseId = $fixture['testCaseId'] ?? 'serialization.provider-output-round-trip';
         $parameters = ['providerId' => $fixture['providerId']];
         if (isset($fixture['sdkModelName'])) $parameters['sdkModelName'] = $fixture['sdkModelName'];
-        if (empty($fixture['hasPublicSdkModel'])) $this->skipCase('serialization.provider-output-round-trip', 'Provider has no public Swagger provider-specific output model.', $parameters);
+        if (isset($fixture['unsupportedReason'])) $this->skipCase($caseId, $fixture['unsupportedReason'], $parameters);
+        if (empty($fixture['hasPublicSdkModel'])) $this->skipCase($caseId, 'Provider has no public Swagger provider-specific output model.', $parameters);
         $class = 'Trinsic\\Api\\Model\\' . $fixture['sdkModelName'];
         if (!class_exists($class)) {
-            if (getenv('SDK_IS_CURRENT') === 'true' && !self::$support->allowMissingPsoModels()) {
-                $this->case('serialization.provider-output-round-trip', fn() => throw new \RuntimeException("Connect declares {$fixture['providerId']}'s {$fixture['sdkModelName']} output as public, but this SDK does not expose {$fixture['sdkModelName']}."), $parameters);
+            if (getenv('SDK_IS_CURRENT') === 'true') {
+                $this->case($caseId, fn() => throw new \RuntimeException("Connect declares {$fixture['providerId']}'s {$fixture['sdkModelName']} output as public, but this SDK does not expose {$fixture['sdkModelName']}."), $parameters);
             }
-            $reason = getenv('SDK_IS_CURRENT') === 'true'
-                ? 'Missing public provider-output models are temporarily allowed by SDK_COMPATIBILITY_ALLOW_MISSING_PSO_MODELS.'
-                : 'The published SDK does not expose this provider-output model.';
-            $this->skipCase('serialization.provider-output-round-trip', $reason, $parameters);
+            $reason = 'The published SDK does not expose this provider-output model.';
+            $this->skipCase($caseId, $reason, $parameters);
         }
-        $this->case('serialization.provider-output-round-trip', function () use ($class, $fixture): void {
+        $this->case($caseId, function () use ($class, $fixture): void {
             if (!isset($fixture['output'])) throw new \RuntimeException('Cached fixture omitted output.');
             $model = \Trinsic\Api\ObjectSerializer::deserialize(json_encode($fixture['output']), $class, []);
             $serialized = json_decode(json_encode(\Trinsic\Api\ObjectSerializer::sanitizeForSerialization($model), JSON_THROW_ON_ERROR), true, flags: JSON_THROW_ON_ERROR);
-            self::$support->compareJson($serialized, $fixture['serializationOutput'] ?? $fixture['output'], $fixture['providerId'], getenv('SDK_IS_CURRENT') === 'true');
+            self::assertIsArray($serialized);
+            self::$support->compareJson($serialized, $fixture['serializationOutput'] ?? $fixture['output'], $fixture['providerId'], getenv('SDK_IS_CURRENT') === 'true' || isset($fixture['testCaseId']));
         }, $parameters);
     }
 
@@ -148,15 +149,6 @@ final class CompatibilityTest extends TestCase
     {
         self::$support->skip($id, $reason, $parameters);
         self::markTestSkipped($reason);
-    }
-
-    private function skippableCase(string $id, callable $action): void
-    {
-        try {
-            $this->case($id, $action);
-        } catch (SkippedCompatibilityCase $error) {
-            $this->markTestSkipped($error->getMessage());
-        }
     }
 
     private function hostedRequest(): object
@@ -200,13 +192,5 @@ final class CompatibilityTest extends TestCase
         return [$session, $accessKey, $result];
     }
 
-    /** @return array{object, string, mixed} */
-    private function completedSessionResultOrSkip(): array
-    {
-        try {
-            return $this->completedSessionResult();
-        } catch (\Throwable) {
-            self::$support->skipFromCase('Redirect-session setup or result retrieval failed.');
-        }
-    }
+
 }

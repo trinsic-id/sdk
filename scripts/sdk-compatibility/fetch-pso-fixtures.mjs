@@ -31,8 +31,10 @@ const fixtures = await Promise.all(catalog.map(async (fixture) => {
   }
   return {
     ...fixture,
-    output: filterToSchema(providerOutput, schema, swagger.components.schemas),
+    // Feed the real wire payload to every SDK, including unknown/legacy fields.
+    output: providerOutput,
     serializationOutput: filterToSchema(providerOutput, schema, swagger.components.schemas, { excludeReadOnly: true }),
+    legacySerializationOutput: filterToSchema(providerOutput, schema, swagger.components.schemas, { excludeReadOnly: true, preserveUnknown: true }),
   };
 }));
 
@@ -45,22 +47,23 @@ function required(name) {
   return value;
 }
 
-function filterToSchema(value, schema, schemas, { excludeReadOnly = false } = {}) {
+function filterToSchema(value, schema, schemas, { excludeReadOnly = false, preserveUnknown = false } = {}) {
   const resolved = resolveSchema(schema, schemas);
   if (isUnconstrained(resolved)) return value;
 
   if (Array.isArray(value)) {
     const itemSchema = childSchema(resolved, "items", schemas);
-    return itemSchema === undefined ? value : value.map((item) => filterToSchema(item, itemSchema, schemas, { excludeReadOnly }));
+    return itemSchema === undefined ? value : value.map((item) => filterToSchema(item, itemSchema, schemas, { excludeReadOnly, preserveUnknown }));
   }
 
   if (!isObject(value)) return value;
 
   return Object.fromEntries(Object.entries(value).flatMap(([key, child]) => {
     const propertySchema = propertySchemaFor(resolved, key, schemas);
+    if (propertySchema === undefined && preserveUnknown) return [[key, child]];
     return propertySchema === undefined || (excludeReadOnly && isReadOnly(propertySchema, schemas))
       ? []
-      : [[key, filterToSchema(child, propertySchema, schemas, { excludeReadOnly })]];
+      : [[key, filterToSchema(child, propertySchema, schemas, { excludeReadOnly, preserveUnknown })]];
   }));
 }
 

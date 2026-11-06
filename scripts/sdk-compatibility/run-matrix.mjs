@@ -7,9 +7,11 @@
  * every language—target selection, report construction, catalog coverage, and
  * API-operation coverage—lives here.
  */
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
+import { targetFixtures, validateWireAliases } from "./target-fixtures.mjs";
 import { preserveProcessFailure } from "./executor-helpers.mjs";
 
 const [language, executor, ...executorArguments] = process.argv.slice(2);
@@ -25,6 +27,17 @@ const required = (name) => {
   return value.trim();
 };
 const configuration = Object.fromEntries(["TRINSIC_TEST_BASE_URL", "TRINSIC_TEST_ACCESS_TOKEN", "TRINSIC_TEST_VERIFICATION_PROFILE_ID"].map((name) => [name, required(name)]));
+// Every standalone language entry point needs the same wire fixtures. The
+// aggregate runner supplies a shared snapshot, so it is never fetched twice.
+if (!process.env.SDK_COMPATIBILITY_PSO_FIXTURES_PATH) {
+  const directory = mkdtempSync(join(tmpdir(), "trinsic-compat-fixtures-"));
+  process.on("exit", () => rmSync(directory, { recursive: true, force: true }));
+  process.env.SDK_COMPATIBILITY_PSO_FIXTURES_PATH = join(directory, "fixtures.json");
+  const fetched = spawnSync(process.execPath, ["--use-system-ca", join(root, "scripts/sdk-compatibility/fetch-pso-fixtures.mjs")], { env: process.env, stdio: "inherit" });
+  if (fetched.status !== 0) throw new Error("Cannot run compatibility tests without the provider-output fixture snapshot.");
+}
+const fixtureCache = JSON.parse(readFileSync(process.env.SDK_COMPATIBILITY_PSO_FIXTURES_PATH));
+if (!Array.isArray(fixtureCache.fixtures) || fixtureCache.fixtures.length === 0) throw new Error("Provider-output fixture snapshot must contain a nonempty fixtures array.");
 const matrix = JSON.parse(readFileSync(join(root, "compatibility.json")));
 const catalog = JSON.parse(readFileSync(join(root, "compatibility-tests.json"))).testCases;
 const versions = matrix.compatibility.sdkVersions[language];
@@ -38,7 +51,7 @@ const targets = [
   ...versions.toSorted(compareVersions).map((version) => ({ isCurrent: false, kind: "published", label: `${packageLabel}@${versionPrefix}${version}`, version })),
 ];
 const results = targets.map(runTarget);
-if (process.env.SDK_COMPATIBILITY_VALIDATE_CATALOG === "true") {
+if (process.env.SDK_COMPATIBILITY_VALIDATE_CATALOG !== "false") {
   const expected = catalog.filter((testCase) => testCase.requiredLanguages?.includes(language)).map((testCase) => testCase.id);
   for (const target of results) {
     const actual = new Set(target.testCases.map((testCase) => testCase.id));
@@ -72,18 +85,27 @@ function compareVersions(left, right) { return right.localeCompare(left, undefin
 function runTarget(target) {
   const result = { isCurrent: target.isCurrent, label: target.label, testCases: [] };
   const resultFile = join(process.env.TMPDIR ?? "/tmp", `trinsic-${language}-target-${process.pid}-${Math.random().toString(36).slice(2)}.json`);
+  const aliasResults = validateWireAliases(fixtureCache, matrix.compatibility.wireAliases);
+  const fixtureFile = `${resultFile}.fixtures.json`;
+  writeFileSync(fixtureFile, JSON.stringify(targetFixtures(fixtureCache, target, matrix.compatibility)));
   const execution = spawnSync(executor, executorArguments, {
     cwd: testsRoot,
     encoding: "utf8",
-    env: { ...process.env, ...configuration, SDK_COMPATIBILITY_LANGUAGE: language, SDK_COMPATIBILITY_RESULT_FILE: resultFile, SDK_COMPATIBILITY_TARGET_KIND: target.kind, SDK_COMPATIBILITY_TARGET_LABEL: target.label, SDK_TARGET_LABEL: target.label, SDK_COMPATIBILITY_TARGET_PACKAGE: target.packagePath ?? "", SDK_COMPATIBILITY_TARGET_VERSION: target.version ?? "", SDK_IS_CURRENT: String(target.isCurrent) },
+    env: { ...process.env, ...configuration, SDK_COMPATIBILITY_PSO_FIXTURES_PATH: fixtureFile, SDK_COMPATIBILITY_LANGUAGE: language, SDK_COMPATIBILITY_RESULT_FILE: resultFile, SDK_COMPATIBILITY_TARGET_KIND: target.kind, SDK_COMPATIBILITY_TARGET_LABEL: target.label, SDK_TARGET_LABEL: target.label, SDK_COMPATIBILITY_TARGET_PACKAGE: target.packagePath ?? "", SDK_COMPATIBILITY_TARGET_VERSION: target.version ?? "", SDK_IS_CURRENT: String(target.isCurrent) },
   });
+  rmSync(fixtureFile);
   if (execution.stdout) process.stdout.write(execution.stdout);
   if (execution.stderr) process.stderr.write(execution.stderr);
   if (existsSync(resultFile)) {
     try {
       const parsed = JSON.parse(readFileSync(resultFile));
       if (parsed.schemaVersion === 1 && Array.isArray(parsed.testCases)) {
-        result.testCases = preserveProcessFailure(parsed.testCases, execution, language, `${language} executor`);
+        result.testCases = [...preserveProcessFailure(parsed.testCases, execution, language, `${language} executor`), ...aliasResults];
+        if (target.isCurrent) result.testCases = result.testCases.map((testCase) => {
+          if (testCase.status !== "skipped" || !testCase.id.startsWith("api.")) return testCase;
+          const { skipReason, ...test } = testCase;
+          return { ...test, status: "failed", failure: { name: "CoverageError", message: `Current SDK API operation was not exercised: ${skipReason ?? testCase.id}` } };
+        });
         if (typeof parsed.sdkVersion === "string") result.sdkVersion = parsed.sdkVersion;
         return result;
       }

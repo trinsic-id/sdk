@@ -19,6 +19,7 @@ generator_args=()
 
 "$REPO_ROOT/helpers/generate-client.sh" \
   --language php \
+  --additional-property "enumUnknownDefaultCase=true" \
   --output-folder "$output_folder" \
   "${generator_args[@]+${generator_args[@]}}" \
   --additional-property "artifactVersion=[VERSION]" \
@@ -29,6 +30,8 @@ generator_args=()
   --additional-property "composerPackageName=trinsic/api" \
   --model-name-mapping "Match=MatchModel" \
   --additional-property "licenseName=MIT"
+
+node "$REPO_ROOT/helpers/make-enums-forward-compatible.mjs" php "$output_folder"
 
 cp "$SCRIPT_DIR/README.md" "$output_folder"
 cp "$REPO_ROOT/LICENSE" "$output_folder"

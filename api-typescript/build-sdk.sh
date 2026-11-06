@@ -29,6 +29,7 @@ fi
 "$REPO_ROOT/helpers/generate-client.sh" \
   "${generator_arguments[@]+${generator_arguments[@]}}" \
   --language typescript-fetch \
+  --additional-property "enumUnknownDefaultCase=true" \
   --version-name node \
   --output-folder "$SCRIPT_DIR/sdk" \
   --additional-property "npmName=@trinsic/api" \

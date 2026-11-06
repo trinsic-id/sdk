@@ -87,6 +87,8 @@ xml = xml.replace("</Project>", `${itemGroup}</Project>`);
 fs.writeFileSync(file, xml);
 NODE
 
+node "$REPO_ROOT/helpers/make-enums-forward-compatible.mjs" csharp "$SCRIPT_DIR/sdk"
+
 cp "$SCRIPT_DIR/README.md" "$SCRIPT_DIR/sdk/src/Trinsic.Api"
 cp "$REPO_ROOT/LICENSE" "$SCRIPT_DIR/sdk/src/Trinsic.Api"
 

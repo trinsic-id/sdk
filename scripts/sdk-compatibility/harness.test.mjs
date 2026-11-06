@@ -1,10 +1,11 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { copyFileSync, existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 import { readProcessTestCases, temporaryDirectory } from "./executor-helpers.mjs";
+import { targetFixtures, validateWireAliases } from "./target-fixtures.mjs";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
 const scripts = join(root, "scripts/sdk-compatibility");
@@ -16,6 +17,35 @@ const configuration = {
 const passed = { id: "example", status: "passed", durationMs: 0 };
 const failed = { ...passed, status: "failed", failure: { name: "Error", message: "Recorded failure" } };
 const json = (path) => JSON.parse(readFileSync(path, "utf8"));
+
+test("historical provider mappings test the original integration and keep raw aliases", () => {
+  const compatibility = json(join(root, "compatibility.json")).compatibility;
+  const output = { firstName: "Ada", legacyAlias: "kept" };
+  const cache = { fixtures: [
+    { providerId: "a-freja-eid-login", sdkModelName: "FrejaIndirectProviderOutput", output, serializationOutput: { firstName: "Ada" }, legacySerializationOutput: output },
+    { providerId: "freja", sdkModelName: "FrejaProviderOutput", output: { name: "Ada" } },
+    { providerId: "a-itsme-login", sdkModelName: "ItsmeLoginProviderOutput", output },
+  ] };
+  const old = targetFixtures(cache, { isCurrent: false, version: "3.0.0" }, compatibility).fixtures;
+  assert.equal(old[0].sdkModelName, "FrejaProviderOutput");
+  assert.deepEqual(old[0].output, output);
+  assert.deepEqual(old[0].serializationOutput, output);
+  assert.match(old[1].unsupportedReason, /introduced after/);
+  assert.equal(old[2].sdkModelName, "ItsmeProviderOutput");
+  for (const version of ["3.0.0", "3.1.0", "3.2.1"]) {
+    const current = targetFixtures(cache, { isCurrent: true, version }, compatibility).fixtures;
+    assert.deepEqual(current.slice(0, 3), cache.fixtures);
+  }
+  assert.equal(cache.fixtures[0].sdkModelName, "FrejaIndirectProviderOutput", "target overrides must not mutate the shared snapshot");
+});
+
+test("removing or changing a legacy wire alias is a failure", () => {
+  const aliases = [{ providerId: "singpass", legacyPath: "person.legacy", currentPath: "person.current" }];
+  const check = (person) => validateWireAliases({ fixtures: [{ providerId: "singpass", output: { person } }] }, aliases)[0];
+  assert.equal(check({ current: { code: "113" }, legacy: { code: "113" } }).status, "passed");
+  assert.equal(check({ current: { code: "113" } }).status, "failed");
+  assert.equal(check({ current: { code: "113" }, legacy: { code: "999" } }).status, "failed");
+});
 function write(path, value, executable = false) {
   mkdirSync(dirname(path), { recursive: true });
   writeFileSync(path, value, { mode: executable ? 0o755 : 0o644 });
@@ -48,8 +78,10 @@ test("matrix coordinator rejects a successful report from a failed executor", ()
 writeFileSync(process.env.SDK_COMPATIBILITY_RESULT_FILE, JSON.stringify({ schemaVersion: 1, testCases: [${JSON.stringify(passed)}] }));
 process.exitCode = 1;`);
   const output = join(directory, "matrix.json");
+  const cache = join(directory, "fixtures.json");
+  write(cache, JSON.stringify({ fixtures: [{ providerId: "test", hasPublicSdkModel: false }] }));
   const result = run(process.execPath, [join(scripts, "run-matrix.mjs"), "typescript", process.execPath, executor], {
-    env: { ...configuration, SDK_COMPATIBILITY_CURRENT_PACKAGE: directory, SDK_COMPATIBILITY_MAIN_PACKAGE: directory, SDK_COMPATIBILITY_RESULTS_PATH: output, SDK_COMPATIBILITY_VALIDATE_CATALOG: "false" },
+    env: { ...configuration, SDK_COMPATIBILITY_CURRENT_PACKAGE: directory, SDK_COMPATIBILITY_MAIN_PACKAGE: directory, SDK_COMPATIBILITY_RESULTS_PATH: output, SDK_COMPATIBILITY_VALIDATE_CATALOG: "false", SDK_COMPATIBILITY_PSO_FIXTURES_PATH: cache },
   });
   assert.equal(result.status, 1, result.stderr);
   for (const target of json(output).targets) {
@@ -59,13 +91,48 @@ process.exitCode = 1;`);
   }
 }));
 
+test("standalone language matrices collect raw fixtures and clean up their target snapshots", () => temporaryDirectory("compat-standalone-", (directory) => {
+  const mock = join(directory, "fetch.mjs"), executor = join(directory, "executor.mjs"), observed = join(directory, "paths");
+  write(mock, `globalThis.fetch = async url => Response.json(url.endsWith('/swagger/api/swagger.json')
+    ? { components: { schemas: { Example: { type: 'object', properties: { name: { type: 'string' } } } } } }
+    : url.endsWith('/sample-json/outputs') ? [{ providerId: 'example', hasPublicSdkModel: true, sdkModelName: 'Example' }]
+    : { name: 'Ada', legacyAlias: 'kept' });`);
+  write(executor, `import assert from 'node:assert/strict'; import { appendFileSync, readFileSync, writeFileSync } from 'node:fs';
+    const path = process.env.SDK_COMPATIBILITY_PSO_FIXTURES_PATH;
+    assert.equal(JSON.parse(readFileSync(path)).fixtures[0].output.legacyAlias, 'kept');
+    appendFileSync(process.env.TEST_PATHS, path + '\\n');
+    writeFileSync(process.env.SDK_COMPATIBILITY_RESULT_FILE, JSON.stringify({schemaVersion: 1, testCases: [${JSON.stringify(passed)}]}));`);
+  succeeded(run(process.execPath, [join(scripts, "run-matrix.mjs"), "ruby", process.execPath, executor], { env: {
+    ...configuration, NODE_OPTIONS: `--import=${mock}`, TEST_PATHS: observed,
+    SDK_COMPATIBILITY_CURRENT_PACKAGE: directory, SDK_COMPATIBILITY_MAIN_PACKAGE: "",
+    SDK_COMPATIBILITY_PSO_FIXTURES_PATH: "", SDK_COMPATIBILITY_VALIDATE_CATALOG: "false",
+    SDK_COMPATIBILITY_RESULTS_PATH: join(directory, "results.json"),
+  } }));
+  const paths = readFileSync(observed, "utf8").trim().split("\n");
+  assert.equal(paths.length, 4);
+  assert.ok(paths.every((path) => !existsSync(path)));
+}));
+
+test("current and main SDKs cannot satisfy required API coverage by skipping", () => temporaryDirectory("compat-skips-", (directory) => {
+  const executor = join(directory, "executor.mjs"), cache = join(directory, "fixtures.json"), output = join(directory, "results.json");
+  write(cache, JSON.stringify({ fixtures: [{ providerId: "test", hasPublicSdkModel: false }] }));
+  write(executor, `import { writeFileSync } from 'node:fs'; writeFileSync(process.env.SDK_COMPATIBILITY_RESULT_FILE,
+    JSON.stringify({ schemaVersion: 1, testCases: [{ id: 'api.providers.get', status: 'skipped', skipReason: 'Method missing', durationMs: 0 }] }));`);
+  const result = run(process.execPath, [join(scripts, "run-matrix.mjs"), "ruby", process.execPath, executor], { env: {
+    ...configuration, SDK_COMPATIBILITY_CURRENT_PACKAGE: directory, SDK_COMPATIBILITY_MAIN_PACKAGE: directory,
+    SDK_COMPATIBILITY_PSO_FIXTURES_PATH: cache, SDK_COMPATIBILITY_VALIDATE_CATALOG: "false", SDK_COMPATIBILITY_RESULTS_PATH: output,
+  } });
+  assert.equal(result.status, 1);
+  for (const target of json(output).targets) assert.equal(target.testCases[0].status, target.isCurrent ? "failed" : "skipped");
+}));
+
 test("acknowledgements apply only to published targets and cannot hide unrecorded suite failures", () => temporaryDirectory("compat-render-", (directory) => {
   const status = join(directory, "suite-status.tsv");
   const report = join(directory, "php/compatibility.json");
   const render = () => run(process.execPath, [join(scripts, "render-results.mjs"), "--results-dir", directory, "--status-file", status, "--check"]);
   const acknowledgement = json(join(root, "compatibility.json")).compatibility.acknowledgements.find((entry) => entry.language === "php" && entry.testCaseId === "api.sessions.get-result");
   assert.ok(acknowledgement);
-  const target = { sdkVersion: acknowledgement.sdkVersion, testCases: [{ ...failed, id: acknowledgement.testCaseId }] };
+  const target = { sdkVersion: acknowledgement.sdkVersion, testCases: [{ ...failed, id: acknowledgement.testCaseId, failure: { name: "Error", message: acknowledgement.failureMessageIncludes.join(" ") } }] };
   const envelope = { schemaVersion: 1, suite: { language: "php" }, targets: [] };
   write(status, "php\t1\n");
   write(report, JSON.stringify({ ...envelope, targets: [{ ...target, isCurrent: false, label: "published" }] }));
@@ -78,12 +145,14 @@ test("acknowledgements apply only to published targets and cannot hide unrecorde
   ] }));
   assert.equal(render().status, 1);
   assert.equal(json(join(directory, "summary.json")).totals.failed, 2);
+  write(report, JSON.stringify({ ...envelope, targets: [{ ...target, isCurrent: false, testCases: [{ ...failed, id: acknowledgement.testCaseId }] }] }));
+  assert.equal(render().status, 1, "a different failure of an acknowledged case must still fail");
   write(report, JSON.stringify({ ...envelope, targets: [{ ...target, isCurrent: true, testCases: [passed] }] }));
   assert.equal(render().status, 1);
   assert.match(json(join(directory, "summary.json")).suites[0].error, /without recording a failure/);
 }));
 
-test("fixture cache removes forbidden and read-only fields while retaining dictionaries", () => temporaryDirectory("compat-fixtures-", (directory) => {
+test("fixture cache keeps wire aliases and filters only serialization expectations", () => temporaryDirectory("compat-fixtures-", (directory) => {
   const output = join(directory, "fixtures.json");
   const schema = { type: "object", additionalProperties: false, properties: {
     name: { type: "string" }, responseOnly: { type: "string", readOnly: true },
@@ -98,8 +167,20 @@ test("fixture cache removes forbidden and read-only fields while retaining dicti
   succeeded(run(process.execPath, ["--import", mock, join(scripts, "fetch-pso-fixtures.mjs")], { env: { ...configuration, SDK_COMPATIBILITY_PSO_FIXTURES_PATH: output } }));
   const fixture = json(output).fixtures[0];
   const expected = { name: "Jane", children: [{ name: "child" }], free: payload.free, dictionary: { key: { name: "value" } } };
-  assert.deepEqual(fixture.output, { ...expected, responseOnly: "server" });
+  assert.deepEqual(fixture.output, payload);
+  const { responseOnly, ...legacy } = payload;
+  assert.deepEqual(fixture.legacySerializationOutput, legacy);
   assert.deepEqual(fixture.serializationOutput, expected);
+}));
+
+test("cross-language comparisons treat empty and omitted parameters equally", () => temporaryDirectory("compat-parameters-", (directory) => {
+  const status = join(directory, "suite-status.tsv");
+  write(status, "typescript\t0\nruby\t0\n");
+  for (const language of ["typescript", "ruby"]) {
+    write(join(directory, `${language}/compatibility.json`), JSON.stringify({ schemaVersion: 1, suite: { language }, targets: [{ label: "current branch", isCurrent: true, testCases: [{ ...passed, ...(language === "ruby" ? { parameters: {} } : {}) }] }] }));
+  }
+  succeeded(run(process.execPath, [join(scripts, "render-results.mjs"), "--results-dir", directory, "--status-file", status, "--check"]));
+  assert.deepEqual(json(join(directory, "summary.json")).languageComparisons, []);
 }));
 
 test("default build wrappers reach the generator with empty argument arrays on Bash 3.2", () => temporaryDirectory("compat-bash-", (directory) => {
@@ -120,8 +201,7 @@ test("default build wrappers reach the generator with empty argument arrays on B
 }));
 
 test("generator config is selected from its repository regardless of the entry directory", () => temporaryDirectory("compat-config-", (directory) => {
-  // Match Node's canonical module path for the header injector's CLI entry point.
-  directory = realpathSync(directory);
+
   mkdirSync(join(directory, "helpers"));
   copyFileSync(join(root, "helpers/generate-client.sh"), join(directory, "helpers/generate-client.sh"));
   copyFileSync(join(root, "helpers/inject-sdk-header.mjs"), join(directory, "helpers/inject-sdk-header.mjs"));
@@ -200,7 +280,7 @@ test("sequential aggregate runs work without background process IDs", () => temp
   mkdirSync(dirname(script), { recursive: true });
   copyFileSync(join(scripts, "run.sh"), script);
   write(join(directory, "scripts/sdk-compatibility/fetch-pso-fixtures.mjs"), 'import { writeFileSync } from "node:fs"; writeFileSync(process.env.SDK_COMPATIBILITY_PSO_FIXTURES_PATH, "{}");');
-  write(join(directory, "scripts/sdk-compatibility/render-results.mjs"), '');
+  write(join(directory, "scripts/sdk-compatibility/render-results.mjs"), 'if (!process.argv.includes("--check")) process.exitCode = 91;');
   write(join(directory, "api-example/tests/run-compatibility.sh"), '#!/bin/bash\nprintf "{}" > "$SDK_COMPATIBILITY_RESULTS_PATH"\n');
   const results = join(directory, "results");
   succeeded(run("/bin/bash", [script], { env: { SDK_COMPATIBILITY_PARALLEL: "false", SDK_COMPATIBILITY_RESULTS_DIR: results } }));
@@ -208,7 +288,7 @@ test("sequential aggregate runs work without background process IDs", () => temp
   assert.ok(existsSync(join(results, "example/compatibility.json")));
 }));
 
-test("TypeScript-only entry point prepares filtered fixtures and preserves a supplied cache", () => temporaryDirectory("compat-typescript-", (directory) => {
+test("TypeScript-only entry point prepares raw fixtures and preserves a supplied cache", () => temporaryDirectory("compat-typescript-", (directory) => {
   const runner = join(directory, "api-typescript/tests/run-compatibility.sh");
   mkdirSync(dirname(runner), { recursive: true });
   copyFileSync(join(root, "api-typescript/tests/run-compatibility.sh"), runner);
@@ -232,7 +312,7 @@ writeFileSync(process.env.TEST_OBSERVATION, JSON.stringify({ path, cache: JSON.p
   const env = { ...configuration, PATH: `${directory}/bin:${process.env.PATH}`, NODE_OPTIONS: `--import=${mock}`, TEST_REPO: directory, TEST_OBSERVATION: observation, SDK_COMPATIBILITY_PSO_FIXTURES_PATH: "" };
   succeeded(run("/bin/bash", [runner], { env }));
   const collected = json(observation);
-  assert.deepEqual(collected.cache.fixtures[0].output, { name: "Jane", responseOnly: "server" });
+  assert.deepEqual(collected.cache.fixtures[0].output, { name: "Jane", responseOnly: "server", alias: "remove" });
   assert.deepEqual(collected.cache.fixtures[0].serializationOutput, { name: "Jane" });
   assert.equal(existsSync(collected.path), false, "temporary fixture cache must be cleaned up");
   const supplied = join(directory, "supplied.json");
