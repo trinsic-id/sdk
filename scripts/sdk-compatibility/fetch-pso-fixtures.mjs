@@ -82,7 +82,7 @@ function collectPropertySchemas(schema, propertyName, schemas, candidates, visit
       collectPropertySchemas(member, propertyName, schemas, candidates, new Set(visited));
     }
   }
-  if (candidates.length === 0 && resolved.additionalProperties !== undefined) {
+  if (candidates.length === 0 && resolved.additionalProperties !== undefined && resolved.additionalProperties !== false) {
     candidates.push(resolved.additionalProperties === true ? {} : resolved.additionalProperties);
   }
 }

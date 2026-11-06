@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { childEnvironment, command, failure, readTestCases, target, temporaryDirectory, writeExecutorResult } from "../../scripts/sdk-compatibility/executor-helpers.mjs";
+import { childEnvironment, command, failure, readProcessTestCases, target, temporaryDirectory, writeExecutorResult } from "../../scripts/sdk-compatibility/executor-helpers.mjs";
 
 const tests = new URL(".", import.meta.url).pathname;
 const selected = target();
@@ -16,8 +16,8 @@ try {
     const cases = [];
     for (const name of files) {
       const output = join(directory, `${name}.result.json`);
-      command(process.execPath, ["--use-system-ca", "--import", "tsx", "--test", join(tests, "src", `${name}.test.ts`)], { cwd: tests, check: false, env: childEnvironment({ SDK_COMPATIBILITY_RESULT_FILE: output, SDK_INSTALL_ROOT: directory, SDK_VERSION: version }) });
-      cases.push(...(readTestCases(output) ?? failure("typescript", `${name} exited before producing structured results.`)));
+      const execution = command(process.execPath, ["--use-system-ca", "--import", "tsx", "--test", join(tests, "src", `${name}.test.ts`)], { cwd: tests, check: false, env: childEnvironment({ SDK_COMPATIBILITY_RESULT_FILE: output, SDK_INSTALL_ROOT: directory, SDK_VERSION: version }) });
+      cases.push(...readProcessTestCases(output, execution, "typescript", name));
     }
     return { sdkVersion: version, testCases: cases };
   }));

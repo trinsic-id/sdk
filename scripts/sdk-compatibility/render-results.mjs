@@ -98,6 +98,13 @@ async function readSuite(resultsDir, language, runnerExitCode, acknowledgements)
   try {
     const report = JSON.parse(await readFile(reportPath, "utf8"));
     validateReport(report, reportPath);
+    // Recorded failures may later be acknowledged. A process failure with no
+    // recorded cause must still fail the suite, even when the report exists.
+    if (runnerExitCode !== 0 && !report.targets.some((target) =>
+      target.setupFailure || target.testCases?.some((testCase) => testCase.status === "failed"),
+    )) {
+      throw new Error(`Suite runner exited with code ${runnerExitCode} without recording a failure.`);
+    }
     const targets = report.targets.map((target) => summarizeTarget(target, language, acknowledgements));
     const hasFailures = targets.some((target) => target.failed > 0 || target.setupFailure);
 
@@ -273,6 +280,7 @@ function summarizeTarget(target, language, acknowledgements) {
 }
 
 function applyAcknowledgements(testCases, target, language, acknowledgements) {
+  if (target.isCurrent !== false) return testCases;
   return testCases.map((testCase) => {
     if (!isRecord(testCase) || typeof testCase.id !== "string") return testCase;
     if (testCase.status !== "failed" && !isRecord(testCase.advisory)) return testCase;

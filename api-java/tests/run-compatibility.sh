@@ -13,7 +13,8 @@ cleanup(){ git -C "$REPO_ROOT" worktree remove --force "$main" 2>/dev/null || tr
 curl -fsS "${TRINSIC_TEST_BASE_URL%/}/swagger/api/swagger.json" -o "$swagger"
 bash "$REPO_ROOT/api-java/build-sdk.sh" --swagger-file-or-url "$swagger" --output-folder "$current"
 [[ -x "$current/gradlew" ]] || { echo "Generated current Java SDK did not include a Gradle wrapper." >&2; exit 1; }
-rmdir "$main"; git -C "$REPO_ROOT" worktree add --detach "$main" "${SDK_COMPATIBILITY_MAIN_REF:-origin/main}" >/dev/null; cp "$REPO_ROOT/api-java/build-sdk.sh" "$main/api-java/build-sdk.sh"; JAVA_HOME="$JAVA_HOME" bash "$main/api-java/build-sdk.sh" --swagger-file-or-url "$swagger" --output-folder "$main/api-java/sdk-build"
+rmdir "$main"; git -C "$REPO_ROOT" worktree add --detach "$main" "${SDK_COMPATIBILITY_MAIN_REF:-origin/main}" >/dev/null
+bash "$REPO_ROOT/scripts/sdk-compatibility/build-baseline.sh" "$main" java "$swagger"
 [[ -x "$main/api-java/sdk-build/gradlew" ]] || { echo "Generated mainline Java SDK did not include a Gradle wrapper." >&2; exit 1; }
 for version in 3.2.1 3.1.0 3.0.0; do curl -fsS --max-time 5 -o /dev/null "https://jitpack.io/com/github/trinsic-id/sdk-java-api/$version/sdk-java-api-$version.pom" || { echo "Published Java SDK artifact com.github.trinsic-id:sdk-java-api:$version could not be resolved from JitPack." >&2; exit 1; }; done
 SDK_COMPATIBILITY_CURRENT_PACKAGE="$current" SDK_COMPATIBILITY_MAIN_PACKAGE="$main/api-java/sdk-build" SDK_ORIGIN_MAIN_REVISION="$(git -C "$main" rev-parse --short HEAD)" SDK_COMPATIBILITY_OPENAPI_SPEC="$swagger" SDK_COMPATIBILITY_PACKAGE_LABEL="com.github.trinsic-id:sdk-java-api" SDK_COMPATIBILITY_VALIDATE_CATALOG=true node "$REPO_ROOT/scripts/sdk-compatibility/run-matrix.mjs" java node "$SCRIPT_DIR/run_matrix.mjs"

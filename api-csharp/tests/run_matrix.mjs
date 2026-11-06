@@ -2,7 +2,7 @@
 // Single-target executor for the shared SDK compatibility matrix coordinator.
 import { cpSync, mkdirSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
-import { childEnvironment, command, failure, readTestCases, target, temporaryDirectory, writeExecutorResult } from "../../scripts/sdk-compatibility/executor-helpers.mjs";
+import { childEnvironment, command, failure, readProcessTestCases, target, temporaryDirectory, writeExecutorResult } from "../../scripts/sdk-compatibility/executor-helpers.mjs";
 
 const tests = new URL(".", import.meta.url).pathname;
 const selected = target();
@@ -28,7 +28,7 @@ try {
   const environment = childEnvironment({ DOTNET_ROLL_FORWARD: "Major", NUGET_PACKAGES: join(directory, "nuget-global-packages"), SDK_COMPATIBILITY_RESULT_FILE: output, SDK_VERSION: version });
   const restore = command("dotnet", ["restore", join(source, "CompatibilityRunner.csproj"), "--configfile", join(directory, "NuGet.Config"), `-p:TrinsicApiVersion=${version}`], { env: environment, check: false });
   const execution = restore.status === 0 && command("dotnet", ["test", join(source, "CompatibilityRunner.csproj"), "--no-restore", `-p:TrinsicApiVersion=${version}`], { env: environment, check: false });
-  return { sdkVersion: version, testCases: readTestCases(output) ?? failure("csharp", `C# target exited with code ${(execution || restore).status ?? "unknown"} before producing structured results.`) };
+  return { sdkVersion: version, testCases: readProcessTestCases(output, execution || restore, "csharp") };
   });
 } catch (error) {
   result = { testCases: failure("csharp", error instanceof Error ? error.message : String(error)) };

@@ -93,14 +93,15 @@ class CompatibilityTest {
   }
   @Test @CompatibilityCase("api.sessions.get-result") void getResult() throws Exception {
     CompletedSession completed = completeOrAbort();
-    try { assertNotNull(completed.result()); } finally { cancelQuietly(completed.session().getSessionId()); }
+    try { assertNotNull(sessionResult(completed)); } finally { cancelQuietly(completed.session().getSessionId()); }
   }
   @Test @CompatibilityCase("api.sessions.get-attachment") void getAttachment() throws Exception {
     CompletedSession completed = completeOrAbort();
     try {
-      assertFalse(completed.result().getIdentityData().getAttachments().isEmpty(), "test provider returned no attachments");
+      var result = sessionResult(completed);
+      assertFalse(result.getIdentityData().getAttachments().isEmpty(), "test provider returned no attachments");
       GetAttachmentRequest request = new GetAttachmentRequest(); request.setResultsAccessKey(completed.resultsAccessKey());
-      assertNotNull(sessions.getAttachment(completed.session().getSessionId(), completed.result().getIdentityData().getAttachments().getFirst().getId(), request));
+      assertNotNull(sessions.getAttachment(completed.session().getSessionId(), result.getIdentityData().getAttachments().getFirst().getId(), request));
     } finally { cancelQuietly(completed.session().getSessionId()); }
   }
   @Test @CompatibilityCase("api.sessions.redact") void redact() throws Exception {
@@ -174,12 +175,15 @@ class CompatibilityTest {
       if (redirectToken.isBlank()) throw new IllegalStateException("Application redirect omitted redirectToken.");
       // The token proves the browser flow reached the application redirect. The
       // generated SDK request is keyed by resultsAccessKey on supported releases.
-      GetSessionResultRequest request = new GetSessionResultRequest(); request.setResultsAccessKey(session.getResultCollection().getResultsAccessKey());
-      return new CompletedSession(session, session.getResultCollection().getResultsAccessKey(), sessions.getSessionResult(session.getSessionId(), request));
+      return new CompletedSession(session, session.getResultCollection().getResultsAccessKey());
     } catch (Exception error) {
       if (session != null) cancelQuietly(session.getSessionId());
       throw new TestAbortedException(REDIRECT_SETUP_SKIP, error);
     }
+  }
+  private id.trinsic.api.models.GetSessionResultResponse sessionResult(CompletedSession completed) throws Exception {
+    GetSessionResultRequest request = new GetSessionResultRequest(); request.setResultsAccessKey(completed.resultsAccessKey());
+    return sessions.getSessionResult(completed.session().getSessionId(), request);
   }
   private URI redirect(HttpClient browser, URI uri) throws Exception {
     HttpResponse<Void> response = browser.send(HttpRequest.newBuilder(uri).GET().build(), HttpResponse.BodyHandlers.discarding());
@@ -193,8 +197,8 @@ class CompatibilityTest {
     }
     query.put(name, value);
     String encoded = query.entrySet().stream().map(entry -> URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8) + "=" + URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8)).reduce((left, right) -> left + "&" + right).orElse("");
-    try { return new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), encoded, uri.getFragment()); }
-    catch (Exception error) { throw new IllegalArgumentException("Could not update redirect query.", error); }
+    String base = uri.toString().split("[?#]", 2)[0];
+    return URI.create(base + "?" + encoded + (uri.getRawFragment() == null ? "" : "#" + uri.getRawFragment()));
   }
   private static String query(URI uri, String name) {
     if (uri.getRawQuery() == null) return "";
@@ -232,5 +236,5 @@ class CompatibilityTest {
   private static boolean allowMissingModels() { String value = System.getenv("SDK_COMPATIBILITY_ALLOW_MISSING_PSO_MODELS"); return "1".equals(value) || "true".equalsIgnoreCase(value); }
   private static String targetLabel() { return System.getenv().getOrDefault("SDK_TARGET_LABEL", "this SDK target"); }
   private static String required(String name) { String value = System.getenv(name); if (value == null || value.isBlank()) throw new IllegalStateException(name + " is required"); return value; }
-  private record CompletedSession(CreateDirectProviderSessionResponse session, String resultsAccessKey, id.trinsic.api.models.GetSessionResultResponse result) { }
+  private record CompletedSession(CreateDirectProviderSessionResponse session, String resultsAccessKey) { }
 }

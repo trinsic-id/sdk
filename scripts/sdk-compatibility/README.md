@@ -18,6 +18,24 @@ fields, including `[SwaggerIgnore]` compatibility aliases, without asking an
 SDK serializer to emit response-only properties. It does not change Connect's
 production response serialization.
 
+The TypeScript-only entry point also prepares this filtered cache when
+`SDK_COMPATIBILITY_PSO_FIXTURES_PATH` is not supplied. Both entry points use the
+repository's release generator configuration.
+
+Baseline targets run the selected revision's build wrapper and generator helper
+from its detached worktree, preserving that revision's options and post-processing.
+`build-baseline.sh` redirects only the Swagger input and skips Ruby's user-level
+gem installation after packaging.
+
+Run the local harness regressions without Connect credentials:
+
+```sh
+node --test scripts/sdk-compatibility/harness.test.mjs
+```
+
+The native test projects also include `CompatibilityHarnessTest` (Java) and
+`HarnessRegressionTests` (C#) for callback handling and JSON comparison regressions.
+
 `render-results.mjs` is language-agnostic. It validates the common envelope,
 aggregates all suite results into `summary.json` and `summary.md`, and renders
 optional API-operation and provider-specific-output coverage when a suite
@@ -59,6 +77,8 @@ language suite writes its raw result: a failed matching test becomes skipped
 and is shown as an `acknowledged-compatibility-exception` warning. It therefore
 does not fail `SDK_COMPATIBILITY_FAIL_ON_FAILURE=true` runs, while its reason
 and original result remain in the generated report.
+Current-branch and `origin/main` targets never receive published-revision
+acknowledgements, even if they share the published package's version number.
 
 ```json
 {

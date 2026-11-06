@@ -23,5 +23,16 @@ export function readTestCases(path) {
   if (!existsSync(path)) return undefined;
   try { const parsed = JSON.parse(readFileSync(path)); return parsed.schemaVersion === 1 && Array.isArray(parsed.testCases) ? parsed.testCases : undefined; } catch { return undefined; }
 }
+export function preserveProcessFailure(testCases, execution, language, label) {
+  const detail = execution.error?.message ?? (execution.signal ? `signal ${execution.signal}` : `code ${execution.status ?? "unknown"}`);
+  if (!testCases) return failure(language, `${label} exited with ${detail} before producing structured results.`);
+  if (execution.status !== 0 && !testCases.some((testCase) => testCase.status === "failed")) {
+    return [...testCases, ...failure(language, `${label} exited with ${detail} without recording a failure.`)];
+  }
+  return testCases;
+}
+export function readProcessTestCases(path, execution, language, label = `${language} target`) {
+  return preserveProcessFailure(readTestCases(path), execution, language, label);
+}
 export function failure(language, message) { return [{ id: `framework.${language}-runner`, status: "failed", durationMs: 0, failure: { name: "TestRunnerError", message } }]; }
 export function writeExecutorResult({ sdkVersion, testCases }) { writeFileSync(required("SDK_COMPATIBILITY_RESULT_FILE"), `${JSON.stringify({ schemaVersion: 1, ...(sdkVersion ? { sdkVersion } : {}), testCases }, null, 2)}\n`); }

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { cpSync, existsSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { childEnvironment, command, failure, readTestCases, target, temporaryDirectory, writeExecutorResult } from "../../scripts/sdk-compatibility/executor-helpers.mjs";
+import { childEnvironment, command, failure, readProcessTestCases, target, temporaryDirectory, writeExecutorResult } from "../../scripts/sdk-compatibility/executor-helpers.mjs";
 
 const selected = target();
 let sdkVersion, testCases;
@@ -15,8 +15,8 @@ try {
     const installed = command("bundle", ["install", "--quiet"], { env, check: false });
     cpSync(join(new URL(".", import.meta.url).pathname, "CompatibilitySupport.rb"), join(directory, "CompatibilitySupport.rb"));
     cpSync(join(new URL(".", import.meta.url).pathname, "compatibility_test.rb"), join(directory, "compatibility_test.rb"));
-    if (installed.status === 0) command("bundle", ["exec", "ruby", join(directory, "compatibility_test.rb")], { env, check: false });
-    return { sdkVersion: selected.version, testCases: readTestCases(output) ?? failure("ruby", installed.status === 0 ? "Ruby target exited before producing structured results." : "Bundler could not install this Ruby SDK target.") };
+    const execution = installed.status === 0 ? command("bundle", ["exec", "ruby", join(directory, "compatibility_test.rb")], { env, check: false }) : installed;
+    return { sdkVersion: selected.version, testCases: readProcessTestCases(output, execution, "ruby", installed.status === 0 ? "Ruby target" : "Bundler install") };
   }));
 } catch (error) { testCases = failure("ruby", error instanceof Error ? error.message : String(error)); }
 writeExecutorResult({ sdkVersion, testCases });

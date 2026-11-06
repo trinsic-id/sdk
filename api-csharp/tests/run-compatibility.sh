@@ -26,8 +26,7 @@ if ! git -C "$REPO_ROOT" rev-parse --verify --quiet "$main_ref" >/dev/null; then
 fi
 rmdir "$main_worktree"
 git -C "$REPO_ROOT" worktree add --detach "$main_worktree" "$main_ref" >/dev/null
-cp "$REPO_ROOT/api-csharp/build-sdk.sh" "$main_worktree/api-csharp/build-sdk.sh"
-"$main_worktree/api-csharp/build-sdk.sh" --swagger-file-or-url "$swagger_spec"
+bash "$REPO_ROOT/scripts/sdk-compatibility/build-baseline.sh" "$main_worktree" csharp "$swagger_spec"
 main_package=("$main_worktree"/api-csharp/sdk/publish/Trinsic.Api.*.nupkg)
 [[ ${#main_package[@]} -eq 1 && -f "${main_package[0]}" ]] || { echo "Expected one $main_ref C# SDK package." >&2; exit 1; }
 main_nupkg="$main_package_directory/$(basename "${main_package[0]}")"

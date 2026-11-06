@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { cpSync, existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { childEnvironment, command, failure, readTestCases, target, temporaryDirectory, writeExecutorResult } from "../../scripts/sdk-compatibility/executor-helpers.mjs";
+import { childEnvironment, command, failure, readProcessTestCases, target, temporaryDirectory, writeExecutorResult } from "../../scripts/sdk-compatibility/executor-helpers.mjs";
 
 const tests = new URL(".", import.meta.url).pathname;
 const moduleName = "github.com/trinsic-id/sdk-go-api/v3";
@@ -22,7 +22,7 @@ try {
     command("go", ["mod", "tidy"], { cwd: directory });
     const output = join(directory, "target-results.json");
     const execution = command("go", ["test", "-count=1", "."], { cwd: directory, check: false, env: childEnvironment({ SDK_COMPATIBILITY_RESULT_FILE: output, SDK_VERSION: version }) });
-    return { sdkVersion: version, testCases: readTestCases(output) ?? failure("go", `Go target exited with code ${execution.status ?? "unknown"} before producing structured results.`) };
+    return { sdkVersion: version, testCases: readProcessTestCases(output, execution, "go") };
   }));
 } catch (error) { testCases = failure("go", error instanceof Error ? error.message : String(error)); }
 writeExecutorResult({ sdkVersion, testCases });

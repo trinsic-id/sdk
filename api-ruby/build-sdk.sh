@@ -19,7 +19,7 @@ generator_args=()
 "$REPO_ROOT/helpers/generate-client.sh" \
   --language ruby \
   --output-folder "$output_folder" \
-  "${generator_args[@]}" \
+  "${generator_args[@]+${generator_args[@]}}" \
   --additional-property "gemAuthor=Trinsic" \
   --additional-property "gemAuthorEmail=support@trinsic.id" \
   --additional-property "gemDescription='Trinsic Api SDK to assist you in integrating with Trinsic'" \

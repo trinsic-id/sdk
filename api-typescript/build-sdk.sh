@@ -27,7 +27,7 @@ if [[ -n "$swagger_file_or_url" ]]; then
 fi
 
 "$REPO_ROOT/helpers/generate-client.sh" \
-  "${generator_arguments[@]}" \
+  "${generator_arguments[@]+${generator_arguments[@]}}" \
   --language typescript-fetch \
   --version-name node \
   --output-folder "$SCRIPT_DIR/sdk" \

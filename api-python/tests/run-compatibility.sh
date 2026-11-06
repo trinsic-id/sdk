@@ -45,10 +45,7 @@ fi
 
 rmdir "$main_worktree"
 git -C "$REPO_ROOT" worktree add --detach "$main_worktree" "$main_ref" >/dev/null
-# Older baseline revisions did not accept --swagger-file-or-url. Only the wrapper
-# is overlaid; the generator configuration remains that revision's configuration.
-cp "$REPO_ROOT/api-python/build-sdk.sh" "$main_worktree/api-python/build-sdk.sh"
-"$main_worktree/api-python/build-sdk.sh" --swagger-file-or-url "$swagger_spec"
+bash "$REPO_ROOT/scripts/sdk-compatibility/build-baseline.sh" "$main_worktree" python "$swagger_spec"
 
 main_wheels=("$main_worktree"/api-python/sdk/publish/trinsic_api-*.whl)
 if (( ${#main_wheels[@]} != 1 )) || [[ ! -f "${main_wheels[0]}" ]]; then

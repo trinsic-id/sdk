@@ -10,6 +10,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
+import { preserveProcessFailure } from "./executor-helpers.mjs";
 
 const [language, executor, ...executorArguments] = process.argv.slice(2);
 if (!language || !executor) {
@@ -82,7 +83,7 @@ function runTarget(target) {
     try {
       const parsed = JSON.parse(readFileSync(resultFile));
       if (parsed.schemaVersion === 1 && Array.isArray(parsed.testCases)) {
-        result.testCases = parsed.testCases;
+        result.testCases = preserveProcessFailure(parsed.testCases, execution, language, `${language} executor`);
         if (typeof parsed.sdkVersion === "string") result.sdkVersion = parsed.sdkVersion;
         return result;
       }

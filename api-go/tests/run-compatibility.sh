@@ -26,9 +26,7 @@ if ! git -C "$REPO_ROOT" rev-parse --verify --quiet "$main_ref" >/dev/null; then
 fi
 rmdir "$main_worktree"
 git -C "$REPO_ROOT" worktree add --detach "$main_worktree" "$main_ref" >/dev/null
-# Keep the current wrapper so older main revisions can generate from this run's Swagger.
-cp "$REPO_ROOT/api-go/build-sdk.sh" "$main_worktree/api-go/build-sdk.sh"
-"$main_worktree/api-go/build-sdk.sh" --swagger-file-or-url "$swagger_spec" --output-folder "$main_worktree/api-go/sdk-build"
+bash "$REPO_ROOT/scripts/sdk-compatibility/build-baseline.sh" "$main_worktree" go "$swagger_spec"
 
 SDK_COMPATIBILITY_CURRENT_PACKAGE="$current_package" SDK_COMPATIBILITY_MAIN_PACKAGE="$main_worktree/api-go/sdk-build" \
 SDK_ORIGIN_MAIN_REVISION="$(git -C "$main_worktree" rev-parse --short HEAD)" SDK_COMPATIBILITY_OPENAPI_SPEC="$swagger_spec" \

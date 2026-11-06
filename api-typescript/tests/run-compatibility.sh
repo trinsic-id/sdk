@@ -38,13 +38,21 @@ swagger_spec="$(mktemp "${TMPDIR:-/tmp}/trinsic-sdk-swagger.XXXXXX")"
 main_ref="${SDK_COMPATIBILITY_MAIN_REF:-origin/main}"
 origin_main_worktree="$(mktemp -d "${TMPDIR:-/tmp}/trinsic-sdk-origin-main.XXXXXX")"
 origin_main_tarball_directory="$(mktemp -d "${TMPDIR:-/tmp}/trinsic-sdk-origin-main-tarball.XXXXXX")"
+fixture_cache=""
 
 cleanup() {
   git -C "$REPO_ROOT" worktree remove --force "$origin_main_worktree" 2>/dev/null || true
   rm -rf "$origin_main_tarball_directory"
   rm -f "$swagger_spec"
+  if [[ -n "$fixture_cache" ]]; then rm -f "$fixture_cache"; fi
 }
 trap cleanup EXIT
+
+if [[ -z "${SDK_COMPATIBILITY_PSO_FIXTURES_PATH:-}" ]]; then
+  fixture_cache="$(mktemp "${TMPDIR:-/tmp}/trinsic-typescript-pso-fixtures.XXXXXX")"
+  SDK_COMPATIBILITY_PSO_FIXTURES_PATH="$fixture_cache" node --use-system-ca "$REPO_ROOT/scripts/sdk-compatibility/fetch-pso-fixtures.mjs"
+  export SDK_COMPATIBILITY_PSO_FIXTURES_PATH="$fixture_cache"
+fi
 
 curl --fail --silent --show-error "$test_swagger_url" --output "$swagger_spec"
 
@@ -64,13 +72,7 @@ fi
 rmdir "$origin_main_worktree"
 git -C "$REPO_ROOT" worktree add --detach "$origin_main_worktree" "$main_ref" >/dev/null
 
-# The baseline source can predate the test-only --swagger-file-or-url option.
-# Overlay the current wrapper solely to generate the baseline SDK code from the
-# selected target; all generator helpers and SDK source remain in its detached
-# worktree.
-cp "$REPO_ROOT/api-typescript/build-sdk.sh" "$origin_main_worktree/api-typescript/build-sdk.sh"
-"$origin_main_worktree/api-typescript/build-sdk.sh" \
-  --swagger-file-or-url "$swagger_spec"
+bash "$REPO_ROOT/scripts/sdk-compatibility/build-baseline.sh" "$origin_main_worktree" typescript "$swagger_spec"
 
 origin_main_tarballs=("$origin_main_worktree"/api-typescript/sdk/publish/trinsic-api-*.tgz)
 if (( ${#origin_main_tarballs[@]} != 1 )) || [[ ! -f "${origin_main_tarballs[0]}" ]]; then

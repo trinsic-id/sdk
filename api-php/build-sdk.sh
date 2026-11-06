@@ -20,7 +20,7 @@ generator_args=()
 "$REPO_ROOT/helpers/generate-client.sh" \
   --language php \
   --output-folder "$output_folder" \
-  "${generator_args[@]}" \
+  "${generator_args[@]+${generator_args[@]}}" \
   --additional-property "artifactVersion=[VERSION]" \
   --additional-property "invokerPackage=Trinsic\\\\Api" \
   --additional-property "artifactUrl=https://github.com/trinsic-id/sdk-php-api" \

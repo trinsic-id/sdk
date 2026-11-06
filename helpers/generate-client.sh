@@ -81,7 +81,7 @@ mkdir -p "$output_folder/publish"
 
 version="$(get_version "$version_name")"
 resolved_properties=()
-for property in "${additional_properties[@]}"; do
+for property in "${additional_properties[@]+${additional_properties[@]}}"; do
   resolved_properties+=("${property//\[VERSION\]/$version}")
 done
 
@@ -91,7 +91,7 @@ if [[ ${#resolved_properties[@]} -gt 0 ]]; then
 fi
 
 echo "Generating $language SDK from $local_swagger_file_path in $output_folder with additional properties: $concatenated_additional_properties"
-generator_command=(npx --yes @openapitools/openapi-generator-cli generate \
+generator_command=(npx --yes @openapitools/openapi-generator-cli --openapitools "$SCRIPT_DIR/../openapitools.json" generate \
   -i "$local_swagger_file_path" \
   -g "$language" \
   -o "$output_folder" \

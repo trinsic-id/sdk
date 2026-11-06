@@ -154,7 +154,28 @@ public sealed class CompatibilityFixture : IAsyncLifetime, IDisposable
     public void Require(bool value, string message) { if (!value) throw new InvalidOperationException(message); }
     public async Task<string> RegisteredRedirectUrl() { var response = await RedirectUris.ListAsync(new(1), new(100)); RequireOk(response); return response.Ok()?.Uris.Select(value => value.Uri).FirstOrDefault(value => Uri.TryCreate(value, UriKind.Absolute, out var parsed) && (parsed.Scheme == Uri.UriSchemeHttp || parsed.Scheme == Uri.UriSchemeHttps)) ?? throw new InvalidOperationException("The test environment must have an HTTP(S) redirect URI."); }
     private static string Required(string name) => Environment.GetEnvironmentVariable(name) is { Length: > 0 } value ? value : throw new InvalidOperationException($"{name} is required.");
-    private static void AssertJson(JsonNode serialized, JsonNode expected, string path, bool exact) { if (serialized is JsonObject actualObject && expected is JsonObject expectedObject) { foreach (var (name, value) in actualObject) if (expectedObject.TryGetPropertyValue(name, out var expectedValue) && value is not null && expectedValue is not null) AssertJson(value, expectedValue, $"{path}.{name}", exact); if (exact && expectedObject.Any(pair => !actualObject.ContainsKey(pair.Key))) throw new InvalidOperationException($"{path}: SDK omitted field(s) from fixture."); return; } if (serialized is JsonArray actualArray && expected is JsonArray expectedArray) { if (actualArray.Count != expectedArray.Count) throw new InvalidOperationException($"{path}: array length differs."); for (var i = 0; i < actualArray.Count; i++) AssertJson(actualArray[i]!, expectedArray[i]!, $"{path}[{i}]", exact); return; } if (serialized.ToJsonString() != expected.ToJsonString() && !EquivalentTimestamp(serialized, expected)) throw new InvalidOperationException($"{path}: values differ."); }
+    private static void AssertJson(JsonNode? serialized, JsonNode? expected, string path, bool exact)
+    {
+        if (serialized is null || expected is null)
+        {
+            if (serialized != expected) throw new InvalidOperationException($"{path}: values differ.");
+            return;
+        }
+        if (serialized is JsonObject actualObject && expected is JsonObject expectedObject)
+        {
+            foreach (var (name, value) in actualObject)
+                if (expectedObject.TryGetPropertyValue(name, out var expectedValue)) AssertJson(value, expectedValue, $"{path}.{name}", exact);
+            if (exact && expectedObject.Any(pair => !actualObject.ContainsKey(pair.Key))) throw new InvalidOperationException($"{path}: SDK omitted field(s) from fixture.");
+            return;
+        }
+        if (serialized is JsonArray actualArray && expected is JsonArray expectedArray)
+        {
+            if (actualArray.Count != expectedArray.Count) throw new InvalidOperationException($"{path}: array length differs.");
+            for (var i = 0; i < actualArray.Count; i++) AssertJson(actualArray[i], expectedArray[i], $"{path}[{i}]", exact);
+            return;
+        }
+        if (serialized.ToJsonString() != expected.ToJsonString() && !EquivalentTimestamp(serialized, expected)) throw new InvalidOperationException($"{path}: values differ.");
+    }
     private static bool EquivalentTimestamp(JsonNode left, JsonNode right) => TryTimestamp(left, out var a) && TryTimestamp(right, out var b) && a == b;
     private static bool TryTimestamp(JsonNode value, out DateTimeOffset timestamp) { timestamp = default; return value is JsonValue scalar && scalar.TryGetValue<string>(out var text) && text.Length >= 10 && text[4] == '-' && text[7] == '-' && (text.Length == 10 || text[10] is 'T' or ' ') && DateTimeOffset.TryParse(text, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out timestamp); }
 }

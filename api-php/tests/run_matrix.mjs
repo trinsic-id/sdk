@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { cpSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { childEnvironment, command, failure, readTestCases, target, temporaryDirectory, writeExecutorResult } from "../../scripts/sdk-compatibility/executor-helpers.mjs";
+import { childEnvironment, command, failure, readProcessTestCases, target, temporaryDirectory, writeExecutorResult } from "../../scripts/sdk-compatibility/executor-helpers.mjs";
 
 const selected = target();
 let sdkVersion, testCases;
@@ -17,8 +17,8 @@ try {
     const output = join(directory, "target-results.json");
     cpSync(join(new URL(".", import.meta.url).pathname, "CompatibilitySupport.php"), join(directory, "CompatibilitySupport.php"));
     cpSync(join(new URL(".", import.meta.url).pathname, "CompatibilityTest.php"), join(directory, "CompatibilityTest.php"));
-    command(join(directory, "vendor/bin/phpunit"), [join(directory, "CompatibilityTest.php")], { check: false, env: childEnvironment({ SDK_COMPATIBILITY_RESULT_FILE: output, SDK_VERSION: version }) });
-    return { sdkVersion: version, testCases: readTestCases(output) ?? failure("php", "PHP target exited before producing structured results.") };
+    const execution = command(join(directory, "vendor/bin/phpunit"), [join(directory, "CompatibilityTest.php")], { check: false, env: childEnvironment({ SDK_COMPATIBILITY_RESULT_FILE: output, SDK_VERSION: version }) });
+    return { sdkVersion: version, testCases: readProcessTestCases(output, execution, "php") };
   }));
 } catch (error) { testCases = failure("php", error instanceof Error ? error.message : String(error)); }
 writeExecutorResult({ sdkVersion, testCases });

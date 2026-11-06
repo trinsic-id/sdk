@@ -57,7 +57,7 @@ for runner in "$REPO_ROOT"/api-*/tests/run-compatibility.sh; do
   fi
 done
 
-for pid in "${suite_pids[@]}"; do wait "$pid" || true; done
+for pid in "${suite_pids[@]+${suite_pids[@]}}"; do wait "$pid" || true; done
 cat "$RESULTS_DIR"/*/status.tsv > "$STATUS_FILE"
 
 if (( suite_count == 0 )); then
