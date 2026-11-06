@@ -6,7 +6,8 @@ import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { test } from "./results.js";
-import { assertRequiredFields } from "./required-fields.js";
+import * as sdk from "@trinsic/api";
+import { assertRequiredFields, modelFields } from "./required-fields.js";
 
 const version = JSON.parse(readFileSync(createRequire(import.meta.url).resolve("@trinsic/api/package.json"), "utf8")).version;
 const legacyMdl = version === "3.2.0";
@@ -58,4 +59,29 @@ test("Required-field failure retains its provider result and later fixtures", ()
     if (legacyMdl) assert.match(provider.failure.message, /raw18013Output\.documentType: required field is missing/);
     assert.equal(cases.find((entry: any) => entry.parameters?.providerId === "later").status, "passed");
   } finally { rmSync(directory, { recursive: true, force: true }); }
+});
+
+
+test("Supported fields survive decoding while future fields are ignored", () => {
+  const wire = { ...step, future: true };
+  assert.deepEqual(modelFields("IntegrationStep", wire), step);
+  assert.deepEqual(modelFields("IntegrationStep", wire, step), step);
+  assert.throws(() => modelFields("IntegrationStep", wire, { method: step.method }), /scalar type must be string/);
+  assert.throws(() => modelFields("MdlOutput", mdl, { ...mdl, nameSpaces: {} }), /dictionary keys/);
+  assert.throws(() => modelFields("RecommendProvidersResponse", { recommendedProviders: [{ id: "provider" }], remainder: [] }, { recommendedProviders: [], remainder: [] }), /array length/);
+});
+
+
+test("Decoded date-only fields retain their calendar date", () => {
+  const wire = { dateOfBirth: "2000-01-02" };
+  const decoded = sdk.PolandEdoAppProviderOutputFromJSON(wire);
+  assert.deepEqual(modelFields("PolandEdoAppProviderOutput", wire, decoded), wire);
+  decoded.dateOfBirth = new Date("2000-01-02T12:00:00Z");
+  assert.throws(() => modelFields("PolandEdoAppProviderOutput", wire, decoded), /time component/);
+});
+
+test("Permissive converters cannot return numbers as declared boolean or string fields", () => {
+  assert.throws(() => modelFields("Session", { done: 1 }, { done: 1 }), /scalar type must be boolean/);
+  assert.throws(() => modelFields("IntegrationStep", { content: 1 }, { content: 1 }), /scalar type must be string/);
+  assert.deepEqual(modelFields("IntegrationStep", { method: "FutureMethod" }, { method: "FutureMethod" }), { method: "FutureMethod" });
 });

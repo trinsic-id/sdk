@@ -4,7 +4,7 @@ Run `scripts/run-api-sdk-compatibility.sh python` from the repository root.
 See the [shared instructions and result contract](../../scripts/sdk-compatibility/README.md).
 
 The live tests compare supported SDK model fields with the raw response returned
-by each `*_with_http_info` method. Unknown wire fields are ignored; list lengths,
+by the capturing SDK client. Unknown wire fields are ignored; list lengths,
 pagination, and nested recommendation fields must survive deserialization.
 Session tests also check launch URLs, access keys, state, identity data, and attachment content.
 

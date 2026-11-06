@@ -112,3 +112,60 @@ export function assertRequiredFields(modelName: string, wire: unknown, path = mo
     if (indexed) for (const [key, child] of Object.entries(record)) visit(indexed, child, `${label}[${JSON.stringify(key)}]`);
   }
 }
+
+// Use the installed declaration's fields, never the surviving converter output,
+// to decide which input values must remain observable after decoding.
+export function modelFields(modelName: string, wire: unknown, decoded?: unknown): unknown {
+  const { checker, models, wireName } = installedContract ??= loadContract();
+  let symbol = models.get(modelName);
+  assert.ok(symbol, `${modelName} must be exported by the installed SDK`);
+  if (symbol.flags & ts.SymbolFlags.Alias) symbol = checker.getAliasedSymbol(symbol);
+  const inspectDecoded = arguments.length === 3;
+  return visit(checker.getDeclaredTypeOfSymbol(symbol), wire, decoded);
+
+  function visit(type: ts.Type, value: any, actual: any): unknown {
+    const concrete = checker.getNonNullableType(type);
+    if (inspectDecoded && value != null) {
+      const members = concrete.isUnion() ? concrete.types : [concrete];
+      const kinds = members.map(member => member.flags & ts.TypeFlags.BooleanLike ? "boolean"
+        : member.flags & ts.TypeFlags.NumberLike ? "number" : member.flags & ts.TypeFlags.StringLike ? "string" : undefined);
+      if (kinds.every(kind => kind !== undefined)) {
+        assert.ok(kinds.some(kind => kind === typeof actual), `SDK scalar type must be ${[...new Set(kinds)].join(" or ")}, got ${typeof actual}`);
+      }
+    }
+    if (inspectDecoded && concrete.getSymbol()?.name === "Date" && actual instanceof Date && typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      assert.equal(actual.toISOString().slice(10), "T00:00:00.000Z", "Date-only value acquired a time component");
+      return actual.toISOString().slice(0, 10);
+    }
+    if (value === null || value === undefined || !(concrete.flags & ts.TypeFlags.Object) || concrete.getSymbol()?.name === "Date") {
+      return inspectDecoded ? actual : value;
+    }
+    if (checker.isArrayType(concrete)) {
+      assert.ok(Array.isArray(value));
+      if (inspectDecoded) { assert.ok(Array.isArray(actual)); assert.equal(actual.length, value.length, "SDK changed array length"); }
+      const [item] = checker.getTypeArguments(concrete as ts.TypeReference);
+      return value.map((child, index) => visit(item, child, actual?.[index]));
+    }
+    assert.ok(typeof value === "object" && !Array.isArray(value));
+    if (inspectDecoded) assert.ok(actual !== null && typeof actual === "object" && !Array.isArray(actual), "SDK dropped a supported object");
+    const output: Record<string, unknown> = {};
+    for (const property of checker.getPropertiesOfType(concrete)) {
+      const name = wireName(property);
+      if (!Object.hasOwn(value, name)) continue;
+      const declaration = property.valueDeclaration ?? property.declarations?.[0];
+      assert.ok(declaration);
+      // Generated converters intentionally map optional null properties to undefined.
+      if (value[name] === null && property.flags & ts.SymbolFlags.Optional) {
+        if (inspectDecoded) assert.ok(actual[property.name] == null, `${name}: null changed to a value`);
+        continue;
+      }
+      output[name] = visit(checker.getTypeOfSymbolAtLocation(property, declaration), value[name], actual?.[property.name]);
+    }
+    const item = checker.getIndexTypeOfType(concrete, ts.IndexKind.String);
+    if (item) {
+      if (inspectDecoded) assert.deepEqual(Object.keys(actual).sort(), Object.keys(value).sort(), "SDK changed dictionary keys");
+      for (const [key, child] of Object.entries(value)) output[key] = visit(item, child, actual?.[key]);
+    }
+    return output;
+  }
+}

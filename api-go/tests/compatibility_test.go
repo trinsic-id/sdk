@@ -3,7 +3,10 @@ package main
 import (
 	"fmt"
 	trinsic_api "github.com/trinsic-id/sdk-go-api/v3"
+	"net/http"
+	"net/url"
 	"os"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -20,12 +23,19 @@ func clientForTest(t *testing.T) (*trinsic_api.APIClient, string) {
 	t.Helper()
 	config := trinsic_api.NewConfiguration()
 	config.Servers = trinsic_api.ServerConfigurations{{URL: required("TRINSIC_TEST_BASE_URL")}}
+	config.HTTPClient = &http.Client{Transport: captureTransport{}}
 	config.AddDefaultHeader("Authorization", "Bearer "+required("TRINSIC_TEST_ACCESS_TOKEN"))
 	return trinsic_api.NewAPIClient(config), required("TRINSIC_TEST_VERIFICATION_PROFILE_ID")
 }
 func runCase(t *testing.T, id string, action func() (any, error)) {
 	t.Helper()
-	record(id, nil, action)
+	record(id, nil, func() (any, error) {
+		value, err := action()
+		if err == nil {
+			err = assertAPI(id, value)
+		}
+		return value, err
+	})
 	results[len(results)-1].NativeTest = t.Name()
 	if results[len(results)-1].Status == "failed" {
 		t.Errorf("%s failed; see structured result", id)
@@ -43,8 +53,10 @@ func TestReadAPIs(t *testing.T) {
 	runCase(t, "api.verification-profiles.list", func() (any, error) {
 		return sdkResult(c.VerificationProfilesAPI.ListVerificationProfiles(ctx).Execute())
 	})
-	runCase(t, "api.sessions.list", func() (any, error) { return sdkResult(c.SessionsAPI.ListSessions(ctx, profile).Execute()) })
-	runCase(t, "api.redirect-uris.list", func() (any, error) { return sdkResult(c.RedirectUrisAPI.List(ctx).Execute()) })
+	runCase(t, "api.sessions.list", func() (any, error) {
+		return sdkResult(c.SessionsAPI.ListSessions(ctx, profile).Page(1).PageSize(1).Execute())
+	})
+	runCase(t, "api.redirect-uris.list", func() (any, error) { return sdkResult(c.RedirectUrisAPI.List(ctx).Page(1).PageSize(1).Execute()) })
 }
 func TestSessionLifecycle(t *testing.T) {
 	c, profile := clientForTest(t)
@@ -54,11 +66,11 @@ func TestSessionLifecycle(t *testing.T) {
 			return nil, err
 		}
 		request := trinsic_api.CreateHostedProviderSessionRequest{Provider: "trinsic-test-redirect", VerificationProfileId: profile, RedirectUrl: redirect}
-		session, _, err := c.SessionsAPI.CreateHostedProviderSession(ctx).CreateHostedProviderSessionRequest(request).Execute()
+		session, response, err := c.SessionsAPI.CreateHostedProviderSession(ctx).CreateHostedProviderSessionRequest(request).Execute()
 		if err == nil {
 			createdSessions[session.SessionId] = c
 		}
-		return session, err
+		return sdkResult(session, response, err)
 	})
 	runCase(t, "api.sessions.create-direct-provider", func() (any, error) { return createDirect(c, profile) })
 	runCase(t, "api.sessions.get", func() (any, error) {
@@ -81,7 +93,10 @@ func completedResult(c *trinsic_api.APIClient, profile string) (*trinsic_api.Cre
 	if err != nil {
 		return nil, "", nil, err
 	}
-	result, _, err := c.SessionsAPI.GetSessionResult(ctx, session.SessionId).GetSessionResultRequest(trinsic_api.GetSessionResultRequest{ResultsAccessKey: key}).Execute()
+	result, response, err := c.SessionsAPI.GetSessionResult(ctx, session.SessionId).GetSessionResultRequest(trinsic_api.GetSessionResultRequest{ResultsAccessKey: key}).Execute()
+	if err == nil {
+		_, err = sdkResult(result, response, nil)
+	}
 	return session, key, result, err
 }
 func TestCompletedSession(t *testing.T) {
@@ -126,6 +141,42 @@ func TestProviderOutputs(t *testing.T) {
 	for _, result := range results {
 		if result.Status == "failed" && strings.HasPrefix(result.ID, "serialization.") {
 			t.Errorf("%s: %v", result.ID, result.Failure)
+		}
+	}
+}
+
+func TestHarnessSemanticFailures(t *testing.T) {
+	lastRequest = &http.Request{URL: &url.URL{Path: "/api/v1/sessions/expected"}}
+	for id, body := range map[string]any{
+		"api.sessions.get":            map[string]any{"session": map[string]any{"id": "wrong", "done": false, "success": false}},
+		"api.sessions.get-attachment": map[string]any{"content": "", "contentType": "image/png"},
+	} {
+		if err := assertAPI(id, body); err == nil {
+			t.Errorf("%s accepted invalid output", id)
+		}
+	}
+	type Child struct {
+		Name *string `json:"name,omitempty"`
+	}
+	type Parent struct {
+		Child Child `json:"child"`
+	}
+	model := Parent{}
+	wire := map[string]any{"child": map[string]any{"name": "Ada", "future": true}, "unknown": true}
+	actual, err := modelFields(reflect.ValueOf(model), wire, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected, err := modelFields(reflect.ValueOf(model), wire, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := compare(actual, expected, "model", true); err == nil {
+		t.Fatal("dropped nested field passed")
+	}
+	for _, pair := range [][2]any{{true, float64(1)}, {false, float64(0)}, {[]any{}, map[string]any{}}, {[]any{}, []any{float64(1)}}} {
+		if compare(pair[0], pair[1], "value", true) == nil {
+			t.Fatal("invalid JSON values compared equal")
 		}
 	}
 }

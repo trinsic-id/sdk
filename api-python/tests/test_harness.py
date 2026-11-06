@@ -41,6 +41,17 @@ def test_scalar_preserves_supported_equivalences(actual, expected):
     support.assert_json_scalar_equivalent(actual, expected, "value")
 
 
+def check_response(response):
+    raw = json.loads(response.raw_data)
+    support.assert_equivalent(
+        support.model_fields(response.data, raw, decoded=True),
+        support.model_fields(response.data, raw),
+        "response",
+        True,
+    )
+    return response.data
+
+
 def envelope(model, raw):
     return SimpleNamespace(status_code=200, data=model, raw_data=json.dumps(raw))
 
@@ -58,7 +69,7 @@ SESSION = {
 def test_list_wire_comparison_accepts_empty_and_nonempty_pages(sessions):
     raw = {"sessions": sessions, "total": len(sessions), "more": False}
     response = envelope(ListSessionsResponse.from_dict(raw), raw)
-    assert support.checked_response(response) is response.data
+    assert check_response(response) is response.data
 
 
 @pytest.mark.parametrize("mutation", ["truncate", "id", "total", "more"])
@@ -74,7 +85,7 @@ def test_list_wire_comparison_rejects_dropped_entries_and_changed_fields(mutatio
     else:
         model.more = True
     with pytest.raises(AssertionError):
-        support.checked_response(envelope(model, raw))
+        check_response(envelope(model, raw))
 
 
 PROVIDER = {
@@ -109,14 +120,14 @@ def test_recommendations_compare_supported_nested_fields(mutation):
         model.recommended_providers[0].sub_providers[0].name = "Changed"
     if mutation:
         with pytest.raises(AssertionError):
-            support.checked_response(envelope(model, raw))
+            check_response(envelope(model, raw))
     else:
-        support.checked_response(envelope(model, raw))
+        check_response(envelope(model, raw))
 
 
 def test_wire_comparison_preserves_boolean_number_distinction():
     with pytest.raises(AssertionError, match="type mismatch"):
-        support.assert_decoded_fields({"value": True}, {"value": 1}, "response")
+        support.assert_equivalent({"value": True}, {"value": 1}, "response", True)
 
 
 def test_published_sdk_response_envelope_against_local_http_server():
@@ -142,11 +153,11 @@ def test_published_sdk_response_envelope_against_local_http_server():
         configuration = support.Configuration(
             host=f"http://127.0.0.1:{server.server_port}"
         )
-        with support.ApiClient(configuration) as client:
+        with support.CapturingClient(configuration) as client:
             response = support.SessionsApi(client).list_sessions_with_http_info(
                 str(support.PROFILE_ID)
             )
-            result = support.checked_response(response)
+            result = check_response(response)
             assert result.sessions[0].id == SESSION["id"]
             assert result.total == 1
     finally:

@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
+using System.Collections;
+using System.Text.Json.Serialization;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -15,42 +17,48 @@ using Xunit;
 
 public sealed class CompatibilityTests(CompatibilityFixture fixture) : IClassFixture<CompatibilityFixture>
 {
-    [Fact] public Task ListProviders() => fixture.Check("api.providers.list", async () => { CompatibilityFixture.Body(await fixture.Providers.ListProvidersAsync()); });
-    [Fact] public Task GetProvider() => fixture.Check("api.providers.get", async () => { CompatibilityFixture.Body(await fixture.Providers.GetProviderAsync("trinsic-test-redirect")); });
-    [Fact] public Task ListVerificationProfiles() => fixture.Check("api.verification-profiles.list", async () => { CompatibilityFixture.Body(await fixture.VerificationProfiles.ListVerificationProfilesAsync()); });
-    [Fact] public Task GetVerificationProfile() => fixture.Check("api.verification-profiles.get-by-id", async () => { CompatibilityFixture.Body(await fixture.VerificationProfiles.GetVerificationProfileByIdAsync(fixture.ProfileId)); });
-    [Fact] public Task ListSessions() => fixture.Check("api.sessions.list", async () => { CompatibilityFixture.Body(await fixture.Sessions.ListSessionsAsync(fixture.ProfileId)); });
-    [Fact] public Task ListRedirectUris() => fixture.Check("api.redirect-uris.list", async () => { CompatibilityFixture.Body(await fixture.RedirectUris.ListAsync()); });
-    [Fact] public Task RecommendProviders() => fixture.Check("api.sessions.recommend-providers", async () => { CompatibilityFixture.Body(await fixture.Sessions.RecommendProvidersAsync(new RecommendProvidersRequest(fixture.ProfileId))); });
+    [Fact] public Task ListProviders() => fixture.Check("api.providers.list", async () => { Assert.NotEmpty(fixture.Read(await fixture.Providers.ListProvidersAsync()).Providers); });
+    [Fact] public Task GetProvider() => fixture.Check("api.providers.get", async () => { Assert.Equal("trinsic-test-redirect", fixture.Read(await fixture.Providers.GetProviderAsync("trinsic-test-redirect")).Provider.Id); });
+    [Fact] public Task ListVerificationProfiles() => fixture.Check("api.verification-profiles.list", async () => { Assert.NotNull(fixture.Read(await fixture.VerificationProfiles.ListVerificationProfilesAsync()).VerificationProfiles); });
+    [Fact] public Task GetVerificationProfile() => fixture.Check("api.verification-profiles.get-by-id", async () => { Assert.Equal(fixture.ProfileId, fixture.Read(await fixture.VerificationProfiles.GetVerificationProfileByIdAsync(fixture.ProfileId)).Id); });
+    [Fact] public Task ListSessions() => fixture.Check("api.sessions.list", async () => { var page = fixture.Read(await fixture.Sessions.ListSessionsAsync(fixture.ProfileId, page: 1, pageSize: 1)); Assert.NotNull(page.Sessions); Assert.True(page.Total >= 0); fixture.AssertQuery("Page", "1"); fixture.AssertQuery("PageSize", "1"); });
+    [Fact] public Task ListRedirectUris() => fixture.Check("api.redirect-uris.list", async () => { Assert.NotNull(fixture.Read(await fixture.RedirectUris.ListAsync(page: 1, pageSize: 1)).Uris); fixture.AssertQuery("page", "1"); fixture.AssertQuery("pageSize", "1"); });
+    [Fact] public Task RecommendProviders() => fixture.Check("api.sessions.recommend-providers", async () => { var result = fixture.Read(await fixture.Sessions.RecommendProvidersAsync(new RecommendProvidersRequest(fixture.ProfileId))); var providers = result.RecommendedProviders.Concat(result.Remainder).ToList(); Assert.NotEmpty(providers); foreach (var item in providers) { Assert.False(string.IsNullOrWhiteSpace(item.Id)); Assert.NotNull(item.Name); Assert.NotNull(item.LogoUrl); Assert.NotNull(item.Subtext); Assert.NotNull(item.Health); Assert.NotNull(item.Countries); Assert.NotNull(item.Regions); Assert.NotNull(item.Subdivisions); } });
 
     [Fact] public Task CreateHostedProviderSession() => fixture.Check("api.sessions.create-hosted-provider", async () =>
     {
         var request = new CreateHostedProviderSessionRequest("trinsic-test-redirect", await fixture.RegisteredRedirectUrl(), fixture.ProfileId);
-        var session = CompatibilityFixture.Body(await fixture.Sessions.CreateHostedProviderSessionAsync(request));
+        var session = fixture.Read(await fixture.Sessions.CreateHostedProviderSessionAsync(request));
         fixture.Track(session.SessionId);
-        Assert.False(string.IsNullOrWhiteSpace(session.LaunchUrl));
+        Assert.NotEqual(Guid.Empty, session.SessionId);
+        CompatibilityFixture.AssertUrl(session.LaunchUrl);
         Assert.False(string.IsNullOrWhiteSpace(session.ResultsAccessKey));
     });
     [Fact] public Task CreateDirectProviderSession() => fixture.Check("api.sessions.create-direct-provider", async () => { await fixture.CreateDirect(); });
     [Fact] public Task GetSession() => fixture.Check("api.sessions.get", async () =>
     {
         var session = await fixture.CreateDirect();
-        CompatibilityFixture.Body(await fixture.Sessions.GetSessionAsync(session.SessionId));
+        CompatibilityFixture.AssertSession(fixture.Read(await fixture.Sessions.GetSessionAsync(session.SessionId)).Session, session.SessionId, false, false);
     });
     [Fact] public Task CancelSession() => fixture.Check("api.sessions.cancel", async () =>
     {
         var session = await fixture.CreateDirect();
-        CompatibilityFixture.Body(await fixture.Sessions.CancelSessionAsync(session.SessionId));
+        CompatibilityFixture.AssertSession(fixture.Read(await fixture.Sessions.CancelSessionAsync(session.SessionId)).Session, session.SessionId, true, false);
     });
     [Fact] public Task GetSessionResult() => fixture.WithCompletedSession("api.sessions.get-result", async (sessionId, key) =>
     {
-        CompatibilityFixture.Body(await fixture.Sessions.GetSessionResultAsync(sessionId, new GetSessionResultRequest(key)));
+        var result = fixture.Read(await fixture.Sessions.GetSessionResultAsync(sessionId, new GetSessionResultRequest(key)));
+        CompatibilityFixture.AssertSession(result.Session, sessionId, true, true);
+        Assert.NotNull(result.IdentityData);
+        Assert.Equal("trinsic-test-redirect", result.IdentityData.OriginatingProviderId);
+        Assert.NotEmpty(result.IdentityData.Attachments);
     });
     [Fact] public Task GetAttachment() => fixture.WithCompletedSession("api.sessions.get-attachment", async (sessionId, key) =>
     {
-        var result = CompatibilityFixture.Body(await fixture.Sessions.GetSessionResultAsync(sessionId, new GetSessionResultRequest(key)));
+        var result = fixture.Read(await fixture.Sessions.GetSessionResultAsync(sessionId, new GetSessionResultRequest(key)));
+        Assert.NotNull(result.IdentityData);
         Assert.NotEmpty(result.IdentityData.Attachments);
-        CompatibilityFixture.Body(await fixture.Sessions.GetAttachmentAsync(sessionId, result.IdentityData.Attachments[0].Id, new GetAttachmentRequest(key)));
+        CompatibilityFixture.AssertAttachment(fixture.Read(await fixture.Sessions.GetAttachmentAsync(sessionId, result.IdentityData.Attachments[0].Id, new GetAttachmentRequest(key))));
     });
     [Fact] public Task RedactSession() => fixture.WithCompletedSession("api.sessions.redact", async (sessionId, _) =>
     {
@@ -74,7 +82,7 @@ public sealed class CompatibilityFixture : IAsyncLifetime
         var services = new ServiceCollection();
         services.AddTrinsicApi(options => {
             options.AddTokens(new BearerToken(Required("TRINSIC_TEST_ACCESS_TOKEN")));
-            options.AddTrinsicApiHttpClients(client => client.BaseAddress = new Uri(Required("TRINSIC_TEST_BASE_URL").TrimEnd('/')));
+            options.AddTrinsicApiHttpClients(client => client.BaseAddress = new Uri(Required("TRINSIC_TEST_BASE_URL").TrimEnd('/')), builder => builder.AddHttpMessageHandler(() => new CaptureHandler(this)));
         });
         provider = services.BuildServiceProvider();
         Providers = provider.GetRequiredService<IProvidersApi>();
@@ -107,10 +115,66 @@ public sealed class CompatibilityFixture : IAsyncLifetime
         // Ok() is the SDK's lazy deserializer: HTTP 200 alone is insufficient.
         return response.Ok() ?? throw new InvalidOperationException("SDK returned no successful response body.");
     }
-    public Task<JsonNode> RoundTrip(JsonNode raw, Type modelType)
+    private JsonNode? lastWire, lastRequestBody;
+    private Uri? lastRequestUri;
+    private sealed class CaptureHandler(CompatibilityFixture owner) : DelegatingHandler
     {
-        var model = JsonSerializer.Deserialize(raw.ToJsonString(), modelType, serializerOptions) ?? throw new InvalidOperationException("SDK deserialized to null.");
-        return Task.FromResult(JsonNode.Parse(JsonSerializer.Serialize(model, modelType, serializerOptions))!);
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            owner.lastRequestUri = request.RequestUri;
+            owner.lastRequestBody = request.Content is null ? null : JsonNode.Parse(await request.Content.ReadAsStringAsync(cancellationToken));
+            var response = await base.SendAsync(request, cancellationToken);
+            var text = await response.Content.ReadAsStringAsync(cancellationToken);
+            owner.lastWire = string.IsNullOrWhiteSpace(text) ? null : JsonNode.Parse(text);
+            return response;
+        }
+    }
+    public T Read<T>(IOk<T?> response) where T : class
+    {
+        var model = Body(response);
+        AssertJson(ModelFields(model, lastWire, true), ModelFields(model, lastWire), "response", true);
+        return model;
+    }
+    public void AssertQuery(string key, string value) => Assert.Equal(value, System.Web.HttpUtility.ParseQueryString(lastRequestUri!.Query)[key]);
+    public static void AssertUrl(string value) => Assert.True(Uri.TryCreate(value, UriKind.Absolute, out var uri) && uri.Scheme is "http" or "https");
+    public static void AssertSession(Session session, Guid id, bool done, bool success)
+    {
+        Assert.Equal(id.ToString().ToLowerInvariant(), session.Id.ToString().ToLowerInvariant()); Assert.Equal(done, session.Done); Assert.Equal(success, session.Success);
+    }
+    public static void AssertAttachment(GetAttachmentResponse response)
+    {
+        Assert.Equal("image/png", response.ContentType);
+        Assert.True(response.Content.AsSpan().StartsWith(new byte[] { 137, 80, 78, 71, 13, 10, 26, 10 }), "Attachment must contain PNG bytes");
+    }
+    public JsonNode? ModelFields(object? model, JsonNode? wire, bool decoded = false)
+    {
+        if (model is not null && wire is JsonObject fields)
+        {
+            var properties = model.GetType().GetProperties().Where(p => p.GetCustomAttribute<JsonPropertyNameAttribute>() is not null).ToArray();
+            if (properties.Length > 0)
+            {
+                var output = new JsonObject();
+                foreach (var property in properties)
+                {
+                    var name = property.GetCustomAttribute<JsonPropertyNameAttribute>()!.Name;
+                    if (fields.ContainsKey(name)) output[name] = ModelFields(property.GetValue(model), fields[name], decoded);
+                }
+                return output;
+            }
+            if (model is IDictionary dictionary)
+            {
+                if (decoded) Assert.Equal(fields.Select(p => p.Key).Order(), dictionary.Keys.Cast<string>().Order());
+                var output = new JsonObject();
+                foreach (var (key, value) in fields) output[key] = ModelFields(dictionary[key], value, decoded);
+                return output;
+            }
+        }
+        if (model is IList list && wire is JsonArray array)
+        {
+            Assert.Equal(array.Count, list.Count);
+            return new JsonArray(array.Select((value, index) => ModelFields(list[index], value, decoded)).ToArray());
+        }
+        return decoded ? JsonSerializer.SerializeToNode(model, model?.GetType() ?? typeof(object), serializerOptions) : wire?.DeepClone();
     }
     public async Task Check(string id, Func<Task> action, object? parameters = null, [CallerMemberName] string nativeTest = "")
     {
@@ -123,9 +187,16 @@ public sealed class CompatibilityFixture : IAsyncLifetime
         var request = new CreateDirectProviderSessionRequest(
             [IntegrationCapability.LaunchBrowser, IntegrationCapability.CaptureRedirect], "trinsic-test-redirect", ProfileId,
             fallbackToHostedUI: new Option<bool?>(false), redirectUrl: await RegisteredRedirectUrl());
-        var session = Body(await Sessions.CreateDirectProviderSessionAsync(request));
+        var session = Read(await Sessions.CreateDirectProviderSessionAsync(request));
         Track(session.SessionId);
-        Assert.False(string.IsNullOrWhiteSpace(session.NextStep.Content));
+        Assert.NotEqual(Guid.Empty, session.SessionId);
+        Assert.Equal(IntegrationLaunchMethod.LaunchBrowser, session.NextStep.Method);
+        Assert.Equal("CaptureRedirect", session.ResultCollection.Method.ToString());
+        AssertUrl(session.NextStep.Content);
+        AssertJson(lastRequestBody?["capabilities"], JsonNode.Parse("[\"LaunchBrowser\",\"CaptureRedirect\"]"), "request.capabilities", true);
+        AssertJson(lastRequestBody?["fallbackToHostedUI"], JsonValue.Create(false), "request.fallbackToHostedUI", true);
+        Assert.Equal(ProfileId.ToString().ToLowerInvariant(), lastRequestBody?["verificationProfileId"]?.GetValue<string>().ToLowerInvariant());
+        Assert.Equal("trinsic-test-redirect", lastRequestBody?["provider"]?.GetValue<string>());
         Assert.False(string.IsNullOrWhiteSpace(session.ResultCollection.ResultsAccessKey));
         return session;
     }
@@ -153,7 +224,7 @@ public sealed class CompatibilityFixture : IAsyncLifetime
     }
     public async Task<string> RegisteredRedirectUrl()
     {
-        var response = Body(await RedirectUris.ListAsync(1, 100));
+        var response = Read(await RedirectUris.ListAsync(1, 100));
         return response.Uris.Select(value => value.Uri).FirstOrDefault(value => Uri.TryCreate(value, UriKind.Absolute, out var uri) && uri.Scheme is "http" or "https")
             ?? throw new InvalidOperationException("The test environment must have an HTTP(S) redirect URI.");
     }
@@ -174,10 +245,14 @@ public sealed class CompatibilityFixture : IAsyncLifetime
             if (!isPublic || modelName is null) { Skip(caseId, "Provider has no public Swagger provider-specific output model.", parameters); continue; }
             var modelType = SdkAssembly.GetType($"Trinsic.Api.Model.{modelName}");
             if (modelType is null) { Skip(caseId, "Model is not exported by this SDK release.", parameters); continue; }
-            await Record(caseId, async () => {
+            await Record(caseId, () => {
                 var raw = fixture["output"] ?? throw new InvalidOperationException($"Cached fixture {providerId} omitted output.");
-                var serialized = await RoundTrip(raw, modelType);
-                AssertJson(serialized, fixture["serializationOutput"] ?? raw, providerId, fixture["testCaseId"] is not null);
+                var decoded = JsonSerializer.Deserialize(raw.ToJsonString(), modelType, serializerOptions) ?? throw new InvalidOperationException("SDK deserialized to null.");
+                AssertJson(ModelFields(decoded, raw, true), ModelFields(decoded, raw), providerId, true);
+                var serialized = JsonSerializer.SerializeToNode(decoded, modelType, serializerOptions);
+                var expected = fixture["serializationOutput"] ?? raw;
+                AssertJson(serialized, fixture["testCaseId"] is not null ? expected : ModelFields(decoded, expected), providerId, true);
+                return Task.CompletedTask;
             }, parameters);
         }
         if (failureCount > failuresBefore) throw new Xunit.Sdk.XunitException($"{failureCount - failuresBefore} serialization cases failed; see the structured report.");

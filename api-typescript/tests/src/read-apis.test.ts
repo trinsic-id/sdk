@@ -91,7 +91,11 @@ function recordReadApiCase(
     assert.equal(capturedRequests.length, requestCount + 1, "expected one API request");
     assert.ok(captured, "expected the SDK request to be captured");
     assert.equal(captured.method, "GET");
-    assert.equal(new URL(captured.url).pathname, expectedPath);
+    const url = new URL(captured.url);
+    assert.equal(url.pathname, expectedPath);
+    if (id === "api.sessions.list") assert.equal(url.searchParams.get("PageSize"), "1");
+    if (id === "api.redirect-uris.list") assert.equal(url.searchParams.get("pageSize"), "1");
+    if (id === "api.verification-profiles.list") assert.equal(url.searchParams.get("pageSize"), "50");
     assert.equal(
       headerValue(captured.headers, "authorization"),
       `Bearer ${configuration.accessToken}`,
