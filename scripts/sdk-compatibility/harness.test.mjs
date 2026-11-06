@@ -5,7 +5,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 import { readNativeTestCases, readProcessTestCases, temporaryDirectory } from "./executor-helpers.mjs";
-import { prepareFixtures, validateWireAliases } from "./fixtures.mjs";
+import { prepareFixtures, validateCoverage, validateWireAliases } from "./fixtures.mjs";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
 const scripts = join(root, "scripts/sdk-compatibility");
@@ -23,11 +23,32 @@ test("3.2.0 binds the original itsme model without changing wire payloads", () =
   const prepared = prepareFixtures({ fixtures: [
     { providerId: "a-itsme-login", sdkModelName: "ItsmeLoginProviderOutput", hasPublicSdkModel: true, output },
     { providerId: "itsme", sdkModelName: "ItsmeProviderOutput", hasPublicSdkModel: true, output: {} },
-  ] });
+  ] }, { "a-itsme-login": "ItsmeProviderOutput" });
   assert.equal(prepared.fixtures[0].sdkModelName, "ItsmeProviderOutput");
   assert.equal(prepared.fixtures[0].output, output);
   assert.match(prepared.fixtures[1].unavailableModel, /predates the direct itsme/);
+  assert.equal(prepared.fixtures[0].modelRequired, true);
+  assert.equal(prepared.fixtures[1].modelRequired, false);
   assert.equal(prepared.fixtures.filter(fixture => fixture.testCaseId).length, 2);
+});
+
+test("release coverage cannot disappear when the remote catalog changes", () => {
+  const fixture = { providerId: "known", sdkModelName: "RenamedModel", hasPublicSdkModel: true, output: { value: "keep" } };
+  const expected = { known: "OriginalModel" };
+  for (const fixtures of [[], [fixture, fixture], [{ ...fixture, hasPublicSdkModel: false }], [{ ...fixture, output: undefined }]]) {
+    assert.throws(() => prepareFixtures({ fixtures }, expected), /Required provider fixture known/);
+  }
+  const prepared = prepareFixtures({ fixtures: [fixture, { ...fixture, providerId: "new" }] }, expected);
+  assert.equal(prepared.fixtures[0].sdkModelName, "OriginalModel");
+  assert.equal(prepared.fixtures[0].output, fixture.output);
+  const fixtures = prepared.fixtures.slice(0, 2);
+  const results = fixtures.map(f => ({ id: "serialization.provider-output-round-trip", parameters: { providerId: f.providerId }, status: "skipped" }));
+  assert.equal(validateCoverage(fixtures, results).length, 1, "a known model cannot become an unsupported-model skip");
+  results[0].status = "failed";
+  assert.deepEqual(validateCoverage(fixtures, results), [], "real decoding failures remain valid reported outcomes");
+  assert.equal(validateCoverage(fixtures, results.slice(0, 1)).length, 1, "even unsupported providers must have an outcome");
+  assert.equal(validateCoverage(fixtures, [...results, results[1]]).length, 1, "duplicate outcomes are incomplete coverage");
+  assert.equal(validateCoverage(prepared.fixtures.slice(2), []).length, 2, "synthetic contract cases are always required");
 });
 
 test("removing or changing a legacy wire alias is a failure", () => {

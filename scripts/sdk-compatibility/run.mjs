@@ -5,7 +5,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn, spawnSync } from "node:child_process";
 import { SDK_VERSION, failure, preserveProcessFailure, readTestCases, required } from "./executor-helpers.mjs";
-import { prepareFixtures, validateWireAliases } from "./fixtures.mjs";
+import { prepareFixtures, validateCoverage, validateWireAliases } from "./fixtures.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const allLanguages = ["csharp", "go", "java", "php", "python", "ruby", "typescript"];
@@ -40,12 +40,12 @@ try {
   const cache = JSON.parse(readFileSync(cachePath));
   if (!Array.isArray(cache.fixtures) || !cache.fixtures.length) throw new Error("Provider-output fixture catalog is empty or malformed.");
   const fixtures = prepareFixtures(cache);
-  report.fixtures = fixtures.fixtures.map(({ providerId, sdkModelName, hasPublicSdkModel, testCaseId }) => ({ providerId, sdkModelName, hasPublicSdkModel, testCaseId: testCaseId ?? "serialization.provider-output-round-trip" }));
+  report.fixtures = fixtures.fixtures.map(({ providerId, sdkModelName, hasPublicSdkModel, modelRequired, testCaseId }) => ({ providerId, sdkModelName, hasPublicSdkModel, modelRequired, testCaseId: testCaseId ?? "serialization.provider-output-round-trip" }));
   const fixturePath = join(directory, "fixtures.json");
   const unavailableModels = fixtures.fixtures.filter(fixture => fixture.unavailableModel).map(fixture => ({
-    id: "serialization.provider-output-round-trip", status: "failed", durationMs: 0,
+    id: "serialization.provider-output-round-trip", status: "skipped", durationMs: 0,
     parameters: { providerId: fixture.providerId, sdkModelName: fixture.sdkModelName },
-    failure: { name: "MissingSdkModelError", message: fixture.unavailableModel },
+    skipReason: fixture.unavailableModel,
   }));
   writeFileSync(fixturePath, JSON.stringify({ ...fixtures, fixtures: fixtures.fixtures.filter(fixture => !fixture.unavailableModel) }));
   const catalog = JSON.parse(readFileSync(join(root, "compatibility-tests.json"))).testCases.filter(id => scope === "full" || id.startsWith("serialization."));
@@ -59,6 +59,7 @@ try {
     });
     const parsed = readTestCases(resultPath);
     const testCases = [...preserveProcessFailure(parsed, execution, language, "SDK test executor", []), ...unavailableModels, ...validateWireAliases(cache)];
+    for (const message of validateCoverage(fixtures.fixtures, testCases)) testCases.push(...failure(language, message));
     const actual = new Set(testCases.map(testCase => testCase.id));
     const missing = catalog.filter(id => !actual.has(id));
     if (missing.length) testCases.push(...failure(language, `Missing required cases: ${missing.join(", ")}.`));

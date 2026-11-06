@@ -169,7 +169,7 @@ func pso() {
 		}
 		factory, ok := providerOutputFactories[name]
 		if !ok {
-			record(caseID, params, func() (any, error) { return nil, fmt.Errorf("SDK 3.2.0 does not export public model %s.", name) })
+			skip(caseID, "Model is not exported by this SDK release.", params)
 			continue
 		}
 		fixture := f

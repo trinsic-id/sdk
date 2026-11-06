@@ -54,12 +54,15 @@ test(`${targetLabel}: provider-output fixtures round-trip through every supporte
     assert.ok(fixture.sdkModelName, `${fixture.providerId} is marked as public but has no SDK model name`);
     const modelParameters = { ...parameters, sdkModelName: fixture.sdkModelName };
     const converters = findConverters(fixture);
+    if (!converters) {
+      recordSkippedCompatibilityCase(caseId, "Model is not exported by this SDK release.", modelParameters);
+      continue;
+    }
 
     try {
       await recordCompatibilityCase(
         caseId,
         async () => {
-          assert.ok(converters, `${targetLabel} does not export ${fixture.sdkModelName}FromJSON and ${fixture.sdkModelName}ToJSON for ${fixture.providerId}.`);
           const rawOutput = asRecord(fixture.output, `${fixture.providerId} fixture`);
           const serializationExpected = fixture.serializationOutput ?? rawOutput;
           const serializedOutput = jsonValue(converters.toJson(converters.fromJson(rawOutput)));
@@ -95,9 +98,11 @@ function findConverters(fixture: ProviderOutputFixture): ProviderOutputConverter
   const fromJson = (sdk as Record<string, unknown>)[`${fixture.sdkModelName}FromJSON`];
   const toJson = (sdk as Record<string, unknown>)[`${fixture.sdkModelName}ToJSON`];
 
-  if (typeof fromJson !== "function" || typeof toJson !== "function") {
+  if (fromJson === undefined && toJson === undefined) {
     return undefined;
   }
+  assert.equal(typeof fromJson, "function", `${fixture.sdkModelName} is missing its FromJSON converter`);
+  assert.equal(typeof toJson, "function", `${fixture.sdkModelName} is missing its ToJSON converter`);
 
   return {
     fromJson: fromJson as ProviderOutputConverters["fromJson"],

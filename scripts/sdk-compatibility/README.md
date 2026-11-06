@@ -50,10 +50,18 @@ to ignore. This phase adds no synthetic unknown-enum case or blanket exception;
 enum errors encountered in real API responses still surface as raw failures.
 
 The 3.2.0 snapshot binds `a-itsme-login` to its original `ItsmeProviderOutput`.
-The later direct `itsme` provider has no model in this release; this is emitted
-as a failed contract case, rather than decoding it using an unrelated model
-that happens to share the same name. Other missing public models also fail.
-Only providers with no public SDK model in Connect's catalog are skipped.
+The later direct `itsme` provider has no corresponding model and is reported as
+unsupported. Each language resolves the other models from its installed package:
+absent models are skipped, while errors decoding an available model remain failures.
+Providers with no public SDK model in Connect's catalog are also skipped.
+
+`provider-models.json` records the 51 public provider/model bindings discovered in
+all seven published 3.2.0 packages. These fixtures and the synthetic cases set
+`modelRequired: true`: a missing payload, missing model, or skipped result fails
+the run. New remote providers are still checked against the installed SDK; their
+models do not need to appear in this baseline to be tested. This inventory prevents
+later catalog changes from silently shrinking coverage and preserves historical
+model names. It is SDK test data, not a Connect exception list.
 
 ## Structured results consumed by Connect
 
@@ -71,7 +79,8 @@ Only providers with no public SDK model in Connect's catalog are skipped.
   },
   "fixtures": [
     { "providerId": "provider", "sdkModelName": "ProviderOutput",
-      "hasPublicSdkModel": true, "testCaseId": "serialization.provider-output-round-trip" }
+      "hasPublicSdkModel": true, "modelRequired": true,
+      "testCaseId": "serialization.provider-output-round-trip" }
   ],
   "suites": [
     { "language": "csharp", "sdkVersion": "3.2.0", "testCases": [
@@ -84,6 +93,7 @@ Only providers with no public SDK model in Connect's catalog are skipped.
 ```
 
 Statuses are `passed`, `failed`, or `skipped`; skipped cases include `skipReason`.
+Unsupported provider models are explicit skips, not failures needing exceptions.
 Setup, missing coverage, malformed native reports, and unrecorded native failures
 use `framework.*` case IDs. `compatibility-tests.json` lists the required cases.
 Raw language results and fixtures remain alongside the combined report. A rerun
@@ -91,7 +101,9 @@ replaces previous results. Exit 0 means no raw failures; exit 1 means failures.
 There is **no exception handling in the SDK repository**: Connect consumes the
 raw report, applies explicitly scoped exceptions, and writes a separate verdict.
 It verifies the expected SDK version, checkout commit, environment, languages,
-required cases, and per-provider coverage. Framework failures cannot be ignored.
+required cases, and per-provider coverage. A required model cannot be skipped,
+and even unsupported providers must have exactly one outcome per language.
+Framework failures cannot be ignored.
 
 Set `SDK_COMPATIBILITY_RESULTS_DIR` to choose an output directory.
 `SDK_COMPATIBILITY_PSO_FIXTURES_PATH` may supply a previously captured wire cache

@@ -26,7 +26,7 @@ const fixtures = await Promise.all(catalog.map(async (fixture) => {
   const schema = swagger.components.schemas[fixture.sdkModelName];
   const providerOutput = await response.json();
   if (!schema) {
-    console.warn(`Swagger did not contain ${fixture.sdkModelName} for ${fixture.providerId}; keeping the unfiltered fixture so the missing-model check can report it.`);
+    console.warn(`Swagger did not contain ${fixture.sdkModelName} for ${fixture.providerId}; keeping the unfiltered fixture for SDK model discovery.`);
     return { ...fixture, output: providerOutput, serializationOutput: providerOutput };
   }
   return {
