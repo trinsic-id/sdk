@@ -6,7 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$REPO_ROOT/helpers/common.sh"
 
-swagger_file_or_url=""
+swagger_file_or_url="${TRINSIC_OPENAPI_SCHEMA:-https://api.trinsic.id/swagger/api/swagger.json}"
 if [[ $# -gt 0 ]]; then
   if [[ "$1" != "--swagger-file-or-url" || $# -ne 2 ]]; then
     echo "Usage: $0 [--swagger-file-or-url <path-or-url>]" >&2
@@ -22,7 +22,7 @@ generator_arguments=(
   --additional-property "packageVersion=[VERSION]"
   --additional-property "nullableReferenceTypes=true"
   --additional-property "modelPropertySorting=alphabetical"
-  --additional-property "library=generichost"
+  --additional-property "library=httpclient"
   --additional-property "useDateTimeOffset=true"
   --additional-property "validatable=false"
   --additional-property "disallowAdditionalPropertiesIfNotPresent=false"
@@ -37,76 +37,21 @@ fi
 "$REPO_ROOT/helpers/generate-client.sh" \
   "${generator_arguments[@]}"
 
-apply_hotfix() {
-  local target_line="$1"
-  local replacement_line="$2"
-  local root_path="${3:-$SCRIPT_DIR/sdk}"
-
-  echo "Applying hotfix for $target_line in $root_path"
-  node - "$target_line" "$replacement_line" "$root_path" <<'NODE'
+# Json.NET otherwise interprets timestamp-looking strings inside free-form JSON
+# as DateTime values. Apply this to both generated serializer defaults, and fail
+# if a generator update changes their shape instead of silently losing the fix.
+node - "$SCRIPT_DIR/sdk/src/Trinsic.Api/Client/ApiClient.cs" <<'NODE'
 const fs = require("fs");
-const path = require("path");
-
-const targetLine = process.argv[2];
-const replacementLine = process.argv[3];
-const rootPath = process.argv[4];
-const normalizedTarget = targetLine.replace(/\s/g, "");
-
-function walk(dir) {
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const fullPath = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      walk(fullPath);
-    } else if (entry.isFile() && fullPath.endsWith(".cs")) {
-      patchFile(fullPath);
-    }
-  }
+const file = process.argv[2];
+const source = fs.readFileSync(file, "utf8");
+const target = "ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,";
+const matches = source.split(target).length - 1;
+if (matches !== 2) {
+  throw new Error(`Expected two generated JSON serializer defaults in ${file}, found ${matches}`);
 }
-
-function patchFile(filePath) {
-  const original = fs.readFileSync(filePath, "utf8");
-  const newline = original.includes("\r\n") ? "\r\n" : "\n";
-  const hadTrailingNewline = original.endsWith("\n");
-  const lines = original.split(/\r?\n/);
-  if (hadTrailingNewline) lines.pop();
-
-  let modified = false;
-  const nextLines = lines.map((line) => {
-    if (line.replace(/\s/g, "") === normalizedTarget) {
-      console.log(`MATCH FOUND in ${filePath}`);
-      modified = true;
-      return replacementLine;
-    }
-    return line;
-  });
-
-  if (modified) {
-    fs.writeFileSync(filePath, nextLines.join(newline) + (hadTrailingNewline ? newline : ""));
-    console.log(`Updated: ${filePath}`);
-  }
-}
-
-walk(rootPath);
+fs.writeFileSync(file, source.replaceAll(target,
+  `${target}\n            DateParseHandling = DateParseHandling.None,`));
 NODE
-}
-
-apply_hotfix \
-  'if (DateOnly.TryParseExact(value, format, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out DateOnly result))' \
-  '                if (DateOnly.TryParseExact(value, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly result))'
-apply_hotfix 'public interface IProvidersApi : IApi' '    public partial interface IProvidersApi : IApi'
-apply_hotfix 'public interface ISessionsApi : IApi' '    public partial interface ISessionsApi : IApi'
-apply_hotfix 'public interface IVerificationProfilesApi : IApi' '    public partial interface IVerificationProfilesApi : IApi'
-apply_hotfix 'public interface IRedirectUrisApi : IApi' '    public partial interface IRedirectUrisApi : IApi'
-apply_hotfix 'services.AddSingleton(typeof(RateLimitProvider<>).MakeGenericType(tokenType));' '                    services.AddTransient(typeof(ConstantTokenProvider<>).MakeGenericType(tokenType));'
-apply_hotfix 'services.AddSingleton(typeof(TokenProvider<>).MakeGenericType(tokenType),' '                    services.AddTransient(typeof(TokenProvider<>).MakeGenericType(tokenType),'
-apply_hotfix 's => s.GetRequiredService(typeof(RateLimitProvider<>).MakeGenericType(tokenType)));' '                        s => s.GetRequiredService(typeof(ConstantTokenProvider<>).MakeGenericType(tokenType)));'
-
-additional_folder="$SCRIPT_DIR/Additional"
-destination_folder="$SCRIPT_DIR/sdk/src/Trinsic.Api/Additional"
-echo "Copying $additional_folder to $destination_folder"
-rm -rf "$destination_folder"
-mkdir -p "$destination_folder"
-cp -R "$additional_folder"/. "$destination_folder"/
 
 csproj_path="$SCRIPT_DIR/sdk/src/Trinsic.Api/Trinsic.Api.csproj"
 node - "$csproj_path" <<'NODE'

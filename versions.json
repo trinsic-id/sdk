@@ -1,14 +1,14 @@
 {
   "backendVersion": "3.2",
   "nodePatchVersion": "1",
-  "csharpPatchVersion": "1",
+  "csharpPatchVersion": "2-alpha1",
   "javaPatchVersion": "1",
   "goPatchVersion": "1",
   "pythonPatchVersion": "1",
   "phpPatchVersion": "1",
   "rubyPatchVersion": "1",
-  "swiftUIVersion": "2.2.0",
-  "androidUIVersion": "2.2.0",
+  "swiftUIVersion": "2.3.0-alpha5",
+  "androidUIVersion": "2.3.0-alpha4",
   "flutterUIVersion": "2.0.0",
   "expoUIVersion": "2.0.1",
   "webUIVersion": "3.0.3"

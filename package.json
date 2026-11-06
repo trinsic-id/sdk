@@ -3,6 +3,9 @@
   "name": "trinsic-sdks",
   "version": "0.0.1",
   "license": "MIT",
+  "scripts": {
+    "test:sdk-headers": "node --test helpers/tests/sdk-headers.test.mjs"
+  },
   "dependencies": {
     "@openapitools/openapi-generator-cli": "2.18.4"
   }

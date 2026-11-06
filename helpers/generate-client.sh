@@ -101,4 +101,6 @@ if [[ ${#model_name_mappings[@]} -gt 0 ]]; then
 fi
 "${generator_command[@]}" >/dev/null
 
+node "$SCRIPT_DIR/inject-sdk-header.mjs" "$language" "$version" "$output_folder"
+
 echo "Generated $language SDK $output_folder"

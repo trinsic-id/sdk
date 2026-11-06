@@ -1,4 +1,4 @@
-using System.Text.Json;
+using Trinsic.Api.Client;
 
 namespace Sample;
 
@@ -29,20 +29,21 @@ public class JsonExceptionMiddleware
     {
         logger.LogError(exception, "An unhandled exception occurred");
 
-        // You could extract response text or other data from inner exceptions or custom exception types
-        if (exception is HttpRequestException httpEx && httpEx.Data["Body"] is string responseBody)
+        if (exception is ApiException apiException)
         {
-            logger.LogError("Response body: {Body}", responseBody);
+            logger.LogError("Trinsic API returned {StatusCode}: {Body}", apiException.ErrorCode, apiException.ErrorContent);
         }
 
-        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-        context.Response.ContentType = "application/json";
-
-        var result = JsonSerializer.Serialize(new
+        context.Response.StatusCode = exception switch
         {
-            message = $"Request failed: check the logs on the backend for more information. {exception.Message}"
-        });
+            ApiException api when api.ErrorCode is >= 400 and <= 599 => api.ErrorCode,
+            BadHttpRequestException badRequest => badRequest.StatusCode,
+            _ => StatusCodes.Status500InternalServerError
+        };
 
-        await context.Response.WriteAsync(result);
+        await context.Response.WriteAsJsonAsync(new
+        {
+            message = "Request failed: check the logs on the backend for more information."
+        });
     }
 }

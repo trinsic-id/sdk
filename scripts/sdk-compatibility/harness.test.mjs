@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
@@ -120,18 +120,52 @@ test("default build wrappers reach the generator with empty argument arrays on B
 }));
 
 test("generator config is selected from its repository regardless of the entry directory", () => temporaryDirectory("compat-config-", (directory) => {
+  // Match Node's canonical module path for the header injector's CLI entry point.
+  directory = realpathSync(directory);
   mkdirSync(join(directory, "helpers"));
   copyFileSync(join(root, "helpers/generate-client.sh"), join(directory, "helpers/generate-client.sh"));
+  copyFileSync(join(root, "helpers/inject-sdk-header.mjs"), join(directory, "helpers/inject-sdk-header.mjs"));
   write(join(directory, "helpers/common.sh"), 'get_version() { printf "3.2.1"; }\n');
   write(join(directory, "openapitools.json"), '{}');
   write(join(directory, "api-typescript/tests/openapitools.json"), '{"generator-cli":{"version":"incorrect"}}');
   write(join(directory, "swagger.json"), '{}');
-  write(join(directory, "bin/npx"), '#!/bin/bash\nprintf "%s\\n" "$@" > "$GENERATOR_LOG"\n', true);
+  write(join(directory, "bin/npx"), `#!/bin/bash
+printf '%s\\n' "$@" > "$GENERATOR_LOG"
+while [[ $# -gt 0 ]]; do
+  if [[ "$1" == "-o" ]]; then
+    mkdir -p "$2/src"
+    printf '        let response: Response | undefined = undefined;\\n' > "$2/src/runtime.ts"
+    break
+  fi
+  shift
+done
+`, true);
   const log = join(directory, "arguments");
   for (const cwd of [directory, join(directory, "api-typescript/tests")]) {
     succeeded(run("/bin/bash", [join(directory, "helpers/generate-client.sh"), "--language", "typescript-fetch", "--output-folder", join(directory, "output"), "--swagger-file-or-url", join(directory, "swagger.json")], { cwd, env: { PATH: `${directory}/bin:${process.env.PATH}`, GENERATOR_LOG: log } }));
     const args = readFileSync(log, "utf8").trim().split("\n");
     assert.equal(resolve(args[args.indexOf("--openapitools") + 1]), join(directory, "openapitools.json"));
+    assert.match(readFileSync(join(directory, "output/src/runtime.ts"), "utf8"), /X-Trinsic-SDK.*typescript\/3\.2\.1/);
+  }
+}));
+
+test("C# keeps the httpclient generator and supports both schema overrides", () => temporaryDirectory("compat-csharp-build-", (directory) => {
+  const wrapper = join(directory, "api-csharp/build-sdk.sh");
+  mkdirSync(dirname(wrapper), { recursive: true });
+  copyFileSync(join(root, "api-csharp/build-sdk.sh"), wrapper);
+  write(join(directory, "helpers/common.sh"), '');
+  write(join(directory, "helpers/generate-client.sh"), '#!/bin/bash\nprintf "%s\\n" "$@" > "$GENERATOR_LOG"\nexit 72\n', true);
+  const log = join(directory, "arguments");
+  for (const [args, schema, expected] of [
+    [[], "", "https://api.trinsic.id/swagger/api/swagger.json"],
+    [[], "environment spec.json", "environment spec.json"],
+    [["--swagger-file-or-url", "argument spec.json"], "environment spec.json", "argument spec.json"],
+  ]) {
+    const result = run("/bin/bash", [wrapper, ...args], { env: { TRINSIC_OPENAPI_SCHEMA: schema, GENERATOR_LOG: log } });
+    assert.equal(result.status, 72, result.stderr);
+    const actual = readFileSync(log, "utf8").trim().split("\n");
+    assert.ok(actual.includes("library=httpclient"));
+    assert.equal(actual[actual.indexOf("--swagger-file-or-url") + 1], expected);
   }
 }));
 

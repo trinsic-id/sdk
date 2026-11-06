@@ -6,6 +6,14 @@ import MicroModal from "micromodal";
   const params = new URLSearchParams(window.location.search);
   const postRedirectAction = params.get("postRedirectAction");
   const sessionId = params.get("sessionId");
+  const redirectToken = params.get("redirectToken");
+
+  // Keep the token available to the opener and the poll-after-redirect page.
+  // Like resultsAccessKey below, this uses localStorage for the sample only;
+  // production applications should keep session credentials on their backend.
+  if (redirectToken) {
+    localStorage.setItem(`redirectToken:${sessionId}`, redirectToken);
+  }
 
   // Fetch resultsAccessKey from localStorage, which was stored there when we created the Session.
   // NOTE: Do not do this in production. resultsAccessKey should be stored securely in your backend, correlated with your user's session.
@@ -14,8 +22,10 @@ import MicroModal from "micromodal";
   // (Direct Sessions Only) If postRedirectAction is "poll", the results of the Session are not immediately available, so we need to poll for them
   // (related to `PollAfterRedirect` capability)
   if (postRedirectAction === "poll") {
-    const pollUrl = window.location.origin + "/direct-poll-after-redirect?sessionId=" + sessionId + "&resultsAccessKey=" + resultsAccessKey;
-    window.location.href = pollUrl;
+    const pollUrl = new URL("/direct-poll-after-redirect", window.location.origin);
+    pollUrl.searchParams.set("sessionId", sessionId);
+    pollUrl.searchParams.set("resultsAccessKey", resultsAccessKey);
+    window.location.href = pollUrl.toString();
     return;
   }
 
@@ -29,6 +39,6 @@ import MicroModal from "micromodal";
       closeWindowAfterSignal: true
     });
   } else {
-    exchangeResult({ resultsAccessKey, sessionId });
+    exchangeResult({ resultsAccessKey, sessionId, redirectToken });
   }
 })();

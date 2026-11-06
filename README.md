@@ -38,7 +38,7 @@ Use these libraries in your frontend (web or mobile app) to launch the Trinsic F
 | [`Android`](./ui-android/) | [![Android Version](https://img.shields.io/jitpack/version/com.github.trinsic-id/sdk-android-ui)](https://jitpack.io/#trinsic-id/sdk-java-api)          | [![Android Build Status](https://github.com/trinsic-id/sdk/actions/workflows/ui-android-release.yml/badge.svg)](https://github.com/trinsic-id/sdk/actions?query=branch%main) |
 | [`Expo`](./ui-expo/)       | [![Expo Version](https://img.shields.io/npm/v/@trinsic/expo-ui.svg)](https://www.npmjs.org/package/@trinsic/expo-ui)                                    | [![Expo Build Status](https://github.com/trinsic-id/sdk/actions/workflows/ui-expo-release.yml/badge.svg)](https://github.com/trinsic-id/sdk/actions?query=branch%main)       |
 | [`Flutter`](./ui-flutter/) | [![Flutter Version](https://img.shields.io/pub/v/trinsic_flutter_ui.svg)](https://pub.dev/packages/trinsic_flutter_ui)                                  | [![Flutter Build Status](https://github.com/trinsic-id/sdk/actions/workflows/ui-flutter-release.yml/badge.svg)](https://github.com/trinsic-id/sdk/actions?query=branch%main) |
-| [`Swift`](./ui-swift/)     | [![Swift UI Version](https://img.shields.io/cocoapods/v/TrinsicUI.svg)](<[https://cocoapods.org/pods/TrinsicUI](https://cocoapods.org/pods/TrinsicUI)>) | [![Swift Build Status](https://github.com/trinsic-id/sdk/actions/workflows/ui-swift-release.yml/badge.svg)](https://github.com/trinsic-id/sdk/actions?query=branch%main)     |
+| [`Swift`](./ui-swift/)     | [![Swift UI Version](https://img.shields.io/github/v/tag/trinsic-id/sdk-swift-ui?label=git)](https://github.com/trinsic-id/sdk-swift-ui/tags) | [![Swift Build Status](https://github.com/trinsic-id/sdk/actions/workflows/ui-swift-release.yml/badge.svg)](https://github.com/trinsic-id/sdk/actions?query=branch%main)     |
 | [`Web`](./ui-web/)         | [![Web Version](https://img.shields.io/npm/v/@trinsic/web-ui.svg)](https://www.npmjs.org/package/@trinsic/web-ui)                                       | [![Web Build Status](https://github.com/trinsic-id/sdk/actions/workflows/ui-web-release.yml/badge.svg)](https://github.com/trinsic-id/sdk/actions?query=branch%main)         |
 
 ## SDK Versioning
@@ -48,6 +48,31 @@ Our SDKs follow the [Semantic Versioning](https://semver.org) ("SemVer") scheme.
 For example, the version number `1.13.0` has a major version of `1`, a minor version of `13`, and a patch version of `0`.
 
 Breaking changes are only introduced alongside a new major version.
+
+## API SDK identification
+
+Every generated API SDK automatically sends `X-Trinsic-SDK: <language>/<version>`
+with its requests, for example `X-Trinsic-SDK: python/3.2.1`. Language identifiers
+are `csharp`, `go`, `java`, `php`, `python`, `ruby`, and `typescript`. The version is
+the SDK package version from `versions.json`, including any prerelease suffix.
+No client configuration is required, and existing authentication and application
+headers are preserved.
+
+`helpers/generate-client.sh` applies the request additions using
+`helpers/inject-sdk-header.mjs` after generation, so they survive every rebuild.
+The patches target the generator libraries and package layouts configured in
+`api-*/build-sdk.sh` and fail the build if an expected injection point is missing.
+When upgrading OpenAPI Generator or changing those configurations, check the
+injection points against its generated request code. This applies to the seven
+generated API SDKs; the UI libraries have a separate build process.
+
+After building an SDK, run `SDK_LANGUAGE=python npm run test:sdk-headers`
+(substitute its language identifier). The PHP test uses Composer to install its
+dependencies in a temporary directory. With all seven SDKs
+built and their toolchains installed, `npm run test:sdk-headers` runs the full
+suite. These tests send requests only to a local HTTP server and verify SDK
+identity alongside authentication and custom headers. Each API build workflow
+runs its language's tests before publishing.
 
 ## Support
 

@@ -29,33 +29,58 @@ The package needs to be configured with your app's access token, which is
 available in the [Trinsic Dashboard](https://dashboard.trinsic.id).
 
 ```cs
+using Trinsic.Api.Api;
+using Trinsic.Api.Client;
+using Trinsic.Api.Model;
 
-// Add the trinsic api to your dependency injection framework 
-builder.Services.AddTrinsicApi(options =>
+using var httpClient = new HttpClient();
+using var sessions = new SessionsApi(httpClient, new Configuration
 {
-    options.AddTokens(new BearerToken(Environment.GetEnvironmentVariable("TRINSIC_ACCESS_TOKEN")));
+    AccessToken = Environment.GetEnvironmentVariable("TRINSIC_ACCESS_TOKEN")
 });
 
-var sessionApi = app.Services.GetService<ISessionsApi>()!;
-var networkApi = app.Services.GetService<INetworkApi>()!;
-var attachmentsApi = app.Services.GetService<IAttachmentsApi>()!;
+var result = await sessions.GetSessionResultAsync(
+    sessionId,
+    new GetSessionResultRequest(resultsAccessKey: resultsAccessKey));
+
+// Successful calls return models directly. HTTP errors throw ApiException,
+// which exposes ErrorCode (HTTP status) and ErrorContent (response body).
+var identity = result.IdentityData;
 ```
 
-You can find a full C# example in the [samples](https://github.com/trinsic-id/sdk/tree/main/api-csharp/samples) folder.
+The [C# sample](samples/server) shows registration with `AddHttpClient`, dependency
+injection into request handlers, and `ApiException` handling. Use named arguments
+for generated request constructors.
 
 ### Data residency
 
-By default, the SDK communicates with `https://api.trinsic.id`. If you have a Verification Profile configured for EU data residency, point the SDK at the EU endpoint by setting the HTTP client's base address when you register the API:
+By default, the SDK communicates with `https://api.trinsic.id`. For a Verification
+Profile configured for EU data residency, set `Configuration.BasePath` when
+constructing the client:
 
 ```cs
-builder.Services.AddTrinsicApi(options =>
+var configuration = new Configuration
 {
-    options.AddTokens(new BearerToken(Environment.GetEnvironmentVariable("TRINSIC_ACCESS_TOKEN")));
-
-    // omit this call to use the default endpoint
-    options.AddTrinsicApiHttpClients(client => client.BaseAddress = new Uri("https://api.eu.trinsic.id"));
-});
+    AccessToken = Environment.GetEnvironmentVariable("TRINSIC_ACCESS_TOKEN"),
+    BasePath = "https://api.eu.trinsic.id"
+};
+using var sessions = new SessionsApi(httpClient, configuration);
 ```
+
+### JSON serialization
+
+The SDK uses Newtonsoft.Json attributes for wire property names, enum strings,
+and nested JSON. Generated `ToJson()` methods exclude read-only properties for
+request serialization. When forwarding responses to a browser, the sample's
+`SdkJson.Result` helper includes those read-only fields and returns
+`application/json` content.
+
+Nullable dates deserialize to `DateOnly?`. An omitted nullable property is emitted
+as explicit null when reserialized. Timestamp-looking strings inside free-form
+JSON remain strings. Untyped floating point values inside free-form JSON use
+`double` precision and may round high-precision numbers; they are not stored as
+lossless JSON number tokens. The SDK does not globally force decimal parsing,
+which would reject valid numbers outside the decimal range.
 
 ## SDK Versioning
 
