@@ -9,7 +9,6 @@ on:
       - "api-csharp/README.md"
       - "api-go/README.md"
       - "api-java/README.md"
-      - "api-php/README.md"
       - "api-python/README.md"
       - "api-ruby/README.md"
       - "api-typescript/README.md"
@@ -57,18 +56,6 @@ jobs:
         uses: readmeio/rdme@v10
         with:
           rdme: reference upload .readme/api-java.md --key=${{ secrets.README_API_KEY }} --branch=1.0
-  api-php:
-    name: Sync PHP SDK Readme
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repo
-        uses: actions/checkout@v3
-      - name: Prepare readme file
-        run: cat api-php/README.md >> .readme/api-php.md
-      - name: Run `docs` command
-        uses: readmeio/rdme@v10
-        with:
-          rdme: reference upload .readme/api-php.md --key=${{ secrets.README_API_KEY }} --branch=1.0
   api-python:
     name: Sync Python SDK Readme
     runs-on: ubuntu-latest

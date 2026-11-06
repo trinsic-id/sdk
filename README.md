@@ -24,7 +24,6 @@ Use these libraries in your backend to communicate with the Trinsic API.
 | [`C#`](./api-csharp/)             | [![C# Version](https://img.shields.io/nuget/v/Trinsic.Api)](https://www.nuget.org/packages/WorkOS.net)                                            | [![C# Status](https://github.com/trinsic-id/sdk/actions/workflows/api-csharp-release.yml/badge.svg)](https://github.com/trinsic-id/sdk/actions?query=branch%main)             |
 | [`Go`](./api-go/)                 | [![Go package version](https://img.shields.io/github/v/tag/trinsic-id/sdk-go-api?label=git)](https://pkg.go.dev/github.com/trinsic-id/sdk-go-api) | [![Go Status](https://github.com/trinsic-id/sdk/actions/workflows/api-go-release.yml/badge.svg)](https://github.com/trinsic-id/sdk/actions?query=branch%main)                 |
 | [`Java`](./api-java/)             | [![Java Version](https://img.shields.io/jitpack/version/com.github.trinsic-id/sdk-java-api)](https://jitpack.io/#trinsic-id/sdk-java-api)         | [![Java Status](https://github.com/trinsic-id/sdk/actions/workflows/api-java-release.yml/badge.svg)](https://github.com/trinsic-id/sdk/actions?query=branch%main)             |
-| [`PHP`](./api-php/)               | [![PHP Version](https://img.shields.io/packagist/v/trinsic/api)](https://packagist.org/packages/trinsic/api)                                      | [![PHP Status](https://github.com/trinsic-id/sdk/actions/workflows/api-php-release.yml/badge.svg)](https://github.com/trinsic-id/sdk/actions?query=branch%main)               |
 | [`Python`](./api-python/)         | [![Python Version](https://img.shields.io/pypi/v/trinsic-api)](https://pypi.org/project/Trinsic-Api/)                                             | [![Python Status](https://github.com/trinsic-id/sdk/actions/workflows/api-python-release.yml/badge.svg)](https://github.com/trinsic-id/sdk/actions?query=branch%main)         |
 | [`Ruby`](./api-ruby/)             | [![Ruby Version](https://img.shields.io/gem/v/trinsic_api)](https://rubygems.org/gems/trinsic_api)                                                | [![Ruby Status](https://github.com/trinsic-id/sdk/actions/workflows/api-ruby-release.yml/badge.svg)](https://github.com/trinsic-id/sdk/actions?query=branch%main)             |
 | [`Typescript`](./api-typescript/) | [![TypeScript Version](https://img.shields.io/npm/v/@trinsic/api.svg)](https://www.npmjs.org/package/@trinsic/api)                                | [![TypeScript Status](https://github.com/trinsic-id/sdk/actions/workflows/api-typescript-release.yml/badge.svg)](https://github.com/trinsic-id/sdk/actions?query=branch%main) |
@@ -53,7 +52,7 @@ Breaking changes are only introduced alongside a new major version.
 
 Every generated API SDK automatically sends `X-Trinsic-SDK: <language>/<version>`
 with its requests, for example `X-Trinsic-SDK: python/3.2.1`. Language identifiers
-are `csharp`, `go`, `java`, `php`, `python`, `ruby`, and `typescript`. The version is
+are `csharp`, `go`, `java`, `python`, `ruby`, and `typescript`. The version is
 the SDK package version from `versions.json`, including any prerelease suffix.
 No client configuration is required, and existing authentication and application
 headers are preserved.
@@ -63,12 +62,11 @@ headers are preserved.
 The patches target the generator libraries and package layouts configured in
 `api-*/build-sdk.sh` and fail the build if an expected injection point is missing.
 When upgrading OpenAPI Generator or changing those configurations, check the
-injection points against its generated request code. This applies to the seven
+injection points against its generated request code. This applies to the six
 generated API SDKs; the UI libraries have a separate build process.
 
 After building an SDK, run `SDK_LANGUAGE=python npm run test:sdk-headers`
-(substitute its language identifier). The PHP test uses Composer to install its
-dependencies in a temporary directory. With all seven SDKs
+(substitute its language identifier). With all six SDKs
 built and their toolchains installed, `npm run test:sdk-headers` runs the full
 suite. These tests send requests only to a local HTTP server and verify SDK
 identity alongside authentication and custom headers. Each API build workflow

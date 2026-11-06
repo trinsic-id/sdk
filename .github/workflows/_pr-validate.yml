@@ -22,12 +22,6 @@ jobs:
     with:
       publish: false
     secrets: inherit
-  api-php:
-    name: Validate API PHP SDK
-    uses: ./.github/workflows/api-php-action.yml
-    with:
-      publish: false
-    secrets: inherit
   api-python:
     name: Validate API Python SDK
     uses: ./.github/workflows/api-python-action.yml
