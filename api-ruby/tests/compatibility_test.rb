@@ -20,7 +20,7 @@ class CompatibilityTest < Minitest::Test
     session
   end
   def run_case(id, params = {}, &action)
-    value = record(id, params, &action); raise RecordedCompatibilityFailure, "#{id} failed; see compatibility result for details" if $compatibility_results.last['status'] == 'failed'; value
+    value = record(id, params, &action); raise RecordedCompatibilityFailure.new("#{id} failed; see compatibility result for details") if $compatibility_results.last['status'] == 'failed'; value
   end
   def redirect_url
     value = find_http(as_hash(@redirects.list)); raise 'No HTTP(S) redirect URI is registered.' unless value; value
@@ -83,6 +83,6 @@ class CompatibilityTest < Minitest::Test
       end
     end
     failures = $compatibility_results.drop(first_result).select { |result| result['status'] == 'failed' }
-    raise RecordedCompatibilityFailure, 'Serialization cases failed; see the structured report.' unless failures.empty?
+    raise RecordedCompatibilityFailure.new('Serialization cases failed; see the structured report.') unless failures.empty?
   end
 end

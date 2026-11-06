@@ -40,6 +40,7 @@ class HarnessRegressionTest < Minitest::Test
     result = Minitest::Result.new('test_example')
     result.klass = 'CompatibilityTest'
     result.failures = [RecordedCompatibilityFailure.new('SDK failed'), Minitest::UnexpectedError.new(RuntimeError.new('cleanup broke'))]
+    assert_instance_of Minitest::Assertion, result.failures[0]
     reporter.record(result)
     reporter.report
     assert reporter.complete

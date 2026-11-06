@@ -1,7 +1,10 @@
 require 'json'; require 'net/http'; require 'time'; require 'trinsic_api'; require 'uri'
 $compatibility_results = []
 
-class RecordedCompatibilityFailure < Minitest::Assertion; end
+module RecordedCompatibilityFailure
+  # Minitest counts exact Assertion classes in its summary.
+  def self.new(message) = Minitest::Assertion.new(message).extend(self)
+end
 class CompatibilityReporter < Minitest::AbstractReporter
   attr_reader :failures, :complete
   def initialize = @failures = []
