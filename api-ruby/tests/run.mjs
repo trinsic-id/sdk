@@ -9,8 +9,13 @@ try {
     const gemLine = `gem 'trinsic_api', "${SDK_VERSION}"`;
     writeFileSync(join(directory, "Gemfile"), `source 'https://rubygems.org'\ngem 'minitest', '~> 5.25'\n${gemLine}\n`);
     const output = join(directory, "target-results.json");
-    const env = childEnvironment({ BUNDLE_GEMFILE: join(directory, "Gemfile"), SDK_COMPATIBILITY_RESULT_FILE: output, SDK_VERSION });
-    const installed = command("bundle", ["install", "--quiet"], { env, check: false });
+    // Generated SDK builds can install an unpublished gem under the same version.
+    const env = childEnvironment({
+      BUNDLE_GEMFILE: join(directory, "Gemfile"), BUNDLE_PATH: join(directory, "gems"),
+      BUNDLE_DISABLE_SHARED_GEMS: "true", BUNDLE_IGNORE_CONFIG: "true", BUNDLE_GLOBAL_GEM_CACHE: "false",
+      SDK_COMPATIBILITY_RESULT_FILE: output, SDK_VERSION,
+    });
+    const installed = command("bundle", ["install", "--quiet"], { env, cwd: directory, check: false });
     const version = installed.status === 0 ? command("bundle", ["exec", "ruby", "-r", "trinsic_api", "-e", "puts TrinsicApi::VERSION"], { env }).stdout.trim() : SDK_VERSION;
     if (version) env.SDK_VERSION = version;
     cpSync(join(new URL(".", import.meta.url).pathname, "CompatibilitySupport.rb"), join(directory, "CompatibilitySupport.rb"));
