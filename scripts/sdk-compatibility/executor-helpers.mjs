@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 export function required(name) { const value = process.env[name]; if (!value) throw new Error(`${name} is required`); return value; }
-export const SDK_VERSION = "3.2.0";
+export const SDK_VERSION = "3.2.1";
 export function temporaryDirectory(prefix, action) {
   const directory = mkdtempSync(join(tmpdir(), prefix));
   try { return action(directory); } finally { rmSync(directory, { recursive: true, force: true }); }

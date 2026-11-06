@@ -212,7 +212,7 @@ public sealed class CompatibilityFixture : IAsyncLifetime
         var completion = await FollowRedirect(browser, verification);
         var application = await FollowRedirect(browser, completion);
         Assert.False(string.IsNullOrWhiteSpace(QueryValue(application, "redirectToken")));
-        // SDK 3.2.0 retrieves results with the access key; it has no redirectToken field.
+        // Retrieve results with the access key issued when this session was created.
         await action(session.SessionId, session.ResultCollection.ResultsAccessKey);
     }, nativeTest: nativeTest);
     private static string QueryValue(Uri uri, string name) => System.Web.HttpUtility.ParseQueryString(uri.Query)[name] ?? throw new InvalidOperationException($"Redirect omitted {name}.");

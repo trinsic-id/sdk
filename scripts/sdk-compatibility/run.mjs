@@ -11,7 +11,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const allLanguages = ["csharp", "go", "java", "python", "ruby", "typescript"];
 const languages = process.argv[2] ? [process.argv[2]] : allLanguages;
 if (languages.some(language => !allLanguages.includes(language))) throw new Error("Unknown SDK language.");
-const directory = resolve(process.env.SDK_COMPATIBILITY_RESULTS_DIR ?? join(root, "test-results/sdk-3.2.0"));
+const directory = resolve(process.env.SDK_COMPATIBILITY_RESULTS_DIR ?? join(root, "test-results/sdk-3.2.1"));
 mkdirSync(directory, { recursive: true });
 const output = join(directory, "compatibility.json");
 rmSync(output, { force: true });
@@ -42,12 +42,7 @@ try {
   const fixtures = prepareFixtures(cache);
   report.fixtures = fixtures.fixtures.map(({ providerId, sdkModelName, hasPublicSdkModel, modelRequired, testCaseId }) => ({ providerId, sdkModelName, hasPublicSdkModel, modelRequired, testCaseId: testCaseId ?? "serialization.provider-output-round-trip" }));
   const fixturePath = join(directory, "fixtures.json");
-  const unavailableModels = fixtures.fixtures.filter(fixture => fixture.unavailableModel).map(fixture => ({
-    id: "serialization.provider-output-round-trip", status: "skipped", durationMs: 0,
-    parameters: { providerId: fixture.providerId, sdkModelName: fixture.sdkModelName },
-    skipReason: fixture.unavailableModel,
-  }));
-  writeFileSync(fixturePath, JSON.stringify({ ...fixtures, fixtures: fixtures.fixtures.filter(fixture => !fixture.unavailableModel) }));
+  writeFileSync(fixturePath, JSON.stringify(fixtures));
   const catalog = JSON.parse(readFileSync(join(root, "compatibility-tests.json"))).testCases.filter(id => scope === "full" || id.startsWith("serialization."));
 
   report.suites = await Promise.all(languages.map(async language => {
@@ -58,7 +53,7 @@ try {
       SDK_TARGET_LABEL: `${language} ${SDK_VERSION}`, SDK_VERSION,
     });
     const parsed = readTestCases(resultPath);
-    const testCases = [...preserveProcessFailure(parsed, execution, language, "SDK test executor", []), ...unavailableModels, ...validateWireAliases(cache)];
+    const testCases = [...preserveProcessFailure(parsed, execution, language, "SDK test executor", []), ...validateWireAliases(cache)];
     for (const message of validateCoverage(fixtures.fixtures, testCases)) testCases.push(...failure(language, message));
     const actual = new Set(testCases.map(testCase => testCase.id));
     const missing = catalog.filter(id => !actual.has(id));

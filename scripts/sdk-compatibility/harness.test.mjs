@@ -18,17 +18,20 @@ const passed = { id: "example", status: "passed", durationMs: 0 };
 const failed = { ...passed, status: "failed", failure: { name: "Error", message: "Recorded failure" } };
 const json = (path) => JSON.parse(readFileSync(path, "utf8"));
 
-test("3.2.0 binds the original itsme model without changing wire payloads", () => {
+test("3.2.1 covers separate itsme login and direct models without changing wire payloads", () => {
   const output = { firstName: "Ada", extra: "keep" };
+  const directOutput = { firstName: "Ada", addresses: [] };
   const prepared = prepareFixtures({ fixtures: [
     { providerId: "a-itsme-login", sdkModelName: "ItsmeLoginProviderOutput", hasPublicSdkModel: true, output },
-    { providerId: "itsme", sdkModelName: "ItsmeProviderOutput", hasPublicSdkModel: true, output: {} },
-  ] }, { "a-itsme-login": "ItsmeProviderOutput" });
-  assert.equal(prepared.fixtures[0].sdkModelName, "ItsmeProviderOutput");
+    { providerId: "itsme", sdkModelName: "ItsmeProviderOutput", hasPublicSdkModel: true, output: directOutput },
+  ] }, { "a-itsme-login": "ItsmeLoginProviderOutput", itsme: "ItsmeProviderOutput" });
+  assert.equal(prepared.fixtures[0].sdkModelName, "ItsmeLoginProviderOutput");
   assert.equal(prepared.fixtures[0].output, output);
-  assert.match(prepared.fixtures[1].unavailableModel, /predates the direct itsme/);
+  assert.equal(prepared.fixtures[1].sdkModelName, "ItsmeProviderOutput");
+  assert.equal(prepared.fixtures[1].output, directOutput);
+  assert.ok(prepared.fixtures.every(fixture => !fixture.unavailableModel));
   assert.equal(prepared.fixtures[0].modelRequired, true);
-  assert.equal(prepared.fixtures[1].modelRequired, false);
+  assert.equal(prepared.fixtures[1].modelRequired, true);
   assert.equal(prepared.fixtures.filter(fixture => fixture.testCaseId).length, 2);
 });
 
@@ -146,7 +149,7 @@ test("startup failures replace an earlier report rather than reusing it", () => 
   assert.equal(execution.status, 1);
   const report = json(output);
   assert.equal(report.schemaVersion, 2);
-  assert.equal(report.sdkVersion, "3.2.0");
+  assert.equal(report.sdkVersion, "3.2.1");
   assert.equal(report.suites[0].testCases[0].status, "failed");
   assert.match(report.suites[0].testCases[0].id, /^framework\./);
 }));

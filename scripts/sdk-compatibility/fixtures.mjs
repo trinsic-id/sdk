@@ -1,7 +1,7 @@
 import { isDeepStrictEqual } from "node:util";
 import { readFileSync } from "node:fs";
 
-// Captured from model discovery in the published 3.2.0 packages. These
+// Captured from model discovery in the published 3.2.1 packages. These
 // contracts must remain covered even if the remote catalog changes later.
 const providerModels = JSON.parse(readFileSync(new URL("./provider-models.json", import.meta.url)));
 
@@ -19,9 +19,6 @@ export function prepareFixtures(cache, expectedModels = providerModels) {
       ...fixture, serializationOutput: fixture.legacySerializationOutput ?? fixture.output,
       modelRequired: Object.hasOwn(expectedModels, fixture.providerId),
       ...(expectedModels[fixture.providerId] ? { sdkModelName: expectedModels[fixture.providerId] } : {}),
-      // In 3.2.0 ItsmeProviderOutput describes the login integration. The direct
-      // provider appeared later and reused the model name for a different shape.
-      ...(fixture.providerId === "itsme" ? { unavailableModel: "SDK 3.2.0 predates the direct itsme provider; ItsmeProviderOutput belongs to a-itsme-login." } : {}),
     })),
     ...forwardCompatibilityFixtures(),
   ] };
