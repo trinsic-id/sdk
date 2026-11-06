@@ -50,8 +50,8 @@ while synthetic fixtures require their expected fields to survive exactly.
 The installed model metadata determines which fields must survive decoding,
 including nested objects, arrays, dictionaries, and read-only properties.
 Round-trip checks require supported fields rather than only comparing the fields
-that happen to remain. Booleans and numbers are distinct, and timestamp
-comparisons preserve fractional seconds.
+that happen to remain. Scalar checks distinguish booleans from numbers;
+Ruby timestamp equality retains fractional seconds.
 The suite also exercises unknown fields, nested model
 dictionaries, and the Singpass legacy wire alias.
 

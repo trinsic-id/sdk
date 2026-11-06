@@ -79,3 +79,9 @@ test("Decoded date-only fields retain their calendar date", () => {
   decoded.dateOfBirth = new Date("2000-01-02T12:00:00Z");
   assert.throws(() => modelFields("PolandEdoAppProviderOutput", wire, decoded), /time component/);
 });
+
+test("Permissive converters cannot return numbers as declared boolean or string fields", () => {
+  assert.throws(() => modelFields("Session", { done: 1 }, { done: 1 }), /scalar type must be boolean/);
+  assert.throws(() => modelFields("IntegrationStep", { content: 1 }, { content: 1 }), /scalar type must be string/);
+  assert.deepEqual(modelFields("IntegrationStep", { method: "FutureMethod" }, { method: "FutureMethod" }), { method: "FutureMethod" });
+});

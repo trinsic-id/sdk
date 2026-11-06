@@ -125,6 +125,14 @@ export function modelFields(modelName: string, wire: unknown, decoded?: unknown)
 
   function visit(type: ts.Type, value: any, actual: any): unknown {
     const concrete = checker.getNonNullableType(type);
+    if (inspectDecoded && value != null) {
+      const members = concrete.isUnion() ? concrete.types : [concrete];
+      const kinds = members.map(member => member.flags & ts.TypeFlags.BooleanLike ? "boolean"
+        : member.flags & ts.TypeFlags.NumberLike ? "number" : member.flags & ts.TypeFlags.StringLike ? "string" : undefined);
+      if (kinds.every(kind => kind !== undefined)) {
+        assert.ok(kinds.some(kind => kind === typeof actual), `SDK scalar type must be ${[...new Set(kinds)].join(" or ")}, got ${typeof actual}`);
+      }
+    }
     if (inspectDecoded && concrete.getSymbol()?.name === "Date" && actual instanceof Date && typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
       assert.equal(actual.toISOString().slice(10), "T00:00:00.000Z", "Date-only value acquired a time component");
       return actual.toISOString().slice(0, 10);
