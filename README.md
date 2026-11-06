@@ -74,6 +74,11 @@ suite. These tests send requests only to a local HTTP server and verify SDK
 identity alongside authentication and custom headers. Each API build workflow
 runs its language's tests before publishing.
 
+## SDK release contract tests
+
+This branch contains [contract tests pinned to published SDK 3.2.0](scripts/sdk-compatibility/README.md).
+Connect selects the test snapshot commits and owns all compatibility exceptions.
+
 ## Support
 
 Any issues, inquiries, and feature requests can be sent to [support@trinsic.id](mailto:support@trinsic.id), or feel free to open a GitHub issue [here](https://github.com/trinsic-id/sdk/issues).

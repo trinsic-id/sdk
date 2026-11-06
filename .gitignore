@@ -620,3 +620,11 @@ go-sample
 
 ui-web/samples/dist
 api-php/samples/server/composer.phar
+
+# SDK contract-test outputs
+test-results/
+api-*/tests/.results/
+api-*/tests/bin/
+api-*/tests/obj/
+api-*/tests/__pycache__/
+api-*/tests/.pytest_cache/
