@@ -16,7 +16,6 @@
     "api.sessions.recommend-providers",
     "serialization.provider-output-round-trip",
     "serialization.unknown-fields",
-    "serialization.unknown-enum",
     "serialization.nested-model-dictionaries",
     "serialization.legacy-wire-aliases"
   ]

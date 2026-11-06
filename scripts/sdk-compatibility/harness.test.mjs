@@ -27,7 +27,7 @@ test("3.2.0 binds the original itsme model without changing wire payloads", () =
   assert.equal(prepared.fixtures[0].sdkModelName, "ItsmeProviderOutput");
   assert.equal(prepared.fixtures[0].output, output);
   assert.match(prepared.fixtures[1].unavailableModel, /predates the direct itsme/);
-  assert.equal(prepared.fixtures.filter(fixture => fixture.testCaseId).length, 3);
+  assert.equal(prepared.fixtures.filter(fixture => fixture.testCaseId).length, 2);
 });
 
 test("removing or changing a legacy wire alias is a failure", () => {

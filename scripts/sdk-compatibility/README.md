@@ -39,8 +39,15 @@ wire payloads once, then shares them across the seven suites. SDK deserializers
 receive those payloads unchanged. Serialization comparisons omit read-only
 fields and retain legacy aliases; they compare the fields the old model exposes,
 while synthetic fixtures require their expected fields to survive exactly.
-The suite also exercises unknown fields, future enum strings, nested model
+The suite also exercises unknown fields, nested model
 dictionaries, and the Singpass legacy wire alias.
+
+Future enum values are deferred to a separate phase. First investigate improving
+the SDK generators/serializers to tolerate unknown enum values while preserving
+the rest of the response. Then restore a synthetic `IntegrationStep` fixture with
+an unknown `method` value and decide in Connect which remaining incompatibilities
+to ignore. This phase adds no synthetic unknown-enum case or blanket exception;
+enum errors encountered in real API responses still surface as raw failures.
 
 The 3.2.0 snapshot binds `a-itsme-login` to its original `ItsmeProviderOutput`.
 The later direct `itsme` provider has no model in this release; this is emitted

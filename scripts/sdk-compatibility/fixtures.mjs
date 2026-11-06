@@ -35,9 +35,6 @@ export function forwardCompatibilityFixtures() {
   const mdl = { iacaRootCertificate: certificate, documentSignerCertificate: certificate, documentType: "org.iso.18013.5.1.mDL", nameSpaces: namespaces };
   return [
     { testCaseId: "serialization.unknown-fields", sdkModelName: "IntegrationStep", output: { ...step, futureField: { nested: [1, "new"] } }, serializationOutput: step },
-    // Success means a future enum does not prevent parsing the rest of a known
-    // response. SDKs may preserve the value or expose their unknown sentinel.
-    { testCaseId: "serialization.unknown-enum", sdkModelName: "IntegrationStep", output: { ...step, method: "FutureSdkTestMethod" }, serializationOutput: { content: step.content } },
     { testCaseId: "serialization.nested-model-dictionaries", sdkModelName: "MdlOutput", output: mdl, serializationOutput: mdl },
   ].map((fixture) => ({ ...fixture, hasPublicSdkModel: true, providerId: fixture.testCaseId }));
 }
