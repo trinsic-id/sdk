@@ -66,7 +66,7 @@ test("Supported fields survive decoding while future fields are ignored", () => 
   const wire = { ...step, future: true };
   assert.deepEqual(modelFields("IntegrationStep", wire), step);
   assert.deepEqual(modelFields("IntegrationStep", wire, step), step);
-  assert.notDeepEqual(modelFields("IntegrationStep", wire, { method: step.method }), step);
+  assert.throws(() => modelFields("IntegrationStep", wire, { method: step.method }), /scalar type must be string/);
   assert.throws(() => modelFields("MdlOutput", mdl, { ...mdl, nameSpaces: {} }), /dictionary keys/);
   assert.throws(() => modelFields("RecommendProvidersResponse", { recommendedProviders: [{ id: "provider" }], remainder: [] }, { recommendedProviders: [], remainder: [] }), /array length/);
 });
