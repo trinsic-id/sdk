@@ -1,0 +1,22 @@
+{
+  "testCases": [
+    "api.providers.list",
+    "api.verification-profiles.get-by-id",
+    "api.sessions.list",
+    "api.redirect-uris.list",
+    "api.verification-profiles.list",
+    "api.providers.get",
+    "api.sessions.create-direct-provider",
+    "api.sessions.create-hosted-provider",
+    "api.sessions.get",
+    "api.sessions.cancel",
+    "api.sessions.get-result",
+    "api.sessions.get-attachment",
+    "api.sessions.redact",
+    "api.sessions.recommend-providers",
+    "serialization.provider-output-round-trip",
+    "serialization.unknown-fields",
+    "serialization.nested-model-dictionaries",
+    "serialization.legacy-wire-aliases"
+  ]
+}
