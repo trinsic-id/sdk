@@ -74,7 +74,7 @@ runs its language's tests before publishing.
 
 ## SDK release contract tests
 
-This branch contains [contract tests pinned to published SDK 3.2.0](scripts/sdk-compatibility/README.md).
+This branch contains [contract tests pinned to published SDK 3.2.1](scripts/sdk-compatibility/README.md).
 Connect selects the test snapshot commits and owns all compatibility exceptions.
 
 ## Support
