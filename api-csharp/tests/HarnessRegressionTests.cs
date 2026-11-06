@@ -3,10 +3,93 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.DependencyInjection;
 using Trinsic.Api.Extensions;
+using Trinsic.Api.Model;
 using Xunit;
 
 public sealed class HarnessRegressionTests
 {
+    private const string SessionJson = """
+        {"id":"00000000-0000-4000-8000-000000000001","done":false,"success":false,"created":1,"updated":1}
+        """;
+    private const string ProviderJson = """
+        {"id":"provider","name":"Provider","logoUrl":"https://example.test/logo","subtext":"Description","health":"Healthy",
+         "regions":[],"countries":["US"],"subdivisions":[],
+         "subProviders":[{"id":"sub","name":"Sub","subtext":"Description","logoUrl":"https://example.test/sub"}]}
+        """;
+
+    private static JsonSerializerOptions SdkOptions()
+    {
+        var services = new ServiceCollection();
+        services.AddTrinsicApi(_ => { });
+        using var provider = services.BuildServiceProvider();
+        return provider.GetRequiredService<Trinsic.Api.Client.JsonSerializerOptionsProvider>().Options;
+    }
+
+    private static void CompareResponse(object decoded, JsonNode wire, JsonSerializerOptions options) =>
+        Compare(CompatibilityFixture.ModelFields(decoded, wire, true, options), CompatibilityFixture.ModelFields(decoded, wire, false, options), "response", true);
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void PublishedSessionModelPreservesEmptyAndNonemptyPages(bool populated)
+    {
+        var options = SdkOptions();
+        var wire = JsonNode.Parse("{\"sessions\":[" + (populated ? SessionJson : "") + "],\"total\":" + (populated ? 1 : 0) + ",\"more\":false,\"futureField\":\"ignored\"}")!;
+        var decoded = JsonSerializer.Deserialize<ListSessionsResponse>(wire, options)!;
+        CompareResponse(decoded, wire, options);
+    }
+
+    [Theory]
+    [InlineData("truncate")]
+    [InlineData("id")]
+    [InlineData("total")]
+    [InlineData("more")]
+    public void PublishedSessionModelRejectsChangedFields(string mutation)
+    {
+        var options = SdkOptions();
+        var wire = JsonNode.Parse("{\"sessions\":[" + SessionJson + "],\"total\":1,\"more\":false}")!;
+        var decoded = JsonSerializer.Deserialize<ListSessionsResponse>(wire, options)!;
+        CompareResponse(decoded, wire, options);
+        switch (mutation)
+        {
+            case "truncate": decoded.Sessions.Clear(); break;
+            case "id": decoded.Sessions[0].Id = "00000000-0000-4000-8000-000000000002"; break;
+            case "total": decoded.Total = 2; break;
+            case "more": decoded.More = true; break;
+        }
+        var error = Record.Exception(() => CompareResponse(decoded, wire, options));
+        Assert.NotNull(error);
+        Assert.True(error is InvalidOperationException or Xunit.Sdk.XunitException, error.ToString());
+    }
+
+    [Theory]
+    [InlineData(false, "unchanged")]
+    [InlineData(false, "provider")]
+    [InlineData(false, "country")]
+    [InlineData(false, "subprovider")]
+    [InlineData(true, "unchanged")]
+    [InlineData(true, "provider")]
+    [InlineData(true, "country")]
+    [InlineData(true, "subprovider")]
+    public void PublishedRecommendationModelPreservesNestedFields(bool remainder, string mutation)
+    {
+        var options = SdkOptions();
+        var wire = JsonNode.Parse("{\"recommendedProviders\":[" + ProviderJson + "],\"remainder\":[" + ProviderJson + "],\"futureField\":\"ignored\"}")!;
+        var decoded = JsonSerializer.Deserialize<RecommendProvidersResponse>(wire, options)!;
+        CompareResponse(decoded, wire, options);
+        var providers = remainder ? decoded.Remainder : decoded.RecommendedProviders;
+        switch (mutation)
+        {
+            case "unchanged": return;
+            case "provider": providers.Clear(); break;
+            case "country": providers[0].Countries.Clear(); break;
+            case "subprovider": providers[0].SubProviders![0].Name = "Changed"; break;
+        }
+        var error = Record.Exception(() => CompareResponse(decoded, wire, options));
+        Assert.NotNull(error);
+        Assert.True(error is InvalidOperationException or Xunit.Sdk.XunitException, error.ToString());
+    }
+
     [Fact]
     public void SuccessfulHttpResponseMustDeserializeItsBody()
     {

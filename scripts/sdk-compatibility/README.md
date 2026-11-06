@@ -34,6 +34,12 @@ URLs and access keys, recommendation/page shapes, and decoded PNG attachment
 contents. Transport checks verify pagination, provider/profile IDs, capabilities,
 and explicit `false` request values. Native regressions inject invalid values and
 dropped fields to prove these checks fail.
+Offline response-model regressions deserialize session pages and recommendations
+with each published SDK, then deliberately drop entries or change IDs, pagination,
+countries, and nested sub-provider fields. Unchanged empty/nonempty pages and
+unknown response fields must still pass. C#, Go, Java, Ruby, and TypeScript check
+both recommendation lists (`recommendedProviders` and `remainder`). These checks
+run with the normal native harness regressions and do not call the live API.
 Tests attempt cancellation during cleanup, including after assertion failures;
 completed/redacted sessions may no longer be cancellable.
 Each live case records its own outcome. TypeScript shares browser-completed

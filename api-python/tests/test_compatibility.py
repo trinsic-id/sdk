@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import os
+from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
@@ -10,14 +11,22 @@ import pytest
 import compatibility_support as support
 
 
+@dataclass
+class Apis:
+    providers: support.ProvidersApi
+    profiles: support.VerificationProfilesApi
+    sessions: support.SessionsApi
+    redirects: support.RedirectUrisApi
+
+
 @pytest.fixture()
 def apis():
     api_client = support.client()
-    return (
-        support.ProvidersApi(api_client),
-        support.VerificationProfilesApi(api_client),
-        support.SessionsApi(api_client),
-        support.RedirectUrisApi(api_client),
+    return Apis(
+        providers=support.ProvidersApi(api_client),
+        profiles=support.VerificationProfilesApi(api_client),
+        sessions=support.SessionsApi(api_client),
+        redirects=support.RedirectUrisApi(api_client),
     )
 
 
@@ -34,20 +43,17 @@ def clean_up_created_sessions():
 
 @pytest.mark.compatibility("api.providers.list")
 def test_list_providers(apis) -> None:
-    providers, *_ = apis
-    support.assert_nonempty(support.value(providers.list_providers(), "providers"), "providers")
+    support.assert_nonempty(support.value(apis.providers.list_providers(), "providers"), "providers")
 
 
 @pytest.mark.compatibility("api.verification-profiles.get-by-id")
 def test_get_verification_profile(apis) -> None:
-    _, profiles, *_ = apis
-    support.assert_profile_id(profiles.get_verification_profile_by_id(str(support.PROFILE_ID)))
+    support.assert_profile_id(apis.profiles.get_verification_profile_by_id(str(support.PROFILE_ID)))
 
 
 @pytest.mark.compatibility("api.verification-profiles.list")
 def test_list_verification_profiles(apis) -> None:
-    _, profiles, *_ = apis
-    support.assert_profile_page(profiles.list_verification_profiles(page=1, page_size=100))
+    support.assert_profile_page(apis.profiles.list_verification_profiles(page=1, page_size=100))
 
 
 def test_profile_list_accepts_a_page_without_the_configured_profile() -> None:
@@ -55,67 +61,59 @@ def test_profile_list_accepts_a_page_without_the_configured_profile() -> None:
     from uuid import uuid4
     response = SimpleNamespace(verification_profiles=[SimpleNamespace(id=uuid4())], more=True)
     profiles = SimpleNamespace(list_verification_profiles=lambda **_kwargs: response)
-    test_list_verification_profiles((None, profiles))
+    test_list_verification_profiles(Apis(None, profiles, None, None))
 
 
 @pytest.mark.compatibility("api.sessions.list")
 def test_list_sessions(apis) -> None:
-    *_, sessions, _ = apis
-    response = sessions.list_sessions(str(support.PROFILE_ID), page_size=1, page=1)
+    response = apis.sessions.list_sessions(str(support.PROFILE_ID), page_size=1, page=1)
     support.assert_page(response, "sessions")
     assert isinstance(response.total, int) and not isinstance(response.total, bool) and response.total >= 0
-    support.assert_request(sessions, query={"Page": 1, "PageSize": 1})
+    support.assert_request(apis.sessions, query={"Page": 1, "PageSize": 1})
 
 
 @pytest.mark.compatibility("api.redirect-uris.list")
 def test_list_redirect_uris(apis) -> None:
-    *_, redirects = apis
-    support.assert_page(redirects.list(page=1, page_size=1), "uris")
-    support.assert_request(redirects, query={"page": 1, "pageSize": 1})
+    support.assert_page(apis.redirects.list(page=1, page_size=1), "uris")
+    support.assert_request(apis.redirects, query={"page": 1, "pageSize": 1})
 
 
 @pytest.mark.compatibility("api.providers.get")
 def test_get_provider(apis) -> None:
-    providers, *_ = apis
-    support.assert_provider(providers.get_provider(support.TEST_PROVIDER))
+    support.assert_provider(apis.providers.get_provider(support.TEST_PROVIDER))
 
 
 @pytest.mark.compatibility("api.sessions.create-hosted-provider")
 def test_create_hosted_provider_session(apis) -> None:
-    *_, sessions, redirects = apis
-    support.create_hosted_session(sessions, redirects)
+    support.create_hosted_session(apis.sessions, apis.redirects)
 
 
 @pytest.mark.compatibility("api.sessions.create-direct-provider")
 def test_create_direct_provider_session(apis) -> None:
-    *_, sessions, redirects = apis
-    support.direct_session(sessions, redirects)
+    support.direct_session(apis.sessions, apis.redirects)
 
 
 @pytest.mark.compatibility("api.sessions.get")
 def test_get_direct_session(apis) -> None:
-    *_, sessions, redirects = apis
-    session = support.direct_session(sessions, redirects)
-    support.assert_session(sessions.get_session(session.session_id), session.session_id, False, False)
+    session = support.direct_session(apis.sessions, apis.redirects)
+    support.assert_session(apis.sessions.get_session(session.session_id), session.session_id, False, False)
 
 
 @pytest.mark.compatibility("api.sessions.cancel")
 def test_cancel_direct_session(apis) -> None:
-    *_, sessions, redirects = apis
-    session = support.direct_session(sessions, redirects)
-    support.assert_session(sessions.cancel_session(session.session_id), session.session_id, True, False)
+    session = support.direct_session(apis.sessions, apis.redirects)
+    support.assert_session(apis.sessions.cancel_session(session.session_id), session.session_id, True, False)
 
 
 def completed_result(apis):
-    *_, sessions, redirects = apis
-    session, token, access_key = support.completed_session(sessions, redirects)
-    result = sessions.get_session_result(session.session_id, support.GetSessionResultRequest(results_access_key=access_key))
-    return sessions, session, access_key, result
+    session, token, access_key = support.completed_session(apis.sessions, apis.redirects)
+    result = apis.sessions.get_session_result(session.session_id, support.GetSessionResultRequest(results_access_key=access_key))
+    return session, access_key, result
 
 
 @pytest.mark.compatibility("api.sessions.get-result")
 def test_get_session_result(apis) -> None:
-    _sessions, session, _access_key, result = completed_result(apis)
+    session, _access_key, result = completed_result(apis)
     support.assert_session(result, session.session_id, True, True)
     assert result.identity_data.originating_provider_id == support.TEST_PROVIDER
     assert result.identity_data.attachments
@@ -123,24 +121,22 @@ def test_get_session_result(apis) -> None:
 
 @pytest.mark.compatibility("api.sessions.get-attachment")
 def test_get_session_attachment(apis) -> None:
-    sessions, session, access_key, result = completed_result(apis)
+    session, access_key, result = completed_result(apis)
     attachments = result.identity_data.attachments if result.identity_data else []
     assert attachments, "Completed redirect session did not return an attachment."
-    support.assert_attachment(sessions.get_attachment(session.session_id, attachments[0].id, support.GetAttachmentRequest(results_access_key=access_key)))
+    support.assert_attachment(apis.sessions.get_attachment(session.session_id, attachments[0].id, support.GetAttachmentRequest(results_access_key=access_key)))
 
 
 @pytest.mark.compatibility("api.sessions.redact")
 def test_redact_session(apis) -> None:
-    *_, sessions, redirects = apis
-    session, _token, _access_key = support.completed_session(sessions, redirects)
-    sessions.redact_session(session.session_id)
+    session, _token, _access_key = support.completed_session(apis.sessions, apis.redirects)
+    apis.sessions.redact_session(session.session_id)
 
 
 @pytest.mark.compatibility("api.sessions.recommend-providers")
 def test_recommend_providers(apis) -> None:
-    *_, sessions, _ = apis
-    support.assert_recommendations(sessions.recommend_providers(support.RecommendProvidersRequest(verification_profile_id=str(support.PROFILE_ID))))
-    support.assert_request(sessions, body={"verificationProfileId": str(support.PROFILE_ID)})
+    support.assert_recommendations(apis.sessions.recommend_providers(support.RecommendProvidersRequest(verification_profile_id=str(support.PROFILE_ID))))
+    support.assert_request(apis.sessions, body={"verificationProfileId": str(support.PROFILE_ID)})
 
 
 def provider_fixtures():
