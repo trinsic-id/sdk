@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { childEnvironment, command, failure, readNativeTestCases, SDK_VERSION, temporaryDirectory, writeExecutorResult } from "../../scripts/sdk-compatibility/executor-helpers.mjs";
 
 const tests = new URL(".", import.meta.url).pathname;
-const files = process.env.SDK_COMPATIBILITY_TEST_SCOPE === "serialization" ? ["provider-outputs", "harness"] : ["read-apis", "session-lifecycle", "recommendations", "provider-outputs", "harness"];
+const files = process.env.SDK_COMPATIBILITY_TEST_SCOPE === "serialization" ? ["provider-outputs", "harness", "required-fields"] : ["read-apis", "session-lifecycle", "recommendations", "provider-outputs", "harness", "required-fields"];
 let sdkVersion, testCases;
 try {
   ({ sdkVersion, testCases } = temporaryDirectory("trinsic-typescript-compat-", (directory) => {

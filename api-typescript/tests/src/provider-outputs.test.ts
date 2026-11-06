@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { test } from "./results.js";
 import { asRecord, requiredEnvironment, sdk, targetLabel, type JsonRecord } from "./support.js";
+import { assertRequiredFields } from "./required-fields.js";
 
 import {
   recordCompatibilityCase,
@@ -65,6 +66,7 @@ test(`${targetLabel}: provider-output fixtures round-trip through every supporte
         async () => {
           const rawOutput = asRecord(fixture.output, `${fixture.providerId} fixture`);
           const serializationExpected = fixture.serializationOutput ?? rawOutput;
+          assertRequiredFields(fixture.sdkModelName!, rawOutput, fixture.providerId);
           const serializedOutput = jsonValue(converters.toJson(converters.fromJson(rawOutput)));
 
           const exact = !!fixture.testCaseId;

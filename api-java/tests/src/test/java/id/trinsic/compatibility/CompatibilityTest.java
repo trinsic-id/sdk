@@ -133,6 +133,7 @@ class CompatibilityTest {
       JsonNode output = fixture.path("output");
       JsonNode expected = fixture.has("serializationOutput") ? fixture.get("serializationOutput") : output;
       allPassed &= CompatibilityResultExtension.recordCase(caseId, parameters, () -> {
+        RequiredFieldValidator.validate(client.getObjectMapper(), output, model, providerId + " (" + modelName + ")");
         Object decoded = client.getObjectMapper().treeToValue(output, model);
         compareJson(client.getObjectMapper().valueToTree(decoded), expected, providerId + " (" + modelName + ")", fixture.has("testCaseId"));
       });
