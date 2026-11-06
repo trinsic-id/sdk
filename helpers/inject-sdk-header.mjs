@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { readdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -112,7 +112,7 @@ export function injectSdkHeader(language, version, outputFolder) {
   }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (process.argv[1] && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) {
   const [language, version, outputFolder] = process.argv.slice(2);
   if (!language || !version || !outputFolder) {
     throw new Error("Usage: node inject-sdk-header.mjs <generator> <sdk-version> <output-folder>");

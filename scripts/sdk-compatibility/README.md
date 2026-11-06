@@ -1,0 +1,106 @@
+# Shared SDK compatibility tests
+
+`run.sh` discovers `api-*/tests/run-compatibility.sh` suites, runs each suite,
+and fails if any suite exits unsuccessfully. Each language suite owns its test
+implementation and writes one `compatibility.json` file to the path supplied in
+`SDK_COMPATIBILITY_RESULTS_PATH`.
+
+`run.sh` fetches the provider-output fixtures once and shares that snapshot with
+every language target. Suites run in parallel by default; set
+`SDK_COMPATIBILITY_PARALLEL=false` to run them sequentially when debugging.
+Each invocation removes the previous per-language report before starting its
+runner, so a build failure cannot reuse an earlier successful report.
+
+The collector retains the complete API response in `output`. SDK deserializers
+therefore see unknown fields and legacy aliases exactly as clients do.
+`serializationOutput` contains current Swagger fields excluding `readOnly`
+properties; `legacySerializationOutput` also retains aliases absent from today's
+Swagger, for published SDKs. No filtering is applied to deserialization input.
+
+The coordinator applies `compatibility.providerMappings` by published version.
+An old model name is matched to its original provider; an explicitly unsupported
+new provider is reported separately. Current and mainline targets never inherit
+historical mappings. `compatibility.wireAliases` checks retained aliases against
+their replacement fields, so removing an alias from the server fails the suite.
+
+Every target also receives synthetic fixtures for unknown fields, future enum
+values, and nested model dictionaries (including mDL namespaces). Enum tests
+require the response to parse and preserve known fields; a language may preserve
+the new enum string or return an explicit unknown sentinel.
+
+All seven languages must report the shared test catalog. The aggregate command
+fails on unexpected compatibility or setup failures by default. Explicitly set
+`SDK_COMPATIBILITY_FAIL_ON_FAILURE=false` only for a report-only diagnostic run.
+Missing public model exports fail current/main targets; there is no exemption.
+
+Every standalone language entry point prepares the same raw cache when
+`SDK_COMPATIBILITY_PSO_FIXTURES_PATH` is not supplied. Missing or empty caches
+fail setup. All entry points use the repository's release generator configuration.
+
+Baseline targets run the selected revision's build wrapper and generator helper
+from its detached worktree, preserving that revision's options and post-processing.
+`build-baseline.sh` redirects only the Swagger input and skips Ruby's user-level
+gem installation after packaging.
+
+Run the local harness regressions without Connect credentials:
+
+```sh
+node --test scripts/sdk-compatibility/harness.test.mjs
+```
+
+The native test projects also include `CompatibilityHarnessTest` (Java) and
+`HarnessRegressionTests` (C#) for callback handling and JSON comparison regressions.
+C# and Java reconcile their TRX/Surefire failures against the native test that
+emitted each compatibility failure. Unrecorded native failures remain framework
+failures even when an SDK failure is acknowledged. Reading those native XML
+reports requires `python3` (standard library only). Ruby runs its local URL
+configuration regressions separately before compatibility tests.
+
+Native test output is available in the job log. Each language's JSON results and
+`suite-status.tsv` are retained as CI artifacts. There is no separate report renderer.
+
+## Results
+
+Each language writes `schemaVersion`, `run`, `suite`, and `targets` in its JSON
+artifact. Targets contain their label, SDK version, and individual test outcomes,
+including failure details, skip reasons, and provider/model parameters.
+`compatibility-tests.json` lists the case IDs required from every language.
+
+## Revision acknowledgements
+
+Use `compatibility.acknowledgements` in the repository-root
+`compatibility.json` to document a known, intentional incompatibility for one
+published SDK revision. The matrix runner applies acknowledgements before
+choosing its exit code: a matching failure becomes skipped, with its reason in
+`skipReason` and original error retained as `acknowledgedFailure` in the JSON.
+Current-branch and `origin/main` targets never receive published-revision
+acknowledgements, even if they share the published package's version number.
+
+```json
+{
+  "language": "go",
+  "sdkVersions": ["3.0.0"],
+  "testCaseId": "serialization.provider-output-round-trip",
+  "parameters": { "providerId": "example-provider" },
+  "reason": "The model shape changed intentionally in this release.",
+  "failureMessageIncludes": ["givenName"]
+}
+```
+
+`language`, `sdkVersions`, `testCaseId`, and `reason` are required. Identical
+exceptions list their affected versions together; versions are matched exactly. A failure is
+acknowledged only when every string in the nonempty `failureMessageIncludes`
+array occurs in its message; another failure of the same case still fails CI. `parameters`
+is an optional exact, partial match for a case's string parameters; use it to
+scope a broad test case such as a PSO check to one provider. Framework failures
+are never acknowledged.
+
+## Serialization-only diagnostics
+
+Set `SDK_COMPATIBILITY_TEST_SCOPE=serialization` when invoking a language's
+single-target `run_matrix.mjs` executor to exercise codecs without API operations.
+Provide a fixture cache plus the normal target/result environment variables.
+This is a partial diagnostic run, not a replacement for the full CI catalog.
+The C# executor detects the installed package's client architecture and exercises
+its own HTTP codec (System.Text.Json for historical generichost packages,
+CustomJsonCodec/Newtonsoft for httpclient packages).

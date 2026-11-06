@@ -6,21 +6,36 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$REPO_ROOT/helpers/common.sh"
 
-"$REPO_ROOT/helpers/generate-client.sh" \
-  --language csharp \
-  --output-folder "$SCRIPT_DIR/sdk" \
-  --swagger-file-or-url "${TRINSIC_OPENAPI_SCHEMA:-https://api.trinsic.id/swagger/api/swagger.json}" \
-  --additional-property "packageName=Trinsic.Api" \
-  --additional-property "packageVersion=[VERSION]" \
-  --additional-property "nullableReferenceTypes=true" \
-  --additional-property "modelPropertySorting=alphabetical" \
-  --additional-property "library=httpclient" \
-  --additional-property "useDateTimeOffset=true" \
-  --additional-property "validatable=false" \
-  --additional-property "disallowAdditionalPropertiesIfNotPresent=false" \
-  --additional-property "licenseId=MIT" \
-  --additional-property "apiName=TrinsicApi" \
+swagger_file_or_url="${TRINSIC_OPENAPI_SCHEMA:-https://api.trinsic.id/swagger/api/swagger.json}"
+if [[ $# -gt 0 ]]; then
+  if [[ "$1" != "--swagger-file-or-url" || $# -ne 2 ]]; then
+    echo "Usage: $0 [--swagger-file-or-url <path-or-url>]" >&2
+    exit 1
+  fi
+  swagger_file_or_url="$2"
+fi
+
+generator_arguments=(
+  --language csharp
+  --output-folder "$SCRIPT_DIR/sdk"
+  --additional-property "packageName=Trinsic.Api"
+  --additional-property "packageVersion=[VERSION]"
+  --additional-property "nullableReferenceTypes=true"
+  --additional-property "modelPropertySorting=alphabetical"
+  --additional-property "library=httpclient"
+  --additional-property "useDateTimeOffset=true"
+  --additional-property "validatable=false"
+  --additional-property "disallowAdditionalPropertiesIfNotPresent=false"
+  --additional-property "licenseId=MIT"
+  --additional-property "apiName=TrinsicApi"
   --additional-property "targetFramework=net8.0"
+)
+if [[ -n "$swagger_file_or_url" ]]; then
+  generator_arguments+=(--swagger-file-or-url "$swagger_file_or_url")
+fi
+
+"$REPO_ROOT/helpers/generate-client.sh" \
+  "${generator_arguments[@]}"
 
 # Json.NET otherwise interprets timestamp-looking strings inside free-form JSON
 # as DateTime values. Apply this to both generated serializer defaults, and fail
@@ -71,6 +86,8 @@ const itemGroup = `  <ItemGroup>
 xml = xml.replace("</Project>", `${itemGroup}</Project>`);
 fs.writeFileSync(file, xml);
 NODE
+
+node "$REPO_ROOT/helpers/make-enums-forward-compatible.mjs" csharp "$SCRIPT_DIR/sdk"
 
 cp "$SCRIPT_DIR/README.md" "$SCRIPT_DIR/sdk/src/Trinsic.Api"
 cp "$REPO_ROOT/LICENSE" "$SCRIPT_DIR/sdk/src/Trinsic.Api"
