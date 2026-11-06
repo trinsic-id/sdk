@@ -25,6 +25,6 @@ echo "Installing api-php sample project dependencies..."
   echo "Ensure there is an .env file..."
   touch .env
 
-  echo "Validating php script..."
-  php public/index.php
+  echo "Validating php scripts..."
+  find public src -name '*.php' -print0 | xargs -0 -n1 php -l
 )
