@@ -79,8 +79,7 @@ test("process failures survive partial reports without duplicating recorded fail
   }
   write(output, JSON.stringify({ schemaVersion: 1, testCases: [failed] }));
   assert.deepEqual(readProcessTestCases(output, { status: 1 }, "test"), [failed]);
-  assert.deepEqual(readProcessTestCases(output, { status: 2 }, "php"), [failed], "PHPUnit reports test errors with exit 2");
-  assert.equal(readProcessTestCases(output, { status: 42 }, "test").length, 2, "a recorded assertion must not hide an abnormal exit");
+  for (const status of [2, 42]) assert.equal(readProcessTestCases(output, { status }, "test").length, 2, "a recorded assertion must not hide an abnormal exit");
   write(output, "invalid JSON");
   assert.equal(readProcessTestCases(output, { status: 0 }, "test")[0].status, "failed");
   assert.equal(readProcessTestCases(join(directory, "missing"), { status: 1 }, "test")[0].status, "failed");

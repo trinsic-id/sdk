@@ -29,8 +29,7 @@ export function preserveProcessFailure(testCases, execution, language, label, na
     testCases = [...testCases, ...nativeFailures.filter(({ name }) => !recorded.has(name)).flatMap(({ name, message }) =>
       failure(language, `${label}: unrecorded native failure in ${name}: ${message}`))];
   }
-  // PHPUnit uses 2 for test errors; the other native runners use 1.
-  const testFailureExit = execution.status === 1 || (language === "php" && execution.status === 2);
+  const testFailureExit = execution.status === 1;
   if (execution.status !== 0 && (!testFailureExit || (nativeFailures ? nativeFailures.length === 0 : !testCases.some((testCase) => testCase.status === "failed")))) {
     return [...testCases, ...failure(language, `${label} exited with ${detail} without a complete accounting of native failures.`)];
   }

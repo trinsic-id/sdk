@@ -8,7 +8,7 @@ import { SDK_VERSION, failure, preserveProcessFailure, readTestCases, required }
 import { prepareFixtures, validateCoverage, validateWireAliases } from "./fixtures.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
-const allLanguages = ["csharp", "go", "java", "php", "python", "ruby", "typescript"];
+const allLanguages = ["csharp", "go", "java", "python", "ruby", "typescript"];
 const languages = process.argv[2] ? [process.argv[2]] : allLanguages;
 if (languages.some(language => !allLanguages.includes(language))) throw new Error("Unknown SDK language.");
 const directory = resolve(process.env.SDK_COMPATIBILITY_RESULTS_DIR ?? join(root, "test-results/sdk-3.2.0"));

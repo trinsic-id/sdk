@@ -1,7 +1,7 @@
 import { isDeepStrictEqual } from "node:util";
 import { readFileSync } from "node:fs";
 
-// Captured from model discovery in all seven published 3.2.0 packages. These
+// Captured from model discovery in the published 3.2.0 packages. These
 // contracts must remain covered even if the remote catalog changes later.
 const providerModels = JSON.parse(readFileSync(new URL("./provider-models.json", import.meta.url)));
 
