@@ -28,12 +28,6 @@ export function injectSdkHeader(language, version, outputFolder) {
       anchor: "    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();",
       addition: `\n    localVarRequestBuilder.header("X-Trinsic-SDK", ${value});`,
     },
-    php: {
-      directory: "lib/Api",
-      filePattern: /Api\.php$/,
-      anchor: "        $defaultHeaders = [];",
-      addition: `\n        $defaultHeaders['X-Trinsic-SDK'] = ${value};`,
-    },
     python: {
       file: "trinsic_api/api_client.py",
       anchor: "        header_params.update(self.default_headers)",
