@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { after } from "node:test";
-import { configuration, sdk, sdkConfiguration, targetLabel } from "./support.js";
+import { configuration, sdk, sdkConfiguration, targetLabel, captureRequests } from "./support.js";
 
 import { test, recordCompatibilityCase } from "./results.js";
 
@@ -100,6 +100,9 @@ test(`${targetLabel}: GetAttachment reads a completed session attachment`, () =>
       session.sessionId, attachmentId, { resultsAccessKey: session.resultsAccessKey },
     );
     assertNonEmptyString(attachment.content, "Attachment content");
+    const bytes = Buffer.from(attachment.content, "base64");
+    assert.equal(bytes.toString("base64"), attachment.content, "Attachment content must be valid base64");
+    assert.deepEqual([...bytes.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10], "Attachment must contain PNG bytes");
     assert.equal(attachment.contentType, "image/png");
   }));
 
@@ -111,7 +114,8 @@ test(`${targetLabel}: RedactSession redacts a completed session`, () =>
   }));
 
 async function createDirectSession() {
-  const response = await new sdk.SessionsApi(sdkConfiguration()).createDirectProviderSession({
+  const { requests, config } = captureRequests();
+  const response = await new sdk.SessionsApi(config).createDirectProviderSession({
     capabilities: ["LaunchBrowser", "CaptureRedirect"],
     fallbackToHostedUI: false,
     provider: TEST_PROVIDER,
@@ -120,6 +124,11 @@ async function createDirectSession() {
   });
 
   createdSessions.add(response.sessionId);
+  const body = requests.at(-1)?.body as Record<string, unknown>;
+  assert.equal(body.provider, TEST_PROVIDER);
+  assert.equal(body.verificationProfileId, configuration.verificationProfileId);
+  assert.deepEqual(body.capabilities, ["LaunchBrowser", "CaptureRedirect"]);
+  assert.equal(body.fallbackToHostedUI, false);
   assertUuid(response.sessionId, "Direct session ID");
   assert.equal(response.resultCollection.method, "CaptureRedirect");
   assertNonEmptyString(response.resultCollection.resultsAccessKey, "Direct session results access key");

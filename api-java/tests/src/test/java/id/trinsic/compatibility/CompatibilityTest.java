@@ -16,6 +16,11 @@ import id.trinsic.api.models.IntegrationCapability;
 import id.trinsic.api.models.RecommendProvidersRequest;
 import java.net.CookieManager;
 import java.net.URI;
+import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
+import java.util.concurrent.Flow;
+import java.util.concurrent.CompletableFuture;
+import org.openapitools.jackson.nullable.JsonNullable;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -38,6 +43,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /** Native JUnit coverage for the Java compatibility catalog. */
@@ -49,47 +56,52 @@ class CompatibilityTest {
   private RedirectUrisApi redirects;
   private ApiClient client;
   private UUID profileId;
+  private HttpRequest lastRequest;
 
   @BeforeEach void configureClient() {
     URI uri = URI.create(required("TRINSIC_TEST_BASE_URL"));
     client = Configuration.getDefaultApiClient();
     client.setScheme(uri.getScheme()).setHost(uri.getHost()).setPort(uri.getPort()).setBasePath(uri.getPath());
-    client.setRequestInterceptor(builder -> builder.header("Authorization", "Bearer " + required("TRINSIC_TEST_ACCESS_TOKEN")));
+    client.setRequestInterceptor(builder -> { builder.header("Authorization", "Bearer " + required("TRINSIC_TEST_ACCESS_TOKEN")); lastRequest = builder.build(); });
     profileId = UUID.fromString(required("TRINSIC_TEST_VERIFICATION_PROFILE_ID"));
     providers = new ProvidersApi(client); profiles = new VerificationProfilesApi(client);
     sessions = new SessionsApi(client); redirects = new RedirectUrisApi(client);
   }
 
-  @Test @CompatibilityCase("api.providers.list") void listProviders() throws Exception { assertNotNull(providers.listProviders(null)); }
-  @Test @CompatibilityCase("api.verification-profiles.get-by-id") void getVerificationProfile() throws Exception { assertNotNull(profiles.getVerificationProfileById(profileId)); }
-  @Test @CompatibilityCase("api.verification-profiles.list") void listVerificationProfiles() throws Exception { assertNotNull(profiles.listVerificationProfiles(1, 100)); }
-  @Test @CompatibilityCase("api.sessions.list") void listSessions() throws Exception { assertNotNull(sessions.listSessions(profileId, null, null, 1, 1)); }
-  @Test @CompatibilityCase("api.redirect-uris.list") void listRedirectUris() throws Exception { assertNotNull(redirects.callList(1, 100)); }
-  @Test @CompatibilityCase("api.providers.get") void getProvider() throws Exception { assertNotNull(providers.getProvider("trinsic-test-redirect")); }
+  @Test @CompatibilityCase("api.providers.list") void listProviders() throws Exception { assertFalse(providers.listProviders(null).getProviders().isEmpty()); }
+  @Test @CompatibilityCase("api.verification-profiles.get-by-id") void getVerificationProfile() throws Exception { assertEquals(profileId, profiles.getVerificationProfileById(profileId).getId()); }
+  @Test @CompatibilityCase("api.verification-profiles.list") void listVerificationProfiles() throws Exception { var page = profiles.listVerificationProfiles(1, 100); assertNotNull(page.getVerificationProfiles()); assertNotNull(page.getMore()); page.getVerificationProfiles().forEach(item -> assertNotNull(item.getId())); }
+  @Test @CompatibilityCase("api.sessions.list") void listSessions() throws Exception { var page = sessions.listSessions(profileId, null, null, 1, 1); assertNotNull(page.getSessions()); assertNotNull(page.getMore()); page.getSessions().forEach(item -> assertNotNull(item.getId())); assertTrue(page.getTotal() >= 0); assertEquals("1", query(lastRequest.uri(), "Page")); assertEquals("1", query(lastRequest.uri(), "PageSize")); }
+  @Test @CompatibilityCase("api.redirect-uris.list") void listRedirectUris() throws Exception { var page = redirects.callList(1, 100); assertNotNull(page.getUris()); assertNotNull(page.getMore()); page.getUris().forEach(item -> assertNotNull(item.getId())); assertEquals("100", query(lastRequest.uri(), "pageSize")); }
+  @Test @CompatibilityCase("api.providers.get") void getProvider() throws Exception { assertEquals("trinsic-test-redirect", providers.getProvider("trinsic-test-redirect").getProvider().getId()); }
 
   @Test @CompatibilityCase("api.sessions.create-hosted-provider") void createHosted() throws Exception {
     var session = sessions.createHostedProviderSession(hostedRequest());
-    try { assertNotNull(session); } finally { cancelQuietly(session.getSessionId()); }
+    try { assertNotNull(session.getSessionId()); assertUrl(session.getLaunchUrl()); assertFalse(session.getResultsAccessKey().isBlank()); } finally { cancelQuietly(session.getSessionId()); }
   }
   @Test @CompatibilityCase("api.sessions.create-direct-provider") void createDirect() throws Exception {
     var session = sessions.createDirectProviderSession(directRequest());
-    try { assertNotNull(session); } finally { cancelQuietly(session.getSessionId()); }
+    try { assertDirect(session); assertDirectRequest(); } finally { cancelQuietly(session.getSessionId()); }
   }
   @Test @CompatibilityCase("api.sessions.get") void getSession() throws Exception {
     var session = sessions.createDirectProviderSession(directRequest());
-    try { assertNotNull(sessions.getSession(session.getSessionId())); } finally { cancelQuietly(session.getSessionId()); }
+    try { assertSession(sessions.getSession(session.getSessionId()).getSession(), session.getSessionId(), false, false); } finally { cancelQuietly(session.getSessionId()); }
   }
   @Test @CompatibilityCase("api.sessions.cancel") void cancelSession() throws Exception {
     var session = sessions.createDirectProviderSession(directRequest());
-    assertNotNull(sessions.cancelSession(session.getSessionId()));
+    try { assertSession(sessions.cancelSession(session.getSessionId()).getSession(), session.getSessionId(), true, false); } finally { cancelQuietly(session.getSessionId()); }
   }
   @Test @CompatibilityCase("api.sessions.recommend-providers") void recommendProviders() throws Exception {
     RecommendProvidersRequest request = new RecommendProvidersRequest(); request.setVerificationProfileId(profileId);
-    assertNotNull(sessions.recommendProviders(request));
+    var response = sessions.recommendProviders(request);
+    var items = new java.util.ArrayList<>(response.getRecommendedProviders()); items.addAll(response.getRemainder());
+    assertFalse(items.isEmpty());
+    for (var item : items) { assertFalse(item.getId().isBlank()); assertNotNull(item.getName()); assertNotNull(item.getLogoUrl()); assertNotNull(item.getSubtext()); assertNotNull(item.getHealth()); assertNotNull(item.getCountries()); assertNotNull(item.getRegions()); assertNotNull(item.getSubdivisions()); }
+    assertEquals(profileId.toString().toLowerCase(), requestBody().path("verificationProfileId").asText().toLowerCase());
   }
   @Test @CompatibilityCase("api.sessions.get-result") void getResult() throws Exception {
     CompletedSession completed = completeSession();
-    try { assertNotNull(sessionResult(completed)); } finally { cancelQuietly(completed.session().getSessionId()); }
+    try { var result = sessionResult(completed); assertSession(result.getSession(), completed.session().getSessionId(), true, true); assertEquals("trinsic-test-redirect", result.getIdentityData().getOriginatingProviderId()); assertFalse(result.getIdentityData().getAttachments().isEmpty()); } finally { cancelQuietly(completed.session().getSessionId()); }
   }
   @Test @CompatibilityCase("api.sessions.get-attachment") void getAttachment() throws Exception {
     CompletedSession completed = completeSession();
@@ -97,7 +109,10 @@ class CompatibilityTest {
       var result = sessionResult(completed);
       assertFalse(result.getIdentityData().getAttachments().isEmpty(), "test provider returned no attachments");
       GetAttachmentRequest request = new GetAttachmentRequest(); request.setResultsAccessKey(completed.resultsAccessKey());
-      assertNotNull(sessions.getAttachment(completed.session().getSessionId(), result.getIdentityData().getAttachments().getFirst().getId(), request));
+      var attachment = sessions.getAttachment(completed.session().getSessionId(), result.getIdentityData().getAttachments().getFirst().getId(), request);
+      assertEquals("image/png", attachment.getContentType());
+      assertTrue(attachment.getContent().length >= 8);
+      assertArrayEquals(new byte[]{(byte)137, 80, 78, 71, 13, 10, 26, 10}, java.util.Arrays.copyOf(attachment.getContent(), 8));
     } finally { cancelQuietly(completed.session().getSessionId()); }
   }
   @Test @CompatibilityCase("api.sessions.redact") void redact() throws Exception {
@@ -135,10 +150,66 @@ class CompatibilityTest {
       allPassed &= CompatibilityResultExtension.recordCase(caseId, parameters, () -> {
         RequiredFieldValidator.validate(client.getObjectMapper(), output, model, providerId + " (" + modelName + ")");
         Object decoded = client.getObjectMapper().treeToValue(output, model);
-        compareJson(client.getObjectMapper().valueToTree(decoded), expected, providerId + " (" + modelName + ")", fixture.has("testCaseId"));
+        compareJson(modelFields(decoded, output, true), modelFields(decoded, output, false), providerId, true);
+        compareJson(client.getObjectMapper().valueToTree(decoded), fixture.has("testCaseId") ? expected : modelFields(decoded, expected, false), providerId + " (" + modelName + ")", true);
       });
     }
     if (!allPassed) fail("One or more provider-output fixtures failed; see the structured compatibility report.");
+  }
+
+  private static void assertUrl(String url) { URI uri = URI.create(url); assertTrue(("http".equals(uri.getScheme()) || "https".equals(uri.getScheme())) && uri.getHost() != null); }
+  static void assertSession(id.trinsic.api.models.Session session, UUID id, boolean done, boolean success) {
+    assertEquals(id.toString().toLowerCase(), session.getId().toString().toLowerCase()); assertEquals(done, session.getDone()); assertEquals(success, session.getSuccess());
+  }
+  private void assertDirect(CreateDirectProviderSessionResponse session) {
+    assertNotNull(session.getSessionId()); assertUrl(session.getNextStep().getContent());
+    assertEquals("LaunchBrowser", session.getNextStep().getMethod().toString());
+    assertEquals("CaptureRedirect", session.getResultCollection().getMethod().toString());
+    assertFalse(session.getResultCollection().getResultsAccessKey().isBlank());
+  }
+  private JsonNode requestBody() throws Exception {
+    var bytes = new ByteArrayOutputStream(); var complete = new CompletableFuture<Void>();
+    lastRequest.bodyPublisher().orElseThrow().subscribe(new Flow.Subscriber<ByteBuffer>() {
+      public void onSubscribe(Flow.Subscription subscription) { subscription.request(Long.MAX_VALUE); }
+      public void onNext(ByteBuffer value) { byte[] part = new byte[value.remaining()]; value.get(part); bytes.writeBytes(part); }
+      public void onError(Throwable error) { complete.completeExceptionally(error); }
+      public void onComplete() { complete.complete(null); }
+    });
+    complete.join(); return client.getObjectMapper().readTree(bytes.toByteArray());
+  }
+  private void assertDirectRequest() throws Exception {
+    var body = requestBody();
+    assertEquals("trinsic-test-redirect", body.path("provider").asText());
+    assertEquals(profileId.toString().toLowerCase(), body.path("verificationProfileId").asText().toLowerCase());
+    assertEquals(client.getObjectMapper().readTree("[\"LaunchBrowser\",\"CaptureRedirect\"]"), body.get("capabilities"));
+    assertTrue(body.path("fallbackToHostedUI").isBoolean()); assertFalse(body.get("fallbackToHostedUI").booleanValue());
+  }
+  JsonNode modelFields(Object model, JsonNode wire, boolean decoded) throws Exception {
+    var mapper = client.getObjectMapper();
+    if (model instanceof JsonNullable<?> nullable) model = nullable.orElse(null);
+    if (model instanceof Map<?, ?> map && wire.isObject()) {
+      if (decoded) assertEquals(wire.size(), map.size(), "SDK changed dictionary keys");
+      var output = mapper.createObjectNode();
+      var fields = wire.fields();
+      while (fields.hasNext()) { var field = fields.next(); if (decoded) assertTrue(map.containsKey(field.getKey()), "SDK omitted dictionary entry"); output.set(field.getKey(), modelFields(map.get(field.getKey()), field.getValue(), decoded)); }
+      return output;
+    }
+    if (model instanceof List<?> list && wire.isArray()) {
+      assertEquals(wire.size(), list.size(), "SDK changed array length");
+      var output = mapper.createArrayNode();
+      for (int i = 0; i < list.size(); i++) output.add(modelFields(list.get(i), wire.get(i), decoded));
+      return output;
+    }
+    if (model != null && wire.isObject()) {
+      var properties = mapper.getDeserializationConfig().introspect(mapper.constructType(model.getClass())).findProperties();
+      if (!properties.isEmpty()) {
+        var output = mapper.createObjectNode();
+        for (var property : properties) if (wire.has(property.getName()) && property.getAccessor() != null)
+          output.set(property.getName(), modelFields(property.getAccessor().getValue(model), wire.get(property.getName()), decoded));
+        return output;
+      }
+    }
+    return decoded ? mapper.valueToTree(model) : wire;
   }
 
   private CreateHostedProviderSessionRequest hostedRequest() throws Exception {
@@ -200,14 +271,14 @@ class CompatibilityTest {
     return "";
   }
   private static Class<?> providerModel(String name) { try { return Class.forName("id.trinsic.api.models." + name); } catch (ClassNotFoundException error) { return null; } }
-  private static void compareJson(JsonNode actual, JsonNode expected, String path, boolean exactFields) {
+  static void compareJson(JsonNode actual, JsonNode expected, String path, boolean exactFields) {
     if (actual.isObject()) {
       if (!expected.isObject()) fail(path + ": SDK produced an object for " + expected.getNodeType());
       Iterator<String> names = exactFields ? expected.fieldNames() : actual.fieldNames();
       while (names.hasNext()) { String name = names.next(); if (!actual.has(name)) fail(path + ": SDK omitted fixture field " + name); if (!expected.has(name)) continue; compareJson(actual.get(name), expected.get(name), path + "." + name, exactFields); }
       return;
     }
-    if (actual.isArray()) { assertEquals(expected.size(), actual.size(), path + ": array shape differs"); for (int index = 0; index < actual.size(); index++) compareJson(actual.get(index), expected.get(index), path + "[" + index + "]", exactFields); return; }
+    if (actual.isArray()) { assertTrue(expected.isArray(), path + ": expected an array"); assertEquals(expected.size(), actual.size(), path + ": array shape differs"); for (int index = 0; index < actual.size(); index++) compareJson(actual.get(index), expected.get(index), path + "[" + index + "]", exactFields); return; }
     if (actual.isTextual() && expected.isTextual() && timestampsEqual(actual.asText(), expected.asText())) return;
     if (actual.isNumber() && expected.isNumber() && actual.decimalValue().compareTo(expected.decimalValue()) == 0) return;
     assertEquals(expected, actual, path + ": SDK serialization differs from fixture");

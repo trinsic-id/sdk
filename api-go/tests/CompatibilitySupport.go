@@ -1,14 +1,18 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	trinsic_api "github.com/trinsic-id/sdk-go-api/v3"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
 	"reflect"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -39,9 +43,12 @@ func createDirect(c *trinsic_api.APIClient, p string) (*trinsic_api.CreateDirect
 	r.Capabilities = []trinsic_api.IntegrationCapability{trinsic_api.INTEGRATIONCAPABILITY_LAUNCH_BROWSER, trinsic_api.INTEGRATIONCAPABILITY_CAPTURE_REDIRECT}
 	fallback := false
 	r.FallbackToHostedUI = *trinsic_api.NewNullableBool(&fallback)
-	session, _, err := c.SessionsAPI.CreateDirectProviderSession(ctx).CreateDirectProviderSessionRequest(r).Execute()
+	session, response, err := c.SessionsAPI.CreateDirectProviderSession(ctx).CreateDirectProviderSessionRequest(r).Execute()
 	if err == nil {
 		createdSessions[session.SessionId] = c
+	}
+	if err == nil {
+		_, err = sdkResult(session, response, nil)
 	}
 	return session, err
 }
@@ -192,14 +199,53 @@ func pso() {
 			var a, b any
 			json.Unmarshal(round, &a)
 			json.Unmarshal(expected, &b)
-			return nil, compare(a, b, fmt.Sprint(fixture["providerId"]), synthetic)
+			projected, err := modelFields(reflect.ValueOf(m), b, false)
+			if err != nil {
+				return nil, err
+			}
+			var original any
+			if err = json.Unmarshal(wire, &original); err != nil {
+				return nil, err
+			}
+			observed, err := modelFields(reflect.ValueOf(m), original, true)
+			if err != nil {
+				return nil, err
+			}
+			supported, err := modelFields(reflect.ValueOf(m), original, false)
+			if err != nil {
+				return nil, err
+			}
+			if err = compare(observed, supported, "decoded", true); err != nil {
+				return nil, err
+			}
+			if synthetic {
+				projected = b
+			}
+			return nil, compare(a, projected, fmt.Sprint(fixture["providerId"]), true)
 		})
 	}
 }
 
 // Keep the SDK's typed request builders and response decoding on the normal path.
 func sdkResult[T any](value T, response *http.Response, err error) (any, error) {
-	return value, err
+	if err != nil {
+		return nil, err
+	}
+	if response != nil {
+		wire := capturedWire[response]
+		actual, e := modelFields(reflect.ValueOf(value), wire, true)
+		if e != nil {
+			return nil, e
+		}
+		expected, e := modelFields(reflect.ValueOf(value), wire, false)
+		if e != nil {
+			return nil, e
+		}
+		if e = compare(actual, expected, "response", true); e != nil {
+			return nil, e
+		}
+	}
+	return value, nil
 }
 func redirectURL(c *trinsic_api.APIClient) (string, error) {
 	result, _, err := c.RedirectUrisAPI.List(ctx).Execute()
@@ -296,4 +342,273 @@ func required(k string) string {
 		panic(k + " is required")
 	}
 	return v
+}
+
+var capturedWire = map[*http.Response]any{}
+var lastRequest *http.Request
+var lastBody map[string]any
+
+type captureTransport struct{}
+
+func (captureTransport) RoundTrip(request *http.Request) (*http.Response, error) {
+	lastRequest = request
+	lastBody = nil
+	if request.Body != nil {
+		body, err := io.ReadAll(request.Body)
+		if err != nil {
+			return nil, err
+		}
+		request.Body = io.NopCloser(bytes.NewReader(body))
+		if len(body) > 0 {
+			if err = json.Unmarshal(body, &lastBody); err != nil {
+				return nil, err
+			}
+		}
+	}
+	response, err := http.DefaultTransport.RoundTrip(request)
+	if err != nil {
+		return nil, err
+	}
+	data, err := io.ReadAll(response.Body)
+	response.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+	response.Body = io.NopCloser(bytes.NewReader(data))
+	if len(data) > 0 {
+		var wire any
+		if err = json.Unmarshal(data, &wire); err != nil {
+			return nil, err
+		}
+		capturedWire[response] = wire
+	}
+	return response, nil
+}
+
+// SDK struct tags and nullable wrappers define supported fields; dictionary keys stay exact.
+func modelFields(value reflect.Value, wire any, decoded bool) (any, error) {
+	for value.IsValid() && (value.Kind() == reflect.Pointer || value.Kind() == reflect.Interface) {
+		if value.IsNil() {
+			value = reflect.Value{}
+			break
+		}
+		value = value.Elem()
+	}
+	if value.IsValid() && strings.HasPrefix(value.Type().Name(), "Nullable") {
+		getter := value.MethodByName("Get")
+		if getter.IsValid() {
+			return modelFields(getter.Call(nil)[0], wire, decoded)
+		}
+	}
+	if object, ok := wire.(map[string]any); ok && value.IsValid() {
+		if value.Kind() == reflect.Struct {
+			result := map[string]any{}
+			for i := 0; i < value.NumField(); i++ {
+				field := value.Type().Field(i)
+				key := strings.Split(field.Tag.Get("json"), ",")[0]
+				if key == "" || key == "-" {
+					continue
+				}
+				if child, exists := object[key]; exists {
+					projected, err := modelFields(value.Field(i), child, decoded)
+					if err != nil {
+						return nil, err
+					}
+					result[key] = projected
+				}
+			}
+			return result, nil
+		}
+		if value.Kind() == reflect.Map {
+			if decoded && value.Len() != len(object) {
+				return nil, fmt.Errorf("SDK changed dictionary keys")
+			}
+			result := map[string]any{}
+			for key, child := range object {
+				entry := value.MapIndex(reflect.ValueOf(key))
+				if decoded && !entry.IsValid() {
+					return nil, fmt.Errorf("SDK omitted dictionary entry %s", key)
+				}
+				projected, err := modelFields(entry, child, decoded)
+				if err != nil {
+					return nil, err
+				}
+				result[key] = projected
+			}
+			return result, nil
+		}
+	}
+	if array, ok := wire.([]any); ok && value.IsValid() && (value.Kind() == reflect.Slice || value.Kind() == reflect.Array) {
+		if value.Len() != len(array) {
+			return nil, fmt.Errorf("SDK changed array length")
+		}
+		result := make([]any, len(array))
+		for i, child := range array {
+			projected, err := modelFields(value.Index(i), child, decoded)
+			if err != nil {
+				return nil, err
+			}
+			result[i] = projected
+		}
+		return result, nil
+	}
+	if !decoded {
+		return wire, nil
+	}
+	if !value.IsValid() {
+		return nil, nil
+	}
+	data, err := json.Marshal(value.Interface())
+	if err != nil {
+		return nil, err
+	}
+	var result any
+	err = json.Unmarshal(data, &result)
+	return result, err
+}
+
+func assertAPI(id string, value any) error {
+	if id == "api.sessions.redact" {
+		return nil
+	}
+	encoded, err := json.Marshal(value)
+	if err != nil {
+		return err
+	}
+	var body map[string]any
+	if err = json.Unmarshal(encoded, &body); err != nil {
+		return err
+	}
+	if body == nil {
+		return fmt.Errorf("SDK returned no body")
+	}
+	require := func(ok bool, message string) error {
+		if !ok {
+			return fmt.Errorf("%s: %s", id, message)
+		}
+		return nil
+	}
+	switch id {
+	case "api.providers.get":
+		provider, ok := body["provider"].(map[string]any)
+		return require(ok && provider["id"] == "trinsic-test-redirect", "provider ID differs")
+	case "api.verification-profiles.get-by-id":
+		return require(strings.EqualFold(fmt.Sprint(body["id"]), required("TRINSIC_TEST_VERIFICATION_PROFILE_ID")), "profile ID differs")
+	case "api.providers.list", "api.verification-profiles.list", "api.sessions.list", "api.redirect-uris.list":
+		fields := map[string]string{"api.providers.list": "providers", "api.verification-profiles.list": "verificationProfiles", "api.sessions.list": "sessions", "api.redirect-uris.list": "uris"}
+		entries, ok := body[fields[id]].([]any)
+		if !ok {
+			return fmt.Errorf("%s: missing array", id)
+		}
+		if id == "api.providers.list" && len(entries) == 0 {
+			return fmt.Errorf("No providers")
+		}
+		for _, entry := range entries {
+			object, ok := entry.(map[string]any)
+			if !ok || object["id"] == nil || object["id"] == "" {
+				return fmt.Errorf("Page entry omitted ID")
+			}
+		}
+		if id == "api.sessions.list" && (lastRequest.URL.Query().Get("Page") != "1" || lastRequest.URL.Query().Get("PageSize") != "1") {
+			return fmt.Errorf("Session pagination request differs")
+		}
+		if id == "api.redirect-uris.list" && (lastRequest.URL.Query().Get("page") != "1" || lastRequest.URL.Query().Get("pageSize") != "1") {
+			return fmt.Errorf("Redirect pagination request differs")
+		}
+		if id != "api.providers.list" {
+			if _, ok = body["more"].(bool); !ok {
+				return fmt.Errorf("Invalid pagination flag")
+			}
+		}
+	case "api.sessions.create-direct-provider", "api.sessions.create-hosted-provider":
+		sessionID, ok := body["sessionId"].(string)
+		if !ok || !regexp.MustCompile(`^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$`).MatchString(sessionID) {
+			return fmt.Errorf("Invalid session ID")
+		}
+		launch, key := body["launchUrl"], body["resultsAccessKey"]
+		if id == "api.sessions.create-direct-provider" {
+			step, ok := body["nextStep"].(map[string]any)
+			collection, valid := body["resultCollection"].(map[string]any)
+			if !ok || !valid || step["method"] != "LaunchBrowser" || collection["method"] != "CaptureRedirect" {
+				return fmt.Errorf("Invalid direct flow")
+			}
+			launch, key = step["content"], collection["resultsAccessKey"]
+			if err := compare(lastBody["capabilities"], []any{"LaunchBrowser", "CaptureRedirect"}, "request.capabilities", true); err != nil {
+				return err
+			}
+			if lastBody["fallbackToHostedUI"] != false {
+				return fmt.Errorf("Request lost explicit false")
+			}
+		}
+		uri, err := url.Parse(fmt.Sprint(launch))
+		if err != nil || uri.Host == "" || (uri.Scheme != "http" && uri.Scheme != "https") || key == nil || key == "" {
+			return fmt.Errorf("Invalid launch URL or key")
+		}
+		if lastBody["provider"] != "trinsic-test-redirect" || !strings.EqualFold(fmt.Sprint(lastBody["verificationProfileId"]), required("TRINSIC_TEST_VERIFICATION_PROFILE_ID")) {
+			return fmt.Errorf("Wrong creation request")
+		}
+	case "api.sessions.get", "api.sessions.cancel", "api.sessions.get-result":
+		session, ok := body["session"].(map[string]any)
+		if !ok {
+			return fmt.Errorf("Missing session")
+		}
+		path := strings.Split(lastRequest.URL.Path, "/")
+		expectedID := ""
+		for i, part := range path {
+			if part == "sessions" && i+1 < len(path) {
+				expectedID = path[i+1]
+				break
+			}
+		}
+		if expectedID == "" || !strings.EqualFold(fmt.Sprint(session["id"]), expectedID) {
+			return fmt.Errorf("Session ID differs")
+		}
+		if session["done"] != (id != "api.sessions.get") || session["success"] != (id == "api.sessions.get-result") {
+			return fmt.Errorf("Session state differs")
+		}
+		if id == "api.sessions.get-result" {
+			identity, ok := body["identityData"].(map[string]any)
+			if !ok || identity["originatingProviderId"] != "trinsic-test-redirect" {
+				return fmt.Errorf("Missing test identity")
+			}
+			attachments, ok := identity["attachments"].([]any)
+			if !ok || len(attachments) == 0 {
+				return fmt.Errorf("Missing attachments")
+			}
+		}
+	case "api.sessions.get-attachment":
+		content, err := base64.StdEncoding.Strict().DecodeString(fmt.Sprint(body["content"]))
+		if err != nil || body["contentType"] != "image/png" || !bytes.HasPrefix(content, []byte{137, 80, 78, 71, 13, 10, 26, 10}) {
+			return fmt.Errorf("Attachment must contain PNG bytes")
+		}
+	case "api.sessions.recommend-providers":
+		recommended, ok := body["recommendedProviders"].([]any)
+		remainder, valid := body["remainder"].([]any)
+		if !ok || !valid || len(recommended)+len(remainder) == 0 {
+			return fmt.Errorf("Missing recommendations")
+		}
+		for _, entry := range append(recommended, remainder...) {
+			provider, ok := entry.(map[string]any)
+			if !ok {
+				return fmt.Errorf("Invalid recommendation")
+			}
+			for _, key := range []string{"id", "name", "logoUrl", "subtext", "health"} {
+				if _, ok := provider[key].(string); !ok {
+					return fmt.Errorf("Invalid recommendation %s", key)
+				}
+			}
+			for _, key := range []string{"regions", "countries", "subdivisions"} {
+				items, ok := provider[key].([]any)
+				if !ok {
+					return fmt.Errorf("Invalid recommendation %s", key)
+				}
+				for _, item := range items {
+					if _, ok := item.(string); !ok {
+						return fmt.Errorf("Invalid recommendation item")
+					}
+				}
+			}
+		}
+	}
+	return nil
 }
