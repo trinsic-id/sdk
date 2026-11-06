@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
@@ -69,7 +69,7 @@ function succeeded(result) { assert.equal(result.status, 0, `${result.stdout}\n$
 
 test("process failures survive partial reports without duplicating recorded failures", () => temporaryDirectory("compat-process-", (directory) => {
   const output = join(directory, "result.json");
-  write(output, JSON.stringify({ schemaVersion: 1, testCases: [passed] }));
+  write(output, JSON.stringify({ schemaVersion: 1, testCases: [passed], nativeFailures: [] }));
   assert.deepEqual(readProcessTestCases(output, { status: 0 }, "test"), [passed]);
   for (const execution of [{ status: 1 }, { status: null, signal: "SIGTERM" }, { status: null, error: new Error("spawn failed") }]) {
     const cases = readProcessTestCases(output, execution, "test");
@@ -77,9 +77,16 @@ test("process failures survive partial reports without duplicating recorded fail
     assert.equal(cases[1].status, "failed");
     assert.match(cases[1].failure.message, /without a complete accounting/);
   }
-  write(output, JSON.stringify({ schemaVersion: 1, testCases: [failed] }));
+  const native = { name: "sdk-test", message: "Recorded failure" };
+  write(output, JSON.stringify({ schemaVersion: 1, testCases: [{ ...failed, nativeTest: native.name }], nativeFailures: [native] }));
   assert.deepEqual(readProcessTestCases(output, { status: 1 }, "test"), [failed]);
   for (const status of [2, 42]) assert.equal(readProcessTestCases(output, { status }, "test").length, 2, "a recorded assertion must not hide an abnormal exit");
+  write(output, JSON.stringify({ schemaVersion: 1, testCases: [{ ...failed, nativeTest: native.name }], nativeFailures: [native, { name: "independent-error", message: "cleanup broke" }] }));
+  const mixed = readProcessTestCases(output, { status: 1 }, "ruby");
+  assert.equal(mixed.length, 2);
+  assert.match(mixed[1].failure.message, /independent-error: cleanup broke/);
+  write(output, JSON.stringify({ schemaVersion: 1, testCases: [failed] }));
+  assert.match(readProcessTestCases(output, { status: 1 }, "ruby")[1].failure.message, /completed native test report/);
   write(output, "invalid JSON");
   assert.equal(readProcessTestCases(output, { status: 0 }, "test")[0].status, "failed");
   assert.equal(readProcessTestCases(join(directory, "missing"), { status: 1 }, "test")[0].status, "failed");
@@ -142,4 +149,49 @@ test("startup failures replace an earlier report rather than reusing it", () => 
   assert.equal(report.sdkVersion, "3.2.0");
   assert.equal(report.suites[0].testCases[0].status, "failed");
   assert.match(report.suites[0].testCases[0].id, /^framework\./);
+}));
+
+test("Node, pytest, and Go native failures survive beside an expected SDK failure", () => temporaryDirectory("compat-native-other-", directory => {
+  for (const [language, format] of [["typescript", "node"], ["python", "junit"], ["go", "go"]]) {
+    const output = join(directory, `${language}.json`), native = join(directory, `${language}.native`);
+    write(output, JSON.stringify({ schemaVersion: 1, testCases: [{ ...failed, nativeTest: "Suite.recorded" }] }));
+    const nativeData = extra => format === "go"
+      ? [
+          { Action: "fail", Test: "Suite.recorded" },
+          ...(extra ? [{ Action: "output", Test: "Suite.unrecorded", Output: "independent failure" }, { Action: "fail", Test: "Suite.unrecorded" }] : []),
+          { Action: "fail", Package: "test" },
+        ].map(value => JSON.stringify(value)).join("\n")
+      : `<testsuite><testcase classname="Suite" name="${format === "node" ? "Suite.recorded" : "recorded"}"><failure message="recorded" /></testcase>${extra ? `<testcase classname="Suite" name="${format === "node" ? "Suite.unrecorded" : "unrecorded"}"><error message="independent failure" /></testcase>` : ""}</testsuite>`;
+    const read = () => readNativeTestCases(output, { status: 1 }, language, format, native);
+    write(native, nativeData(false));
+    assert.deepEqual(read(), [failed]);
+    write(native, nativeData(true));
+    const cases = read();
+    assert.equal(cases.length, 2);
+    assert.match(cases[1].failure.message, /Suite.unrecorded: independent failure/);
+    write(native, "incomplete report");
+    assert.ok(read().some(entry => entry.id.startsWith("framework.")));
+  }
+}));
+
+test("Java copies its tests even when checkout ancestors contain target or .results", () => temporaryDirectory("target-sdk-.results-", directory => {
+  const source = join(directory, "api-java/tests");
+  cpSync(join(root, "api-java/tests"), source, { recursive: true, filter: path => !["target", ".results"].includes(path.split("/").at(-1)) });
+  const helpers = join(directory, "scripts/sdk-compatibility");
+  mkdirSync(helpers, { recursive: true });
+  for (const file of ["executor-helpers.mjs", "read-native-results.py"]) copyFileSync(join(scripts, file), join(helpers, file));
+  const bin = join(directory, "bin");
+  write(join(bin, "mvn"), `#!${process.execPath}\n
+    const fs = require('node:fs'), path = require('node:path'), assert = require('node:assert/strict');
+    const pom = process.argv[process.argv.indexOf('-f') + 1];
+    assert.ok(fs.existsSync(pom), 'pom.xml was filtered out');
+    assert.ok(fs.existsSync(path.join(path.dirname(pom), 'src/test/java/id/trinsic/compatibility/CompatibilityTest.java')));
+    const native = path.join(path.dirname(pom), 'target/surefire-reports');
+    fs.mkdirSync(native, {recursive: true});
+    fs.writeFileSync(path.join(native, 'TEST-example.xml'), '<testsuite><testcase classname="Example" name="passed" /></testsuite>');
+    fs.writeFileSync(process.env.SDK_COMPATIBILITY_RESULT_FILE, JSON.stringify({schemaVersion:1,testCases:[${JSON.stringify(passed)}]}));
+  `, true);
+  const output = join(directory, "result.json");
+  succeeded(run(process.execPath, [join(source, "run.mjs")], { env: { PATH: `${bin}:${process.env.PATH}`, SDK_COMPATIBILITY_RESULT_FILE: output } }));
+  assert.deepEqual(json(output).testCases, [passed]);
 }));

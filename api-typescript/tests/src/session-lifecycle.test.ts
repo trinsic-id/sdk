@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
-import test, { after } from "node:test";
+import { after } from "node:test";
 import { configuration, sdk, sdkConfiguration, targetLabel } from "./support.js";
 
-import { recordCompatibilityCase } from "./results.js";
+import { test, recordCompatibilityCase } from "./results.js";
 
 interface BrowserResponse {
   location?: string;
@@ -11,7 +11,6 @@ interface BrowserResponse {
 }
 
 interface CompletedSession {
-  attachmentId: string;
   redirectToken: string;
   resultsAccessKey: string;
   sessionId: string;
@@ -19,6 +18,8 @@ interface CompletedSession {
 
 const TEST_PROVIDER = "trinsic-test-redirect";
 const createdSessions = new Set<string>();
+let completedSession: Promise<CompletedSession> | undefined;
+const completed = () => completedSession ??= completeRedirectSession();
 after(async () => {
   for (const id of createdSessions) {
     try { await new sdk.SessionsApi(sdkConfiguration()).cancelSession(id); }
@@ -47,65 +48,67 @@ test(`${targetLabel}: CreateHostedProviderSession returns a launch URL and acces
     assertUrl(response.launchUrl, "Hosted session launch URL");
     assertNonEmptyString(response.resultsAccessKey, "Hosted session results access key");
 
-    await new sdk.SessionsApi(sdkConfiguration()).cancelSession(response.sessionId);
   }));
 
-test(`${targetLabel}: Direct redirect session can be read and cancelled`, () =>
+test(`${targetLabel}: CreateDirectProviderSession returns a launch step`, () =>
   recordCompatibilityCase("api.sessions.create-direct-provider", async () => {
     const session = await createDirectSession();
     assert.equal(session.nextStep.method, "LaunchBrowser");
     assertUrl(session.nextStep.content, "Direct session launch URL");
-
-    await recordCompatibilityCase("api.sessions.get", async () => {
-      const fetched = await new sdk.SessionsApi(sdkConfiguration()).getSession(session.sessionId);
-      assert.equal(fetched.session.id, session.sessionId);
-      assert.equal(fetched.session.done, false);
-    });
-
-    await recordCompatibilityCase("api.sessions.cancel", async () => {
-      const cancelled = await new sdk.SessionsApi(sdkConfiguration()).cancelSession(session.sessionId);
-      assert.equal(cancelled.session.id, session.sessionId);
-      assert.equal(cancelled.session.done, true);
-      assert.equal(cancelled.session.success, false);
-    });
   }));
 
-test(`${targetLabel}: Redirect session results, attachments, and redaction use the supported contract`, async () => {
-  const completed = await completeRedirectSession();
+test(`${targetLabel}: GetSession reads a direct session`, () =>
+  recordCompatibilityCase("api.sessions.get", async () => {
+    const session = await createDirectSession();
+    const fetched = await new sdk.SessionsApi(sdkConfiguration()).getSession(session.sessionId);
+    assert.equal(fetched.session.id, session.sessionId);
+    assert.equal(fetched.session.done, false);
+  }));
 
-  await recordCompatibilityCase("api.sessions.get-result", async () => {
+test(`${targetLabel}: CancelSession cancels a direct session`, () =>
+  recordCompatibilityCase("api.sessions.cancel", async () => {
+    const session = await createDirectSession();
+    const cancelled = await new sdk.SessionsApi(sdkConfiguration()).cancelSession(session.sessionId);
+    assert.equal(cancelled.session.id, session.sessionId);
+    assert.equal(cancelled.session.done, true);
+    assert.equal(cancelled.session.success, false);
+  }));
+
+test(`${targetLabel}: GetSessionResult reads a completed session`, () =>
+  recordCompatibilityCase("api.sessions.get-result", async () => {
+    const session = await completed();
     const result = await new sdk.SessionsApi(sdkConfiguration()).getSessionResult(
-      completed.sessionId,
-      {
-        resultsAccessKey: completed.resultsAccessKey,
-      },
+      session.sessionId, { resultsAccessKey: session.resultsAccessKey },
     );
-
-    assert.equal(result.session.id, completed.sessionId);
+    assert.equal(result.session.id, session.sessionId);
     assert.equal(result.session.done, true);
     assert.equal(result.session.success, true);
     assert.ok(result.identityData, "Redirect test provider must return identity data");
     assert.equal(result.identityData.originatingProviderId, TEST_PROVIDER);
     assert.ok(result.identityData.attachments.length > 0, "Redirect test provider must return attachments");
-    assert.equal(result.identityData.attachments[0].id, completed.attachmentId);
-  });
+  }));
 
-  await recordCompatibilityCase("api.sessions.get-attachment", async () => {
-    const attachment = await new sdk.SessionsApi(sdkConfiguration()).getAttachment(
-      completed.sessionId,
-      completed.attachmentId,
-      { resultsAccessKey: completed.resultsAccessKey },
+test(`${targetLabel}: GetAttachment reads a completed session attachment`, () =>
+  recordCompatibilityCase("api.sessions.get-attachment", async () => {
+    const session = await completed();
+    const result = await new sdk.SessionsApi(sdkConfiguration()).getSessionResult(
+      session.sessionId, { resultsAccessKey: session.resultsAccessKey },
     );
-
+    const attachmentId = result.identityData?.attachments[0]?.id;
+    assert.ok(attachmentId, "Completed redirect session must include an attachment");
+    const attachment = await new sdk.SessionsApi(sdkConfiguration()).getAttachment(
+      session.sessionId, attachmentId, { resultsAccessKey: session.resultsAccessKey },
+    );
     assertNonEmptyString(attachment.content, "Attachment content");
     assert.equal(attachment.contentType, "image/png");
-  });
+  }));
 
-  await recordCompatibilityCase("api.sessions.redact", async () => {
-    const result = await new sdk.SessionsApi(sdkConfiguration()).redactSession(completed.sessionId);
+test(`${targetLabel}: RedactSession redacts a completed session`, () =>
+  recordCompatibilityCase("api.sessions.redact", async () => {
+    const session = await completed();
+    const result = await new sdk.SessionsApi(sdkConfiguration()).redactSession(session.sessionId);
     assert.equal(result, undefined);
-  });
-});
+  }));
 
 async function createDirectSession() {
   const response = await new sdk.SessionsApi(sdkConfiguration()).createDirectProviderSession({
@@ -147,16 +150,7 @@ async function completeRedirectSession(): Promise<CompletedSession> {
   );
   const redirectToken = requiredSearchParameter(applicationRedirectUrl, "redirectToken");
 
-  const result = await new sdk.SessionsApi(sdkConfiguration()).getSessionResult(
-    session.sessionId,
-    { resultsAccessKey: session.resultCollection.resultsAccessKey },
-  );
-  assert.ok(result.identityData, "Completed redirect session must have identity data");
-  const attachment = result.identityData.attachments[0];
-  assert.ok(attachment, "Completed redirect session must include an attachment");
-
   return {
-    attachmentId: attachment.id,
     redirectToken,
     resultsAccessKey: session.resultCollection.resultsAccessKey,
     sessionId: session.sessionId,

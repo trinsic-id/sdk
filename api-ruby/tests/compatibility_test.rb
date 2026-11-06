@@ -20,7 +20,7 @@ class CompatibilityTest < Minitest::Test
     session
   end
   def run_case(id, params = {}, &action)
-    value = record(id, params, &action); flunk "#{id} failed; see compatibility result for details" if $compatibility_results.last['status'] == 'failed'; value
+    value = record(id, params, &action); raise RecordedCompatibilityFailure, "#{id} failed; see compatibility result for details" if $compatibility_results.last['status'] == 'failed'; value
   end
   def redirect_url
     value = find_http(as_hash(@redirects.list)); raise 'No HTTP(S) redirect URI is registered.' unless value; value
@@ -31,22 +31,22 @@ class CompatibilityTest < Minitest::Test
   def completed_result
     session = create_direct; token, key = completed_redirect_session(session); attributes = { results_access_key: key }; [session, key, @sessions.get_session_result(session.session_id, get_session_result_request: model('GetSessionResultRequest', attributes))]
   end
-  def test_read_apis
-    run_case('api.providers.list') { @providers.list_providers }; run_case('api.verification-profiles.get-by-id') { @profiles.get_verification_profile_by_id(@profile) }; run_case('api.verification-profiles.list') { @profiles.list_verification_profiles }; run_case('api.sessions.list') { @sessions.list_sessions(@profile) }; run_case('api.redirect-uris.list') { @redirects.list }
-    run_case('api.providers.get') { @providers.get_provider('trinsic-test-redirect') }
-  end
+  def test_list_providers = run_case('api.providers.list') { @providers.list_providers }
+  def test_get_profile = run_case('api.verification-profiles.get-by-id') { @profiles.get_verification_profile_by_id(@profile) }
+  def test_list_profiles = run_case('api.verification-profiles.list') { @profiles.list_verification_profiles }
+  def test_list_sessions = run_case('api.sessions.list') { @sessions.list_sessions(@profile) }
+  def test_list_redirects = run_case('api.redirect-uris.list') { @redirects.list }
+  def test_get_provider = run_case('api.providers.get') { @providers.get_provider('trinsic-test-redirect') }
   def test_create_hosted
-    run_case('api.sessions.create-hosted-provider') { attributes = { provider: 'trinsic-test-redirect', verification_profile_id: @profile, redirect_url: redirect_url }; session = track(response_body(@sessions.create_hosted_provider_session(create_hosted_provider_session_request: model('CreateHostedProviderSessionRequest', attributes)))); @sessions.cancel_session(session.session_id); session }
+    run_case('api.sessions.create-hosted-provider') { attributes = { provider: 'trinsic-test-redirect', verification_profile_id: @profile, redirect_url: redirect_url }; track(response_body(@sessions.create_hosted_provider_session(create_hosted_provider_session_request: model('CreateHostedProviderSessionRequest', attributes)))) }
   end
   def test_create_direct
-    session = run_case('api.sessions.create-direct-provider') { create_direct }; @sessions.cancel_session(session.session_id) if session
+    run_case('api.sessions.create-direct-provider') { create_direct }
   end
   def test_get_direct
     run_case('api.sessions.get') do
       session = create_direct
-      begin; @sessions.get_session(session.session_id)
-      ensure; @sessions.cancel_session(session.session_id)
-      end
+      @sessions.get_session(session.session_id)
     end
   end
   def test_cancel_direct
@@ -83,6 +83,6 @@ class CompatibilityTest < Minitest::Test
       end
     end
     failures = $compatibility_results.drop(first_result).select { |result| result['status'] == 'failed' }
-    assert_empty failures, 'Serialization cases failed; see the structured report.'
+    raise RecordedCompatibilityFailure, 'Serialization cases failed; see the structured report.' unless failures.empty?
   end
 end

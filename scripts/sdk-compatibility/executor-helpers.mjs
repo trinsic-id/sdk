@@ -36,7 +36,12 @@ export function preserveProcessFailure(testCases, execution, language, label, na
   return testCases;
 }
 export function readProcessTestCases(path, execution, language, label = `${language} target`) {
-  return preserveProcessFailure(readTestCases(path), execution, language, label);
+  const testCases = readTestCases(path);
+  if (!testCases) return preserveProcessFailure(testCases, execution, language, label, []);
+  const nativeFailures = testCases ? JSON.parse(readFileSync(path)).nativeFailures : undefined;
+  if (!Array.isArray(nativeFailures) || nativeFailures.some(item => typeof item.name !== "string" || typeof item.message !== "string")) return [...testCases, ...failure(language, `${label} omitted its completed native test report.`)];
+  return preserveProcessFailure(testCases, execution, language, label, nativeFailures)
+    .map(({ nativeTest, ...testCase }) => testCase);
 }
 export function readNativeTestCases(path, execution, language, format, reportPath) {
   const testCases = readTestCases(path);

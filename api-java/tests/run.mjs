@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 import { cpSync, mkdirSync } from "node:fs";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { childEnvironment, command, failure, readNativeTestCases, SDK_VERSION, temporaryDirectory, writeExecutorResult } from "../../scripts/sdk-compatibility/executor-helpers.mjs";
 
 const tests = new URL(".", import.meta.url).pathname;
 let result;
 try {
   result = temporaryDirectory("trinsic-java-compat-", (directory) => {
-    const source = join(directory, "runner"); cpSync(tests, source, { recursive: true, filter: path => !path.includes("target") && !path.includes(".results") && !path.endsWith("run.mjs") });
+    const source = join(directory, "runner"); cpSync(tests, source, { recursive: true, filter: path => !["target", ".results", "run.mjs"].includes(basename(path)) });
     const repository = join(directory, "m2"); mkdirSync(repository);
     const output = join(directory, "target-results.json");
     const env = childEnvironment({ SDK_COMPATIBILITY_RESULT_FILE: output, SDK_VERSION, MAVEN_OPTS: `-Dmaven.repo.local=${repository}` });

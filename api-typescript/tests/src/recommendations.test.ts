@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import test from "node:test";
+import { test } from "./results.js";
 import { asRecord, asRecordArray, captureRequests, configuration, headerValue, sdk, targetLabel, type JsonRecord } from "./support.js";
 
 import {

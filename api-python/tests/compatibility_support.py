@@ -165,8 +165,10 @@ def assert_nonempty(candidate: Any, label: str) -> None:
     assert candidate, f"Expected {label} to be non-empty."
 
 
-def assert_profile_present(response: Any) -> None:
-    assert any(normalized_uuid(profile.id) == normalized_uuid(PROFILE_ID) for profile in response.verification_profiles)
+def assert_profile_page(response: Any) -> None:
+    assert isinstance(response.verification_profiles, list)
+    for profile in response.verification_profiles:
+        UUID(str(profile.id))
 
 
 def assert_profile_id(response: Any) -> None:

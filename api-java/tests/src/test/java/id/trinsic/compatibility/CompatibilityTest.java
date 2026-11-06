@@ -150,7 +150,11 @@ class CompatibilityTest {
     request.setCapabilities(List.of(IntegrationCapability.LAUNCH_BROWSER, IntegrationCapability.CAPTURE_REDIRECT)); request.setFallbackToHostedUI(false);
     return request;
   }
-  private String redirectUrl() throws Exception { return redirects.callList(1, 100).getUris().getFirst().getUri(); }
+  private String redirectUrl() throws Exception {
+    return redirects.callList(1, 100).getUris().stream().map(entry -> entry.getUri())
+      .filter(value -> { try { String scheme = URI.create(value).getScheme(); return "https".equalsIgnoreCase(scheme) || "http".equalsIgnoreCase(scheme); } catch (IllegalArgumentException | NullPointerException error) { return false; } })
+      .findFirst().orElseThrow(() -> new IllegalStateException("No HTTP(S) redirect URI is registered."));
+  }
 
   private CompletedSession completeSession() throws Exception {
     CreateDirectProviderSessionResponse session = null;

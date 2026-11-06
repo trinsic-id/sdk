@@ -16,9 +16,8 @@ try {
     cpSync(join(new URL(".", import.meta.url).pathname, "CompatibilitySupport.rb"), join(directory, "CompatibilitySupport.rb"));
     cpSync(join(new URL(".", import.meta.url).pathname, "compatibility_test.rb"), join(directory, "compatibility_test.rb"));
     cpSync(join(new URL(".", import.meta.url).pathname, "harness_regression_test.rb"), join(directory, "harness_regression_test.rb"));
-    // Keep harness failures separate from SDK compatibility outcomes.
-    if (installed.status === 0) command("bundle", ["exec", "ruby", join(directory, "harness_regression_test.rb")], { env });
-    const execution = installed.status === 0 ? command("bundle", ["exec", "ruby", join(directory, "compatibility_test.rb"), ...(process.env.SDK_COMPATIBILITY_TEST_SCOPE === "serialization" ? ["--name", "/provider_outputs/"] : [])], { env, check: false }) : installed;
+    // One native run preserves harness failures alongside SDK outcomes.
+    const execution = installed.status === 0 ? command("bundle", ["exec", "ruby", "-r", join(directory, "harness_regression_test.rb"), join(directory, "compatibility_test.rb"), ...(process.env.SDK_COMPATIBILITY_TEST_SCOPE === "serialization" ? ["--name", "/provider_outputs|HarnessRegressionTest/"] : [])], { env, check: false }) : installed;
     return { sdkVersion: version, testCases: readProcessTestCases(output, execution, "ruby", installed.status === 0 ? "Ruby target" : "Bundler install") };
   }));
 } catch (error) { testCases = failure("ruby", error instanceof Error ? error.message : String(error)); }

@@ -26,6 +26,7 @@ func clientForTest(t *testing.T) (*trinsic_api.APIClient, string) {
 func runCase(t *testing.T, id string, action func() (any, error)) {
 	t.Helper()
 	record(id, nil, action)
+	results[len(results)-1].NativeTest = t.Name()
 	if results[len(results)-1].Status == "failed" {
 		t.Errorf("%s failed; see structured result", id)
 	}
@@ -117,7 +118,11 @@ func TestRecommendations(t *testing.T) {
 }
 func TestProviderOutputs(t *testing.T) {
 	// pso records one compatibility outcome per provider, preserving provider and model details.
+	first := len(results)
 	pso()
+	for index := first; index < len(results); index++ {
+		results[index].NativeTest = t.Name()
+	}
 	for _, result := range results {
 		if result.Status == "failed" && strings.HasPrefix(result.ID, "serialization.") {
 			t.Errorf("%s: %v", result.ID, result.Failure)

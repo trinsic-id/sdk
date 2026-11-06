@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { cpSync, existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { childEnvironment, command, failure, readProcessTestCases, SDK_VERSION, temporaryDirectory, writeExecutorResult } from "../../scripts/sdk-compatibility/executor-helpers.mjs";
+import { childEnvironment, command, failure, readNativeTestCases, SDK_VERSION, temporaryDirectory, writeExecutorResult } from "../../scripts/sdk-compatibility/executor-helpers.mjs";
 
 const tests = new URL(".", import.meta.url).pathname;
 const moduleName = "github.com/trinsic-id/sdk-go-api/v3";
@@ -17,8 +17,10 @@ try {
     writeFileSync(join(directory, "pso_models_gen.go"), providerOutputRegistry(packageDirectory));
     command("go", ["mod", "tidy"], { cwd: directory });
     const output = join(directory, "target-results.json");
-    const execution = command("go", ["test", "-count=1", ...(process.env.SDK_COMPATIBILITY_TEST_SCOPE === "serialization" ? ["-run", "TestProviderOutputs|TestHarness"] : []), "."], { cwd: directory, check: false, env: childEnvironment({ SDK_COMPATIBILITY_RESULT_FILE: output, SDK_VERSION: version }) });
-    return { sdkVersion: version, testCases: readProcessTestCases(output, execution, "go") };
+    const execution = command("go", ["test", "-json", "-count=1", ...(process.env.SDK_COMPATIBILITY_TEST_SCOPE === "serialization" ? ["-run", "TestProviderOutputs|TestHarness"] : []), "."], { cwd: directory, check: false, env: childEnvironment({ SDK_COMPATIBILITY_RESULT_FILE: output, SDK_VERSION: version }) });
+    const native = join(directory, "native.jsonl");
+    writeFileSync(native, execution.stdout ?? "");
+    return { sdkVersion: version, testCases: readNativeTestCases(output, execution, "go", "go", native) };
   }));
 } catch (error) { testCases = failure("go", error instanceof Error ? error.message : String(error)); }
 writeExecutorResult({ sdkVersion, testCases });

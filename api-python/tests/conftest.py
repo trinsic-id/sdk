@@ -25,7 +25,7 @@ def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo[Any]):
     marker = item.get_closest_marker("compatibility")
     if marker is None:
         return
-    entry: dict[str, Any] = {"id": marker.args[0], "status": "passed" if report.passed else "skipped" if report.skipped else "failed", "durationMs": round(report.duration * 1000, 3)}
+    entry: dict[str, Any] = {"id": marker.args[0], "nativeTest": item.nodeid.replace(".py::", ".").replace("/", ".").replace("::", "."), "status": "passed" if report.passed else "skipped" if report.skipped else "failed", "durationMs": round(report.duration * 1000, 3)}
     if marker.kwargs.get("parameters"):
         entry["parameters"] = marker.kwargs["parameters"]
     if marker.kwargs.get("advisory"):

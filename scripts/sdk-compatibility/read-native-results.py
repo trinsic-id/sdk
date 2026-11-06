@@ -1,4 +1,4 @@
-"""Read completed TRX/Surefire reports, including tests without compatibility IDs."""
+"""Read native test reports, including tests without compatibility IDs."""
 import json
 from pathlib import Path
 import sys
@@ -6,7 +6,17 @@ import xml.etree.ElementTree as ET
 
 
 kind, source = sys.argv[1:]
-paths = [Path(source)] if kind == "trx" else sorted(Path(source).glob("TEST-*.xml"))
+if kind == "go":
+    events = [json.loads(line) for line in Path(source).read_text().splitlines() if line.strip()]
+    if not any(not event.get("Test") and event.get("Action") in ("pass", "fail") for event in events):
+        raise ValueError("Go did not finish its native report")
+    failures = [{"name": event["Test"], "message": "".join(output.get("Output", "") for output in events if output.get("Test") == event["Test"])}
+                for event in events if event.get("Test") and event.get("Action") == "fail"]
+    failures.extend({"name": "native-panic", "message": event["Output"]} for event in events if event.get("Output", "").startswith("panic:"))
+    print(json.dumps(failures))
+    sys.exit(0)
+
+paths = [Path(source)] if Path(source).is_file() else sorted(Path(source).glob("TEST-*.xml"))
 if not paths:
     raise ValueError("Native test runner did not produce a report")
 failures = []
@@ -44,6 +54,6 @@ for path in paths:
             raise ValueError("JUnit report contains no test results")
         for case in root.iter("testcase"):
             for error in list(case.findall("failure")) + list(case.findall("error")):
-                failures.append({"name": case.attrib["classname"] + "." + case.attrib["name"],
+                failures.append({"name": case.attrib["name"] if kind == "node" else case.attrib["classname"] + "." + case.attrib["name"],
                                  "message": error.attrib.get("message") or error.text or "Native test failed"})
 print(json.dumps(failures))

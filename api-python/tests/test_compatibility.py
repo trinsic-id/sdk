@@ -47,7 +47,15 @@ def test_get_verification_profile(apis) -> None:
 @pytest.mark.compatibility("api.verification-profiles.list")
 def test_list_verification_profiles(apis) -> None:
     _, profiles, *_ = apis
-    support.assert_profile_present(profiles.list_verification_profiles(page=1, page_size=100))
+    support.assert_profile_page(profiles.list_verification_profiles(page=1, page_size=100))
+
+
+def test_profile_list_accepts_a_page_without_the_configured_profile() -> None:
+    from types import SimpleNamespace
+    from uuid import uuid4
+    response = SimpleNamespace(verification_profiles=[SimpleNamespace(id=uuid4())], more=True)
+    profiles = SimpleNamespace(list_verification_profiles=lambda **_kwargs: response)
+    test_list_verification_profiles((None, profiles))
 
 
 @pytest.mark.compatibility("api.sessions.list")

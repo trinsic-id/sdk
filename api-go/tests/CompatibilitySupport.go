@@ -20,6 +20,7 @@ type testCase struct {
 	Parameters map[string]any `json:"parameters,omitempty"`
 	Failure    map[string]any `json:"failure,omitempty"`
 	SkipReason string         `json:"skipReason,omitempty"`
+	NativeTest string         `json:"nativeTest,omitempty"`
 }
 
 var results []testCase

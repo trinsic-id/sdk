@@ -1,5 +1,12 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
+import { AsyncLocalStorage } from "node:async_hooks";
+import nativeTest from "node:test";
+
+const nativeTestName = new AsyncLocalStorage<string>();
+export function test(name: string, action: () => void | Promise<void>) {
+  return nativeTest(name, () => nativeTestName.run(name, action));
+}
 
 export interface CompatibilityCaseResult {
   advisory?: {
@@ -12,6 +19,7 @@ export interface CompatibilityCaseResult {
     name: string;
   };
   id: string;
+  nativeTest?: string;
   parameters?: Record<string, string>;
   skipReason?: string;
   status: "passed" | "failed" | "skipped";
@@ -45,6 +53,7 @@ export async function recordCompatibilityCase<T>(
     testCases.push({
       durationMs: elapsedMilliseconds(startedAt),
       failure: failureDetails(error),
+      nativeTest: nativeTestName.getStore(),
       id,
       parameters,
       status: "failed",

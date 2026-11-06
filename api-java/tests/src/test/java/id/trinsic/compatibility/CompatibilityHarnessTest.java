@@ -57,7 +57,7 @@ class CompatibilityHarnessTest {
       var mapper = new ApiClient().getObjectMapper();
       UUID sessionId = UUID.randomUUID();
       var session = mapper.readValue("{\"sessionId\":\"" + sessionId + "\",\"nextStep\":{\"content\":\"" + base + "/start\"},\"resultCollection\":{\"resultsAccessKey\":\"key\"}}", CreateDirectProviderSessionResponse.class);
-      var uris = mapper.readValue("{\"uris\":[{\"uri\":\"" + base + "/application\"}]}", ListRedirectUrisResponse.class);
+      var uris = mapper.readValue("{\"uris\":[{\"uri\":\"myapp://callback\"},{\"uri\":\"" + base + "/application\"}]}", ListRedirectUrisResponse.class);
       ApiException regression = new ApiException("GetSessionResult regression");
       CompatibilityTest compatibility = new CompatibilityTest();
       setField(compatibility, "profileId", UUID.randomUUID());
@@ -65,7 +65,7 @@ class CompatibilityHarnessTest {
         @Override public ListRedirectUrisResponse callList(Integer page, Integer size) { return uris; }
       });
       setField(compatibility, "sessions", new SessionsApi() {
-        @Override public CreateDirectProviderSessionResponse createDirectProviderSession(CreateDirectProviderSessionRequest request) { return session; }
+        @Override public CreateDirectProviderSessionResponse createDirectProviderSession(CreateDirectProviderSessionRequest request) { assertEquals(base + "/application", request.getRedirectUrl()); return session; }
         @Override public GetSessionResultResponse getSessionResult(UUID id, GetSessionResultRequest request) throws ApiException {
           assertEquals(sessionId, id);
           assertEquals("key", request.getResultsAccessKey());

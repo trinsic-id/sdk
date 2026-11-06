@@ -1,5 +1,24 @@
 require 'json'; require 'net/http'; require 'time'; require 'trinsic_api'; require 'uri'
 $compatibility_results = []
+
+class RecordedCompatibilityFailure < Minitest::Assertion; end
+class CompatibilityReporter < Minitest::AbstractReporter
+  attr_reader :failures, :complete
+  def initialize = @failures = []
+  def record(result)
+    result.failures.each_with_index do |error, index|
+      next if error.is_a?(Minitest::Skip)
+      name = error.is_a?(RecordedCompatibilityFailure) ? 'compatibility' : "#{result.klass}.#{result.name}:#{index}"
+      @failures << { 'name' => name, 'message' => error.message }
+    end
+  end
+  def report = @complete = true
+end
+Minitest.extensions << 'compatibility'
+def Minitest.plugin_compatibility_init(_options)
+  $compatibility_reporter = CompatibilityReporter.new
+  reporter << $compatibility_reporter
+end
 def configure_base_url(config, base_url)
   uri = URI(base_url)
   raise 'TRINSIC_TEST_BASE_URL must be an absolute HTTP(S) URL.' unless uri.is_a?(URI::HTTP) && uri.host
@@ -12,10 +31,10 @@ def record(id, params = {})
   started = Process.clock_gettime(Process::CLOCK_MONOTONIC); value = yield
   $compatibility_results << { 'id' => id, 'status' => 'passed', 'durationMs' => ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started) * 1000).to_i, 'parameters' => params }; value
 rescue StandardError => error
-  $compatibility_results << { 'id' => id, 'status' => 'failed', 'durationMs' => ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started) * 1000).to_i, 'parameters' => params, 'failure' => { 'name' => error.class.name, 'message' => error.message } }; nil
+  $compatibility_results << { 'id' => id, 'status' => 'failed', 'nativeTest' => 'compatibility', 'durationMs' => ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started) * 1000).to_i, 'parameters' => params, 'failure' => { 'name' => error.class.name, 'message' => error.message } }; nil
 end
 def record_skip(id, reason, params = {}) = $compatibility_results << { 'id' => id, 'status' => 'skipped', 'durationMs' => 0, 'parameters' => params, 'skipReason' => reason }
-def write_results = File.write(ENV.fetch('SDK_COMPATIBILITY_RESULT_FILE'), JSON.pretty_generate({ 'schemaVersion' => 1, 'testCases' => $compatibility_results }) + "\n")
+def write_results = File.write(ENV.fetch('SDK_COMPATIBILITY_RESULT_FILE'), JSON.pretty_generate({ 'schemaVersion' => 1, 'testCases' => $compatibility_results, 'nativeFailures' => $compatibility_reporter&.complete ? $compatibility_reporter.failures : nil }) + "\n")
 def model(name, attributes) = TrinsicApi.const_get(name).new(attributes)
 def as_hash(value) = value.respond_to?(:to_hash) ? value.to_hash : value
 def response_body(value) = value.is_a?(Array) && value.length == 3 && value.last.is_a?(Hash) ? value[0] : value
@@ -25,7 +44,7 @@ def compare_json(actual, expected, path, exact)
   if actual.is_a?(Hash) && expected.is_a?(Hash)
     actual.each { |key, value| compare_json(value, expected[key], "#{path}.#{key}", exact) if expected.key?(key) }; raise "#{path}: SDK omitted fixture fields: #{expected.keys - actual.keys}." if exact && !(expected.keys - actual.keys).empty?
   elsif actual.is_a?(Array) && expected.is_a?(Array)
-    raise "#{path}: array lengths differ." if exact && actual.length != expected.length; actual.each_with_index { |value, index| raise "#{path}[#{index}]: SDK emitted an array value absent from fixture." if index >= expected.length; compare_json(value, expected[index], "#{path}[#{index}]", exact) }
+    raise "#{path}: array lengths differ." if actual.length != expected.length; actual.each_with_index { |value, index| compare_json(value, expected[index], "#{path}[#{index}]", exact) }
   elsif actual != expected && !(actual.is_a?(String) && expected.is_a?(String) && equivalent_timestamp?(actual, expected))
     raise "#{path}: values differ; SDK=#{actual.inspect}, wire=#{expected.inspect}."
   end

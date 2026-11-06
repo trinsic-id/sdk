@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { childEnvironment, command, failure, readProcessTestCases, SDK_VERSION, temporaryDirectory, writeExecutorResult } from "../../scripts/sdk-compatibility/executor-helpers.mjs";
+import { childEnvironment, command, failure, readNativeTestCases, SDK_VERSION, temporaryDirectory, writeExecutorResult } from "../../scripts/sdk-compatibility/executor-helpers.mjs";
 
 const tests = new URL(".", import.meta.url).pathname;
-const files = process.env.SDK_COMPATIBILITY_TEST_SCOPE === "serialization" ? ["provider-outputs"] : ["read-apis", "session-lifecycle", "recommendations", "provider-outputs"];
+const files = process.env.SDK_COMPATIBILITY_TEST_SCOPE === "serialization" ? ["provider-outputs", "harness"] : ["read-apis", "session-lifecycle", "recommendations", "provider-outputs", "harness"];
 let sdkVersion, testCases;
 try {
   ({ sdkVersion, testCases } = temporaryDirectory("trinsic-typescript-compat-", (directory) => {
@@ -13,8 +13,9 @@ try {
     const cases = [];
     for (const name of files) {
       const output = join(directory, `${name}.result.json`);
-      const execution = command(process.execPath, ["--use-system-ca", "--import", "tsx", "--test", join(tests, "src", `${name}.test.ts`)], { cwd: tests, check: false, env: childEnvironment({ SDK_COMPATIBILITY_RESULT_FILE: output, SDK_VERSION: version }) });
-      cases.push(...readProcessTestCases(output, execution, "typescript", name));
+      const native = join(directory, `${name}.xml`);
+      const execution = command(process.execPath, ["--use-system-ca", "--import", "tsx", "--test", "--test-reporter=spec", "--test-reporter-destination=stdout", "--test-reporter=junit", `--test-reporter-destination=${native}`, join(tests, "src", `${name}.test.ts`)], { cwd: tests, check: false, env: childEnvironment({ SDK_COMPATIBILITY_RESULT_FILE: output, SDK_VERSION: version }) });
+      cases.push(...readNativeTestCases(output, execution, "typescript", "node", native));
     }
     return { sdkVersion: version, testCases: cases };
   }));

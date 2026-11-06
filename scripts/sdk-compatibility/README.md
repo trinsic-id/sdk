@@ -31,6 +31,9 @@ redirect test provider supplies synthetic verification data. HTTP redirect
 helpers perform the browser portion; SDK operations still use SDK serializers.
 Tests attempt cancellation during cleanup, including after assertion failures;
 completed/redacted sessions may no longer be cancellable.
+Each live case records its own outcome. TypeScript shares browser-completed
+session setup lazily, while result decoding stays inside the result/attachment
+cases so a decoding failure cannot suppress redaction or unrelated operations.
 
 ## Contract coverage
 
@@ -96,6 +99,10 @@ Statuses are `passed`, `failed`, or `skipped`; skipped cases include `skipReason
 Unsupported provider models are explicit skips, not failures needing exceptions.
 Setup, missing coverage, malformed native reports, and unrecorded native failures
 use `framework.*` case IDs. `compatibility-tests.json` lists the required cases.
+Native TRX, JUnit, Go JSON, and Minitest results are reconciled with the SDK cases;
+one recorded incompatibility cannot account for an independent native failure.
+Ruby runs its harness regressions and SDK cases together so both sets of outcomes
+survive even when one fails.
 Raw language results and fixtures remain alongside the combined report. A rerun
 replaces previous results. Exit 0 means no raw failures; exit 1 means failures.
 There is **no exception handling in the SDK repository**: Connect consumes the
