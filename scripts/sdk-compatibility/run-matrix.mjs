@@ -4,8 +4,7 @@
  *
  * The language executor installs one SDK target and writes a small result file
  * ({ schemaVersion: 1, sdkVersion, testCases }).  Everything that is common to
- * every language—target selection, report construction, catalog coverage, and
- * API-operation coverage—lives here.
+ * every language—target selection, report construction, required-case coverage—lives here.
  */
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -52,10 +51,9 @@ const targets = [
 ];
 const results = targets.map(runTarget);
 if (process.env.SDK_COMPATIBILITY_VALIDATE_CATALOG !== "false") {
-  const expected = catalog.filter((testCase) => testCase.requiredLanguages?.includes(language)).map((testCase) => testCase.id);
   for (const target of results) {
     const actual = new Set(target.testCases.map((testCase) => testCase.id));
-    const missing = expected.filter((id) => !actual.has(id));
+    const missing = catalog.filter((id) => !actual.has(id));
     if (missing.length) target.testCases.push(failure("framework.catalog-coverage", "CoverageError", `Missing required ${language} test cases: ${missing.join(", ")}.`));
   }
 }
@@ -64,13 +62,10 @@ for (const target of results) {
   target.testCases = acknowledgeFailures(target.testCases, target, language, matrix.compatibility.acknowledgements);
 }
 const report = {
-  $schema: "https://trinsic.id/schemas/sdk-compatibility-results-v1.json",
   schemaVersion: 1,
   run: { generatedAt: new Date().toISOString(), targetBaseUrl: configuration.TRINSIC_TEST_BASE_URL.replace(/\/$/, "") },
-  suite: { language }, testCatalog: catalog, targets: results,
+  suite: { language }, targets: results,
 };
-const coverage = apiCoverage(catalog);
-if (coverage) report.apiCoverage = coverage;
 const output = resolve(process.env.SDK_COMPATIBILITY_RESULTS_PATH ?? join(testsRoot, ".results", "compatibility.json"));
 mkdirSync(dirname(output), { recursive: true });
 writeFileSync(output, `${JSON.stringify(report, null, 2)}\n`);
@@ -120,18 +115,3 @@ function runTarget(target) {
   return result;
 }
 function failure(id, name, message) { return { id, status: "failed", durationMs: 0, failure: { name, message } }; }
-function apiCoverage(cases) {
-  const specPath = process.env.SDK_COMPATIBILITY_OPENAPI_SPEC;
-  if (!specPath || !existsSync(specPath)) return undefined;
-  const spec = JSON.parse(readFileSync(specPath));
-  const caseMap = new Map();
-  for (const testCase of cases.filter((testCase) => testCase.kind === "api-operation" && testCase.operationId)) caseMap.set(testCase.operationId, [...(caseMap.get(testCase.operationId) ?? []), testCase.id]);
-  const operations = [], operationIds = new Set();
-  for (const [path, item] of Object.entries(spec.paths ?? {})) for (const [method, operation] of Object.entries(item ?? {})) {
-    if (!['delete','get','head','options','patch','post','put'].includes(method.toLowerCase()) || !operation?.operationId) continue;
-    operationIds.add(operation.operationId); const testCaseIds = caseMap.get(operation.operationId) ?? [];
-    operations.push({ covered: testCaseIds.length > 0, method: method.toUpperCase(), operationId: operation.operationId, path, testCaseIds });
-  }
-  operations.sort((left, right) => left.path.localeCompare(right.path) || left.method.localeCompare(right.method));
-  return { covered: operations.filter((operation) => operation.covered).length, total: operations.length, operations, unmappedTestCaseIds: cases.filter((testCase) => testCase.kind === "api-operation" && !operationIds.has(testCase.operationId)).map((testCase) => testCase.id) };
-}

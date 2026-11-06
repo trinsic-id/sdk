@@ -31,7 +31,7 @@ run_suite() {
   if [[ ! -f "$result_path" ]]; then
     SDK_COMPATIBILITY_FALLBACK_RESULT_PATH="$result_path" SDK_COMPATIBILITY_FALLBACK_LANGUAGE="$language" SDK_COMPATIBILITY_FALLBACK_EXIT_CODE="$runner_exit_code" SDK_COMPATIBILITY_FALLBACK_BASE_URL="${TRINSIC_TEST_BASE_URL:-https://unknown.invalid}" node -e '
       const fs = require("node:fs"); const path = process.env.SDK_COMPATIBILITY_FALLBACK_RESULT_PATH;
-      fs.writeFileSync(path, `${JSON.stringify({ $schema: "https://trinsic.id/schemas/sdk-compatibility-results-v1.json", schemaVersion: 1, run: { generatedAt: new Date().toISOString(), targetBaseUrl: process.env.SDK_COMPATIBILITY_FALLBACK_BASE_URL }, suite: { language: process.env.SDK_COMPATIBILITY_FALLBACK_LANGUAGE }, testCatalog: [], targets: [{ isCurrent: true, label: "suite startup", setupFailure: `Runner exited with code ${process.env.SDK_COMPATIBILITY_FALLBACK_EXIT_CODE} before writing a compatibility report. See the preceding suite output.`, testCases: [] }] }, null, 2)}\n`);
+      fs.writeFileSync(path, `${JSON.stringify({ schemaVersion: 1, run: { generatedAt: new Date().toISOString(), targetBaseUrl: process.env.SDK_COMPATIBILITY_FALLBACK_BASE_URL }, suite: { language: process.env.SDK_COMPATIBILITY_FALLBACK_LANGUAGE }, targets: [{ isCurrent: true, label: "suite startup", setupFailure: `Runner exited with code ${process.env.SDK_COMPATIBILITY_FALLBACK_EXIT_CODE} before writing a compatibility report. See the preceding suite output.`, testCases: [] }] }, null, 2)}\n`);
     '
     # Even a zero exit is invalid if the runner did not produce its results.
     if (( runner_exit_code == 0 )); then runner_exit_code=1; fi

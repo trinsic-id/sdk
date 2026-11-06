@@ -59,31 +59,12 @@ configuration regressions separately before compatibility tests.
 Native test output is available in the job log. Each language's JSON results and
 `suite-status.tsv` are retained as CI artifacts. There is no separate report renderer.
 
-## Result contract
+## Results
 
-Every suite must write a JSON document with these required fields:
-
-```json
-{
-  "$schema": "https://trinsic.id/schemas/sdk-compatibility-results-v1.json",
-  "schemaVersion": 1,
-  "run": { "generatedAt": "<ISO-8601>", "targetBaseUrl": "<URL>" },
-  "suite": { "language": "<language>" },
-  "testCatalog": [],
-  "targets": []
-}
-```
-
-Each target has a label, optional SDK version, and `testCases`. A test case
-records its `id`, `status` (`passed`, `failed`, or `skipped`), and optional
-failure, advisory, parameter, or skip-reason details.
-
-Suites may additionally include `apiCoverage`, derived from the shared Swagger
-contract for that run. It contains `covered`, `total`, `operations`, and
-`unmappedTestCaseIds`. Each operation records its HTTP method, path, operation
-ID, and mapped compatibility-test IDs. A suite may report PSO outcomes through
-the standard `serialization.provider-output-round-trip` case ID with
-`providerId` and optional `sdkModelName` parameters.
+Each language writes `schemaVersion`, `run`, `suite`, and `targets` in its JSON
+artifact. Targets contain their label, SDK version, and individual test outcomes,
+including failure details, skip reasons, and provider/model parameters.
+`compatibility-tests.json` lists the case IDs required from every language.
 
 ## Revision acknowledgements
 
@@ -98,7 +79,7 @@ acknowledgements, even if they share the published package's version number.
 ```json
 {
   "language": "go",
-  "sdkVersion": "3.0.0",
+  "sdkVersions": ["3.0.0"],
   "testCaseId": "serialization.provider-output-round-trip",
   "parameters": { "providerId": "example-provider" },
   "reason": "The model shape changed intentionally in this release.",
@@ -106,7 +87,8 @@ acknowledgements, even if they share the published package's version number.
 }
 ```
 
-`language`, `sdkVersion`, `testCaseId`, and `reason` are required. A failure is
+`language`, `sdkVersions`, `testCaseId`, and `reason` are required. Identical
+exceptions list their affected versions together; versions are matched exactly. A failure is
 acknowledged only when every string in the nonempty `failureMessageIncludes`
 array occurs in its message; another failure of the same case still fails CI. `parameters`
 is an optional exact, partial match for a case's string parameters; use it to

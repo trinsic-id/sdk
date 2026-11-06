@@ -40,33 +40,10 @@
     "acknowledgements": [
       {
         "language": "csharp",
-        "sdkVersion": "3.0.0",
-        "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": {
-          "providerId": "france-identite-numerique",
-          "sdkModelName": "FrenchNumeriqueProviderOutput"
-        },
-        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName.",
-        "failureMessageIncludes": [
-          "FrenchNumeriqueGivenName"
-        ]
-      },
-      {
-        "language": "csharp",
-        "sdkVersion": "3.1.0",
-        "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": {
-          "providerId": "france-identite-numerique",
-          "sdkModelName": "FrenchNumeriqueProviderOutput"
-        },
-        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName.",
-        "failureMessageIncludes": [
-          "FrenchNumeriqueGivenName"
-        ]
-      },
-      {
-        "language": "go",
-        "sdkVersion": "3.0.0",
+        "sdkVersions": [
+          "3.0.0",
+          "3.1.0"
+        ],
         "testCaseId": "serialization.provider-output-round-trip",
         "parameters": {
           "providerId": "france-identite-numerique",
@@ -79,7 +56,10 @@
       },
       {
         "language": "go",
-        "sdkVersion": "3.1.0",
+        "sdkVersions": [
+          "3.0.0",
+          "3.1.0"
+        ],
         "testCaseId": "serialization.provider-output-round-trip",
         "parameters": {
           "providerId": "france-identite-numerique",
@@ -92,20 +72,10 @@
       },
       {
         "language": "php",
-        "sdkVersion": "3.0.0",
-        "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": {
-          "providerId": "france-identite-numerique",
-          "sdkModelName": "FrenchNumeriqueProviderOutput"
-        },
-        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName.",
-        "failureMessageIncludes": [
-          "givenName"
-        ]
-      },
-      {
-        "language": "php",
-        "sdkVersion": "3.1.0",
+        "sdkVersions": [
+          "3.0.0",
+          "3.1.0"
+        ],
         "testCaseId": "serialization.provider-output-round-trip",
         "parameters": {
           "providerId": "france-identite-numerique",
@@ -118,20 +88,10 @@
       },
       {
         "language": "python",
-        "sdkVersion": "3.0.0",
-        "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": {
-          "providerId": "france-identite-numerique",
-          "sdkModelName": "FrenchNumeriqueProviderOutput"
-        },
-        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName.",
-        "failureMessageIncludes": [
-          "FrenchNumeriqueGivenName"
-        ]
-      },
-      {
-        "language": "python",
-        "sdkVersion": "3.1.0",
+        "sdkVersions": [
+          "3.0.0",
+          "3.1.0"
+        ],
         "testCaseId": "serialization.provider-output-round-trip",
         "parameters": {
           "providerId": "france-identite-numerique",
@@ -144,33 +104,10 @@
       },
       {
         "language": "ruby",
-        "sdkVersion": "3.0.0",
-        "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": {
-          "providerId": "france-identite-numerique",
-          "sdkModelName": "FrenchNumeriqueProviderOutput"
-        },
-        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName.",
-        "failureMessageIncludes": [
-          "givenName"
-        ]
-      },
-      {
-        "language": "ruby",
-        "sdkVersion": "3.1.0",
-        "testCaseId": "serialization.provider-output-round-trip",
-        "parameters": {
-          "providerId": "france-identite-numerique",
-          "sdkModelName": "FrenchNumeriqueProviderOutput"
-        },
-        "reason": "Connect intentionally changed France Identité Numérique's givenName from an object to a string and exposed the structured value separately as splittedGivenName.",
-        "failureMessageIncludes": [
-          "givenName"
-        ]
-      },
-      {
-        "language": "typescript",
-        "sdkVersion": "3.0.0",
+        "sdkVersions": [
+          "3.0.0",
+          "3.1.0"
+        ],
         "testCaseId": "serialization.provider-output-round-trip",
         "parameters": {
           "providerId": "france-identite-numerique",
@@ -183,7 +120,10 @@
       },
       {
         "language": "typescript",
-        "sdkVersion": "3.1.0",
+        "sdkVersions": [
+          "3.0.0",
+          "3.1.0"
+        ],
         "testCaseId": "serialization.provider-output-round-trip",
         "parameters": {
           "providerId": "france-identite-numerique",
@@ -196,7 +136,9 @@
       },
       {
         "language": "go",
-        "sdkVersion": "3.0.0",
+        "sdkVersions": [
+          "3.0.0"
+        ],
         "testCaseId": "serialization.provider-output-round-trip",
         "parameters": {
           "providerId": "apple-wallet",
@@ -209,7 +151,9 @@
       },
       {
         "language": "go",
-        "sdkVersion": "3.0.0",
+        "sdkVersions": [
+          "3.0.0"
+        ],
         "testCaseId": "serialization.provider-output-round-trip",
         "parameters": {
           "providerId": "google-wallet",
@@ -222,7 +166,9 @@
       },
       {
         "language": "go",
-        "sdkVersion": "3.0.0",
+        "sdkVersions": [
+          "3.0.0"
+        ],
         "testCaseId": "serialization.provider-output-round-trip",
         "parameters": {
           "providerId": "samsung-wallet",
@@ -235,7 +181,9 @@
       },
       {
         "language": "python",
-        "sdkVersion": "3.0.0",
+        "sdkVersions": [
+          "3.0.0"
+        ],
         "testCaseId": "serialization.provider-output-round-trip",
         "parameters": {
           "providerId": "apple-wallet",
@@ -248,7 +196,9 @@
       },
       {
         "language": "python",
-        "sdkVersion": "3.0.0",
+        "sdkVersions": [
+          "3.0.0"
+        ],
         "testCaseId": "serialization.provider-output-round-trip",
         "parameters": {
           "providerId": "google-wallet",
@@ -261,7 +211,9 @@
       },
       {
         "language": "python",
-        "sdkVersion": "3.0.0",
+        "sdkVersions": [
+          "3.0.0"
+        ],
         "testCaseId": "serialization.provider-output-round-trip",
         "parameters": {
           "providerId": "samsung-wallet",
@@ -274,7 +226,9 @@
       },
       {
         "language": "go",
-        "sdkVersion": "3.0.0",
+        "sdkVersions": [
+          "3.0.0"
+        ],
         "testCaseId": "serialization.provider-output-round-trip",
         "parameters": {
           "providerId": "philippines-digital-national-id-qr",
@@ -287,7 +241,9 @@
       },
       {
         "language": "go",
-        "sdkVersion": "3.0.0",
+        "sdkVersions": [
+          "3.0.0"
+        ],
         "testCaseId": "serialization.provider-output-round-trip",
         "parameters": {
           "providerId": "philippines-physical-national-id-qr",
@@ -300,7 +256,9 @@
       },
       {
         "language": "go",
-        "sdkVersion": "3.0.0",
+        "sdkVersions": [
+          "3.0.0"
+        ],
         "testCaseId": "api.providers.list",
         "reason": "Connect added localizedDisplayNames to provider responses after Go 3.0; its strict generated deserializer rejects the added field.",
         "failureMessageIncludes": [
@@ -309,7 +267,9 @@
       },
       {
         "language": "go",
-        "sdkVersion": "3.0.0",
+        "sdkVersions": [
+          "3.0.0"
+        ],
         "testCaseId": "api.verification-profiles.get-by-id",
         "reason": "Connect added externalId to verification profile responses after Go 3.0; its strict generated deserializer rejects the added field.",
         "failureMessageIncludes": [
@@ -318,7 +278,9 @@
       },
       {
         "language": "go",
-        "sdkVersion": "3.0.0",
+        "sdkVersions": [
+          "3.0.0"
+        ],
         "testCaseId": "api.verification-profiles.list",
         "reason": "Connect added externalId to verification profile responses after Go 3.0; its strict generated deserializer rejects the added field.",
         "failureMessageIncludes": [
@@ -327,7 +289,9 @@
       },
       {
         "language": "go",
-        "sdkVersion": "3.0.0",
+        "sdkVersions": [
+          "3.0.0"
+        ],
         "testCaseId": "api.sessions.recommend-providers",
         "reason": "Connect added remainder to provider recommendation responses after Go 3.0; its strict generated deserializer rejects the added field.",
         "failureMessageIncludes": [
@@ -336,25 +300,11 @@
       },
       {
         "language": "php",
-        "sdkVersion": "3.0.0",
-        "testCaseId": "api.sessions.get-result",
-        "reason": "This published PHP SDK was generated with Match as an identifier, which is reserved syntax on its supported PHP 8.1+ runtime.",
-        "failureMessageIncludes": [
-          "match"
-        ]
-      },
-      {
-        "language": "php",
-        "sdkVersion": "3.1.0",
-        "testCaseId": "api.sessions.get-result",
-        "reason": "This published PHP SDK was generated with Match as an identifier, which is reserved syntax on its supported PHP 8.1+ runtime.",
-        "failureMessageIncludes": [
-          "match"
-        ]
-      },
-      {
-        "language": "php",
-        "sdkVersion": "3.2.1",
+        "sdkVersions": [
+          "3.0.0",
+          "3.1.0",
+          "3.2.1"
+        ],
         "testCaseId": "api.sessions.get-result",
         "reason": "This published PHP SDK was generated with Match as an identifier, which is reserved syntax on its supported PHP 8.1+ runtime.",
         "failureMessageIncludes": [
@@ -363,7 +313,9 @@
       },
       {
         "language": "java",
-        "sdkVersion": "3.0.0",
+        "sdkVersions": [
+          "3.0.0"
+        ],
         "testCaseId": "api.providers.get",
         "reason": "Java 3.0 predates the provider-by-ID operation and does not expose ProvidersApi.getProvider.",
         "failureMessageIncludes": [
@@ -372,7 +324,9 @@
       },
       {
         "language": "java",
-        "sdkVersion": "3.2.1",
+        "sdkVersions": [
+          "3.2.1"
+        ],
         "testCaseId": "serialization.provider-output-round-trip",
         "parameters": {
           "providerId": "india-digilocker-aadhaar-fetch",
@@ -385,7 +339,9 @@
       },
       {
         "language": "java",
-        "sdkVersion": "3.1.0",
+        "sdkVersions": [
+          "3.1.0"
+        ],
         "testCaseId": "serialization.provider-output-round-trip",
         "parameters": {
           "providerId": "france-identite-numerique",
@@ -398,7 +354,9 @@
       },
       {
         "language": "java",
-        "sdkVersion": "3.1.0",
+        "sdkVersions": [
+          "3.1.0"
+        ],
         "testCaseId": "serialization.provider-output-round-trip",
         "parameters": {
           "providerId": "india-digilocker-aadhaar-fetch",
@@ -411,7 +369,9 @@
       },
       {
         "language": "java",
-        "sdkVersion": "3.0.0",
+        "sdkVersions": [
+          "3.0.0"
+        ],
         "testCaseId": "serialization.provider-output-round-trip",
         "parameters": {
           "providerId": "france-identite-numerique",
@@ -424,33 +384,11 @@
       },
       {
         "language": "python",
-        "sdkVersion": "3.0.0",
-        "testCaseId": "serialization.unknown-enum",
-        "parameters": {
-          "sdkModelName": "IntegrationStep"
-        },
-        "failureMessageIncludes": [
-          "ValidationError",
-          "FutureSdkTestMethod"
+        "sdkVersions": [
+          "3.0.0",
+          "3.1.0",
+          "3.2.1"
         ],
-        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
-      },
-      {
-        "language": "python",
-        "sdkVersion": "3.1.0",
-        "testCaseId": "serialization.unknown-enum",
-        "parameters": {
-          "sdkModelName": "IntegrationStep"
-        },
-        "failureMessageIncludes": [
-          "ValidationError",
-          "FutureSdkTestMethod"
-        ],
-        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
-      },
-      {
-        "language": "python",
-        "sdkVersion": "3.2.1",
         "testCaseId": "serialization.unknown-enum",
         "parameters": {
           "sdkModelName": "IntegrationStep"
@@ -463,31 +401,11 @@
       },
       {
         "language": "go",
-        "sdkVersion": "3.0.0",
-        "testCaseId": "serialization.unknown-enum",
-        "parameters": {
-          "sdkModelName": "IntegrationStep"
-        },
-        "failureMessageIncludes": [
-          "FutureSdkTestMethod is not a valid IntegrationLaunchMethod"
+        "sdkVersions": [
+          "3.0.0",
+          "3.1.0",
+          "3.2.1"
         ],
-        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
-      },
-      {
-        "language": "go",
-        "sdkVersion": "3.1.0",
-        "testCaseId": "serialization.unknown-enum",
-        "parameters": {
-          "sdkModelName": "IntegrationStep"
-        },
-        "failureMessageIncludes": [
-          "FutureSdkTestMethod is not a valid IntegrationLaunchMethod"
-        ],
-        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
-      },
-      {
-        "language": "go",
-        "sdkVersion": "3.2.1",
         "testCaseId": "serialization.unknown-enum",
         "parameters": {
           "sdkModelName": "IntegrationStep"
@@ -499,33 +417,11 @@
       },
       {
         "language": "csharp",
-        "sdkVersion": "3.0.0",
-        "testCaseId": "serialization.unknown-enum",
-        "parameters": {
-          "sdkModelName": "IntegrationStep"
-        },
-        "failureMessageIncludes": [
-          "Property is not nullable for class IntegrationStep",
-          "'method'"
+        "sdkVersions": [
+          "3.0.0",
+          "3.1.0",
+          "3.2.1"
         ],
-        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
-      },
-      {
-        "language": "csharp",
-        "sdkVersion": "3.1.0",
-        "testCaseId": "serialization.unknown-enum",
-        "parameters": {
-          "sdkModelName": "IntegrationStep"
-        },
-        "failureMessageIncludes": [
-          "Property is not nullable for class IntegrationStep",
-          "'method'"
-        ],
-        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
-      },
-      {
-        "language": "csharp",
-        "sdkVersion": "3.2.1",
         "testCaseId": "serialization.unknown-enum",
         "parameters": {
           "sdkModelName": "IntegrationStep"
@@ -538,33 +434,11 @@
       },
       {
         "language": "php",
-        "sdkVersion": "3.0.0",
-        "testCaseId": "serialization.unknown-enum",
-        "parameters": {
-          "sdkModelName": "IntegrationStep"
-        },
-        "failureMessageIncludes": [
-          "Invalid value for enum",
-          "IntegrationLaunchMethod"
+        "sdkVersions": [
+          "3.0.0",
+          "3.1.0",
+          "3.2.1"
         ],
-        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
-      },
-      {
-        "language": "php",
-        "sdkVersion": "3.1.0",
-        "testCaseId": "serialization.unknown-enum",
-        "parameters": {
-          "sdkModelName": "IntegrationStep"
-        },
-        "failureMessageIncludes": [
-          "Invalid value for enum",
-          "IntegrationLaunchMethod"
-        ],
-        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
-      },
-      {
-        "language": "php",
-        "sdkVersion": "3.2.1",
         "testCaseId": "serialization.unknown-enum",
         "parameters": {
           "sdkModelName": "IntegrationStep"
@@ -577,31 +451,11 @@
       },
       {
         "language": "ruby",
-        "sdkVersion": "3.0.0",
-        "testCaseId": "serialization.unknown-enum",
-        "parameters": {
-          "sdkModelName": "IntegrationStep"
-        },
-        "failureMessageIncludes": [
-          "Invalid ENUM value FutureSdkTestMethod"
+        "sdkVersions": [
+          "3.0.0",
+          "3.1.0",
+          "3.2.1"
         ],
-        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
-      },
-      {
-        "language": "ruby",
-        "sdkVersion": "3.1.0",
-        "testCaseId": "serialization.unknown-enum",
-        "parameters": {
-          "sdkModelName": "IntegrationStep"
-        },
-        "failureMessageIncludes": [
-          "Invalid ENUM value FutureSdkTestMethod"
-        ],
-        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
-      },
-      {
-        "language": "ruby",
-        "sdkVersion": "3.2.1",
         "testCaseId": "serialization.unknown-enum",
         "parameters": {
           "sdkModelName": "IntegrationStep"
@@ -613,31 +467,11 @@
       },
       {
         "language": "java",
-        "sdkVersion": "3.0.0",
-        "testCaseId": "serialization.unknown-enum",
-        "parameters": {
-          "sdkModelName": "IntegrationStep"
-        },
-        "failureMessageIncludes": [
-          "Unexpected value 'FutureSdkTestMethod'"
+        "sdkVersions": [
+          "3.0.0",
+          "3.1.0",
+          "3.2.1"
         ],
-        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
-      },
-      {
-        "language": "java",
-        "sdkVersion": "3.1.0",
-        "testCaseId": "serialization.unknown-enum",
-        "parameters": {
-          "sdkModelName": "IntegrationStep"
-        },
-        "failureMessageIncludes": [
-          "Unexpected value 'FutureSdkTestMethod'"
-        ],
-        "reason": "This immutable published SDK rejects future enum values. Current generated SDKs must pass the forward-compatibility case."
-      },
-      {
-        "language": "java",
-        "sdkVersion": "3.2.1",
         "testCaseId": "serialization.unknown-enum",
         "parameters": {
           "sdkModelName": "IntegrationStep"
@@ -649,7 +483,9 @@
       },
       {
         "language": "go",
-        "sdkVersion": "3.0.0",
+        "sdkVersions": [
+          "3.0.0"
+        ],
         "testCaseId": "serialization.unknown-fields",
         "parameters": {
           "sdkModelName": "IntegrationStep"
@@ -661,7 +497,9 @@
       },
       {
         "language": "python",
-        "sdkVersion": "3.0.0",
+        "sdkVersions": [
+          "3.0.0"
+        ],
         "testCaseId": "serialization.nested-model-dictionaries",
         "parameters": {
           "sdkModelName": "MdlOutput"
@@ -673,7 +511,9 @@
       },
       {
         "language": "go",
-        "sdkVersion": "3.0.0",
+        "sdkVersions": [
+          "3.0.0"
+        ],
         "testCaseId": "serialization.provider-output-round-trip",
         "parameters": {
           "providerId": "a-itsme-login",
@@ -686,25 +526,11 @@
       },
       {
         "language": "php",
-        "sdkVersion": "3.0.0",
-        "testCaseId": "api.sessions.get-attachment",
-        "reason": "PHP releases through 3.2.1 use the reserved Match class name; parsing the completed result needed to locate an attachment fails on supported PHP 8 runtimes. The current generator maps Match to MatchModel.",
-        "failureMessageIncludes": [
-          "match"
-        ]
-      },
-      {
-        "language": "php",
-        "sdkVersion": "3.1.0",
-        "testCaseId": "api.sessions.get-attachment",
-        "reason": "PHP releases through 3.2.1 use the reserved Match class name; parsing the completed result needed to locate an attachment fails on supported PHP 8 runtimes. The current generator maps Match to MatchModel.",
-        "failureMessageIncludes": [
-          "match"
-        ]
-      },
-      {
-        "language": "php",
-        "sdkVersion": "3.2.1",
+        "sdkVersions": [
+          "3.0.0",
+          "3.1.0",
+          "3.2.1"
+        ],
         "testCaseId": "api.sessions.get-attachment",
         "reason": "PHP releases through 3.2.1 use the reserved Match class name; parsing the completed result needed to locate an attachment fails on supported PHP 8 runtimes. The current generator maps Match to MatchModel.",
         "failureMessageIncludes": [

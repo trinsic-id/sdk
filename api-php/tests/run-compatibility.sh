@@ -18,4 +18,4 @@ git -C "$REPO_ROOT" fetch --no-tags origin main:refs/remotes/origin/main 2>/dev/
 rmdir "$main_worktree"
 git -C "$REPO_ROOT" worktree add --detach "$main_worktree" "${SDK_COMPATIBILITY_MAIN_REF:-origin/main}" >/dev/null
 bash "$REPO_ROOT/scripts/sdk-compatibility/build-baseline.sh" "$main_worktree" php "$swagger_spec"
-SDK_COMPATIBILITY_CURRENT_PACKAGE="$current_package" SDK_COMPATIBILITY_MAIN_PACKAGE="$main_package" SDK_ORIGIN_MAIN_REVISION="$(git -C "$main_worktree" rev-parse --short HEAD)" SDK_COMPATIBILITY_OPENAPI_SPEC="$swagger_spec" SDK_COMPATIBILITY_PACKAGE_LABEL="trinsic/api" node "$REPO_ROOT/scripts/sdk-compatibility/run-matrix.mjs" php node "$SCRIPT_DIR/run_matrix.mjs"
+SDK_COMPATIBILITY_CURRENT_PACKAGE="$current_package" SDK_COMPATIBILITY_MAIN_PACKAGE="$main_package" SDK_ORIGIN_MAIN_REVISION="$(git -C "$main_worktree" rev-parse --short HEAD)" SDK_COMPATIBILITY_PACKAGE_LABEL="trinsic/api" node "$REPO_ROOT/scripts/sdk-compatibility/run-matrix.mjs" php node "$SCRIPT_DIR/run_matrix.mjs"

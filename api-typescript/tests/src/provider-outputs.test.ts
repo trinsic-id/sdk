@@ -1,16 +1,12 @@
 import assert from "node:assert/strict";
-import { createRequire } from "node:module";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import { asRecord, isCurrentSdk, requiredEnvironment, sdk, targetLabel, type JsonRecord } from "./support.js";
 
-import { readTestConfiguration } from "./config.js";
 import {
   recordCompatibilityCase,
   recordSkippedCompatibilityCase,
 } from "./results.js";
-
-type JsonRecord = Record<string, unknown>;
-type SdkModule = Record<string, unknown>;
 
 interface ProviderOutputFixture {
   hasPublicSdkModel: boolean;
@@ -27,16 +23,10 @@ interface ProviderOutputConverters {
   toJson: (value: unknown) => unknown;
 }
 
-const installRoot = requiredEnvironment("SDK_INSTALL_ROOT");
-const isCurrentSdk = requiredEnvironment("SDK_IS_CURRENT") === "true";
-const targetLabel = requiredEnvironment("SDK_TARGET_LABEL");
-const configuration = readTestConfiguration();
-const sdk = loadSdk(installRoot);
-
 test(`${targetLabel}: provider-output fixtures round-trip through every supported generated model`, async () => {
   const fixtures = await recordCompatibilityCase(
     "serialization.provider-output-round-trip",
-    fetchFixtureCatalog,
+    async () => JSON.parse(await readFile(requiredEnvironment("SDK_COMPATIBILITY_PSO_FIXTURES_PATH"), "utf8")).fixtures as ProviderOutputFixture[],
     { scope: "catalog" },
   );
   assert.ok(fixtures.length > 0, "expected Connect to expose provider-output fixtures");
@@ -69,31 +59,8 @@ test(`${targetLabel}: provider-output fixtures round-trip through every supporte
       continue;
     }
     const converters = findConverters(fixture);
-    if (!converters) {
-      if (isCurrentSdk || fixture.testCaseId) {
-        try {
-          await recordCompatibilityCase(
-            caseId,
-            async () => {
-              assert.fail(
-                `Connect declares ${fixture.providerId}'s ${fixture.sdkModelName} output as public, `
-                + `but ${targetLabel} does not export ${fixture.sdkModelName}FromJSON and ${fixture.sdkModelName}ToJSON. `
-                + "Expose the model in the target Swagger document and regenerate the SDK, "
-                + "or mark the provider output as non-public in the fixture catalog.",
-              );
-            },
-            modelParameters,
-          );
-        } catch (error) {
-          failures.push(asError(error));
-        }
-      } else {
-        recordSkippedCompatibilityCase(
-          caseId,
-          "The published SDK does not expose this provider-output model.",
-          modelParameters,
-        );
-      }
+    if (!converters && !isCurrentSdk && !fixture.testCaseId) {
+      recordSkippedCompatibilityCase(caseId, "The published SDK does not expose this provider-output model.", modelParameters);
       continue;
     }
 
@@ -101,24 +68,15 @@ test(`${targetLabel}: provider-output fixtures round-trip through every supporte
       await recordCompatibilityCase(
         caseId,
         async () => {
-          const rawOutput = await fetchFixture(fixture.providerId);
+          assert.ok(converters, `${targetLabel} does not export ${fixture.sdkModelName}FromJSON and ${fixture.sdkModelName}ToJSON for ${fixture.providerId}.`);
+          const rawOutput = asRecord(fixture.output, `${fixture.providerId} fixture`);
           const serializationExpected = fixture.serializationOutput ?? rawOutput;
           const serializedOutput = jsonValue(converters.toJson(converters.fromJson(rawOutput)));
 
-          if (isCurrentSdk || fixture.testCaseId) {
-            assertJsonEquivalent(
-              serializedOutput,
-              serializationExpected,
-              `${fixture.providerId} (${fixture.sdkModelName})`,
-            );
-            return;
-          }
+          const exact = isCurrentSdk || !!fixture.testCaseId;
+          assertJsonEquivalent(serializedOutput, serializationExpected, `${fixture.providerId} (${fixture.sdkModelName})`, exact);
+          if (exact) return;
 
-          assertSerializedSubset(
-            serializedOutput,
-            serializationExpected,
-            `${fixture.providerId} (${fixture.sdkModelName})`,
-          );
           if (Object.keys(serializationExpected).length > 0) {
             const serializedFields = Object.keys(asRecord(serializedOutput, fixture.providerId));
             assert.ok(serializedFields.length > 0,
@@ -141,89 +99,6 @@ test(`${targetLabel}: provider-output fixtures round-trip through every supporte
   }
 });
 
-async function fetchFixtureCatalog(): Promise<ProviderOutputFixture[]> {
-  const cached = await readCachedFixtures();
-  if (cached) return cached;
-  const response = await globalThis.fetch(
-    `${configuration.baseUrl}/api/v1/providers/sample-json/outputs`,
-    { headers: authenticatedJsonHeaders() },
-  );
-
-  assert.equal(
-    response.status,
-    200,
-    `Provider-output fixture catalog returned HTTP ${response.status}. `
-    + "Verify that the selected Connect environment has the SDK test-support endpoint and accepts TRINSIC_TEST_ACCESS_TOKEN.",
-  );
-  const body = await response.json();
-  assert.ok(Array.isArray(body), "expected the fixture catalog to be an array");
-
-  return body.map((value, index) => {
-    const fixture = asRecord(value, `fixture catalog entry ${index}`);
-    assert.equal(typeof fixture.providerId, "string");
-    assert.equal(
-      typeof fixture.hasPublicSdkModel,
-      "boolean",
-      "Connect fixture catalog must return hasPublicSdkModel; deploy the SDK test-support endpoint update.",
-    );
-    assert.ok(
-      !fixture.hasPublicSdkModel || typeof fixture.sdkModelName === "string",
-      `Fixture catalog marks ${fixture.providerId} as a public SDK model but omits sdkModelName. `
-      + "Connect must provide the generated model name for every public provider output.",
-    );
-    assert.ok(
-      fixture.hasPublicSdkModel || fixture.sdkModelName === null || fixture.sdkModelName === undefined,
-      `Fixture catalog marks ${fixture.providerId} as non-public but includes sdkModelName. `
-      + "Mark it public or remove the model name so SDK compatibility tests can classify it correctly.",
-    );
-
-    return {
-      hasPublicSdkModel: fixture.hasPublicSdkModel as boolean,
-      providerId: fixture.providerId as string,
-      ...(typeof fixture.sdkModelName === "string"
-        ? { sdkModelName: fixture.sdkModelName }
-        : {}),
-    };
-  });
-}
-
-async function fetchFixture(providerId: string): Promise<JsonRecord> {
-  const cached = await readCachedFixtures();
-  const cachedOutput = cached?.find((fixture) => fixture.providerId === providerId)?.output;
-  if (cachedOutput) return cachedOutput;
-  const response = await globalThis.fetch(
-    `${configuration.baseUrl}/api/v1/providers/${encodeURIComponent(providerId)}/sample-json/output`,
-    { headers: authenticatedJsonHeaders() },
-  );
-
-  assert.equal(
-    response.status,
-    200,
-    `Provider-output fixture for ${providerId} returned HTTP ${response.status}. `
-    + "Verify that the provider is present in the target environment and the test token is authorized.",
-  );
-  return asRecord(await response.json(), `${providerId} fixture`);
-}
-
-let cachedFixtures: Promise<ProviderOutputFixture[] | undefined> | undefined;
-function readCachedFixtures(): Promise<ProviderOutputFixture[] | undefined> {
-  cachedFixtures ??= (async () => {
-    const path = process.env.SDK_COMPATIBILITY_PSO_FIXTURES_PATH;
-    if (!path) return undefined;
-    const body = asRecord(JSON.parse(await readFile(path, "utf8")), "PSO fixture cache");
-    assert.ok(Array.isArray(body.fixtures), "PSO fixture cache omitted fixtures.");
-    return body.fixtures.map((fixture, index) => asRecord(fixture, `cached fixture ${index}`) as unknown as ProviderOutputFixture);
-  })();
-  return cachedFixtures;
-}
-
-function authenticatedJsonHeaders(): Record<string, string> {
-  return {
-    Accept: "application/json",
-    Authorization: `Bearer ${configuration.accessToken}`,
-  };
-}
-
 function findConverters(fixture: ProviderOutputFixture): ProviderOutputConverters | undefined {
   assert.ok(fixture.sdkModelName, `${fixture.providerId} has no SDK model name`);
   const fromJson = sdk[`${fixture.sdkModelName}FromJSON`];
@@ -239,49 +114,7 @@ function findConverters(fixture: ProviderOutputFixture): ProviderOutputConverter
   };
 }
 
-function assertSerializedSubset(
-  serialized: unknown,
-  raw: unknown,
-  path: string,
-): void {
-  if (serialized === null || typeof serialized !== "object") {
-    assertJsonScalarEquivalent(serialized, raw, `${path} must preserve its scalar value`);
-    return;
-  }
-
-  if (Array.isArray(serialized)) {
-    assert.ok(
-      Array.isArray(raw),
-      `${path}: this SDK serializes the value as an array, but the current fixture has ${jsonType(raw)}. `
-      + "That is an incompatible provider-output shape change for this SDK release.",
-    );
-    assert.equal(
-      serialized.length,
-      raw.length,
-      `${path}: this SDK serializes ${serialized.length} items, but the current fixture has ${raw.length}. `
-      + "That is an incompatible provider-output shape change for this SDK release.",
-    );
-    for (const [index, item] of serialized.entries()) {
-      assertSerializedSubset(item, raw[index], `${path}[${index}]`);
-    }
-    return;
-  }
-
-  const serializedRecord = asRecord(serialized, path);
-  assert.ok(
-    raw !== null && typeof raw === "object" && !Array.isArray(raw),
-    `${path}: this SDK serializes the value as an object, but the current fixture has ${jsonType(raw)}. `
-    + "That is an incompatible provider-output shape change for this SDK release.",
-  );
-  const rawRecord = raw as JsonRecord;
-  for (const [key, value] of Object.entries(serializedRecord)) {
-    if (Object.hasOwn(rawRecord, key)) {
-      assertSerializedSubset(value, rawRecord[key], `${path}.${key}`);
-    }
-  }
-}
-
-function assertJsonEquivalent(actual: unknown, expected: unknown, path: string): void {
+function assertJsonEquivalent(actual: unknown, expected: unknown, path: string, exact: boolean): void {
   if (actual === null || typeof actual !== "object") {
     assertJsonScalarEquivalent(actual, expected, `${path} must preserve its scalar value`);
     return;
@@ -291,7 +124,7 @@ function assertJsonEquivalent(actual: unknown, expected: unknown, path: string):
     assert.ok(Array.isArray(expected), `${path}: SDK round-trip produced an array, but the wire fixture has ${jsonType(expected)}.`);
     assert.equal(actual.length, expected.length, `${path}: SDK round-trip changed the array length from ${expected.length} to ${actual.length}.`);
     for (const [index, item] of actual.entries()) {
-      assertJsonEquivalent(item, expected[index], `${path}[${index}]`);
+      assertJsonEquivalent(item, expected[index], `${path}[${index}]`, exact);
     }
     return;
   }
@@ -304,14 +137,14 @@ function assertJsonEquivalent(actual: unknown, expected: unknown, path: string):
   const expectedRecord = expected as JsonRecord;
   const missingFields = Object.keys(expectedRecord).filter((key) => !Object.hasOwn(actualRecord, key));
   assert.equal(
-    missingFields.length,
+    exact ? missingFields.length : 0,
     0,
     `${path}: SDK round-trip drops wire field(s): ${missingFields.join(", ")}. `
     + "The generated model must preserve every field from this current provider-output fixture.",
   );
   for (const [key, value] of Object.entries(actualRecord)) {
     if (Object.hasOwn(expectedRecord, key)) {
-      assertJsonEquivalent(value, expectedRecord[key], `${path}.${key}`);
+      assertJsonEquivalent(value, expectedRecord[key], `${path}.${key}`, exact);
     }
   }
 }
@@ -358,26 +191,6 @@ function jsonValue(value: unknown): unknown {
   const serialized = JSON.stringify(value);
   assert.notEqual(serialized, undefined, "generated ToJSON helper must return JSON data");
   return JSON.parse(serialized);
-}
-
-function asRecord(value: unknown, label: string): JsonRecord {
-  assert.equal(typeof value, "object", `${label} must be an object`);
-  assert.notEqual(value, null, `${label} must not be null`);
-  assert.equal(Array.isArray(value), false, `${label} must not be an array`);
-  return value as JsonRecord;
-}
-
-function loadSdk(root: string): SdkModule {
-  const requireFromInstalledPackage = createRequire(`${root}/package.json`);
-  return requireFromInstalledPackage("@trinsic/api") as SdkModule;
-}
-
-function requiredEnvironment(name: string): string {
-  const value = process.env[name]?.trim();
-  if (!value) {
-    throw new Error(`${name} must be supplied by the compatibility test runner.`);
-  }
-  return value;
 }
 
 function asError(error: unknown): Error {

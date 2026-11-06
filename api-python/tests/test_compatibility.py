@@ -4,11 +4,10 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
-import urllib.parse
 
 import pytest
 
-import run_target as support
+import compatibility_support as support
 
 
 @pytest.fixture()
@@ -124,8 +123,7 @@ def test_recommend_providers(apis) -> None:
 
 
 def provider_fixtures():
-    cache_path = os.environ.get("SDK_COMPATIBILITY_PSO_FIXTURES_PATH")
-    return json.loads(Path(cache_path).read_text())["fixtures"] if cache_path else support.http_json("/api/v1/providers/sample-json/outputs")
+    return json.loads(Path(os.environ["SDK_COMPATIBILITY_PSO_FIXTURES_PATH"]).read_text())["fixtures"]
 
 
 def provider_parameters():
@@ -155,10 +153,7 @@ def test_provider_output_round_trip(fixture) -> None:
         if support.CURRENT:
             raise AssertionError(f"Connect declares {provider_id}'s {model_name} output as public, but {support.TARGET} does not export {model_name}.")
         pytest.skip("The published SDK does not expose this provider-output model.")
-    raw = fixture.get("output") if "output" in fixture else support.http_json(f"/api/v1/providers/{urllib.parse.quote(provider_id, safe='')}/sample-json/output")
+    raw = fixture["output"]
     expected = fixture.get("serializationOutput", raw)
     serialized = model.from_dict(raw).to_dict()
-    if support.CURRENT or fixture.get("testCaseId"):
-        support.assert_equivalent(serialized, expected, f"{provider_id} ({model_name})")
-    else:
-        support.assert_subset(serialized, expected, f"{provider_id} ({model_name})")
+    support.assert_equivalent(serialized, expected, f"{provider_id} ({model_name})", support.CURRENT or bool(fixture.get("testCaseId")))

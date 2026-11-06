@@ -1,12 +1,10 @@
 import assert from "node:assert/strict";
-import { createRequire } from "node:module";
 import test from "node:test";
+import { configuration, sdk, sdkConfiguration, sdkVersion, targetLabel } from "./support.js";
 
 import { MINIMUM_SDK_VERSION } from "./contracts.js";
-import { isSdkVersionAtLeast, readTestConfiguration } from "./config.js";
+import { isSdkVersionAtLeast } from "./config.js";
 import { recordCompatibilityCase, recordSkippedCompatibilityCase } from "./results.js";
-
-type SdkModule = Record<string, any>;
 
 interface BrowserResponse {
   location?: string;
@@ -22,11 +20,6 @@ interface CompletedSession {
 }
 
 const TEST_PROVIDER = "trinsic-test-redirect";
-const installRoot = requiredEnvironment("SDK_INSTALL_ROOT");
-const sdkVersion = requiredEnvironment("SDK_VERSION");
-const targetLabel = requiredEnvironment("SDK_TARGET_LABEL");
-const configuration = readTestConfiguration();
-const sdk = loadSdk(installRoot);
 
 test(`${targetLabel}: GetProvider returns the redirect test integration`, async () => {
   if (!isSdkVersionAtLeast(sdkVersion, MINIMUM_SDK_VERSION.getProvider)) {
@@ -195,13 +188,6 @@ class BrowserSession {
   }
 }
 
-function sdkConfiguration(): any {
-  return new sdk.Configuration({
-    accessToken: configuration.accessToken,
-    basePath: configuration.baseUrl,
-  });
-}
-
 async function testRedirectUrl(): Promise<string> {
   const response = await new sdk.RedirectUrisApi(sdkConfiguration()).list(undefined, 50);
   const redirectUriEntries = response.uris as Array<{ uri?: unknown }>;
@@ -221,17 +207,6 @@ function isHttpUrl(value: string): boolean {
   } catch {
     return false;
   }
-}
-
-function loadSdk(root: string): SdkModule {
-  const requireFromInstalledPackage = createRequire(`${root}/package.json`);
-  return requireFromInstalledPackage("@trinsic/api") as SdkModule;
-}
-
-function requiredEnvironment(name: string): string {
-  const value = process.env[name]?.trim();
-  if (!value) throw new Error(`${name} must be supplied by the compatibility test runner.`);
-  return value;
 }
 
 function requiredLocation(response: BrowserResponse): string {

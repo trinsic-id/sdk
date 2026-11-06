@@ -1,15 +1,7 @@
-import { readFile } from "node:fs/promises";
-
 export interface TestConfiguration {
   accessToken: string;
   baseUrl: string;
   verificationProfileId: string;
-}
-
-export interface CompatibilityMatrix {
-  compatibility: {
-    sdkVersions: Record<string, string[]>;
-  };
 }
 
 const REQUIRED_ENVIRONMENT_VARIABLES = [
@@ -54,26 +46,6 @@ export function normalizeBaseUrl(value: string): string {
   return parsed.toString().replace(/\/+$/, "");
 }
 
-export async function readCompatibilityMatrix(
-  path: string,
-): Promise<CompatibilityMatrix> {
-  let parsed: unknown;
-
-  try {
-    parsed = JSON.parse(await readFile(path, "utf8"));
-  } catch (error) {
-    throw new Error(`Unable to read compatibility matrix at ${path}: ${String(error)}`);
-  }
-
-  if (!isCompatibilityMatrix(parsed)) {
-    throw new Error(
-      "Compatibility matrix must contain compatibility.sdkVersions with version arrays.",
-    );
-  }
-
-  return parsed;
-}
-
 export function isSdkVersionAtLeast(version: string, minimum: string): boolean {
   const actualParts = parseStableVersion(version);
   const minimumParts = parseStableVersion(minimum);
@@ -87,28 +59,6 @@ export function isSdkVersionAtLeast(version: string, minimum: string): boolean {
   return true;
 }
 
-function isCompatibilityMatrix(value: unknown): value is CompatibilityMatrix {
-  if (!isRecord(value) || !isRecord(value.compatibility)) {
-    return false;
-  }
-
-  const sdkVersions = value.compatibility.sdkVersions;
-  if (!isRecord(sdkVersions)) {
-    return false;
-  }
-
-  return Object.values(sdkVersions).every(
-    (versions) =>
-      Array.isArray(versions) &&
-      versions.length > 0 &&
-      versions.every(
-        (version) =>
-          typeof version === "string" &&
-          /^v?\d+\.\d+\.\d+$/.test(version),
-      ),
-  );
-}
-
 function parseStableVersion(version: string): [number, number, number] {
   const match = /^v?(\d+)\.(\d+)\.(\d+)$/.exec(version);
   if (!match) {
@@ -116,8 +66,4 @@ function parseStableVersion(version: string): [number, number, number] {
   }
 
   return [Number(match[1]), Number(match[2]), Number(match[3])];
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
 }

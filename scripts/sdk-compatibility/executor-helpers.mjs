@@ -24,7 +24,7 @@ export function acknowledgeFailures(testCases, target, language, acknowledgement
   return testCases.map((testCase) => {
     if (testCase.status !== "failed" || testCase.id.startsWith("framework.")) return testCase;
     const matches = acknowledgements.filter((entry) => entry.language === language
-      && entry.sdkVersion === target.sdkVersion && entry.testCaseId === testCase.id
+      && entry.sdkVersions.includes(target.sdkVersion) && entry.testCaseId === testCase.id
       && Object.entries(entry.parameters ?? {}).every(([key, value]) => testCase.parameters?.[key] === value));
     if (matches.length > 1) throw new Error(`Multiple acknowledgements match ${language} ${target.sdkVersion} ${testCase.id}.`);
     const match = matches[0];

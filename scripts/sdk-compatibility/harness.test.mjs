@@ -87,7 +87,7 @@ test("native reports preserve harness failures beside acknowledged SDK failures"
       ? `<TestRun xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010"><TestDefinitions><UnitTest id="1"><TestMethod className="CompatibilityTest" name="providerOutputs" /></UnitTest><UnitTest id="2"><TestMethod className="HarnessRegressionTests" name="regression" /></UnitTest></TestDefinitions><Results><UnitTestResult testId="1" testName="providerOutputs" outcome="Failed" />${extra ? '<UnitTestResult testId="2" testName="regression" outcome="Failed"><Output><ErrorInfo><Message>independent failure &amp; details</Message></ErrorInfo></Output></UnitTestResult>' : ''}</Results></TestRun>`
       : `<testsuite><testcase classname="CompatibilityTest" name="providerOutputs"><failure message="expected enum failure" /></testcase>${extra ? '<testcase classname="HarnessRegressionTests" name="regression"><error message="independent failure &amp; details" /></testcase>' : ''}</testsuite>`);
     const read = () => readNativeTestCases(output, { status: 1 }, language, language === "csharp" ? "trx" : "junit", nativePath);
-    const check = (testCases) => acknowledgeFailures(testCases, { isCurrent: false, sdkVersion: acknowledgement.sdkVersion }, language, [acknowledgement]);
+    const check = (testCases) => acknowledgeFailures(testCases, { isCurrent: false, sdkVersion: acknowledgement.sdkVersions[0] }, language, [acknowledgement]);
     writeNative(false);
     assert.equal(read().length, 1);
     assert.equal(check(read())[0].status, "skipped");
@@ -179,7 +179,7 @@ test("matrix exits reflect scoped acknowledgements without a separate reporting 
     if (!target.isCurrent) assert.deepEqual(actual.acknowledgedFailure, entry.failure);
   }
   for (const mode of ["current-failure", "different-failure", "framework-failure"]) assert.equal(execute(mode).status, 1, mode);
-  const target = { isCurrent: false, sdkVersion: acknowledgement.sdkVersion };
+  const target = { isCurrent: false, sdkVersion: acknowledgement.sdkVersions[0] };
   assert.equal(acknowledgeFailures([entry], target, "php", [{ ...acknowledgement, failureMessageIncludes: [] }])[0].status, "failed");
 }));
 

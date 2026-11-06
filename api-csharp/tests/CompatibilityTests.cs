@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Globalization;
-using System.Net.Http.Headers;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
@@ -214,13 +213,9 @@ public sealed class CompatibilityFixture : IAsyncLifetime, IDisposable
     public async Task ProviderOutputs()
     {
         var failuresBefore = failureCount;
-        using var client = new HttpClient { BaseAddress = new Uri(targetBaseUrl) };
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-        var cache = Environment.GetEnvironmentVariable("SDK_COMPATIBILITY_PSO_FIXTURES_PATH");
-        var catalog = cache is { Length: > 0 } ? JsonNode.Parse(await File.ReadAllTextAsync(cache))?["fixtures"]?.AsArray() : null;
-        var hasCachedCatalog = catalog is not null;
-        if (catalog is null) catalog = JsonNode.Parse(await client.GetStringAsync("/api/v1/providers/sample-json/outputs"))?.AsArray();
-        if (catalog is null) throw new InvalidOperationException("Provider-output fixture catalog was not an array.");
+        var cache = Required("SDK_COMPATIBILITY_PSO_FIXTURES_PATH");
+        var catalog = JsonNode.Parse(await File.ReadAllTextAsync(cache))?["fixtures"]?.AsArray()
+            ?? throw new InvalidOperationException("Provider-output fixture catalog was not an array.");
         foreach (var item in catalog)
         {
             var fixture = item?.AsObject() ?? throw new InvalidOperationException("Provider-output fixture was not an object.");
@@ -233,11 +228,9 @@ public sealed class CompatibilityFixture : IAsyncLifetime, IDisposable
             var modelType = SdkAssembly.GetType($"Trinsic.Api.Model.{modelName}");
             if (modelType is null) { if (isCurrent) await Record(caseId, () => throw new InvalidOperationException($"Connect declares {providerId}'s {modelName} output as public, but this SDK does not export {modelName}."), parameters); else Skip(caseId, "The published SDK does not expose this provider-output model.", parameters); continue; }
             await Record(caseId, async () => {
-                var raw = hasCachedCatalog
-                    ? fixture["output"] ?? throw new InvalidOperationException($"Cached fixture {providerId} omitted output.")
-                    : JsonNode.Parse(client.GetStringAsync($"/api/v1/providers/{Uri.EscapeDataString(providerId)}/sample-json/output").GetAwaiter().GetResult()) ?? throw new InvalidOperationException("Fixture JSON was empty.");
+                var raw = fixture["output"] ?? throw new InvalidOperationException($"Cached fixture {providerId} omitted output.");
                 var serialized = await RoundTrip(raw, modelType);
-                AssertJson(serialized, hasCachedCatalog ? fixture["serializationOutput"] ?? raw : raw, providerId, isCurrent || fixture["testCaseId"] is not null);
+                AssertJson(serialized, fixture["serializationOutput"] ?? raw, providerId, isCurrent || fixture["testCaseId"] is not null);
             }, parameters);
         }
         if (failureCount > failuresBefore) throw new Xunit.Sdk.XunitException($"{failureCount - failuresBefore} serialization cases failed; see the structured report.");

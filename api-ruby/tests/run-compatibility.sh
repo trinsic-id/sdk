@@ -8,4 +8,4 @@ curl -fsS "$TRINSIC_TEST_BASE_URL/swagger/api/swagger.json" -o "$swagger"
 SDK_COMPATIBILITY_SKIP_INSTALL=true "$REPO_ROOT/api-ruby/build-sdk.sh" --swagger-file-or-url "$swagger" --output-folder "$current"
 rmdir "$main"; git -C "$REPO_ROOT" worktree add --detach "$main" "${SDK_COMPATIBILITY_MAIN_REF:-origin/main}" >/dev/null
 bash "$REPO_ROOT/scripts/sdk-compatibility/build-baseline.sh" "$main" ruby "$swagger"
-SDK_COMPATIBILITY_CURRENT_PACKAGE="$current" SDK_COMPATIBILITY_MAIN_PACKAGE="$main/api-ruby/sdk" SDK_ORIGIN_MAIN_REVISION="$(git -C "$main" rev-parse --short HEAD)" SDK_COMPATIBILITY_OPENAPI_SPEC="$swagger" SDK_COMPATIBILITY_PACKAGE_LABEL="trinsic_api" node "$REPO_ROOT/scripts/sdk-compatibility/run-matrix.mjs" ruby node "$SCRIPT_DIR/run_matrix.mjs"
+SDK_COMPATIBILITY_CURRENT_PACKAGE="$current" SDK_COMPATIBILITY_MAIN_PACKAGE="$main/api-ruby/sdk" SDK_ORIGIN_MAIN_REVISION="$(git -C "$main" rev-parse --short HEAD)" SDK_COMPATIBILITY_PACKAGE_LABEL="trinsic_api" node "$REPO_ROOT/scripts/sdk-compatibility/run-matrix.mjs" ruby node "$SCRIPT_DIR/run_matrix.mjs"

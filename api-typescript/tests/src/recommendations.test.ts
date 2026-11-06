@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { createRequire } from "node:module";
 import test from "node:test";
+import { asRecord, asRecordArray, captureRequests, configuration, headerValue, isCurrentSdk, recordIds, sdk, sdkVersion, targetLabel, type JsonRecord } from "./support.js";
 
 import {
   MINIMUM_SDK_VERSION,
@@ -8,80 +8,17 @@ import {
   RECOMMEND_PROVIDER_REQUIRED_STRING_FIELDS,
   SUB_PROVIDER_REQUIRED_STRING_FIELDS,
 } from "./contracts.js";
-import { isSdkVersionAtLeast, readTestConfiguration } from "./config.js";
+import { isSdkVersionAtLeast } from "./config.js";
 import { recordCompatibilityCase } from "./results.js";
-
-type JsonRecord = Record<string, unknown>;
-type SdkModule = Record<string, any>;
-
-interface CapturedRequest {
-  body: unknown;
-  headers: HeadersInit | undefined;
-  method: string | undefined;
-  responseJson: unknown;
-  responseStatus: number;
-  url: string;
-}
-
-const installRoot = requiredEnvironment("SDK_INSTALL_ROOT");
-const isCurrentSdk = requiredEnvironment("SDK_IS_CURRENT") === "true";
-const sdkVersion = requiredEnvironment("SDK_VERSION");
-const targetLabel = requiredEnvironment("SDK_TARGET_LABEL");
-const configuration = readTestConfiguration();
-const sdk = loadSdk(installRoot);
 
 test(`${targetLabel}: RecommendProviders serializes and deserializes its supported contract`, () => recordCompatibilityCase(
   "api.sessions.recommend-providers",
   async () => {
-  const capturedRequests: CapturedRequest[] = [];
-  const originalFetch = globalThis.fetch.bind(globalThis);
-
-  const captureFetch: typeof fetch = async (input, init) => {
-    const response = await originalFetch(input, init);
-    let responseJson: unknown;
-
-    if (response.headers.get("content-type")?.includes("json")) {
-      responseJson = await response.clone().json();
-    }
-
-    capturedRequests.push({
-      body: parseJsonBody(init?.body),
-      headers: init?.headers,
-      method: init?.method,
-      responseJson,
-      responseStatus: response.status,
-      url: requestUrl(input),
-    });
-
-    return response;
-  };
-
-  const api = new sdk.SessionsApi(
-    new sdk.Configuration({
-      accessToken: configuration.accessToken,
-      basePath: configuration.baseUrl,
-      fetchApi: captureFetch,
-    }),
-  );
-
-  let result: any;
-  try {
-    result = await api.recommendProviders({
-      health: "All",
-      verificationProfileId: configuration.verificationProfileId,
-    });
-  } catch (error) {
-    const captured = capturedRequests.at(-1);
-    if (captured) {
-      assert.fail(
-        `Connect rejected RecommendProviders with HTTP ${captured.responseStatus}. `
-        + "The request reached Connect before the SDK could deserialize a response; "
-        + "verify that TRINSIC_TEST_ACCESS_TOKEN and TRINSIC_TEST_VERIFICATION_PROFILE_ID "
-        + "belong to the selected test environment.",
-      );
-    }
-    throw error;
-  }
+  const { requests: capturedRequests, config } = captureRequests();
+  const result = await new sdk.SessionsApi(config).recommendProviders({
+    health: "All",
+    verificationProfileId: configuration.verificationProfileId,
+  });
 
   assert.equal(capturedRequests.length, 1, "expected one Recommendations request");
   const captured = capturedRequests[0];
@@ -137,7 +74,7 @@ test(`${targetLabel}: RecommendProviders serializes and deserializes its support
     return;
   }
 
-  assert.deepEqual(providerIds(deserializedRecommended), providerIds(rawRecommended));
+  assert.deepEqual(recordIds(deserializedRecommended), recordIds(rawRecommended));
 
   if (
     isSdkVersionAtLeast(
@@ -149,87 +86,13 @@ test(`${targetLabel}: RecommendProviders serializes and deserializes its support
       result.remainder,
       "SDK Recommendations response.remainder",
     );
-    assert.deepEqual(providerIds(resultRemainder), providerIds(rawRemainder));
+    assert.deepEqual(recordIds(resultRemainder), recordIds(rawRemainder));
   }
   },
 ));
 
-function loadSdk(root: string): SdkModule {
-  const requireFromInstalledPackage = createRequire(`${root}/package.json`);
-  return requireFromInstalledPackage("@trinsic/api") as SdkModule;
-}
-
-function requiredEnvironment(name: string): string {
-  const value = process.env[name]?.trim();
-  if (!value) {
-    throw new Error(`${name} must be supplied by the compatibility test runner.`);
-  }
-  return value;
-}
-
-function requestUrl(input: RequestInfo | URL): string {
-  if (typeof input === "string") {
-    return input;
-  }
-
-  if (input instanceof URL) {
-    return input.toString();
-  }
-
-  return input.url;
-}
-
-function parseJsonBody(body: BodyInit | null | undefined): unknown {
-  if (typeof body !== "string") {
-    assert.fail("expected SDK request body to be JSON text");
-  }
-
-  return JSON.parse(body);
-}
-
-function headerValue(headers: HeadersInit | undefined, name: string): string | undefined {
-  if (!headers) {
-    return undefined;
-  }
-
-  if (headers instanceof Headers) {
-    return headers.get(name) ?? undefined;
-  }
-
-  if (Array.isArray(headers)) {
-    return headers.find(([key]) => key.toLowerCase() === name.toLowerCase())?.[1];
-  }
-
-  return Object.entries(headers).find(
-    ([key]) => key.toLowerCase() === name.toLowerCase(),
-  )?.[1];
-}
-
-function asRecord(value: unknown, label: string): JsonRecord {
-  assert.equal(typeof value, "object", `${label} must be an object`);
-  assert.notEqual(value, null, `${label} must not be null`);
-  assert.equal(Array.isArray(value), false, `${label} must not be an array`);
-  return value as JsonRecord;
-}
-
-function asRecordArray(value: unknown, label: string): JsonRecord[] {
-  assert.ok(Array.isArray(value), `${label} must be an array`);
-  return value.map((item, index) => asRecord(item, `${label}[${index}]`));
-}
-
 function optionalRecordArray(value: unknown): JsonRecord[] {
   return value === undefined ? [] : asRecordArray(value, "Recommendations response.remainder");
-}
-
-function providerIds(providers: JsonRecord[]): string[] {
-  return providers.map((provider, index) => {
-    assert.equal(
-      typeof provider.id,
-      "string",
-      `provider at index ${index} must have a string id`,
-    );
-    return provider.id as string;
-  });
 }
 
 function assertCurrentRecommendationResponseShape(
