@@ -45,6 +45,12 @@ while synthetic fixtures require their expected fields to survive exactly.
 The suite also exercises unknown fields, nested model
 dictionaries, and the Singpass legacy wire alias.
 
+TypeScript and Java also check required fields against the installed release's
+model metadata before decoding provider fixtures, including nested objects,
+arrays, and dictionaries. Missing required fields remain raw compatibility
+failures; optional fields and unknown response fields remain allowed. A field
+required by one release may be optional in another release's snapshot.
+
 Future enum values are deferred to a separate phase. First investigate improving
 the SDK generators/serializers to tolerate unknown enum values while preserving
 the rest of the response. Then restore a synthetic `IntegrationStep` fixture with
