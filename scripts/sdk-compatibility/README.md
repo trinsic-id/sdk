@@ -31,6 +31,9 @@ redirect test provider supplies synthetic verification data. HTTP redirect
 helpers perform the browser portion; SDK operations still use SDK serializers.
 Tests attempt cancellation during cleanup, including after assertion failures;
 completed/redacted sessions may no longer be cancellable.
+Ruby 3.2.1 requires an explicit `enable_redirect_backwards_compatibility` value.
+Its tests set it to `false` and pass the captured `redirect_token` to the result
+request, using the redirect validation flow exposed by that package.
 Each live case records its own outcome. TypeScript shares browser-completed
 session setup lazily, while result decoding stays inside the result/attachment
 cases so a decoding failure cannot suppress redaction or unrelated operations.

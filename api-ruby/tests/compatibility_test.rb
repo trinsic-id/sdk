@@ -26,10 +26,10 @@ class CompatibilityTest < Minitest::Test
     value = find_http(as_hash(@redirects.list)); raise 'No HTTP(S) redirect URI is registered.' unless value; value
   end
   def create_direct
-    attributes = { provider: 'trinsic-test-redirect', verification_profile_id: @profile, redirect_url: redirect_url, capabilities: %w[LaunchBrowser CaptureRedirect], fallback_to_hosted_ui: false }; track(response_body(@sessions.create_direct_provider_session(create_direct_provider_session_request: model('CreateDirectProviderSessionRequest', attributes))))
+    attributes = { provider: 'trinsic-test-redirect', verification_profile_id: @profile, redirect_url: redirect_url, enable_redirect_backwards_compatibility: false, capabilities: %w[LaunchBrowser CaptureRedirect], fallback_to_hosted_ui: false }; track(response_body(@sessions.create_direct_provider_session(create_direct_provider_session_request: model('CreateDirectProviderSessionRequest', attributes))))
   end
   def completed_result
-    session = create_direct; token, key = completed_redirect_session(session); attributes = { results_access_key: key }; [session, key, @sessions.get_session_result(session.session_id, get_session_result_request: model('GetSessionResultRequest', attributes))]
+    session = create_direct; token, key = completed_redirect_session(session); attributes = { results_access_key: key, redirect_token: token }; [session, key, @sessions.get_session_result(session.session_id, get_session_result_request: model('GetSessionResultRequest', attributes))]
   end
   def test_list_providers = run_case('api.providers.list') { @providers.list_providers }
   def test_get_profile = run_case('api.verification-profiles.get-by-id') { @profiles.get_verification_profile_by_id(@profile) }
@@ -38,7 +38,7 @@ class CompatibilityTest < Minitest::Test
   def test_list_redirects = run_case('api.redirect-uris.list') { @redirects.list }
   def test_get_provider = run_case('api.providers.get') { @providers.get_provider('trinsic-test-redirect') }
   def test_create_hosted
-    run_case('api.sessions.create-hosted-provider') { attributes = { provider: 'trinsic-test-redirect', verification_profile_id: @profile, redirect_url: redirect_url }; track(response_body(@sessions.create_hosted_provider_session(create_hosted_provider_session_request: model('CreateHostedProviderSessionRequest', attributes)))) }
+    run_case('api.sessions.create-hosted-provider') { attributes = { provider: 'trinsic-test-redirect', verification_profile_id: @profile, redirect_url: redirect_url, enable_redirect_backwards_compatibility: false }; track(response_body(@sessions.create_hosted_provider_session(create_hosted_provider_session_request: model('CreateHostedProviderSessionRequest', attributes)))) }
   end
   def test_create_direct
     run_case('api.sessions.create-direct-provider') { create_direct }
