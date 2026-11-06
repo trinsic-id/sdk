@@ -1,6 +1,6 @@
-# SDK 3.2.0 contract tests
+# SDK 3.2.1 contract tests
 
-This test snapshot installs the published **3.2.0** API SDK for C#, Go, Java,
+This test snapshot installs the published **3.2.1** API SDK for C#, Go, Java,
 Python, Ruby, and TypeScript. It does not generate SDKs or test multiple
 package versions. Connect owns the matrix of snapshot commits and the exception
 policy. Use a new branch/tagged snapshot for another SDK release.
@@ -23,7 +23,7 @@ Python 3.9+ with venv, .NET 8+, Go, Java 21/Maven, and
 Ruby 3.3+/Bundler. Installations use temporary directories, except the locked
 TypeScript test dependencies installed with `npm ci` in `api-typescript/tests`.
 The language executors install exact SDK versions. The C# and Java project files
-also pin 3.2.0 directly. No package-path or SDK-version override is supported.
+also pin 3.2.1 directly. No package-path or SDK-version override is supported.
 
 Live tests create hosted/direct sessions through each real SDK. They exercise
 reads, cancellation, results, attachments, redaction, and recommendations. The
@@ -68,14 +68,14 @@ an unknown `method` value and decide in Connect which remaining incompatibilitie
 to ignore. This phase adds no synthetic unknown-enum case or blanket exception;
 enum errors encountered in real API responses still surface as raw failures.
 
-The 3.2.0 snapshot binds `a-itsme-login` to its original `ItsmeProviderOutput`.
-The later direct `itsme` provider has no corresponding model and is reported as
-unsupported. Each language resolves the other models from its installed package:
+The 3.2.1 snapshot binds `a-itsme-login` to `ItsmeLoginProviderOutput` and the
+direct `itsme` provider to `ItsmeProviderOutput`. Both integrations are tested.
+Each language resolves models from its installed package:
 absent models are skipped, while errors decoding an available model remain failures.
 Providers with no public SDK model in Connect's catalog are also skipped.
 
-`provider-models.json` records the 51 public provider/model bindings discovered in
-the published 3.2.0 packages. These fixtures and the synthetic cases set
+`provider-models.json` records the 65 public provider/model bindings discovered in
+the published 3.2.1 packages. These fixtures and the synthetic cases set
 `modelRequired: true`: a missing payload, missing model, or skipped result fails
 the run. New remote providers are still checked against the installed SDK; their
 models do not need to appear in this baseline to be tested. This inventory prevents
@@ -84,12 +84,12 @@ model names. It is SDK test data, not a Connect exception list.
 
 ## Structured results consumed by Connect
 
-`test-results/sdk-3.2.0/compatibility.json` contains:
+`test-results/sdk-3.2.1/compatibility.json` contains:
 
 ```json
 {
   "schemaVersion": 2,
-  "sdkVersion": "3.2.0",
+  "sdkVersion": "3.2.1",
   "run": {
     "generatedAt": "ISO-8601 timestamp",
     "scope": "full",
@@ -102,7 +102,7 @@ model names. It is SDK test data, not a Connect exception list.
       "testCaseId": "serialization.provider-output-round-trip" }
   ],
   "suites": [
-    { "language": "csharp", "sdkVersion": "3.2.0", "testCases": [
+    { "language": "csharp", "sdkVersion": "3.2.1", "testCases": [
       { "id": "serialization.provider-output-round-trip", "status": "failed",
         "durationMs": 1, "parameters": { "providerId": "provider", "sdkModelName": "ProviderOutput" },
         "failure": { "name": "JsonException", "message": "Deserialization error details" } }

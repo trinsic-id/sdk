@@ -31,7 +31,7 @@ test("Lifecycle failures retain their own cases and do not suppress later operat
         return new Response(null, { status: 302, headers: { location } });
       };
     `);
-    const env: NodeJS.ProcessEnv = { ...process.env, SDK_TARGET_LABEL: "typescript regression", SDK_VERSION: "3.2.0", SDK_COMPATIBILITY_RESULT_FILE: output, TRINSIC_TEST_BASE_URL: "https://example.test", TRINSIC_TEST_ACCESS_TOKEN: "test-only", TRINSIC_TEST_VERIFICATION_PROFILE_ID: "00000000-0000-4000-8000-000000000001" };
+    const env: NodeJS.ProcessEnv = { ...process.env, SDK_TARGET_LABEL: "typescript regression", SDK_VERSION: "3.2.1", SDK_COMPATIBILITY_RESULT_FILE: output, TRINSIC_TEST_BASE_URL: "https://example.test", TRINSIC_TEST_ACCESS_TOKEN: "test-only", TRINSIC_TEST_VERIFICATION_PROFILE_ID: "00000000-0000-4000-8000-000000000001" };
     delete env.NODE_TEST_CONTEXT;
     const result = spawnSync(process.execPath, ["--import", "tsx", "--import", mock, "--test", fileURLToPath(new URL("./session-lifecycle.test.ts", import.meta.url))], {
       cwd: fileURLToPath(new URL("..", import.meta.url)), encoding: "utf8",
