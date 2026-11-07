@@ -3,10 +3,15 @@ name: "Release API Typescript SDK"
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   release:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.repository == 'trinsic-id/sdk'
     name: Publish NPM Packages
     uses: ./.github/workflows/api-typescript-action.yml
     with:
       publish: true
-    secrets: inherit
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -3,12 +3,21 @@ name: Release UI Android SDK
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   release:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.repository == 'trinsic-id/sdk'
     name: Publish Android Package
     uses: ./.github/workflows/ui-android-action.yml
     concurrency:
       group: git-release
     with:
       publish: true
-    secrets: inherit
+    secrets:
+      MAVEN_CENTRAL_PUBLISHING_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PUBLISHING_PASSWORD }}
+      MAVEN_CENTRAL_PUBLISHING_USERNAME: ${{ secrets.MAVEN_CENTRAL_PUBLISHING_USERNAME }}
+      MAVEN_CENTRAL_SIGNING_KEY: ${{ secrets.MAVEN_CENTRAL_SIGNING_KEY }}
+      MAVEN_CENTRAL_SIGNING_KEY_PASSWORD: ${{ secrets.MAVEN_CENTRAL_SIGNING_KEY_PASSWORD }}
+      MEWMBA_GIT_PUBLISH_TOKEN: ${{ secrets.MEWMBA_GIT_PUBLISH_TOKEN }}

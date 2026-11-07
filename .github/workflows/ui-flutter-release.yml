@@ -3,10 +3,16 @@ name: Release UI Flutter SDK
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   release:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.repository == 'trinsic-id/sdk'
     name: Publish Flutter Package
     uses: ./.github/workflows/ui-flutter-action.yml
     with:
       publish: true
-    secrets: inherit
+    secrets:
+      DART_PUB_OAUTH_ACCESS_TOKEN: ${{ secrets.DART_PUB_OAUTH_ACCESS_TOKEN }}
+      DART_PUB_OAUTH_REFRESH_TOKEN: ${{ secrets.DART_PUB_OAUTH_REFRESH_TOKEN }}

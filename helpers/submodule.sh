@@ -79,7 +79,7 @@ fi
   git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
   remote_origin="https://$github_pat@github.com/$repository_path.git"
-  echo "Setting origin to $remote_origin"
+  echo "Configuring authenticated publishing remote"
   git remote set-url origin "$remote_origin"
 
   echo "Checking out main branch"
@@ -113,7 +113,7 @@ fi
 (
   cd "$REPO_ROOT"
   remote_origin="https://$github_pat@github.com/$sdk_repository_path.git"
-  echo "Setting origin to $remote_origin"
+  echo "Configuring authenticated publishing remote"
   git remote set-url origin "$remote_origin"
 
   git add "$destination_location"
