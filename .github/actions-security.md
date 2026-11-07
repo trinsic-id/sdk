@@ -1,5 +1,10 @@
 # GitHub Actions security
 
+The threat model is an external contributor without repository write access.
+Repository writers, administrators, and configured ruleset bypass actors are
+trusted. Publishing credentials may remain in repository or environment secrets;
+isolating them from trusted writers is outside this policy.
+
 PR builds run on GitHub-hosted runners with a read-only `GITHUB_TOKEN`. Do not
 pass publishing secrets to validation workflows or persist checkout credentials.
 Treat PR code, build scripts, dependencies, titles, comments, branch names,
@@ -21,7 +26,7 @@ Actions Security workflow checks regular zizmor findings at medium severity and
 above; it is a regression check, not a proof that a workflow is safe. To inspect
 additional hardening recommendations locally, run `zizmor --persona auditor .github/workflows`.
 
-## Repository settings and remaining secret isolation
+## Repository settings and trust boundaries
 
 Repository settings should default workflow tokens to read-only, disallow
 Actions from approving PRs, require approval of workflows from all outside
@@ -30,16 +35,17 @@ should dismiss stale reviews, require approval of the latest push and code-owner
 review, and require the Actions Security check after its first successful run.
 These settings are not controlled by this file.
 
-Workflow conditions and removing `secrets: inherit` do **not** isolate repository
-secrets from a contributor with repository write access: that contributor can
-add a new workflow which requests them. To enforce that boundary, an administrator
-must move publishing credentials into environments restricted to the `main`
-branch (not a wildcard or a tag named `main`), have publishing jobs explicitly use
-those environments, and remove the repository-level copies. Require a reviewer
-for particularly sensitive credentials. CI jobs must not select these environments.
-GitHub does not return existing secret values through its API; use the credential
-issuer or secret manager to populate the environments. Coordinate the workflow
-change and secret migration to avoid breaking releases.
+For public fork PRs, GitHub withholds repository secrets and limits the
+`GITHUB_TOKEN` to read access. Approving a fork workflow permits its execution;
+it does not grant it publishing secrets. A contributor changing workflow YAML
+in their fork cannot bypass that platform boundary. Privileged triggers such as
+`pull_request_target` and `workflow_run` have different rules, which is why this
+policy prohibits using them to execute PR-controlled code or artifacts.
+
+Keep publishing secrets out of PR validation even when GitHub would withhold
+them. Environment migration is optional defense in depth under this threat
+model, not a prerequisite for accepting external contributions. Existing
+protected environments must retain their branch restrictions.
 
 Also review organization runner-group access: public PRs must not be able to
 request persistent self-hosted runners. Repository-level token defaults do not
