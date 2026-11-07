@@ -3,10 +3,15 @@ name: Release API Python SDK
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   release:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.repository == 'trinsic-id/sdk'
     name: Publish PyPI Package
     uses: ./.github/workflows/api-python-action.yml
     with:
       publish: true
-    secrets: inherit
+    secrets:
+      PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}

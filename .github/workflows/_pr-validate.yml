@@ -3,64 +3,57 @@ name: PR Validation
 on:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   api-csharp:
     name: Validate API CSharp SDK
     uses: ./.github/workflows/api-csharp-action.yml
     with:
       publish: false
-    secrets: inherit
   api-go:
     name: Validate API Go SDK
     uses: ./.github/workflows/api-go-action.yml
     with:
       publish: false
-    secrets: inherit
   api-java:
     name: Validate API Java SDK
     uses: ./.github/workflows/api-java-action.yml
     with:
       publish: false
-    secrets: inherit
   api-python:
     name: Validate API Python SDK
     uses: ./.github/workflows/api-python-action.yml
     with:
       publish: false
-    secrets: inherit
   api-ruby:
     name: Validate API Ruby SDK
     uses: ./.github/workflows/api-ruby-action.yml
     with:
       publish: false
-    secrets: inherit
   api-typescript:
     name: Validate API Typescript
     uses: ./.github/workflows/api-typescript-action.yml
     with:
       publish: false
-    secrets: inherit
   ui-android:
     name: Validate UI Android SDK
     uses: ./.github/workflows/ui-android-action.yml
     with:
       publish: false
-    secrets: inherit
   ui-expo:
     name: Validate UI Expo SDK
     uses: ./.github/workflows/ui-expo-action.yml
     with:
       publish: false
-    secrets: inherit
   ui-flutter:
     name: Validate UI Flutter SDK
     uses: ./.github/workflows/ui-flutter-action.yml
     with:
       publish: false
-    secrets: inherit
   ui-web:
     name: Validate UI Web SDK
     uses: ./.github/workflows/ui-web-action.yml
     with:
       publish: false
-    secrets: inherit

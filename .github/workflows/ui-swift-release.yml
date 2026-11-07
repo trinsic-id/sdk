@@ -3,14 +3,18 @@ name: Release UI Swift SDK
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   release:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.repository == 'trinsic-id/sdk'
     name: Publish
     runs-on: macos-latest
     concurrency:
       group: git-release
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           submodules: recursive
           token: ${{ secrets.GITHUB_TOKEN }}

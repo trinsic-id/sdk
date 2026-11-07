@@ -2,13 +2,15 @@ name: Release API Ruby SDK
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - jp/publish-python
+permissions:
+  contents: read
+
 jobs:
   release:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.repository == 'trinsic-id/sdk'
     name: Publish Rubygems Package
     uses: ./.github/workflows/api-ruby-action.yml
     with:
       publish: true
-    secrets: inherit
+    secrets:
+      RUBYGEMS_API_TOKEN: ${{ secrets.RUBYGEMS_API_TOKEN }}

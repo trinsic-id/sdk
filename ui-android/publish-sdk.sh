@@ -21,7 +21,7 @@ require_env ORG_GRADLE_PROJECT_signingInMemoryKeyPassword
   git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
   remote_origin="https://$MEWMBA_GIT_PUBLISH_TOKEN@github.com/trinsic-id/sdk-android-ui.git"
-  echo "Setting origin to $remote_origin"
+  echo "Configuring authenticated publishing remote"
   git remote set-url origin "$remote_origin"
 
   echo "Checking out main branch"
@@ -49,7 +49,7 @@ require_env ORG_GRADLE_PROJECT_signingInMemoryKeyPassword
 # (
   # cd "$REPO_ROOT"
   # remote_origin="https://$MEWMBA_GIT_PUBLISH_TOKEN@github.com/$SDK_REPOSITORY_PATH.git"
-  # echo "Setting origin to $remote_origin"
+  # echo "Configuring authenticated publishing remote"
   # git remote set-url origin "$remote_origin"
 
   # git add "ui-android/sdk"

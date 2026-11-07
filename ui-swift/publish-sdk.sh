@@ -18,7 +18,7 @@ package_version="$(get_version swiftUIVersion)"
   git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
   remote_origin="https://$MEWMBA_GIT_PUBLISH_TOKEN@github.com/trinsic-id/sdk-swift-ui.git"
-  echo "Setting origin to $remote_origin"
+  echo "Configuring authenticated publishing remote"
   git remote set-url origin "$remote_origin"
 
   echo "Checking out main branch"
@@ -33,7 +33,7 @@ package_version="$(get_version swiftUIVersion)"
 (
   cd "$REPO_ROOT"
   remote_origin="https://$MEWMBA_GIT_PUBLISH_TOKEN@github.com/$SDK_REPOSITORY_PATH.git"
-  echo "Setting origin to $remote_origin"
+  echo "Configuring authenticated publishing remote"
   git remote set-url origin "$remote_origin"
 
   git add "ui-swift/sdk"
