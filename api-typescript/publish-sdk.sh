@@ -8,6 +8,13 @@ source "$REPO_ROOT/helpers/common.sh"
 
 require_env NPM_TOKEN
 
+package_version="$(get_version node)"
+dist_tag="latest"
+# Build metadata may contain hyphens without making the version a prerelease.
+if [[ "${package_version%%+*}" == *-* ]]; then
+  dist_tag="next"
+fi
+
 echo "Setting npm token"
 npm set //registry.npmjs.org/:_authToken "$NPM_TOKEN"
 npm whoami
@@ -20,7 +27,7 @@ if [[ ${#packages[@]} -eq 0 ]]; then
 fi
 
 for package in "${packages[@]}"; do
-  echo "Publishing $package"
-  npm publish "$package" --access=public
+  echo "Publishing $package with tag $dist_tag"
+  npm publish "$package" --access=public --tag "$dist_tag"
   echo "Published $package"
 done
