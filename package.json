@@ -4,7 +4,8 @@
   "version": "0.0.1",
   "license": "MIT",
   "scripts": {
-    "test:sdk-headers": "node --test helpers/tests/sdk-headers.test.mjs"
+    "test:sdk-headers": "node --test helpers/tests/sdk-headers.test.mjs",
+    "test:npm-publish": "node --test helpers/tests/npm-publish.test.mjs"
   },
   "dependencies": {
     "@openapitools/openapi-generator-cli": "2.18.4"
