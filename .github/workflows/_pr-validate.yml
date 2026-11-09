@@ -10,8 +10,6 @@ jobs:
   api-csharp:
     name: Validate API CSharp SDK
     uses: ./.github/workflows/api-csharp-action.yml
-    with:
-      publish: false
   api-go:
     name: Validate API Go SDK
     uses: ./.github/workflows/api-go-action.yml
