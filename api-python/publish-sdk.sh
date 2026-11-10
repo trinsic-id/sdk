@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+# Manual publishing helper. GitHub releases use gh-action-pypi-publish with OIDC
+# directly; they do not run this script or require a stored PYPI_API_TOKEN.
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$REPO_ROOT/helpers/common.sh"
