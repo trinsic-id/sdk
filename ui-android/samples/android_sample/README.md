@@ -19,6 +19,9 @@ It includes both supported session launch paths:
 
 _See the [SDK Documentation](https://github.com/trinsic-id/sdk/tree/main/ui-android#usage-1) to better understand the differences between these two flows._
 
+The optional native credential sample uses `TrinsicCredentials.performCredentialExchange`.
+Set `CREDENTIAL_REQUEST_OBJECT_BASE64URL` in `MainActivity.java` to the unchanged `nextStep.content` from a Direct Provider Session whose `nextStep.method` is `PerformNativeChallenge` to show the **Launch Credential Exchange** button.
+The native challenge must use the `credentialRequest` type; the previous `TrinsicMdl` API and `mdlRequest` type are no longer supported.
 
 
 The relevant files for this sample are:
@@ -43,6 +46,7 @@ git submodule update --init ui-android/sdk
 
 The script uses `-PuseLocalTrinsicSdk=true` to substitute the checked-out SDK library for the Maven dependency.
 You can also pass that flag to `./gradlew build` from the sample directory; without it, Gradle uses Maven Central.
+Use the local SDK option until the declared version is published to Maven Central.
 
 ## Implementation Guide
 
