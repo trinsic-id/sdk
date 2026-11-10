@@ -10,7 +10,7 @@ to launch verifications.
 
 ## Setup
 
-Make sure to create a new `.env` file to set your Trinsic Access Token. You can use [`example.env`](./example.env) as a reference. If you need more information where to find this token, visit our [Getting Started](https://docs.trinsic.id/docs/getting-started-with-trinsic-connect) guide.
+Make sure to create a new `.env` file to set your Trinsic Access Token. You can use [`example.env`](./example.env) as a reference. If you need more information where to find this token, visit our [documentation](https://docs.trinsic.id).
 
 The sample uses the generated SDK in `api-typescript/sdk` through a local package
 dependency. Build it first so the sample uses the same named request arguments

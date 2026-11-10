@@ -17,7 +17,7 @@ You need to run an API sample, so just pick one and follow its intructions. Here
 
 In the `api-typescript/samples` folder, run `npm ci` to install the necessary dependencies.
 
-Create a new `.env` file to set your Trinsic Access Token. You can use [`example.env`](./example.env) as a reference. If you need more information where to find this token, visit our [Getting Started](https://docs.trinsic.id/docs/getting-started-with-trinsic-connect) guide.
+Create a new `.env` file to set your Trinsic Access Token. You can use [`example.env`](./example.env) as a reference. If you need more information where to find this token, visit our [documentation](https://docs.trinsic.id).
 
 After you created your `.env` file you are good to run the project.
 

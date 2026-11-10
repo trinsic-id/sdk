@@ -72,10 +72,10 @@ suite. These tests send requests only to a local HTTP server and verify SDK
 identity alongside authentication and custom headers. Each API build workflow
 runs its language's tests before publishing.
 
-## SDK release contract tests
+## Generated SDK regression tests
 
-This branch contains [contract tests pinned to published SDK 3.2.1](scripts/sdk-compatibility/README.md).
-Connect selects the test snapshot commits and owns all compatibility exceptions.
+This repository keeps the regression tests for generated SDKs in `helpers/tests`.
+The API build workflows run those checks before publishing.
 
 ## Named model construction
 
@@ -102,8 +102,7 @@ After building an API SDK, run
 `python`, `ruby`, `typescript`). With all six built, `npm run test:sdk-construction`
 runs them together. The checks compile or run valid consumers, require unsafe
 calls to fail, and verify JSON behavior without calling the Trinsic API. Each
-API build workflow runs its checks. The published 3.2.1 contract-test
-snapshot remains unchanged.
+API build workflow runs its checks.
 
 ## Wire formats
 
