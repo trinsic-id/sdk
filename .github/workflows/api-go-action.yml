@@ -49,6 +49,10 @@ jobs:
         run: npm run test:sdk-construction
         env:
           SDK_LANGUAGE: go
+      - name: Test unknown enum values
+        run: npm run test:sdk-unknown-enums
+        env:
+          SDK_LANGUAGE: go
       - name: Publish SDK
         if: inputs.publish == true
         run: ./api-go/publish-sdk.sh

@@ -15,11 +15,18 @@ baseline or patch mismatch stops generation before existing SDK output is delete
 The patches preserve these changes:
 
 - C# `httpclient`: property initializers, required writable properties, and null
-  checks, while retaining defaults and JSON serialization behavior.
+  checks, while retaining defaults and JSON serialization behavior. Enums use
+  `UnknownEnumConverter`, added beside `OpenAPIDateConverter`, to read unknown
+  values as the fallback member.
 - Go: keyed model construction, no positional factories, and updated model docs.
 - Java `native`: private field constructors for Jackson, public named setters.
+- Python: enums read unknown values as the fallback member.
 
 TypeScript uses `useSingleRequestParameter=true` and needs no template patch.
+
+The enum fallback member comes from `enumUnknownDefaultCase=true` in the C#, Go,
+Java, Python, and Ruby build scripts. The Go, Java, and Ruby templates already
+read unknown values as that member, so only C# and Python are patched.
 
 Run `npm run templates:check` to verify the current artifact, template baselines,
 and patches. CI runs this check and `npm run test:templates`; every API generation
@@ -65,6 +72,7 @@ Rebuild the affected SDKs, inspect the generated changes, then run:
 npm run templates:check
 npm run test:templates
 npm run test:sdk-construction
+npm run test:sdk-unknown-enums
 # Run for each rebuilt SDK: csharp, go, java, python, ruby, typescript.
 SDK_LANGUAGE=csharp npm run test:sdk-headers
 ```

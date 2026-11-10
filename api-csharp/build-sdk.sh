@@ -15,6 +15,7 @@ source "$REPO_ROOT/helpers/common.sh"
   --additional-property "nullableReferenceTypes=true" \
   --additional-property "modelPropertySorting=alphabetical" \
   --additional-property "library=httpclient" \
+  --additional-property "enumUnknownDefaultCase=true" \
   --additional-property "useDateTimeOffset=true" \
   --additional-property "validatable=false" \
   --additional-property "disallowAdditionalPropertiesIfNotPresent=false" \
