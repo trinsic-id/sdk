@@ -74,8 +74,13 @@ runs its language's tests before publishing.
 
 ## SDK release contract tests
 
-This branch contains [contract tests pinned to published SDK 3.2.1](scripts/sdk-compatibility/README.md).
-Connect selects the test snapshot commits and owns all compatibility exceptions.
+Published API SDK compatibility suites live in
+[Connect's `Tests/SdkCompatibility`](https://github.com/trinsic-id/connect/tree/main/Tests/SdkCompatibility).
+Connect owns the versioned suites, published package pins, live API checks, and
+compatibility exception policy. See its README for setup and execution instructions.
+
+This repository keeps the regression tests for generated SDKs in `helpers/tests`.
+The API build workflows run those checks before publishing.
 
 ## Named model construction
 
@@ -102,8 +107,8 @@ After building an API SDK, run
 `python`, `ruby`, `typescript`). With all six built, `npm run test:sdk-construction`
 runs them together. The checks compile or run valid consumers, require unsafe
 calls to fail, and verify JSON behavior without calling the Trinsic API. Each
-API build workflow runs its checks. The published 3.2.1 contract-test
-snapshot remains unchanged.
+API build workflow runs its checks. Published-release compatibility suites are
+maintained separately in Connect.
 
 ## Wire formats
 
