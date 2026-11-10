@@ -14,7 +14,7 @@ import android.view.View;
 
 import id.trinsic.android.ui.TrinsicPendingIntentHelper;
 import id.trinsic.android.ui.TrinsicUI;
-import id.trinsic.android.ui.alpha.TrinsicMdl;
+import id.trinsic.android.ui.TrinsicCredentials;
 import id.trinsic.android.ui.models.AcceptanceSessionResult;
 import id.trinsic.android_sample.databinding.ActivityMainBinding;
 
@@ -43,16 +43,16 @@ public class MainActivity extends AppCompatActivity {
 
 
     /**
-     * A request object as retrieved from Trinsic's CreateMdlExchange API.
+     * The base64url nextStep.content from a Direct Provider Session's PerformNativeChallenge step.
      * <p>
-     * Specific to the mDL sample.
+     * Pass the native challenge unchanged; its request type must be credentialRequest.
      */
-    private static String MDL_REQUEST_OBJECT_BASE64URL = "";
+    private static String CREDENTIAL_REQUEST_OBJECT_BASE64URL = "";
 
     /**
      * The TrinsicUI instance, which will be used to launch a Hosted session.
      * <p>
-     * Not used for Direct Sessions, or for mDL Exchanges.
+     * Not used for Direct Sessions, or for native credential exchanges.
      */
     private TrinsicUI trinsicUI;
 
@@ -126,17 +126,16 @@ public class MainActivity extends AppCompatActivity {
             );
         });
 
-        /** Set up Trinsic mDL Exchange Sample */
-        if (MDL_REQUEST_OBJECT_BASE64URL.isEmpty()) {
-            binding.buttonLaunchMdl.setVisibility(View.INVISIBLE);
+        /** Set up Trinsic Credential Exchange Sample */
+        if (CREDENTIAL_REQUEST_OBJECT_BASE64URL.isEmpty()) {
+            binding.buttonLaunchCredential.setVisibility(View.INVISIBLE);
         } else {
-            binding.buttonLaunchMdl.setOnClickListener((View v) -> {
-                // When the "Launch mDL Exchange" button is pressed, use the Trinsic mDL SDK to
-                // perform an exchange using a requestObject received from Trinsic's API (or hardcoded, in this case).
-                TrinsicMdl.performMdlExchange(MainActivity.this, MDL_REQUEST_OBJECT_BASE64URL, (result) -> {
+            binding.buttonLaunchCredential.setOnClickListener((View v) -> {
+                // Perform a native credential exchange using the challenge received from Trinsic's API.
+                TrinsicCredentials.performCredentialExchange(MainActivity.this, CREDENTIAL_REQUEST_OBJECT_BASE64URL, (result) -> {
                     if (result.getSuccess()) {
                         String token = result.getToken(); // Send this token to your backend to send it to Trinsic.
-                        Toast.makeText(MainActivity.this, "Got mDL Callback for Exchange " + result.getExchangeId() + ": " + token, Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, "Got Credential Callback for Exchange " + result.getExchangeId() + ": " + token, Toast.LENGTH_LONG).show();
                     } else {
                         String exceptionMessage = result.getException().getMessage();
                         Toast.makeText(MainActivity.this, "Got error: " + exceptionMessage, Toast.LENGTH_LONG).show();
