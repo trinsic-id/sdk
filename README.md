@@ -105,6 +105,20 @@ calls to fail, and verify JSON behavior without calling the Trinsic API. Each
 API build workflow runs its checks. The published 3.2.1 contract-test
 snapshot remains unchanged.
 
+## Wire formats
+
+TypeScript date-only fields use UTC midnight when read and UTC calendar
+components when written. Python request serialization encodes raw bytes as
+standard base64 and leaves existing base64 strings unchanged. Ruby and Java
+support verification-profile multipart requests without a logo or provider
+list. Ruby model timestamps serialize as ISO 8601 with nanosecond precision.
+
+After building the SDKs, run `npm run test:sdk-wire`, or select one with
+`SDK_LANGUAGE=ruby npm run test:sdk-wire`. The tests check date handling across
+timezones, binary request bodies, optional multipart fields, and fractional
+timestamps. HTTP checks use only a local server. The Java, Python, Ruby, and
+TypeScript API builds run these checks before publishing.
+
 ## Unknown enum values
 
 The API can add enum values after an SDK version is released. API SDKs read a

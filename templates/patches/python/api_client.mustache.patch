@@ -1,0 +1,19 @@
+--- a/python/api_client.mustache
++++ b/python/api_client.mustache
+@@ -1,6 +1,7 @@
+ {{>partial_header}}
+ 
+ 
++import base64
+ import datetime
+ from dateutil.parser import parse
+ from enum import Enum
+@@ -502,6 +503,8 @@
+             return obj.value
+         elif isinstance(obj, SecretStr):
+             return obj.get_secret_value()
++        elif isinstance(obj, bytes):
++            return base64.b64encode(obj).decode("ascii")
+         elif isinstance(obj, self.PRIMITIVE_TYPES):
+             return obj
+         elif isinstance(obj, uuid.UUID):

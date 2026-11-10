@@ -10,7 +10,8 @@
     "test:templates": "node --test helpers/tests/template-overrides.test.mjs",
     "test:sdk-construction": "node --test helpers/tests/sdk-construction.test.mjs",
     "test:sdk-unknown-enums": "node --test helpers/tests/sdk-unknown-enums.test.mjs",
-    "test:sdk-headers": "node --test helpers/tests/sdk-headers.test.mjs"
+    "test:sdk-headers": "node --test helpers/tests/sdk-headers.test.mjs",
+    "test:sdk-wire": "node --test helpers/tests/sdk-wire.test.mjs"
   },
   "dependencies": {
     "@openapitools/openapi-generator-cli": "2.18.4"

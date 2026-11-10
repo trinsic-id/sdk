@@ -54,6 +54,41 @@
       "outputPath": "python/model_enum.mustache",
       "upstreamSha256": "6ea1f9f84c8b870571045a0326ea228f7ef105e4e80434659907271e222fdf6b",
       "patch": "patches/python/model_enum.mustache.patch"
+    },
+    {
+      "generator": "typescript-fetch",
+      "upstreamPath": "typescript-fetch/runtime.mustache",
+      "outputPath": "typescript-fetch/runtime.mustache",
+      "upstreamSha256": "32e3df6fce2af1912eaecc070cf0141af6b2b4768d464d8389fbe7486ac8d033",
+      "patch": "patches/typescript-fetch/runtime.mustache.patch"
+    },
+    {
+      "generator": "python",
+      "upstreamPath": "python/api_client.mustache",
+      "outputPath": "python/api_client.mustache",
+      "upstreamSha256": "50b41368f9d5af87a4c8f8f2ca94542824de15631f806c4331a26287d67caf3c",
+      "patch": "patches/python/api_client.mustache.patch"
+    },
+    {
+      "generator": "java",
+      "upstreamPath": "Java/libraries/native/api.mustache",
+      "outputPath": "java/libraries/native/api.mustache",
+      "upstreamSha256": "29cca9d976056acdf2b94ecc5f84db66a7e6c6067e20cf9ffe0e6ca5331b1d14",
+      "patch": "patches/java/libraries/native/api.mustache.patch"
+    },
+    {
+      "generator": "ruby",
+      "upstreamPath": "ruby-client/api_client_typhoeus_partial.mustache",
+      "outputPath": "ruby/api_client_typhoeus_partial.mustache",
+      "upstreamSha256": "dd5a1a98ca65f15ee74a5f1fba61df27cae07d76632f4490a5358c1b6eed08ab",
+      "patch": "patches/ruby/api_client_typhoeus_partial.mustache.patch"
+    },
+    {
+      "generator": "ruby",
+      "upstreamPath": "ruby-client/api_model_base.mustache",
+      "outputPath": "ruby/api_model_base.mustache",
+      "upstreamSha256": "5e4840c3c189492c1d9892738b307d8696eb4c8d5860dc5051ccfffcbcb60d6e",
+      "patch": "patches/ruby/api_model_base.mustache.patch"
     }
   ]
 }

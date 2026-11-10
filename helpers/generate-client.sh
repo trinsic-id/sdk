@@ -67,7 +67,7 @@ fi
 
 if [[ "${swagger_file_or_url}" == https://* ]]; then
   echo "Downloading specification from $swagger_file_or_url"
-  local_swagger_file_path="$SCRIPT_DIR/swagger.json"
+  local_swagger_file_path="$template_workspace/downloaded-schema.json"
   curl -fsSL "$swagger_file_or_url" -o "$local_swagger_file_path"
   echo "Downloaded specification from $swagger_file_or_url to $local_swagger_file_path"
 else
