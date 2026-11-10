@@ -1,26 +1,23 @@
-name: Build and Publish API Typescript SDK
+name: Build API Typescript SDK
 
 on:
   workflow_call:
     inputs:
-      publish:
+      upload-artifact:
         type: boolean
         required: false
         default: false
-        description: "Publish the package, default is false"
-
-    secrets:
-      NPM_TOKEN:
-        required: false
+        description: "Upload packages for the release job, default is false"
 
 permissions:
   contents: read
 
 jobs:
   build_and_publish:
+    # Keep this name: repository rulesets require the existing PR check.
     name: Build and Publish
-    # Reusable workflows must also reject publish requests from PRs and other refs.
-    if: ${{ !inputs.publish || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.repository == 'trinsic-id/sdk') }}
+    # Only trusted release runs may produce artifacts for publishing.
+    if: ${{ !inputs.upload-artifact || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.repository == 'trinsic-id/sdk') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -38,9 +35,12 @@ jobs:
         run: npm run test:sdk-headers
         env:
           SDK_LANGUAGE: typescript
-      - name: Publish SDK
-        if: inputs.publish == true
-        run: ./api-typescript/publish-sdk.sh
-        shell: bash
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Upload release packages
+        if: inputs.upload-artifact == true
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: api-typescript-npm
+          path: |
+            api-typescript/sdk/publish/trinsic-api-*.tgz
+          if-no-files-found: error
+          overwrite: true

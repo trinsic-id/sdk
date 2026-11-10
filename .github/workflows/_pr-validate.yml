@@ -23,18 +23,12 @@ jobs:
   api-python:
     name: Validate API Python SDK
     uses: ./.github/workflows/api-python-action.yml
-    with:
-      publish: false
   api-ruby:
     name: Validate API Ruby SDK
     uses: ./.github/workflows/api-ruby-action.yml
-    with:
-      publish: false
   api-typescript:
     name: Validate API Typescript
     uses: ./.github/workflows/api-typescript-action.yml
-    with:
-      publish: false
   ui-android:
     name: Validate UI Android SDK
     uses: ./.github/workflows/ui-android-action.yml
@@ -43,8 +37,6 @@ jobs:
   ui-expo:
     name: Validate UI Expo SDK
     uses: ./.github/workflows/ui-expo-action.yml
-    with:
-      publish: false
   ui-flutter:
     name: Validate UI Flutter SDK
     uses: ./.github/workflows/ui-flutter-action.yml
@@ -53,5 +45,3 @@ jobs:
   ui-web:
     name: Validate UI Web SDK
     uses: ./.github/workflows/ui-web-action.yml
-    with:
-      publish: false

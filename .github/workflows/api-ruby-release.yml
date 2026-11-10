@@ -2,15 +2,45 @@ name: Release API Ruby SDK
 
 on:
   workflow_dispatch:
+
 permissions:
   contents: read
 
 jobs:
-  release:
+  build:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.repository == 'trinsic-id/sdk'
-    name: Publish Rubygems Package
+    name: Build release packages
     uses: ./.github/workflows/api-ruby-action.yml
     with:
-      publish: true
-    secrets:
-      RUBYGEMS_API_TOKEN: ${{ secrets.RUBYGEMS_API_TOKEN }}
+      upload-artifact: true
+
+  release:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.repository == 'trinsic-id/sdk'
+    name: Publish to rubygems
+    needs: build
+    runs-on: ubuntu-latest
+    environment: rubygems
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: false
+      - name: Download release packages
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: api-ruby-rubygems
+          path: api-ruby/sdk/publish
+      - name: Configure RubyGems trusted publishing
+        uses: rubygems/configure-rubygems-credentials@bc6dd217f8a4f919d6835fcfefd470ef821f5c44 # v1.0.0
+        with:
+          trusted-publisher: true
+      - name: Publish SDK
+        run: ./api-ruby/publish-sdk.sh
+        shell: bash

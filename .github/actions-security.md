@@ -15,6 +15,14 @@ workflow and the reusable build workflow enforce this condition. Each release
 passes only the secrets that its publishing step needs. Documentation sync runs
 only on `main`. Preserve these checks when adding a language or release path.
 
+The npm, PyPI, and RubyGems releases use trusted publishing. Their reusable build
+workflows have read-only permissions and upload packages only for trusted release
+runs. Separate jobs in the release entry points download artifacts from the same
+run and authenticate with OIDC. Only those publishing jobs have `id-token: write`.
+The `npm`, `pypi`, and `rubygems` environments must restrict deployment branches to
+`main`; their names must match the corresponding registry policies. Existing PR
+check names are preserved for repository rulesets.
+
 Do not run PR code in `pull_request_target`, issue/comment workflows, or privileged
 `workflow_run` jobs. Do not consume PR-produced executables or caches in a
 privileged job. Pass event data through environment variables instead of
