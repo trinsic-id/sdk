@@ -60,5 +60,8 @@ require_env ORG_GRADLE_PROJECT_signingInMemoryKeyPassword
 # Release to Maven Central and wait for publication; upload-only leaves a manual deployment.
 (
   cd "$SCRIPT_DIR/sdk"
-  ./gradlew publishAndReleaseToMavenCentral -PmavenCentralDeploymentValidation=PUBLISHED
+  # Central can remain in PUBLISHING beyond the plugin's 15-minute default.
+  ./gradlew publishAndReleaseToMavenCentral \
+    -PmavenCentralDeploymentValidation=PUBLISHED \
+    -PSONATYPE_CLOSE_TIMEOUT_SECONDS=3600
 )
