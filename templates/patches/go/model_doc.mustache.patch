@@ -1,0 +1,21 @@
+--- a/go/model_doc.mustache
++++ b/go/model_doc.mustache
+@@ -16,14 +16,11 @@ Name | Type | Description | Notes
+ ## Methods
+ 
+ {{^vendorExtensions.x-is-one-of-interface}}
+-### New{{classname}}
++### Named construction
+ 
+-`func New{{classname}}({{#vars}}{{#required}}{{nameInCamelCase}} {{dataType}}, {{/required}}{{/vars}}) *{{classname}}`
+-
+-New{{classname}} instantiates a new {{classname}} object
+-This constructor will assign default values to properties that have it defined,
+-and makes sure properties required by API are set, but the set of arguments
+-will change when the set of required properties is changed
++Use a keyed struct literal (`{{classname}}{FieldName: value}`), or call
++`New{{classname}}WithDefaults()` and set fields by name. Positional field
++factories and unkeyed struct literals are not supported.
+ 
+ ### New{{classname}}WithDefaults
+ 

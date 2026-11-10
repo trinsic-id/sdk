@@ -12,7 +12,7 @@ public static class DirectProviderSession
             var request = await context.Request.ReadFromJsonAsync<ResultsAccessKeyBody>()
                 ?? throw new BadHttpRequestException("A request body is required.");
             var response = await sessionApi.RefreshStepContentAsync(Guid.Parse(sessionId),
-                new RefreshStepContentRequest(resultsAccessKey: request.ResultsAccessKey), cancellationToken: context.RequestAborted);
+                new RefreshStepContentRequest { ResultsAccessKey = request.ResultsAccessKey }, cancellationToken: context.RequestAborted);
             return SdkJson.Result(response);
         });
 
@@ -24,13 +24,15 @@ public static class DirectProviderSession
                 .Select(x => (IntegrationCapability)Enum.Parse(typeof(IntegrationCapability), x)).ToList();
 
             var request =
-                new CreateDirectProviderSessionRequest(
-                    capabilities: capabilities,
-                    enableRedirectBackwardsCompatibility: false,
-                    provider: providerId,
-                    verificationProfileId: EnvironmentHelper.GetVerificationProfileIdOrThrow(),
-                    fallbackToHostedUI: fallbackToTrinsicUI,
-                    redirectUrl: redirectUrl);
+                new CreateDirectProviderSessionRequest
+                {
+                    Capabilities = capabilities,
+                    EnableRedirectBackwardsCompatibility = false,
+                    Provider = providerId,
+                    VerificationProfileId = EnvironmentHelper.GetVerificationProfileIdOrThrow(),
+                    FallbackToHostedUI = fallbackToTrinsicUI,
+                    RedirectUrl = redirectUrl
+                };
             var response = await sessionApi.CreateDirectProviderSessionAsync(request, cancellationToken: context.RequestAborted);
 
             return SdkJson.Result(response);
@@ -40,7 +42,7 @@ public static class DirectProviderSession
         {
             var request = await context.Request.ReadFromJsonAsync<ResultsAccessKeyBody>()
                 ?? throw new BadHttpRequestException("A request body is required.");
-            var resultRequest = new GetSessionResultRequest(resultsAccessKey: request.ResultsAccessKey);
+            var resultRequest = new GetSessionResultRequest { ResultsAccessKey = request.ResultsAccessKey };
             if (request.RedirectToken is not null)
                 resultRequest.RedirectToken = request.RedirectToken;
             var response =

@@ -11,6 +11,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
   --additional-property "apiPackage=id.trinsic.api" \
   --additional-property "artifactVersion=[VERSION]" \
   --additional-property "library=native" \
+  --additional-property "generateConstructorWithAllArgs=false" \
   --additional-property "modelPackage=id.trinsic.api.models" \
   --additional-property "artifactId=api" \
   --additional-property "groupId=id.trinsic" \

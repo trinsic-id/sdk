@@ -22,11 +22,14 @@ export function directRoutes(app: Express, sessionsApi: SessionsApi) {
     const capabilities = req.query.capabilities.split(",");
 
     const result = await sessionsApi.createDirectProviderSession({
-      verificationProfileId: process.env.TRINSIC_VERIFICATION_PROFILE_ID!,
-      provider: provider,
-      redirectUrl: redirectUrl,
-      capabilities: capabilities,
-      fallbackToHostedUI: fallbackToTrinsicUI === "true",
+      createDirectProviderSessionRequest: {
+        verificationProfileId: process.env.TRINSIC_VERIFICATION_PROFILE_ID!,
+        provider: provider,
+        redirectUrl: redirectUrl,
+        capabilities: capabilities,
+        fallbackToHostedUI: fallbackToTrinsicUI === "true",
+        enableRedirectBackwardsCompatibility: true,
+      },
     });
 
     res.json(result);
@@ -35,16 +38,18 @@ export function directRoutes(app: Express, sessionsApi: SessionsApi) {
   app.post("/refresh-content/:sessionId", async (req: any, res: any) => {
     const sessionId = req.params.sessionId;
     const resultsAccessKey = req.body.resultsAccessKey;
-    const result = await sessionsApi.refreshStepContent(sessionId, {
-      resultsAccessKey: resultsAccessKey,
+    const result = await sessionsApi.refreshStepContent({
+      sessionId,
+      refreshStepContentRequest: { resultsAccessKey },
     });
     res.json(result);
   });
 
   app.post("/poll-results/:sessionId", async (req: any, res: any) => {
     const resultsAccessKey = req.body.resultsAccessKey;
-    const results = await sessionsApi.getSessionResult(req.params.sessionId, {
-      resultsAccessKey: resultsAccessKey,
+    const results = await sessionsApi.getSessionResult({
+      sessionId: req.params.sessionId,
+      getSessionResultRequest: { resultsAccessKey },
     });
     res.json(results);
   });

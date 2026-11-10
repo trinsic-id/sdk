@@ -4,6 +4,11 @@
   "version": "0.0.1",
   "license": "MIT",
   "scripts": {
+    "templates:check": "node helpers/template-overrides.mjs check",
+    "templates:upgrade": "node helpers/template-overrides.mjs upgrade",
+    "templates:accept": "node helpers/template-overrides.mjs accept",
+    "test:templates": "node --test helpers/tests/template-overrides.test.mjs",
+    "test:sdk-construction": "node --test helpers/tests/sdk-construction.test.mjs",
     "test:sdk-headers": "node --test helpers/tests/sdk-headers.test.mjs"
   },
   "dependencies": {

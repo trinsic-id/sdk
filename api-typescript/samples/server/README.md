@@ -12,9 +12,14 @@ to launch verifications.
 
 Make sure to create a new `.env` file to set your Trinsic Access Token. You can use [`example.env`](./example.env) as a reference. If you need more information where to find this token, visit our [Getting Started](https://docs.trinsic.id/docs/getting-started-with-trinsic-connect) guide.
 
-After you created your `.env`, you can run the sample by running the `./start.sh` script. It will check for the presence of the `TRINSIC_ACCESS_TOKEN`, build the UI sample, and then start the TypeScript application.
+The sample uses the generated SDK in `api-typescript/sdk` through a local package
+dependency. Build it first so the sample uses the same named request arguments
+as the SDK in this checkout. After creating your `.env`, run the following from
+this directory. `start.sh` checks for `TRINSIC_ACCESS_TOKEN`, builds the UI sample,
+and starts the TypeScript application.
 
 ```sh
+../../build-sdk.sh
 ./start.sh
 ```
 

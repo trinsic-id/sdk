@@ -1,0 +1,17 @@
+--- a/java/libraries/native/pojo.mustache
++++ b/java/libraries/native/pojo.mustache
+@@ -1,3 +1,4 @@
++{{! Modified from the pinned OpenAPI Generator: private read-only field constructor. }}
+ {{#discriminator}}
+ import {{invokerPackage}}.JSON;
+ {{/discriminator}}
+@@ -88,7 +89,8 @@ public class {{classname}} {{#parent}}extends {{{.}}} {{/parent}}{{#vendorExtens
+   }{{#vendorExtensions.x-has-readonly-properties}}{{^withXml}}
+ 
+   {{#jackson}}@JsonCreator{{/jackson}}
+-  public {{classname}}(
++  // Used only by Jackson; public construction uses named setters.
++  private {{classname}}(
+   {{#readOnlyVars}}
+     @JsonProperty(JSON_PROPERTY_{{nameInSnakeCase}}) {{{datatypeWithEnum}}} {{name}}{{^-last}}, {{/-last}}
+   {{/readOnlyVars}}

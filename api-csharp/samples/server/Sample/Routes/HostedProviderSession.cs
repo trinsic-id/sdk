@@ -11,11 +11,13 @@ public static class HostedProviderSession
         {
             var redirectUrl = context.Request.Query["redirectUrl"].ToString();
 
-            var request = new CreateHostedProviderSessionRequest(
-                enableRedirectBackwardsCompatibility: false,
-                provider: providerId,
-                redirectUrl: redirectUrl,
-                verificationProfileId: EnvironmentHelper.GetVerificationProfileIdOrThrow());
+            var request = new CreateHostedProviderSessionRequest
+            {
+                EnableRedirectBackwardsCompatibility = false,
+                Provider = providerId,
+                RedirectUrl = redirectUrl,
+                VerificationProfileId = EnvironmentHelper.GetVerificationProfileIdOrThrow()
+            };
 
             var response = await sessionApi.CreateHostedProviderSessionAsync(request, cancellationToken: context.RequestAborted);
 

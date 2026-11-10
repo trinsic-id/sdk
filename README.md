@@ -77,6 +77,34 @@ runs its language's tests before publishing.
 This branch contains [contract tests pinned to published SDK 3.2.1](scripts/sdk-compatibility/README.md).
 Connect selects the test snapshot commits and owns all compatibility exceptions.
 
+## Named model construction
+
+The next major API SDK release prevents schema changes from silently rebinding
+positional model fields. C# uses object initializers with required writable
+properties; Go uses keyed structs or named setters; Java uses no-argument
+constructors and named setters, with private Jackson constructors for read-only
+fields. Python keyword models and Ruby attribute hashes retain their existing
+behavior. TypeScript models remain interfaces, and endpoint calls now take one
+object containing named endpoint parameters.
+
+These are breaking source changes. Package versions have not been advanced for
+release yet. See each API SDK's README for migration examples and
+[the template notes](templates/README.md) for the generator overrides. Client
+configuration constructors and endpoint methods outside TypeScript retain their
+existing calling conventions.
+
+Template changes are maintained as patches against the checksum-pinned generator.
+`npm run templates:check` detects drift; the template notes describe staging and
+reviewing upgrades with `templates:upgrade` and `templates:accept`.
+
+After building an API SDK, run
+`SDK_LANGUAGE=csharp npm run test:sdk-construction` (or `go`, `java`,
+`python`, `ruby`, `typescript`). With all six built, `npm run test:sdk-construction`
+runs them together. The checks compile or run valid consumers, require unsafe
+calls to fail, and verify JSON behavior without calling the Trinsic API. Each
+API build workflow runs its checks. The published 3.2.1 contract-test
+snapshot remains unchanged.
+
 ## Support
 
 Any issues, inquiries, and feature requests can be sent to [support@trinsic.id](mailto:support@trinsic.id), or feel free to open a GitHub issue [here](https://github.com/trinsic-id/sdk/issues).
