@@ -41,7 +41,7 @@ using var sessions = new SessionsApi(httpClient, new Configuration
 
 var result = await sessions.GetSessionResultAsync(
     sessionId,
-    new GetSessionResultRequest(resultsAccessKey: resultsAccessKey));
+    new GetSessionResultRequest { ResultsAccessKey = resultsAccessKey });
 
 // Successful calls return models directly. HTTP errors throw ApiException,
 // which exposes ErrorCode (HTTP status) and ErrorContent (response body).
@@ -49,8 +49,8 @@ var identity = result.IdentityData;
 ```
 
 The [C# sample](samples/server) shows registration with `AddHttpClient`, dependency
-injection into request handlers, and `ApiException` handling. Use named arguments
-for generated request constructors.
+injection into request handlers, and `ApiException` handling. Construct models
+with object initializers, as shown above.
 
 ### Data residency
 

@@ -24,16 +24,29 @@ available in the [Trinsic Dashboard](https://dashboard.trinsic.id).
 
 <!-- prettier-ignore -->
 ```ts
-import { AttachmentsApi, Configuration, NetworkApi, SessionsApi } from "@trinsic/api";
+import { Configuration, ProvidersApi, SessionsApi } from "@trinsic/api";
 
 const config = new Configuration({ accessToken: "your-access-token" });
 
-const attachments = new AttachmentsApi(config);
-const network = new NetworkApi(config);
+const providers = new ProvidersApi(config);
 const sessions = new SessionsApi(config);
+
+const result = await sessions.getSessionResult({
+  sessionId,
+  getSessionResultRequest: { resultsAccessKey },
+});
 ```
 
 You can find a full TypeScript server example in the [samples](https://github.com/trinsic-id/sdk/tree/main/api-typescript/samples) folder.
+
+Endpoint parameters are supplied by name in one request object. For example,
+replace `sessions.getSession(sessionId)` with `sessions.getSession({ sessionId })`.
+Body parameters are nested under their generated request name, as shown above.
+Optional fetch overrides remain a separate final argument. Model fields are
+still ordinary named object properties.
+
+This is a breaking change intended for the next major SDK release. The sample
+uses the locally generated SDK so its calls are checked against this API.
 
 ### Data residency
 

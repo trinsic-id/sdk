@@ -11,8 +11,9 @@ public static class Shared
         app.MapGet("/providers", async (HttpContext context, ISessionsApi sessionApi) =>
         {
             List<string> ipAddresses = context.Request.Query["ipAddress"] == StringValues.Empty ? [] : [context.Request.Query["ipAddress"].ToString()];
-            var response = await sessionApi.RecommendProvidersAsync(new RecommendProvidersRequest(verificationProfileId: EnvironmentHelper.GetVerificationProfileIdOrThrow())
+            var response = await sessionApi.RecommendProvidersAsync(new RecommendProvidersRequest
             {
+                VerificationProfileId = EnvironmentHelper.GetVerificationProfileIdOrThrow(),
                 RecommendationInfo = new RecommendationInfo
                 {
                     IpAddresses = ipAddresses,
@@ -28,7 +29,7 @@ public static class Shared
                 ?? throw new BadHttpRequestException("A request body is required.");
 
             // Call the method to exchange the results key
-            var resultRequest = new GetSessionResultRequest(resultsAccessKey: request.ResultsAccessKey);
+            var resultRequest = new GetSessionResultRequest { ResultsAccessKey = request.ResultsAccessKey };
             if (request.RedirectToken is not null)
                 resultRequest.RedirectToken = request.RedirectToken;
             var response = await sessionApi.GetSessionResultAsync(Guid.Parse(request.SessionId), resultRequest,

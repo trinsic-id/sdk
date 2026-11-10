@@ -13,7 +13,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
   --additional-property "npmVersion=[VERSION]" \
   --additional-property "supportsES6=true" \
   --additional-property "withInterfaces=true" \
-  --additional-property "useSingleRequestParameter=false"
+  --additional-property "useSingleRequestParameter=true"
 
 cp "$SCRIPT_DIR/README.md" "$SCRIPT_DIR/sdk"
 cp "$REPO_ROOT/LICENSE" "$SCRIPT_DIR/sdk"

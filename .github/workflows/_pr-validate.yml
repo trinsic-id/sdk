@@ -7,6 +7,19 @@ permissions:
   contents: read
 
 jobs:
+  generator-templates:
+    name: Validate generator template baseline
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Install NPM dependencies
+        run: npm ci
+      - name: Test template maintenance
+        run: npm run test:templates
+      - name: Verify generator artifact and template patches
+        run: npm run templates:check
   api-csharp:
     name: Validate API CSharp SDK
     uses: ./.github/workflows/api-csharp-action.yml

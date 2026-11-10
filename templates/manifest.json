@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "generator": {
+    "version": "7.26.0",
+    "downloadUrl": "https://github.com/trinsic-id/static-dependencies/releases/download/openapitools-7.26.0/openapi-generator-cli-7.26.0.jar",
+    "sha256": "1760050094997b9cc790cc1350be095f15da8c08a996b184d3eadc4ccda5e35e"
+  },
+  "templates": [
+    {
+      "generator": "csharp",
+      "upstreamPath": "csharp/modelGeneric.mustache",
+      "outputPath": "csharp/modelGeneric.mustache",
+      "upstreamSha256": "ac86348ea2da9dbe62afde8fbc31940c309b0584ad2c555a151c425febfe1cfc",
+      "patch": "patches/csharp/modelGeneric.mustache.patch"
+    },
+    {
+      "generator": "go",
+      "upstreamPath": "go/model_simple.mustache",
+      "outputPath": "go/model_simple.mustache",
+      "upstreamSha256": "80293db777ee6940cfc7f489e73d0c540990263a4e6d75a41aad5a711d7ff861",
+      "patch": "patches/go/model_simple.mustache.patch"
+    },
+    {
+      "generator": "go",
+      "upstreamPath": "go/model_doc.mustache",
+      "outputPath": "go/model_doc.mustache",
+      "upstreamSha256": "e8b28d30fe14c688a181f928fa888ada3999abe7450aea793928e8c8a8ddb5f2",
+      "patch": "patches/go/model_doc.mustache.patch"
+    },
+    {
+      "generator": "java",
+      "upstreamPath": "Java/libraries/native/pojo.mustache",
+      "outputPath": "java/libraries/native/pojo.mustache",
+      "upstreamSha256": "4f12b0193ae69723c5ad31754dc6582a2c8423d5d6936931e6832650879a4b7e",
+      "patch": "patches/java/libraries/native/pojo.mustache.patch"
+    }
+  ]
+}
