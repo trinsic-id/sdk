@@ -19,10 +19,15 @@ The patches preserve these changes:
   `UnknownEnumConverter`, added beside `OpenAPIDateConverter`, to read unknown
   values as the fallback member.
 - Go: keyed model construction, no positional factories, and updated model docs.
-- Java `native`: private field constructors for Jackson, public named setters.
-- Python: enums read unknown values as the fallback member.
+- Java `native`: private field constructors for Jackson, public named setters,
+  and null guards for optional multipart lists and files.
+- Python: enums read unknown values as the fallback member; raw bytes are
+  base64-encoded when serializing requests.
+- Ruby: force multipart encoding even without a file, and serialize model
+  timestamps as ISO 8601 with nanosecond precision.
+- TypeScript `fetch`: date-only fields use UTC calendar components.
 
-TypeScript uses `useSingleRequestParameter=true` and needs no template patch.
+TypeScript also uses `useSingleRequestParameter=true` for named endpoint arguments.
 
 The enum fallback member comes from `enumUnknownDefaultCase=true` in the C#, Go,
 Java, Python, and Ruby build scripts. The Go, Java, and Ruby templates already
@@ -73,6 +78,7 @@ npm run templates:check
 npm run test:templates
 npm run test:sdk-construction
 npm run test:sdk-unknown-enums
+npm run test:sdk-wire
 # Run for each rebuilt SDK: csharp, go, java, python, ruby, typescript.
 SDK_LANGUAGE=csharp npm run test:sdk-headers
 ```

@@ -39,6 +39,10 @@ jobs:
         run: npm run test:sdk-construction
         env:
           SDK_LANGUAGE: typescript
+      - name: Test SDK wire behavior
+        run: npm run test:sdk-wire
+        env:
+          SDK_LANGUAGE: typescript
       - name: Test unknown enum values
         run: npm run test:sdk-unknown-enums
         env:
