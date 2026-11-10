@@ -12,6 +12,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
   --additional-property "artifactVersion=[VERSION]" \
   --additional-property "library=native" \
   --additional-property "generateConstructorWithAllArgs=false" \
+  --additional-property "enumUnknownDefaultCase=true" \
   --additional-property "modelPackage=id.trinsic.api.models" \
   --additional-property "artifactId=api" \
   --additional-property "groupId=id.trinsic" \

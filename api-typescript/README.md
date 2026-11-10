@@ -63,6 +63,23 @@ const config = new Configuration({
 const sessions = new SessionsApi(config);
 ```
 
+### Unknown enum values
+
+The API can add enum values after this SDK version was released. A value this
+version does not know is returned as the original string, even though the enum
+type lists only the values known when the SDK was generated. Keep a default
+branch when handling enum values:
+
+```ts
+switch (session.errorCode) {
+  case SessionErrorCode.Expired:
+    break;
+  default:
+    // Also reached for an error code newer than this SDK version.
+    break;
+}
+```
+
 ## SDK Versioning
 
 Our SDKs follow the [Semantic Versioning](https://semver.org) ("SemVer") scheme.

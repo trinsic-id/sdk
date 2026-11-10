@@ -14,6 +14,20 @@
       "patch": "patches/csharp/modelGeneric.mustache.patch"
     },
     {
+      "generator": "csharp",
+      "upstreamPath": "csharp/modelEnum.mustache",
+      "outputPath": "csharp/modelEnum.mustache",
+      "upstreamSha256": "99eda8b48bc0a704dfcb7d14dd1f28faa3eadf4ad0f12289dcc8fe887be23924",
+      "patch": "patches/csharp/modelEnum.mustache.patch"
+    },
+    {
+      "generator": "csharp",
+      "upstreamPath": "csharp/OpenAPIDateConverter.mustache",
+      "outputPath": "csharp/OpenAPIDateConverter.mustache",
+      "upstreamSha256": "a019575d567b9bf86436d4f67a3ba63a7b416d5e8dcf7dbf2afdcdc3c6873b9e",
+      "patch": "patches/csharp/OpenAPIDateConverter.mustache.patch"
+    },
+    {
       "generator": "go",
       "upstreamPath": "go/model_simple.mustache",
       "outputPath": "go/model_simple.mustache",
@@ -33,6 +47,13 @@
       "outputPath": "java/libraries/native/pojo.mustache",
       "upstreamSha256": "4f12b0193ae69723c5ad31754dc6582a2c8423d5d6936931e6832650879a4b7e",
       "patch": "patches/java/libraries/native/pojo.mustache.patch"
+    },
+    {
+      "generator": "python",
+      "upstreamPath": "python/model_enum.mustache",
+      "outputPath": "python/model_enum.mustache",
+      "upstreamSha256": "6ea1f9f84c8b870571045a0326ea228f7ef105e4e80434659907271e222fdf6b",
+      "patch": "patches/python/model_enum.mustache.patch"
     }
   ]
 }

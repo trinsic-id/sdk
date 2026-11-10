@@ -23,6 +23,7 @@ find_python() {
   --additional-property "packageName=trinsic_api" \
   --additional-property "packageVersion=[VERSION]" \
   --additional-property "packageUrl=https://trinsic.id" \
+  --additional-property "enumUnknownDefaultCase=true" \
   --additional-property "projectName=trinsic_api"
 
 cp "$SCRIPT_DIR/README.md" "$SCRIPT_DIR/sdk"

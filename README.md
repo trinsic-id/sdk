@@ -105,6 +105,30 @@ calls to fail, and verify JSON behavior without calling the Trinsic API. Each
 API build workflow runs its checks. The published 3.2.1 contract-test
 snapshot remains unchanged.
 
+## Unknown enum values
+
+The API can add enum values after an SDK version is released. API SDKs read a
+value they do not know instead of failing the whole response. C#, Go, Java,
+Python, and Ruby are generated with `enumUnknownDefaultCase=true`, which adds a
+fallback member with the wire value `unknown_default_open_api` to every enum,
+and read unknown values as that member. Go, Java, and Ruby get this from the
+generator; C# and Python need [template patches](templates/README.md) because
+their generators add the member without using it. TypeScript needs neither: its
+models already return an unknown value as the original string.
+
+The fallback member is for reading only; the API does not accept it in requests.
+Where an SDK converts strings to enums, such as Java's `fromValue` or Python
+model fields, a misspelled value now also becomes the fallback member instead of
+raising an error.
+
+After building an API SDK, run
+`SDK_LANGUAGE=csharp npm run test:sdk-unknown-enums` (or `go`, `java`,
+`python`, `ruby`, `typescript`). The checks read responses holding unknown
+values without calling the Trinsic API, and each API build workflow runs them.
+Only enums declared as their own schema are covered, which is every enum in the
+API today. The C#, Python, and Ruby checks fail if an enum is ever declared
+inside a model property, because the code generated for those has no fallback.
+
 ## Support
 
 Any issues, inquiries, and feature requests can be sent to [support@trinsic.id](mailto:support@trinsic.id), or feel free to open a GitHub issue [here](https://github.com/trinsic-id/sdk/issues).

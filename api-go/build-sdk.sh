@@ -19,6 +19,7 @@ fi
   --additional-property "packageName=trinsic_api" \
   --additional-property "packageVersion=[VERSION]" \
   --additional-property "disallowAdditionalPropertiesIfNotPresent=false" \
+  --additional-property "enumUnknownDefaultCase=true" \
   --additional-property "enumClassPrefix=true"
 
 cp "$SCRIPT_DIR/README.md" "$SCRIPT_DIR/sdk-build"

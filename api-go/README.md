@@ -75,6 +75,21 @@ api := trinsic_api.NewAPIClient(config)
 sessions := api.SessionsAPI
 ```
 
+### Unknown enum values
+
+The API can add enum values after this SDK version was released. A value this
+version does not know is read as the enum's `UNKNOWN_DEFAULT_OPEN_API` member
+instead of failing the response:
+
+```go
+if session.GetErrorCode() == trinsic_api.SESSIONERRORCODE_UNKNOWN_DEFAULT_OPEN_API {
+    // An error code newer than this SDK version.
+}
+```
+
+Upgrade the SDK to read the new value. Do not send the fallback member in
+requests; the API does not accept it.
+
 ## SDK Versioning
 
 Our SDKs follow the [Semantic Versioning](https://semver.org) ("SemVer") scheme. 

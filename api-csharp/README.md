@@ -82,6 +82,22 @@ JSON remain strings. Untyped floating point values inside free-form JSON use
 lossless JSON number tokens. The SDK does not globally force decimal parsing,
 which would reject valid numbers outside the decimal range.
 
+### Unknown enum values
+
+The API can add enum values after this SDK version was released. A value this
+version does not know is read as the enum's `UnknownDefaultOpenApi` member
+instead of failing the response:
+
+```csharp
+if (session.ErrorCode == SessionErrorCode.UnknownDefaultOpenApi)
+{
+    // An error code newer than this SDK version.
+}
+```
+
+Upgrade the SDK to read the new value. Do not send the fallback member in
+requests; the API does not accept it.
+
 ## SDK Versioning
 
 Our SDKs follow the [Semantic Versioning](https://semver.org) ("SemVer") scheme. 
