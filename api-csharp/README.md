@@ -48,7 +48,7 @@ var result = await sessions.GetSessionResultAsync(
 var identity = result.IdentityData;
 ```
 
-The [C# sample](samples/server) shows registration with `AddHttpClient`, dependency
+The [C# sample](https://github.com/trinsic-id/sdk/tree/main/api-csharp/samples/server) shows registration with `AddHttpClient`, dependency
 injection into request handlers, and `ApiException` handling. Construct models
 with object initializers, as shown above.
 
