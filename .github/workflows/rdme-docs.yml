@@ -35,7 +35,7 @@ jobs:
       - name: Prepare readme file
         run: cat api-csharp/README.md >> .readme/api-csharp.md
       - name: Run `docs` command
-        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10
+        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10.10.0
         with:
           rdme: reference upload .readme/api-csharp.md --key=${{ secrets.README_API_KEY }} --branch=1.0
   api-go:
@@ -50,7 +50,7 @@ jobs:
       - name: Prepare readme file
         run: cat api-go/README.md >> .readme/api-go.md
       - name: Run `docs` command
-        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10
+        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10.10.0
         with:
           rdme: reference upload .readme/api-go.md --key=${{ secrets.README_API_KEY }} --branch=1.0
   api-java:
@@ -65,7 +65,7 @@ jobs:
       - name: Prepare readme file
         run: cat api-java/README.md >> .readme/api-java.md
       - name: Run `docs` command
-        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10
+        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10.10.0
         with:
           rdme: reference upload .readme/api-java.md --key=${{ secrets.README_API_KEY }} --branch=1.0
   api-python:
@@ -80,7 +80,7 @@ jobs:
       - name: Prepare readme file
         run: cat api-python/README.md >> .readme/api-python.md
       - name: Run `docs` command
-        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10
+        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10.10.0
         with:
           rdme: reference upload .readme/api-python.md --key=${{ secrets.README_API_KEY }} --branch=1.0
   api-ruby:
@@ -95,7 +95,7 @@ jobs:
       - name: Prepare readme file
         run: cat api-ruby/README.md >> .readme/api-ruby.md
       - name: Run `docs` command
-        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10
+        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10.10.0
         with:
           rdme: reference upload .readme/api-ruby.md --key=${{ secrets.README_API_KEY }} --branch=1.0
   api-typescript:
@@ -110,7 +110,7 @@ jobs:
       - name: Prepare readme file
         run: cat api-typescript/README.md >> .readme/api-typescript.md
       - name: Run `docs` command
-        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10
+        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10.10.0
         with:
           rdme: reference upload .readme/api-typescript.md --key=${{ secrets.README_API_KEY }} --branch=1.0
   ui-android:
@@ -125,7 +125,7 @@ jobs:
       - name: Prepare readme file
         run: cat ui-android/README.md >> .readme/ui-android.md
       - name: Run `docs` command
-        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10
+        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10.10.0
         with:
           rdme: reference upload .readme/ui-android.md --key=${{ secrets.README_API_KEY }} --branch=1.0
   ui-expo:
@@ -140,7 +140,7 @@ jobs:
       - name: Prepare readme file
         run: cat ui-expo/README.md >> .readme/ui-expo.md
       - name: Run `docs` command
-        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10
+        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10.10.0
         with:
           rdme: reference upload .readme/ui-expo.md --key=${{ secrets.README_API_KEY }} --branch=1.0
   ui-flutter:
@@ -155,7 +155,7 @@ jobs:
       - name: Prepare readme file
         run: cat ui-flutter/README.md >> .readme/ui-flutter.md
       - name: Run `docs` command
-        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10
+        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10.10.0
         with:
           rdme: reference upload .readme/ui-flutter.md --key=${{ secrets.README_API_KEY }} --branch=1.0
   ui-swift:
@@ -170,7 +170,7 @@ jobs:
       - name: Prepare readme file
         run: cat ui-swift/README.md >> .readme/ui-swift.md
       - name: Run `docs` command
-        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10
+        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10.10.0
         with:
           rdme: reference upload .readme/ui-swift.md --key=${{ secrets.README_API_KEY }} --branch=1.0
   ui-web:
@@ -185,6 +185,6 @@ jobs:
       - name: Prepare readme file
         run: cat ui-web/README.md >> .readme/ui-web.md
       - name: Run `docs` command
-        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10
+        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10.10.0
         with:
           rdme: reference upload .readme/ui-web.md --key=${{ secrets.README_API_KEY }} --branch=1.0
