@@ -1,13 +1,14 @@
+using Microsoft.AspNetCore.Mvc;
 using Trinsic.Api.Api;
 using Trinsic.Api.Model;
 
-namespace Sample;
+namespace Sample.Routes;
 
 public static class HostedProviderSession
 {
     public static void MapHostedProviderSessionRoutes(this WebApplication app)
     {
-        app.MapPost("/create-hosted-session/{providerId}", async (HttpContext context, string providerId, ISessionsApi sessionApi) =>
+        app.MapPost("/create-hosted-session/{providerId}", async (HttpContext context, string providerId, ISessionsApi sessionApi, [FromServices]IPersistence persistence) =>
         {
             var redirectUrl = context.Request.Query["redirectUrl"].ToString();
 
@@ -20,6 +21,8 @@ public static class HostedProviderSession
             };
 
             var response = await sessionApi.CreateHostedProviderSessionAsync(request, cancellationToken: context.RequestAborted);
+
+            await persistence.SaveResultsAccessKey(response.SessionId, response.ResultsAccessKey);
 
             return SdkJson.Result(response);
         });
