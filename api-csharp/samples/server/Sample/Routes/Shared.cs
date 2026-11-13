@@ -22,21 +22,24 @@ public static class Shared
             return SdkJson.Result(response);
         });
 
-        app.MapPost("/exchange-result", async (HttpContext context, ISessionsApi sessionApi) =>
+        app.MapGet("/exchange-result", async (string sessionId, string? redirectToken, HttpContext context, ISessionsApi sessionApi, [FromServices]IPersistence persistence) =>
         {
-            // Read and deserialize the request body
-            var request = await context.Request.ReadFromJsonAsync<ExchangeResultRequest>()
-                ?? throw new BadHttpRequestException("A request body is required.");
-
-            // Call the method to exchange the results key
-            var resultRequest = new GetSessionResultRequest { ResultsAccessKey = request.ResultsAccessKey };
-            if (request.RedirectToken is not null)
-                resultRequest.RedirectToken = request.RedirectToken;
-            var response = await sessionApi.GetSessionResultAsync(Guid.Parse(request.SessionId), resultRequest,
-                cancellationToken: context.RequestAborted);
+            var resultRequest = new GetSessionResultRequest
+            {
+                ResultsAccessKey = await persistence.GetResultsAccessKey(sessionId)
+            };
             
-            // Return the result as JSON
-            return SdkJson.Result(response);
+            if (redirectToken is not null)
+            {
+                resultRequest.RedirectToken = redirectToken;
+            }
+            
+            var response = await sessionApi.GetSessionResultAsync(sessionId, resultRequest,
+                cancellationToken: context.RequestAborted);
+
+            return response.Session.Success 
+                ? Results.Redirect($"{Environment.GetEnvironmentVariable("OWN_FRONTEND_BASE_URL")}/exchange-result-success")
+                : Results.Redirect($"{Environment.GetEnvironmentVariable("OWN_FRONTEND_BASE_URL")}/exchange-result-failure");
         });
     }
 }
