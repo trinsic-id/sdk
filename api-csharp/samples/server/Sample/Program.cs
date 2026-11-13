@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Rewrite;
 using Sample;
+using Sample.Routes;
 using Trinsic.Api.Api;
 using Trinsic.Api.Client;
 

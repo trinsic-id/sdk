@@ -1,8 +1,9 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using Trinsic.Api.Api;
 using Trinsic.Api.Model;
 
-namespace Sample;
+namespace Sample.Routes;
 
 public static class Shared
 {
@@ -22,7 +23,7 @@ public static class Shared
             return SdkJson.Result(response);
         });
 
-        app.MapGet("/exchange-result", async (string sessionId, string? redirectToken, HttpContext context, ISessionsApi sessionApi, [FromServices]IPersistence persistence) =>
+        app.MapGet("/exchange-result", async (Guid sessionId, string? redirectToken, HttpContext context, ISessionsApi sessionApi, [FromServices]IPersistence persistence) =>
         {
             var resultRequest = new GetSessionResultRequest
             {

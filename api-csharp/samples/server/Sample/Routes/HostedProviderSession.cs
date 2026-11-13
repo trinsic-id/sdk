@@ -1,7 +1,8 @@
+using Microsoft.AspNetCore.Mvc;
 using Trinsic.Api.Api;
 using Trinsic.Api.Model;
 
-namespace Sample;
+namespace Sample.Routes;
 
 public static class HostedProviderSession
 {
