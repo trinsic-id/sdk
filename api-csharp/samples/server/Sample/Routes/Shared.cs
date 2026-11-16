@@ -3,7 +3,7 @@ using Microsoft.Extensions.Primitives;
 using Trinsic.Api.Api;
 using Trinsic.Api.Model;
 
-namespace Sample;
+namespace Sample.Routes;
 
 public static class Shared
 {
@@ -23,24 +23,24 @@ public static class Shared
             return SdkJson.Result(response);
         });
 
-        app.MapPost("/exchange-result", async (HttpContext context, ISessionsApi sessionApi, [FromServices] IPersistence persistence) =>
+        app.MapGet("/exchange-result", async (Guid sessionId, string? redirectToken, HttpContext context, ISessionsApi sessionApi, [FromServices]IPersistence persistence) =>
         {
-            // Read and deserialize the request body
-            var request = await context.Request.ReadFromJsonAsync<ExchangeResultRequest>()
-                ?? throw new BadHttpRequestException("A request body is required.");
-
-            // Retrieve the results access key saved when the session was created.
             var resultRequest = new GetSessionResultRequest
             {
-                ResultsAccessKey = await persistence.GetResultsAccessKey(Guid.Parse(request.SessionId))
+                ResultsAccessKey = await persistence.GetResultsAccessKey(sessionId)
             };
-            if (request.RedirectToken is not null)
-                resultRequest.RedirectToken = request.RedirectToken;
-            var response = await sessionApi.GetSessionResultAsync(Guid.Parse(request.SessionId), resultRequest,
+
+            if (redirectToken is not null)
+            {
+                resultRequest.RedirectToken = redirectToken;
+            }
+
+            var response = await sessionApi.GetSessionResultAsync(sessionId, resultRequest,
                 cancellationToken: context.RequestAborted);
 
-            // Return the result as JSON
-            return SdkJson.Result(response);
+            return response.Session.Success
+                ? Results.Redirect($"{Environment.GetEnvironmentVariable("OWN_FRONTEND_BASE_URL")}/exchange-result-success")
+                : Results.Redirect($"{Environment.GetEnvironmentVariable("OWN_FRONTEND_BASE_URL")}/exchange-result-failure");
         });
     }
 }
