@@ -55,7 +55,8 @@ If you are using this library to launch Trinsic sessions from within an iFrame, 
       - Therefore, in certain circumstances, it may be impossible for the popup window to send the finalization signal to the parent window.
     - As a consequence, you **must** provide a value for `pollingFunction` when awaiting a popup's completion.
         - This function should hit your backend and query the status of the session.
-        - The library will only call `pollingFunction` if it detects that the browser has closed off cross-window communication with the popup.
+        - By default, the library only calls `pollingFunction` if it detects that the browser has closed off cross-window communication with the popup.
+        - Set `pollWhilePopupOpen: true` to poll continuously (including while the popup still appears open). This is useful in case the popup never closed but the verification completed elsewhere.
 
 ## Usage
 ### Redirect Query Parameters

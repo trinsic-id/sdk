@@ -186,8 +186,11 @@ export class TrinsicPopup {
                         return;
                     }
 
-                    // Don't poll if we still have a connection to the popup -- no need, since polling is a backup mechanism
-                    if (!this.isMaybeClosed) {
+                    // By default, polling is a backup when the popup connection is lost.
+                    // With pollWhilePopupOpen, poll for the life of waitForCompletion(),
+                    // in case the popup never closed but the verification completed
+                    // elsewhere.
+                    if (!options.pollWhilePopupOpen && !this.isMaybeClosed) {
                         return;
                     }
 
@@ -303,9 +306,19 @@ export interface WaitForResultsOptions {
      * 
      * This is necessary because certain circumstances could cause cross-window messaging to be blocked by the browser when running inside a cross-origin iFrame.
      * 
-     * This function is not called unless the library detects that the browser has closed off cross-window communication with the popup.
+     * By default this function is not called unless the library detects that the browser has closed off cross-window communication with the popup, but
+     * you can set pollWhilePopupOpen to true to poll for the lifetime of waitForCompletion(), including while the popup still appears open.
      */
     pollingFunction?: () => Promise<boolean>;
+
+    /**
+     * If true, call pollingFunction on an interval for the lifetime of waitForCompletion(), even while the popup still appears open.
+     * 
+     * This option is useful as a fallback in case the popup never closed but the verification completed elsewhere.
+     * 
+     * Default value: false (only poll after the popup connection appears closed).
+     */
+    pollWhilePopupOpen?: boolean;
 
     /**
      * A function which is called when an error occurs in the polling function.
