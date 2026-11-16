@@ -1,7 +1,7 @@
 using Trinsic.Api.Api;
 using Trinsic.Api.Model;
 
-namespace Sample.Routes;
+namespace Sample;
 
 public static class DirectProviderSession
 {
