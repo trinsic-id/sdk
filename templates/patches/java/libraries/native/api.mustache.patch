@@ -1,0 +1,41 @@
+--- a/java/libraries/native/api.mustache
++++ b/java/libraries/native/api.mustache
+@@ -757,22 +757,26 @@
+     boolean hasFiles = false;
+     {{#formParams}}
+     {{#isArray}}
+-    for (int i=0; i < {{paramName}}.size(); i++) {
+-        {{#isFile}}
+-        multiPartBuilder.addBinaryBody("{{{baseName}}}", {{paramName}}.get(i));
+-        hasFiles = true;
+-        {{/isFile}}
+-        {{^isFile}}
+-        if ({{paramName}}.get(i) != null) {
+-            multiPartBuilder.addTextBody("{{{baseName}}}", {{paramName}}.get(i).toString());
+-        }
+-        {{/isFile}}
++    if ({{paramName}} != null) {
++        for (int i=0; i < {{paramName}}.size(); i++) {
++            {{#isFile}}
++            multiPartBuilder.addBinaryBody("{{{baseName}}}", {{paramName}}.get(i));
++            hasFiles = true;
++            {{/isFile}}
++            {{^isFile}}
++            if ({{paramName}}.get(i) != null) {
++                multiPartBuilder.addTextBody("{{{baseName}}}", {{paramName}}.get(i).toString());
++            }
++            {{/isFile}}
++        }
+     }
+     {{/isArray}}
+     {{^isArray}}
+     {{#isFile}}
+-    multiPartBuilder.addBinaryBody("{{{baseName}}}", {{paramName}});
+-    hasFiles = true;
++    if ({{paramName}} != null) {
++        multiPartBuilder.addBinaryBody("{{{baseName}}}", {{paramName}});
++        hasFiles = true;
++    }
+     {{/isFile}}
+     {{^isFile}}
+     if ({{paramName}} != null) {

@@ -1,0 +1,8 @@
+# Workflows and the scripts they execute are part of the release trust boundary.
+/.github/ @trinsic-id/engineers
+/.gitmodules @trinsic-id/engineers
+/helpers/ @trinsic-id/engineers
+/package.json @trinsic-id/engineers
+/package-lock.json @trinsic-id/engineers
+/*/build-*.sh @trinsic-id/engineers
+/*/publish-sdk.sh @trinsic-id/engineers

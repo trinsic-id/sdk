@@ -1,1 +1,1 @@
-public record ResultsAccessKeyBody(string ResultsAccessKey);
+public record ResultsAccessKeyBody(string ResultsAccessKey, string? RedirectToken = null);

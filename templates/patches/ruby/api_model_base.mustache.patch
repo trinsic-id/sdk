@@ -1,0 +1,11 @@
+--- a/ruby/api_model_base.mustache
++++ b/ruby/api_model_base.mustache
+@@ -71,6 +71,8 @@
+         {}.tap do |hash|
+           value.each { |k, v| hash[k] = _to_hash(v) }
+         end
++      elsif value.is_a?(Time)
++        value.iso8601(9)
+       elsif value.respond_to? :to_hash
+         value.to_hash
+       else

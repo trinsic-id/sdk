@@ -14,9 +14,12 @@ export function hostedRoutes(app: Express, sessionsApi: SessionsApi) {
     const redirectUrl = req.query.redirectUrl;
 
     const result = await sessionsApi.createHostedProviderSession({
-      verificationProfileId: process.env.TRINSIC_VERIFICATION_PROFILE_ID!,
-      provider: provider,
-      redirectUrl: redirectUrl,
+      createHostedProviderSessionRequest: {
+        verificationProfileId: process.env.TRINSIC_VERIFICATION_PROFILE_ID!,
+        provider: provider,
+        redirectUrl: redirectUrl,
+        enableRedirectBackwardsCompatibility: true,
+      },
     });
 
     res.json(result);

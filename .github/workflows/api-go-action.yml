@@ -9,19 +9,29 @@ on:
         default: false
         description: "Publish the package, default is false"
 
+    secrets:
+      MEWMBA_GIT_PUBLISH_TOKEN:
+        required: false
+
+permissions:
+  contents: read
+
 jobs:
   build_and_publish:
     name: Build and Publish
+    # Reusable workflows must also reject publish requests from PRs and other refs.
+    if: ${{ !inputs.publish || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.repository == 'trinsic-id/sdk') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           submodules: recursive
           token: ${{ secrets.GITHUB_TOKEN }}
           persist-credentials: false
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
         with:
           go-version: "1.24.x"
+          cache: ${{ !inputs.publish }}
       - name: Install NPM dependencies
         run: npm ci
       - name: Generate SDK
@@ -31,6 +41,18 @@ jobs:
       - name: Build sample
         run: ./api-go/build-samples.sh
         shell: bash
+      - name: Test SDK request headers
+        run: npm run test:sdk-headers
+        env:
+          SDK_LANGUAGE: go
+      - name: Test named model construction
+        run: npm run test:sdk-construction
+        env:
+          SDK_LANGUAGE: go
+      - name: Test unknown enum values
+        run: npm run test:sdk-unknown-enums
+        env:
+          SDK_LANGUAGE: go
       - name: Publish SDK
         if: inputs.publish == true
         run: ./api-go/publish-sdk.sh

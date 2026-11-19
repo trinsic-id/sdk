@@ -1,0 +1,11 @@
+--- a/csharp/modelEnum.mustache
++++ b/csharp/modelEnum.mustache
+@@ -15,7 +15,7 @@
+     {{#-first}}
+     {{#isString}}
+     {{^useGenericHost}}
+-    [JsonConverter(typeof(StringEnumConverter))]
++    [JsonConverter(typeof({{packageName}}.Client.UnknownEnumConverter))]
+     {{/useGenericHost}}
+     {{/isString}}
+     {{/-first}}

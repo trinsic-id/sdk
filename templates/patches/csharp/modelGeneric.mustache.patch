@@ -1,0 +1,202 @@
+--- a/csharp/modelGeneric.mustache
++++ b/csharp/modelGeneric.mustache
+@@ -1,3 +1,4 @@
++{{! Customized from csharp/modelGeneric.mustache; upstream is pinned in templates/manifest.json. }}
+     /// <summary>
+     /// {{description}}{{^description}}{{classname}}{{/description}}
+     /// </summary>
+@@ -53,7 +54,7 @@
+         {{#deprecated}}
+         [Obsolete]
+         {{/deprecated}}
+-        public {{{complexType}}}{{^complexType}}{{{datatypeWithEnum}}}{{/complexType}}{{^isContainer}}{{^required}}?{{/required}}{{/isContainer}} {{name}} { get; set; }
++        public {{#required}}{{^isReadOnly}}required {{/isReadOnly}}{{/required}}{{{complexType}}}{{^complexType}}{{{datatypeWithEnum}}}{{/complexType}}{{^isContainer}}{{^required}}?{{/required}}{{/isContainer}} {{name}} { get; set; }
+         {{#isReadOnly}}
+ 
+         /// <summary>
+@@ -72,7 +73,7 @@
+         {{#deprecated}}
+         [Obsolete]
+         {{/deprecated}}
+-        public {{{complexType}}}{{^complexType}}{{{datatypeWithEnum}}}{{/complexType}}{{^isContainer}}{{^required}}?{{/required}}{{/isContainer}} {{name}} { get; set; }
++        public {{#required}}{{^isReadOnly}}required {{/isReadOnly}}{{/required}}{{{complexType}}}{{^complexType}}{{{datatypeWithEnum}}}{{/complexType}}{{^isContainer}}{{^required}}?{{/required}}{{/isContainer}} {{name}} { get; set; }
+ 
+ 
+         /// <summary>
+@@ -90,11 +91,14 @@
+         {{#deprecated}}
+         [Obsolete]
+         {{/deprecated}}
+-        public {{{complexType}}}{{^complexType}}{{{datatypeWithEnum}}}{{/complexType}}{{^isContainer}}{{^required}}?{{/required}}{{/isContainer}} {{name}}
++        public {{#required}}{{^isReadOnly}}required {{/isReadOnly}}{{/required}}{{{complexType}}}{{^complexType}}{{{datatypeWithEnum}}}{{/complexType}}{{^isContainer}}{{^required}}?{{/required}}{{/isContainer}} {{name}}
+         {
+             get{ return _{{name}};}
+             set
+             {
++                {{#required}}{{^vendorExtensions.x-csharp-value-type}}{{^isNullable}}
++                ArgumentNullException.ThrowIfNull(value);
++                {{/isNullable}}{{/vendorExtensions.x-csharp-value-type}}{{/required}}
+                 _{{name}} = value;
+                 _flag{{name}} = true;
+             }
+@@ -114,105 +118,19 @@
+         {{/conditionalSerialization}}
+         {{/isEnum}}
+         {{/vars}}
+-    {{#hasRequired}}
+-    {{^hasOnlyReadOnly}}
+         /// <summary>
+         /// Initializes a new instance of the <see cref="{{classname}}" /> class.
++        /// Set model fields by name using an object initializer.
+         /// </summary>
+         [JsonConstructorAttribute]
+-        {{^isAdditionalPropertiesTrue}}
+-        protected {{classname}}() { }
+-        {{/isAdditionalPropertiesTrue}}
+-        {{#isAdditionalPropertiesTrue}}
+-        protected {{classname}}()
++        public {{classname}}()
+         {
+-            this.AdditionalProperties = new Dictionary<string, object>();
+-        }
+-        {{/isAdditionalPropertiesTrue}}
+-    {{/hasOnlyReadOnly}}
+-    {{/hasRequired}}
+-        /// <summary>
+-        /// Initializes a new instance of the <see cref="{{classname}}" /> class.
+-        /// </summary>
+-        {{#readWriteVars}}
+-        /// <param name="{{#lambda.camelcase_sanitize_param}}{{name}}{{/lambda.camelcase_sanitize_param}}">{{description}}{{^description}}{{#lambda.camelcase_sanitize_param}}{{name}}{{/lambda.camelcase_sanitize_param}}{{/description}}{{#required}} (required){{/required}}{{#defaultValue}} (default to {{.}}){{/defaultValue}}.</param>
+-        {{/readWriteVars}}
+-    {{#hasOnlyReadOnly}}
+-        [JsonConstructorAttribute]
+-    {{/hasOnlyReadOnly}}
+-        public {{classname}}({{#readWriteVars}}{{{datatypeWithEnum}}}{{#isEnum}}{{^isContainer}}{{^required}}?{{/required}}{{/isContainer}}{{/isEnum}}{{^isEnum}}{{#conditionalSerialization}}{{#vendorExtensions.x-csharp-value-type}}{{^required}}{{^defaultValue}}?{{/defaultValue}}{{/required}}{{/vendorExtensions.x-csharp-value-type}}{{/conditionalSerialization}}{{/isEnum}} {{#lambda.camelcase_sanitize_param}}{{name}}{{/lambda.camelcase_sanitize_param}} = {{#defaultValue}}{{^isDateTime}}{{#isString}}{{^isEnum}}@{{/isEnum}}{{/isString}}{{{defaultValue}}}{{/isDateTime}}{{#isDateTime}}default{{/isDateTime}}{{/defaultValue}}{{^defaultValue}}default{{/defaultValue}}{{^-last}}, {{/-last}}{{/readWriteVars}}){{#parent}} : base({{#parentVars}}{{#lambda.camelcase_sanitize_param}}{{name}}{{/lambda.camelcase_sanitize_param}}{{^-last}}, {{/-last}}{{/parentVars}}){{/parent}}
+-        {
+-            {{#vars}}
+-            {{^isInherited}}
+-            {{^isReadOnly}}
+-            {{#required}}
+-            {{^conditionalSerialization}}
+-            {{^vendorExtensions.x-csharp-value-type}}
+-            // to ensure "{{#lambda.camelcase_sanitize_param}}{{name}}{{/lambda.camelcase_sanitize_param}}" is required (not null)
+-            if ({{#lambda.camelcase_sanitize_param}}{{name}}{{/lambda.camelcase_sanitize_param}} == null)
+-            {
+-                throw new ArgumentNullException("{{#lambda.camelcase_sanitize_param}}{{name}}{{/lambda.camelcase_sanitize_param}} is a required property for {{classname}} and cannot be null");
+-            }
+-            this.{{name}} = {{#lambda.camelcase_sanitize_param}}{{name}}{{/lambda.camelcase_sanitize_param}};
+-            {{/vendorExtensions.x-csharp-value-type}}
+-            {{#vendorExtensions.x-csharp-value-type}}
+-            this.{{name}} = {{#lambda.camelcase_sanitize_param}}{{name}}{{/lambda.camelcase_sanitize_param}};
+-            {{/vendorExtensions.x-csharp-value-type}}
+-            {{/conditionalSerialization}}
+-            {{#conditionalSerialization}}
+-            {{^vendorExtensions.x-csharp-value-type}}
+-            // to ensure "{{#lambda.camelcase_sanitize_param}}{{name}}{{/lambda.camelcase_sanitize_param}}" is required (not null)
+-            if ({{#lambda.camelcase_sanitize_param}}{{name}}{{/lambda.camelcase_sanitize_param}} == null)
+-            {
+-                throw new ArgumentNullException("{{#lambda.camelcase_sanitize_param}}{{name}}{{/lambda.camelcase_sanitize_param}} is a required property for {{classname}} and cannot be null");
+-            }
+-            this._{{name}} = {{#lambda.camelcase_sanitize_param}}{{name}}{{/lambda.camelcase_sanitize_param}};
+-            {{/vendorExtensions.x-csharp-value-type}}
+-            {{#vendorExtensions.x-csharp-value-type}}
+-            this._{{name}} = {{#lambda.camelcase_sanitize_param}}{{name}}{{/lambda.camelcase_sanitize_param}};
+-            {{/vendorExtensions.x-csharp-value-type}}
+-            {{/conditionalSerialization}}
+-            {{/required}}
+-            {{/isReadOnly}}
+-            {{/isInherited}}
+-            {{/vars}}
+             {{#vars}}
+             {{^isInherited}}
+             {{^isReadOnly}}
+-            {{^required}}
+             {{#defaultValue}}
+-            {{^conditionalSerialization}}
+-            {{^vendorExtensions.x-csharp-value-type}}
+-            // use default value if no "{{#lambda.camelcase_sanitize_param}}{{name}}{{/lambda.camelcase_sanitize_param}}" provided
+-            this.{{name}} = {{#lambda.camelcase_sanitize_param}}{{name}}{{/lambda.camelcase_sanitize_param}} ?? {{#isString}}@{{/isString}}{{{defaultValue}}};
+-            {{/vendorExtensions.x-csharp-value-type}}
+-            {{#vendorExtensions.x-csharp-value-type}}
+-            this.{{name}} = {{#lambda.camelcase_sanitize_param}}{{name}}{{/lambda.camelcase_sanitize_param}};
+-            {{/vendorExtensions.x-csharp-value-type}}
+-            {{/conditionalSerialization}}
++            this.{{name}} = {{^isDateTime}}{{#isString}}{{^isEnum}}@{{/isEnum}}{{/isString}}{{{defaultValue}}}{{/isDateTime}}{{#isDateTime}}default{{/isDateTime}};
+             {{/defaultValue}}
+-            {{^defaultValue}}
+-            {{^conditionalSerialization}}
+-            this.{{name}} = {{#lambda.camelcase_sanitize_param}}{{name}}{{/lambda.camelcase_sanitize_param}};
+-            {{/conditionalSerialization}}
+-            {{#conditionalSerialization}}
+-            {{#vendorExtensions.x-csharp-value-type}}
+-            if ({{#lambda.camelcase_sanitize_param}}{{name}}{{/lambda.camelcase_sanitize_param}} != null)
+-            {
+-                this._{{name}} = {{#lambda.camelcase_sanitize_param}}{{name}}{{/lambda.camelcase_sanitize_param}}.Value;
+-                this._flag{{name}} = true;
+-            }
+-            {{/vendorExtensions.x-csharp-value-type}}
+-            {{^vendorExtensions.x-csharp-value-type}}
+-            this._{{name}} = {{#lambda.camelcase_sanitize_param}}{{name}}{{/lambda.camelcase_sanitize_param}};
+-            if (this.{{name}} != null)
+-            {
+-                this._flag{{name}} = true;
+-            }
+-            {{/vendorExtensions.x-csharp-value-type}}
+-            {{/conditionalSerialization}}
+-            {{/defaultValue}}
+-            {{/required}}
+             {{/isReadOnly}}
+             {{/isInherited}}
+             {{/vars}}
+@@ -243,7 +161,26 @@
+         {{#deprecated}}
+         [Obsolete]
+         {{/deprecated}}
++        {{#required}}{{^isReadOnly}}{{^vendorExtensions.x-csharp-value-type}}{{^isNullable}}
++        public required {{{dataType}}} {{name}}
++        {
++            get => _{{name}};
++            set
++            {
++                ArgumentNullException.ThrowIfNull(value);
++                _{{name}} = value;
++            }
++        }
++        private {{{dataType}}} _{{name}};
++        {{/isNullable}}{{#isNullable}}
++        public required {{{dataType}}} {{name}} { get; set; }
++        {{/isNullable}}{{/vendorExtensions.x-csharp-value-type}}{{#vendorExtensions.x-csharp-value-type}}
++        public required {{{dataType}}} {{name}} { get; set; }
++        {{/vendorExtensions.x-csharp-value-type}}{{/isReadOnly}}{{#isReadOnly}}
++        public {{{dataType}}} {{name}} { get; private set; }
++        {{/isReadOnly}}{{/required}}{{^required}}
+         public {{{dataType}}} {{name}} { get; {{#isReadOnly}}private {{/isReadOnly}}set; }
++        {{/required}}
+ 
+         {{#isReadOnly}}
+         /// <summary>
+@@ -265,7 +202,7 @@
+         {{#deprecated}}
+         [Obsolete]
+         {{/deprecated}}
+-        public {{{dataType}}} {{name}} { get; private set; }
++        public {{#required}}{{^isReadOnly}}required {{/isReadOnly}}{{/required}}{{{dataType}}} {{name}} { get; private set; }
+ 
+         /// <summary>
+         /// Returns false as {{name}} should not be serialized given that it's read-only.
+@@ -284,11 +221,14 @@
+         {{#deprecated}}
+         [Obsolete]
+         {{/deprecated}}
+-        public {{{dataType}}} {{name}}
++        public {{#required}}{{^isReadOnly}}required {{/isReadOnly}}{{/required}}{{{dataType}}} {{name}}
+         {
+             get{ return _{{name}};}
+             set
+             {
++                {{#required}}{{^vendorExtensions.x-csharp-value-type}}{{^isNullable}}
++                ArgumentNullException.ThrowIfNull(value);
++                {{/isNullable}}{{/vendorExtensions.x-csharp-value-type}}{{/required}}
+                 _{{name}} = value;
+                 _flag{{name}} = true;
+             }

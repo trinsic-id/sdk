@@ -9,17 +9,26 @@ on:
         default: false
         description: "Publish the package, default is false"
 
+    secrets:
+      MEWMBA_GIT_PUBLISH_TOKEN:
+        required: false
+
+permissions:
+  contents: read
+
 jobs:
   build_and_publish:
     name: Build and Publish
+    # Reusable workflows must also reject publish requests from PRs and other refs.
+    if: ${{ !inputs.publish || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.repository == 'trinsic-id/sdk') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           submodules: recursive
           token: ${{ secrets.GITHUB_TOKEN }}
           persist-credentials: false
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
         with:
           distribution: "temurin"
           java-version: "21"
@@ -32,6 +41,22 @@ jobs:
       - name: Build sample
         run: ./api-java/build-samples.sh
         shell: bash
+      - name: Test SDK request headers
+        run: npm run test:sdk-headers
+        env:
+          SDK_LANGUAGE: java
+      - name: Test named model construction
+        run: npm run test:sdk-construction
+        env:
+          SDK_LANGUAGE: java
+      - name: Test SDK wire behavior
+        run: npm run test:sdk-wire
+        env:
+          SDK_LANGUAGE: java
+      - name: Test unknown enum values
+        run: npm run test:sdk-unknown-enums
+        env:
+          SDK_LANGUAGE: java
       - name: Publish SDK
         if: inputs.publish == true
         run: ./api-java/publish-sdk.sh

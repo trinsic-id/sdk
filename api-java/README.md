@@ -86,6 +86,22 @@ var sessions = new SessionsApi(apiClient);
 
 You can find a full Java example in the [samples](https://github.com/trinsic-id/sdk/tree/main/api-java/samples) folder.
 
+Construct request models using no-argument constructors and named setters or
+fluent methods:
+
+```java
+var request = new CreateHostedProviderSessionRequest()
+    .provider("provider-id")
+    .verificationProfileId(verificationProfileId)
+    .redirectUrl("https://example.com/return")
+    .enableRedirectBackwardsCompatibility(false);
+```
+
+Read-only model field constructors are private and reserved for Jackson
+deserialization. Public positional field construction is no longer supported.
+This is a breaking change intended for the next major SDK release; endpoint and
+client constructor signatures retain their existing calling conventions.
+
 ### Data residency
 
 By default, the SDK communicates with `https://api.trinsic.id`. If you have a Verification Profile configured for EU data residency, point the SDK at the EU endpoint by calling `updateBaseUri` on the `ApiClient`:
@@ -100,6 +116,21 @@ apiClient.setRequestInterceptor(interceptor -> {
 
 var sessions = new SessionsApi(apiClient);
 ```
+
+### Unknown enum values
+
+The API can add enum values after this SDK version was released. A value this
+version does not know is read as the enum's `UNKNOWN_DEFAULT_OPEN_API` member
+instead of failing the response:
+
+```java
+if (session.getErrorCode() == SessionErrorCode.UNKNOWN_DEFAULT_OPEN_API) {
+    // An error code newer than this SDK version.
+}
+```
+
+Upgrade the SDK to read the new value. Do not send the fallback member in
+requests; the API does not accept it.
 
 ## SDK Versioning
 

@@ -8,11 +8,12 @@ source "$REPO_ROOT/helpers/common.sh"
 
 (
   cd "$SCRIPT_DIR/sdk"
-  ./gradlew :library:build
 
-  # Update package version in gradle build file
+  # Set the publication and diagnostic version before building the SDK.
   package_version="$(get_version androidUIVersion)"
   gradle_path="./library/build.gradle.kts"
-  NEW_VERSION="$package_version" perl -0pi -e 's/(coordinates\(\s*"id\.trinsic"\s*,\s*"sdk-android-ui"\s*,\s*")[^"]*(")/$1$ENV{NEW_VERSION}$2/g' $gradle_path
+  NEW_VERSION="$package_version" perl -0pi -e 's/^(val sdkVersion\s*=\s*")[^"]*(")/$1$ENV{NEW_VERSION}$2/m or die "Could not find sdkVersion in $ARGV\n"' "$gradle_path"
   echo "Gradle file updated with version $package_version."
+
+  ./gradlew :library:build
 )

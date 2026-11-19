@@ -11,7 +11,7 @@ to launch verifications.
 
 ## Setup
 
-Make sure to create a new `.env` file to set your Trinsic Access Token. You can use [`example.env`](./example.env) as a reference. If you need more information where to find this token, visit our [Getting Started](https://docs.trinsic.id/docs/getting-started-with-trinsic-connect) guide.
+Make sure to create a new `.env` file to set your Trinsic Access Token. You can use [`example.env`](./example.env) as a reference. If you need more information where to find this token, visit our [documentation](https://docs.trinsic.id).
 
 After you created your `.env`, you can run the sample by running the `./start.sh` script. It will check for the presence of the `TRINSIC_ACCESS_TOKEN`, build the UI sample, and then start the Java application.
 

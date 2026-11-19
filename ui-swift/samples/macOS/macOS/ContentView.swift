@@ -49,10 +49,11 @@ struct ContentView: View {
                 print("Button clicked, opening: \(url)")
                 
                 let result = try await trinsicUI.launchSession(launchUrl: url.absoluteString, callbackUrlScheme: sampleCallbackUrlScheme)
-                print("Success \(result.success)")
+                // Use your backend's Trinsic API response for session status and results access.
                 print("Canceled \(result.canceled)")
                 print("Session id \(String(describing: result.sessionId))")
-                print("Result key \(String(describing: result.resultsAccessKey))")
+                print("Redirect token \(String(describing: result.redirectToken))")
+                print("Callback URL \(String(describing: result.callbackUrl))")
             }
         }
         catch {

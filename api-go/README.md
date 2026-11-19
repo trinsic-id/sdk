@@ -40,6 +40,26 @@ func main() {
 
 You can find a full Go example in the [samples](https://github.com/trinsic-id/sdk/tree/main/api-go/samples) folder.
 
+Construct models using field names:
+
+```go
+request := trinsic_api.CreateHostedProviderSessionRequest{
+    Provider: "provider-id",
+    VerificationProfileId: "profile-id",
+    RedirectUrl: "https://example.com/return",
+    EnableRedirectBackwardsCompatibility: false,
+}
+```
+
+Positional `NewModel(field1, field2, ...)` factories have been removed, and an
+unexported marker prevents unkeyed struct literals outside the SDK package.
+`NewModelWithDefaults()` and named setters remain available when schema defaults
+are needed. Keyed literals use Go zero values for omitted fields and do not
+enforce required API fields at compile time. Nullable value wrappers and client
+constructors retain their existing signatures.
+
+This is a breaking change intended for the next major SDK release.
+
 ### Data residency
 
 By default, the SDK communicates with `https://api.trinsic.id`. If you have a Verification Profile configured for EU data residency, point the SDK at the EU endpoint by setting the configuration `Servers`.
@@ -54,6 +74,21 @@ config.AddDefaultHeader("Authorization", "Bearer "+"your-access-token")
 api := trinsic_api.NewAPIClient(config)
 sessions := api.SessionsAPI
 ```
+
+### Unknown enum values
+
+The API can add enum values after this SDK version was released. A value this
+version does not know is read as the enum's `UNKNOWN_DEFAULT_OPEN_API` member
+instead of failing the response:
+
+```go
+if session.GetErrorCode() == trinsic_api.SESSIONERRORCODE_UNKNOWN_DEFAULT_OPEN_API {
+    // An error code newer than this SDK version.
+}
+```
+
+Upgrade the SDK to read the new value. Do not send the fallback member in
+requests; the API does not accept it.
 
 ## SDK Versioning
 

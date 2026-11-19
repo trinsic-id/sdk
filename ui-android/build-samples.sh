@@ -6,5 +6,5 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 (
   cd "$SCRIPT_DIR/samples/android_sample"
-  ./gradlew build
+  ./gradlew -PuseLocalTrinsicSdk=true build
 )

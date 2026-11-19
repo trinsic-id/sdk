@@ -1,7 +1,6 @@
 # C# SDK Sample
 
-This simple application demonstrates how to set up the Trinsic SDK to start verification flows and read their results. It sets 4 server endpoints that an UI application can call
-to launch verifications.
+This simple application demonstrates how to set up the Trinsic SDK to start verification flows and read their results. It provides endpoints that a UI application can call to launch verifications and fetch their results.
 
 ## Dependencies
 
@@ -11,7 +10,17 @@ to launch verifications.
 
 ## Setup
 
-Make sure to use your Trinsic access token to set the `TRINSIC_ACCESS_TOKEN` environment variable. Alternatively you can create a `.env` file and set the environment variable there (see the `example.env` file).
+
+Set `TRINSIC_VERIFICATION_PROFILE_ID` as well as the `TRINSIC_ACCESS_TOKEN` environment variable. Alternatively you can create a `.env` file and set the environment variable there (see the `example.env` file).
+
+ For EU residency, optionally set
+`TRINSIC_API_BASE_URL=https://api.eu.trinsic.id`.
+
+The shared browser sample captures `redirectToken` from the return URL and sends
+it to `/exchange-result` or the first successful `/poll-results/{sessionId}` call.
+Both C# endpoints pass it to `GetSessionResultRequest`. The token is optional for
+non-redirect flows and subsequent result fetches; new sessions keep
+`enableRedirectBackwardsCompatibility` set to `false`.
 
 ### Running the project
 

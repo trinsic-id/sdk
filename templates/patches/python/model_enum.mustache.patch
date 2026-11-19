@@ -1,0 +1,22 @@
+--- a/python/model_enum.mustache
++++ b/python/model_enum.mustache
+@@ -24,6 +24,19 @@ class {{classname}}({{vendorExtensions.x-py-enum-type}}, Enum):
+     def from_json(cls, json_str: str) -> Self:
+         """Create an instance of {{classname}} from a JSON string"""
+         return cls(json.loads(json_str))
++    {{#enumUnknownDefaultCase}}
++
++    @classmethod
++    def _missing_(cls, value):
++        """Read a value this SDK version does not know as the fallback member"""
++        if isinstance(value, {{vendorExtensions.x-py-enum-type}}):
++            {{#enumVars}}
++            {{#-last}}
++            return cls.{{{name}}}
++            {{/-last}}
++            {{/enumVars}}
++        return None
++    {{/enumUnknownDefaultCase}}
+ 
+     {{#defaultValue}}
+ 

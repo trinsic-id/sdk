@@ -1,32 +1,28 @@
 import { jsonHandleError } from './shared';
 
 async function startPollingAfterRedirect(sessionId, resultsAccessKey) {
-  let result = null;
-  let resultUrl = `/poll-results/${sessionId}`;
-  let resultPollingInterval = setInterval(async () => {
-    result = await fetch(resultUrl, {
+  const tokenKey = `redirectToken:${sessionId}`;
+  async function poll() {
+    const result = await fetch(`/poll-results/${sessionId}`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        resultsAccessKey: resultsAccessKey
-      })
-    })
-      .then(r => jsonHandleError(r))
-      .then((r) => r);
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ resultsAccessKey, redirectToken: sessionStorage.getItem(tokenKey) ?? undefined })
+    }).then(jsonHandleError);
 
+    // The first successful poll validates the one-time redirect token.
+    sessionStorage.removeItem(tokenKey);
     document.getElementById("last-polled").innerText = new Date().toLocaleTimeString();
     document.getElementById("done").innerText = result.session.done;
     document.getElementById("success").innerText = result.session.success;
     document.getElementById("error-code").innerText = result.session.errorCode || "N/A";
 
     if (result.session.done === true) {
-      clearInterval(resultPollingInterval);
-
       window.location.href = `${location.origin}/redirect?sessionId=${encodeURIComponent(sessionId)}`;
+      return;
     }
-  }, 1000);
+    setTimeout(poll, 1000);
+  }
+  await poll();
 }
 
 async function initializePollAfterRedirect() {

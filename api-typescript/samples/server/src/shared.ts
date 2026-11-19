@@ -43,17 +43,20 @@ export function sharedRoutes(
   app.get("/providers", async (req: any, res: any) => {
     const ipAddress = req.query.ipAddress;
     const result = await sessionsApi.recommendProviders({
-      verificationProfileId: process.env.TRINSIC_VERIFICATION_PROFILE_ID!,
-      recommendationInfo: {
-        ipAddresses: ipAddress ? [ipAddress] : null,
+      recommendProvidersRequest: {
+        verificationProfileId: process.env.TRINSIC_VERIFICATION_PROFILE_ID!,
+        recommendationInfo: {
+          ipAddresses: ipAddress ? [ipAddress] : null,
+        },
       },
     });
     res.send(result);
   });
 
   app.post("/exchange-result", async (req: any, res: any) => {
-    const result = await sessionsApi.getSessionResult(req.body.sessionId, {
-      resultsAccessKey: req.body.resultsAccessKey,
+    const result = await sessionsApi.getSessionResult({
+      sessionId: req.body.sessionId,
+      getSessionResultRequest: { resultsAccessKey: req.body.resultsAccessKey },
     });
     res.send(result);
   });

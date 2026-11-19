@@ -1,20 +1,28 @@
-name: Build and Publish API Python SDK
+name: Build API Python SDK
 
 on:
   workflow_call:
     inputs:
-      publish:
+      upload-artifact:
         type: boolean
         required: false
         default: false
-        description: "Publish the package, default is false"
+        description: "Upload packages for the release job, default is false"
+
+permissions:
+  contents: read
 
 jobs:
   build_and_publish:
+    # Keep this name: repository rulesets require the existing PR check.
     name: Build and Publish
+    # Only trusted release runs may produce artifacts for publishing.
+    if: ${{ !inputs.upload-artifact || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.repository == 'trinsic-id/sdk') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
       - name: Install NPM dependencies
         run: npm ci
       - name: Generate SDK
@@ -23,9 +31,29 @@ jobs:
       - name: Build sample
         run: ./api-python/build-samples.sh
         shell: bash
-      - name: Publish SDK
-        if: inputs.publish == true
-        run: ./api-python/publish-sdk.sh
-        shell: bash
+      - name: Test SDK request headers
+        run: npm run test:sdk-headers
         env:
-          PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+          SDK_LANGUAGE: python
+      - name: Test named model construction
+        run: npm run test:sdk-construction
+        env:
+          SDK_LANGUAGE: python
+      - name: Test SDK wire behavior
+        run: npm run test:sdk-wire
+        env:
+          SDK_LANGUAGE: python
+      - name: Test unknown enum values
+        run: npm run test:sdk-unknown-enums
+        env:
+          SDK_LANGUAGE: python
+      - name: Upload release packages
+        if: inputs.upload-artifact == true
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: api-python-pypi
+          path: |
+            api-python/sdk/publish/*.whl
+            api-python/sdk/publish/*.tar.gz
+          if-no-files-found: error
+          overwrite: true

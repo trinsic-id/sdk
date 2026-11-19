@@ -15,6 +15,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
   --additional-property "gemName=trinsic_api" \
   --additional-property "gemSummary='Trinsic Api SDK'" \
   --additional-property "gemVersion=[VERSION]" \
+  --additional-property "enumUnknownDefaultCase=true" \
   --additional-property "moduleName=TrinsicApi"
 
 cp "$REPO_ROOT/LICENSE" "$SCRIPT_DIR/sdk/"

@@ -3,12 +3,17 @@ name: Release API Java SDK (GIT)
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   release:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.repository == 'trinsic-id/sdk'
     name: Publish Java Package
     uses: ./.github/workflows/api-java-action.yml
     concurrency:
       group: git-release
     with:
       publish: true
-    secrets: inherit
+    secrets:
+      MEWMBA_GIT_PUBLISH_TOKEN: ${{ secrets.MEWMBA_GIT_PUBLISH_TOKEN }}

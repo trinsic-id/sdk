@@ -55,9 +55,19 @@ if [[ -z "$output_folder" ]]; then
   exit 1
 fi
 
+template_args=()
+# Verify the pinned artifact and every upstream template before deleting any
+# existing SDK output. Render overrides from the reviewed patches for this run.
+template_workspace="$(mktemp -d "${TMPDIR:-/tmp}/trinsic-templates.XXXXXX")"
+trap 'rm -rf "$template_workspace"' EXIT
+generator_jar="$(node "$SCRIPT_DIR/template-overrides.mjs" prepare --output "$template_workspace")"
+if [[ -d "$template_workspace/$language" ]]; then
+  template_args+=(--template-dir "$template_workspace/$language")
+fi
+
 if [[ "${swagger_file_or_url}" == https://* ]]; then
   echo "Downloading specification from $swagger_file_or_url"
-  local_swagger_file_path="$SCRIPT_DIR/swagger.json"
+  local_swagger_file_path="$template_workspace/downloaded-schema.json"
   curl -fsSL "$swagger_file_or_url" -o "$local_swagger_file_path"
   echo "Downloaded specification from $swagger_file_or_url to $local_swagger_file_path"
 else
@@ -86,10 +96,14 @@ if [[ ${#resolved_properties[@]} -gt 0 ]]; then
 fi
 
 echo "Generating $language SDK from $local_swagger_file_path in $output_folder with additional properties: $concatenated_additional_properties"
-npx --yes @openapitools/openapi-generator-cli generate \
+# Invoke the exact JAR selected by the root configuration and verified above.
+java -jar "$generator_jar" generate \
   -i "$local_swagger_file_path" \
   -g "$language" \
   -o "$output_folder" \
+  ${template_args[@]+"${template_args[@]}"} \
   --additional-properties="$concatenated_additional_properties" >/dev/null
+
+node "$SCRIPT_DIR/inject-sdk-header.mjs" "$language" "$version" "$output_folder"
 
 echo "Generated $language SDK $output_folder"

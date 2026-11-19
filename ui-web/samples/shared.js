@@ -1,12 +1,13 @@
-window.exchangeResult = exchangeResult;
 window.getProviders = getProviders;
 window.ipAddress = async () => {
     try {
-        const data = await fetch("https://ipwhois.app/json/");
+        const response = await fetch("https://ipwhois.app/json/");
+        if (!response.ok) return null;
+        const data = await response.json();
         const ip = data?.ip ?? null;
         return ip;
     } catch (error) {
-        console.error("Failed to fetch country code:", error);
+        console.error("Failed to fetch IP address:", error);
         return null;
     }
 }
@@ -44,8 +45,7 @@ export async function jsonHandleError(response) {
     return data;
 }
 
-async function exchangeResult(response) {
-    console.debug("Exchanging result, response:", response);
+export async function exchangeResult(response) {
     const result = await fetch("/exchange-result", {
         method: "POST",
         headers: {
@@ -54,8 +54,9 @@ async function exchangeResult(response) {
         body: JSON.stringify({
             sessionId: response.sessionId,
             resultsAccessKey: response.resultsAccessKey,
+            redirectToken: response.redirectToken,
         }),
-    }).then(r => jsonHandleError(r))
+    }).then(jsonHandleError);
     document.getElementById("session-id").innerText = response.sessionId;
     document.getElementById("results").innerText = JSON.stringify(result, null, 2);
     document.getElementById("result-loading").hidden = true;
@@ -69,7 +70,7 @@ async function getProviders(launchMethod) {
     if (doIp) {
         const ip = await window.ipAddress();
         if (ip) {
-            url += `?ipAddress=${ip}`;
+            url += `?ipAddress=${encodeURIComponent(ip)}`;
         }
     }
 
@@ -86,10 +87,10 @@ async function getProviders(launchMethod) {
 
     const container = document.getElementById("recommendedProviders");
     container.innerHTML = "";
-    for (let i = 0; i < providers.recommendedProviders.length; i++) {
-
-        container.innerHTML += `<li><button class="launch-button" style="padding: 10px; background-color: transparent;" onclick="${launchMethod}('${providers.recommendedProviders[i].id}')"> <img src="${providers.recommendedProviders[i].logoUrl}" /> <div class="launch-name"> Launch ${providers.recommendedProviders[i].name}</div>  <div class="chevron"></div></button></li>`;
+    // The API returns every other available provider in remainder. Without
+    // recommendation inputs, recommendedProviders can be empty.
+    const availableProviders = [...providers.recommendedProviders, ...providers.remainder];
+    for (const provider of availableProviders) {
+        container.innerHTML += `<li><button class="launch-button" style="padding: 10px; background-color: transparent;" onclick="${launchMethod}('${provider.id}')"> <img src="${provider.logoUrl}" /> <div class="launch-name"> Launch ${provider.name}</div>  <div class="chevron"></div></button></li>`;
     }
 }
-
-window.ipAddress();

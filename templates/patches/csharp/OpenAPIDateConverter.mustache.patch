@@ -1,0 +1,55 @@
+--- a/csharp/OpenAPIDateConverter.mustache
++++ b/csharp/OpenAPIDateConverter.mustache
+@@ -1,4 +1,8 @@
+ {{>partial_header}}
++using System;
++using System.Reflection;
++using System.Runtime.Serialization;
++using Newtonsoft.Json;
+ using Newtonsoft.Json.Converters;
+ 
+ namespace {{packageName}}.Client
+@@ -18,4 +22,43 @@ namespace {{packageName}}.Client
+             DateTimeFormat = "yyyy-MM-dd";
+         }
+     }
++
++    /// <summary>
++    /// Reads a string enum value this SDK version does not know, such as one added
++    /// to the API after it was generated, as the enum's fallback member instead of
++    /// failing. The fallback member exists when generating with enumUnknownDefaultCase.
++    /// </summary>
++    public class UnknownEnumConverter : StringEnumConverter
++    {
++        /// <summary>
++        /// The wire value of the fallback member.
++        /// </summary>
++        public const string UnknownValue = "unknown_default_open_api";
++
++        /// <inheritdoc />
++        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
++        {
++            try
++            {
++                return base.ReadJson(reader, objectType, existingValue, serializer);
++            }
++            catch (JsonSerializationException) when (reader.TokenType == JsonToken.String && Fallback(objectType) != null)
++            {
++                return Fallback(objectType);
++            }
++        }
++
++        private static object Fallback(Type objectType)
++        {
++            Type enumType = Nullable.GetUnderlyingType(objectType) ?? objectType;
++            foreach (FieldInfo field in enumType.GetFields(BindingFlags.Public | BindingFlags.Static))
++            {
++                if (field.GetCustomAttribute<EnumMemberAttribute>()?.Value == UnknownValue)
++                {
++                    return field.GetValue(null);
++                }
++            }
++            return null;
++        }
++    }
+ }

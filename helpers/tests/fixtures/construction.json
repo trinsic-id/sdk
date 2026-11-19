@@ -1,0 +1,68 @@
+{
+  "openapi": "3.0.3",
+  "info": { "title": "Named model construction regression", "version": "1" },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "StringPair": {
+        "type": "object",
+        "properties": {
+          "aardvark": { "type": "string" },
+          "alpha": { "type": "string" },
+          "bravo": { "type": "string" },
+          "label": { "type": "string", "default": "default label" },
+          "enabled": { "type": "boolean", "default": true },
+          "mode": { "type": "string", "enum": ["fast", "slow"], "default": "fast" }
+        }
+      },
+      "RequiredInput": {
+        "type": "object",
+        "required": ["name", "enabled", "mode", "nullableName", "tags"],
+        "properties": {
+          "name": { "type": "string" },
+          "enabled": { "type": "boolean" },
+          "mode": { "type": "string", "enum": ["fast", "slow"] },
+          "nullableName": { "type": "string", "nullable": true },
+          "tags": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "ReadOnlyResponse": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string", "readOnly": true },
+          "label": { "type": "string" }
+        }
+      },
+      "DerivedInput": {
+        "allOf": [
+          { "$ref": "#/components/schemas/RequiredInput" },
+          {
+            "type": "object",
+            "required": ["child"],
+            "properties": { "child": { "type": "string" } }
+          }
+        ]
+      },
+      "BaseInput": {
+        "type": "object",
+        "discriminator": { "propertyName": "kind" },
+        "required": ["id", "kind"],
+        "properties": {
+          "id": { "type": "string" },
+          "kind": { "type": "string" }
+        }
+      },
+      "ChildInput": {
+        "allOf": [
+          { "$ref": "#/components/schemas/BaseInput" },
+          {
+            "type": "object",
+            "required": ["child"],
+            "properties": { "child": { "type": "string" } }
+          }
+        ]
+      }
+    }
+  }
+}
