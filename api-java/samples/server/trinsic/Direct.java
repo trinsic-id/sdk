@@ -23,6 +23,7 @@ public class Direct {
             CreateDirectProviderSessionRequest req = new CreateDirectProviderSessionRequest();
             req.setProvider(provider);
             req.setRedirectUrl(redirectUrl);
+            req.setEnableRedirectBackwardsCompatibility(false);
             req.setFallbackToHostedUI(fallbackToTrinsicUI);
             req.setVerificationProfileId(verificationProfileId);
 
@@ -65,6 +66,7 @@ public class Direct {
             String resultsAccessKey = (String) body.get("resultsAccessKey");
 
             GetSessionResultRequest request = new GetSessionResultRequest();
+            if (body.get("redirectToken") instanceof String token) request.setRedirectToken(token);
             request.setResultsAccessKey(resultsAccessKey);
 
             GetSessionResultResponse result =

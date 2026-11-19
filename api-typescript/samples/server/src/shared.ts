@@ -56,7 +56,10 @@ export function sharedRoutes(
   app.post("/exchange-result", async (req: any, res: any) => {
     const result = await sessionsApi.getSessionResult({
       sessionId: req.body.sessionId,
-      getSessionResultRequest: { resultsAccessKey: req.body.resultsAccessKey },
+      getSessionResultRequest: {
+        resultsAccessKey: req.body.resultsAccessKey,
+        redirectToken: req.body.redirectToken,
+      },
     });
     res.send(result);
   });

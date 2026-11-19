@@ -3,9 +3,10 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SDK_TARBALL="$(find "$SCRIPT_DIR/sdk/publish" -maxdepth 1 -name 'trinsic-web-ui-*.tgz' -print -quit)"
+source "$SCRIPT_DIR/../helpers/common.sh"
+SDK_TARBALL="$SCRIPT_DIR/sdk/publish/trinsic-web-ui-$(get_version webUIVersion).tgz"
 
-if [[ -z "$SDK_TARBALL" ]]; then
+if [[ ! -f "$SDK_TARBALL" ]]; then
   echo "Build the Web UI SDK before building samples." >&2
   exit 1
 fi

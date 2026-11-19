@@ -7,7 +7,7 @@ The Trinsic Expo UI Library provides ways to launch verification sessions direct
 
 This library must be paired with an [api library](https://github.com/trinsic-id/sdk#api-libraries) as part of a full integration.
 
-Currently, only iOS and Android are supported.
+Use this library on iOS and Android. For Expo web, launch the session with `launchRedirect` from [the Web UI SDK](../ui-web/README.md).
 
 ## Documentation
 
@@ -32,15 +32,13 @@ Inside your `app.json` configuration file, configure the [`scheme`](https://docs
 Import the Trinsic `launchSession` method:
 
 ```tsx
-import { launchSession, LaunchSessionResult } from '@trinsic/expo-ui
+import { launchSession, LaunchSessionResult } from '@trinsic/expo-ui';
 ```
 
 Call this method with the launch url you've retrieved from a trusted backend that can securely reach out to Trinsic's servers. [See our API libraries.](https://github.com/trinsic-id/sdk#api-libraries).
 
 ```tsx
-const result: LaunchSessionResult = await launchSession(launchUrl, {
-  callbackPath: "/",
-});
+const result: LaunchSessionResult = await launchSession(launchUrl, redirectUrl);
 console.log(result);
 ```
 

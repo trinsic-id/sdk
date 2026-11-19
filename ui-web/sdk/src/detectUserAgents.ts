@@ -25,7 +25,7 @@ export const detectUserAgents = (): UserAgents => {
     isAndroid: isAndroid(),
     isMacOs: isMacOs(),
     isIos: isIos(),
-    isChrome: Boolean(isChromium() && !isEdge() && !isOpera()),
+    isChrome: isChrome(),
     isSafari: isSafari(),
     supportsDigitalCredentialsApi: supportsDigitalCredentialsApi()
   };

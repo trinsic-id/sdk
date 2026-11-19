@@ -22,7 +22,7 @@ export function directRoutes(app: Express, sessionsApi: SessionsApi) {
         redirectUrl: redirectUrl,
         capabilities: capabilities,
         fallbackToHostedUI: fallbackToTrinsicUI === "true",
-        enableRedirectBackwardsCompatibility: true,
+        enableRedirectBackwardsCompatibility: false,
       },
     });
 
@@ -43,7 +43,7 @@ export function directRoutes(app: Express, sessionsApi: SessionsApi) {
     const resultsAccessKey = req.body.resultsAccessKey;
     const results = await sessionsApi.getSessionResult({
       sessionId: req.params.sessionId,
-      getSessionResultRequest: { resultsAccessKey },
+      getSessionResultRequest: { resultsAccessKey, redirectToken: req.body.redirectToken },
     });
     res.json(results);
   });

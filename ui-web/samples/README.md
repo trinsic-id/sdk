@@ -9,21 +9,9 @@ This simple application demonstrates how to set up the Trinsic SDK to start veri
 
 ## Setup
 
-This project is used by the API samples. You will need to run one of them in order to see it working. To make sure you get them working run `npm ci` in the repository's root, and then `npm run build` in this directory.
+Run `npm ci` and `npm run build` in this directory to build the sample against the Web UI SDK in this checkout.
 
-### Running the project
-
-You need to run an API sample, so just pick one and follow its intructions. Here we use the `api-typescript` as an example.
-
-In the `api-typescript/samples` folder, run `npm ci` to install the necessary dependencies.
-
-Create a new `.env` file to set your Trinsic Access Token. You can use [`example.env`](./example.env) as a reference. If you need more information where to find this token, visit our [documentation](https://docs.trinsic.id).
-
-After you created your `.env` file you are good to run the project.
-
-```sh
-npm run dev
-```
+To launch a verification, run one of the API sample servers. The server serves these pages and handles session creation and result collection. Follow the [TypeScript sample setup](../../api-typescript/samples/server/README.md) to configure credentials and start that server.
 
 ## Support
 

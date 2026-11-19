@@ -19,7 +19,7 @@ import { launchRedirect } from "@trinsic/web-ui";
 Or, from the global exposed by the IIFE build:
 
 ```html
-<script src="https://unpkg.com/@trinsic/web-ui"></script>
+<script src="https://unpkg.com/@trinsic/web-ui@4/dist/index.iife.js"></script>
 <script>TrinsicUI.launchRedirect(launchUrl);</script>
 ```
 
@@ -34,7 +34,7 @@ await launchRedirect(session.launchUrl);
 
 `launchRedirect` preserves the launch URL's host and query parameters, including EU regional URLs, while authoritatively setting `launchMode=redirect`. It rejects invalid URLs and calls made from inside an iframe; launch this flow only from the top-level browsing context.
 
-When Trinsic sends the browser back to `redirectUrl`, use the `sessionId` query parameter only to locate the server-side session record, then retrieve and validate the result through Trinsic's API. Do not trust `success` or other redirect query parameters as proof of a completed verification.
+When Trinsic sends the browser back to `redirectUrl`, use the `sessionId` query parameter to locate the server-side session record. Pass the returned `redirectToken` and the stored results access key to your backend’s first `GetSessionResult` call, including when polling after redirect. Subsequent calls only need the results access key. Do not trust `success` or other redirect query parameters as proof of a completed verification.
 
 ## Migrating from v3
 

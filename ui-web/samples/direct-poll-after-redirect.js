@@ -2,7 +2,7 @@ import { jsonHandleError } from './shared';
 
 async function startPollingAfterRedirect(sessionId, resultsAccessKey) {
   const tokenKey = `redirectToken:${sessionId}`;
-  async function poll() {
+  while (true) {
     const result = await fetch(`/poll-results/${sessionId}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -20,22 +20,23 @@ async function startPollingAfterRedirect(sessionId, resultsAccessKey) {
       window.location.href = `${location.origin}/redirect?sessionId=${encodeURIComponent(sessionId)}`;
       return;
     }
-    setTimeout(poll, 1000);
+    await new Promise(resolve => setTimeout(resolve, 1000));
   }
-  await poll();
 }
 
 async function initializePollAfterRedirect() {
   const urlSearchParams = new URLSearchParams(window.location.search);
   const sessionId = urlSearchParams.get('sessionId');
-  const resultsAccessKey = localStorage.getItem(`resultsAccessKey:${sessionId}`);
+  const resultsAccessKey = sessionStorage.getItem(`resultsAccessKey:${sessionId}`);
 
   document.getElementById("session-id").innerText = sessionId;
   document.getElementById("success").innerText = "false";
   document.getElementById("done").innerText = "false";
   document.getElementById("last-polled").innerText = new Date().toLocaleTimeString();
 
-  startPollingAfterRedirect(sessionId, resultsAccessKey);
+  await startPollingAfterRedirect(sessionId, resultsAccessKey);
 }
 
-initializePollAfterRedirect();
+initializePollAfterRedirect().catch(error => {
+  document.getElementById("error-code").innerText = error.message;
+});

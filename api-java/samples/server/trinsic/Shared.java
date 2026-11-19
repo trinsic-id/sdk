@@ -39,6 +39,7 @@ public class Shared{
 
             var request = new GetSessionResultRequest();
             request.setResultsAccessKey(body.resultsAccessKey);
+            if (body.redirectToken != null) request.setRedirectToken(body.redirectToken);
 
             var result = session.getSessionResult(UUID.fromString(body.sessionId), request);
 

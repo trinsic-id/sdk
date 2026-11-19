@@ -27,11 +27,12 @@ func DirectRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 
 		// Create request
 		req := trinsic_api.CreateDirectProviderSessionRequest{
-			RedirectUrl:           *trinsic_api.NewNullableString(&redirectUrl),
-			Provider:              provider,
-			Capabilities:          integrationCapabilities,
-			FallbackToHostedUI:    *trinsic_api.NewNullableBool(&fallbackToTrinsicUI),
-			VerificationProfileId: verificationProfileId,
+			RedirectUrl:                          *trinsic_api.NewNullableString(&redirectUrl),
+			Provider:                             provider,
+			Capabilities:                         integrationCapabilities,
+			FallbackToHostedUI:                   *trinsic_api.NewNullableBool(&fallbackToTrinsicUI),
+			VerificationProfileId:                verificationProfileId,
+			EnableRedirectBackwardsCompatibility: false,
 		}
 
 		// Call API
@@ -77,7 +78,8 @@ func DirectRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 
 		// Parse request body
 		var requestPayload struct {
-			ResultsAccessKey string `json:"resultsAccessKey"`
+			ResultsAccessKey string  `json:"resultsAccessKey"`
+			RedirectToken    *string `json:"redirectToken"`
 		}
 		if err := c.BodyParser(&requestPayload); err != nil {
 			return c.Status(400).JSON(fiber.Map{"error": "Invalid request body"})
@@ -86,6 +88,10 @@ func DirectRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 		// Create request
 		request := trinsic_api.GetSessionResultRequest{
 			ResultsAccessKey: requestPayload.ResultsAccessKey,
+		}
+
+		if requestPayload.RedirectToken != nil {
+			request.SetRedirectToken(*requestPayload.RedirectToken)
 		}
 
 		req := api.SessionsAPI.GetSessionResult(c.Context(), sessionId).GetSessionResultRequest(request)

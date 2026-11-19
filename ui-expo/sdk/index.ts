@@ -1,3 +1,4 @@
+import { Platform } from "expo-modules-core";
 import * as WebBrowser from "expo-web-browser";
 import { AuthSessionOpenOptions } from "expo-web-browser";
 
@@ -7,7 +8,6 @@ import { AuthSessionOpenOptions } from "expo-web-browser";
  *
  * @param url The url to open in the web browser. This should be a login page.
  * @param redirectUrl _Optional_ - The url to deep link back into your app.
- * On web, this defaults to the output of [`Linking.createURL("")`](./linking/#linkingcreateurlpath-namedparameters).
  * @param options _Optional_ - An object extending the [`WebBrowserOpenOptions`](#webbrowseropenoptions).
  * If there is no native AuthSession implementation available (which is the case on Android)
  * these params will be used in the browser polyfill. If there is a native AuthSession implementation,
@@ -24,6 +24,10 @@ export async function launchSession(
   redirectUrl?: string | null,
   options: AuthSessionOpenOptions = {}
 ): Promise<LaunchSessionResult> {
+  if (Platform.OS === "web") {
+    throw new Error("Use @trinsic/web-ui launchRedirect in a web browser.");
+  }
+
   if (launchUrl === null || launchUrl === undefined || launchUrl.length === 0) {
     throw new Error("Launch URL is required");
   }
@@ -42,8 +46,8 @@ export async function launchSession(
     throw new Error("Launch URL must contain a sessionId query parameter");
   }
 
-  if (!url.searchParams.has("launchMode")) {
-    url.searchParams.append("launchMode", "mobile");
+  if (!url.searchParams.has("launchMode") || url.searchParams.getAll("launchMode").includes("popup")) {
+    url.searchParams.set("launchMode", "mobile");
   }
 
   try {

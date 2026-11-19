@@ -1,3 +1,8 @@
 import { launchRedirect } from "@trinsic/web-ui";
 
-launchRedirect("https://verify.trinsic.id/example");
+const form = document.querySelector("form")!;
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const launchUrl = new FormData(form).get("launchUrl");
+  if (typeof launchUrl === "string") launchRedirect(launchUrl).catch(error => alert(error.message));
+});

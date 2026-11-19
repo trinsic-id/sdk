@@ -619,3 +619,5 @@ api-typescript/sdk
 go-sample
 
 ui-web/samples/dist
+ui-web/sdk/dist/
+ui-expo/sdk/dist/

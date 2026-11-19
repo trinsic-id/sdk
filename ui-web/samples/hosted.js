@@ -12,10 +12,10 @@ async function createHostedSession(providerId) {
     }
   }).then(r => jsonHandleError(r));
 
-  // Store resultsAccessKey from created Session in localStorage for later retrieval
+  // Store resultsAccessKey from created Session in sessionStorage for later retrieval
   // NOTE: Do not do this in production. resultsAccessKey should be stored securely in your backend, correlated with your user's session.
   if (session.sessionId && session.resultsAccessKey) {
-    localStorage.setItem(`resultsAccessKey:${session.sessionId}`, session.resultsAccessKey);
+    sessionStorage.setItem(`resultsAccessKey:${session.sessionId}`, session.resultsAccessKey);
   }
 
   return session;
