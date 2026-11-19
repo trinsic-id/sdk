@@ -46,7 +46,7 @@ export async function launchSession(
     throw new Error("Launch URL must contain a sessionId query parameter");
   }
 
-  if (!url.searchParams.has("launchMode") || url.searchParams.getAll("launchMode").includes("popup")) {
+  if (!url.searchParams.has("launchMode")) {
     url.searchParams.set("launchMode", "mobile");
   }
 
