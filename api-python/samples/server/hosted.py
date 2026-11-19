@@ -16,9 +16,14 @@ async def redirect():
 
 @hostedRouter.post("/create-hosted-session/{provider_id}")
 async def launch(request: Request, provider_id: str, sessions_api: SessionsApi = Depends()):
-    request = CreateHostedProviderSessionRequest(redirect_url = request.query_params.get("redirectUrl"), verification_profile_id=os.getenv("TRINSIC_VERIFICATION_PROFILE_ID"), provider=provider_id)
+    session_request = CreateHostedProviderSessionRequest(
+        provider=provider_id,
+        verification_profile_id=os.getenv("TRINSIC_VERIFICATION_PROFILE_ID"),
+        redirect_url=request.query_params.get("redirectUrl"),
+        enable_redirect_backwards_compatibility=False,
+    )
 
-    result = sessions_api.create_hosted_provider_session(create_hosted_provider_session_request=request)
+    result = sessions_api.create_hosted_provider_session(create_hosted_provider_session_request=session_request)
     
     return JSONResponse(content=json.loads(json.dumps(result.to_dict(), default=json_serial)))
 def json_serial(obj):

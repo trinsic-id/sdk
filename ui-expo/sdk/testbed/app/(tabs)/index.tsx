@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Button } from "react-native";
+import { Image, StyleSheet, Platform, Button } from "react-native";
 import { HelloWave } from "@/components/HelloWave";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
@@ -18,7 +18,7 @@ export default function HomeScreen() {
     const getSessionUrlResult = await fetch(fetchUrl);
     const launchUrl = await getSessionUrlResult.text();
     console.log("Launch URL: ", launchUrl);
-    const result = await launchSession(launchUrl, callbackPath);
+    const result = await launchSession(launchUrl, url);
     setResult(result);
   };
   return (
@@ -36,7 +36,11 @@ export default function HomeScreen() {
         <HelloWave />
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
-        <Button title="Launch Session" onPress={handleButtonPress} />
+        {Platform.OS === "web" ? (
+          <ThemedText>Open this sample on iOS or Android to launch a session.</ThemedText>
+        ) : (
+          <Button title="Launch Session" onPress={handleButtonPress} />
+        )}
         {!!result && (
           <>
             <ThemedText>Session ID: {result.sessionId}</ThemedText>

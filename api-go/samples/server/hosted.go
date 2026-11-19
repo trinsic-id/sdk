@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/gofiber/fiber/v2"
 	"os"
+
+	"github.com/gofiber/fiber/v2"
 	trinsic_api "github.com/trinsic-id/sdk-go-api/v3"
 )
 
@@ -17,9 +18,10 @@ func HostedRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 		verificationProfileId := os.Getenv("TRINSIC_VERIFICATION_PROFILE_ID")
 		// Create request with provider and nullable redirectUrl
 		request := trinsic_api.CreateHostedProviderSessionRequest{
-			RedirectUrl: redirectUrl,
-			Provider:    provider,
-			VerificationProfileId: verificationProfileId,
+			RedirectUrl:                          redirectUrl,
+			Provider:                             provider,
+			VerificationProfileId:                verificationProfileId,
+			EnableRedirectBackwardsCompatibility: false,
 		}
 
 		req := api.SessionsAPI.CreateHostedProviderSession(c.Context()).CreateHostedProviderSessionRequest(request)

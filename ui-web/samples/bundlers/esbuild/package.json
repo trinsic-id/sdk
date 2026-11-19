@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "build": "node build.js",
-    "start": "npm run build && http-server ."
+    "start": "npm run build && http-server .",
+    "postinstall": "npm --prefix ../../../sdk ci && npm --prefix ../../../sdk run build"
   },
   "author": "",
   "license": "MIT",
@@ -14,6 +15,6 @@
     "http-server": "^14.1.1"
   },
   "dependencies": {
-    "@trinsic/web-ui": "2.0.1"
+    "@trinsic/web-ui": "file:../../../sdk"
   }
 }

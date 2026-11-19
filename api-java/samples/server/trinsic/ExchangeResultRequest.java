@@ -12,4 +12,5 @@ public class ExchangeResultRequest
 
     public String sessionId;
     public String resultsAccessKey;
+    public String redirectToken;
 }

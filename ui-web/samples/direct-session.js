@@ -1,8 +1,5 @@
 import QRCode from 'qrcode'
-import MicroModal from "micromodal";
-import { signalRedirectFromPopup } from '@trinsic/web-ui';
 import { catchErrorAlert } from './shared';
-MicroModal.init();
 
 async function showDeeplink(url) {
   document.getElementById("qrcode-canvas").style.removeProperty("display");
@@ -77,10 +74,7 @@ function startSessionUpdates(sessionId, resultsAccessKey, initialRefreshAfter) {
 
     if (result.session.done === true) {
       stop();
-      signalRedirectFromPopup({
-        sessionId,
-        closeWindowAfterSignal: true
-      });
+      window.location.href = `${location.origin}/redirect?sessionId=${encodeURIComponent(sessionId)}`;
       return true;
     }
     return false;
@@ -124,10 +118,10 @@ function startSessionUpdates(sessionId, resultsAccessKey, initialRefreshAfter) {
   void update();
 }
 
-async function initializeDirectPopup() {
+async function initializeDirectSession() {
   const urlSearchParams = new URLSearchParams(window.location.search);
   const sessionId = urlSearchParams.get('sessionId');
-  const resultsAccessKey = urlSearchParams.get('resultsAccessKey');
+  const resultsAccessKey = sessionStorage.getItem(`resultsAccessKey:${sessionId}`);
   const nextStep = urlSearchParams.get('nextStep');
   const content = urlSearchParams.get('content');
   const shouldRefresh = urlSearchParams.get('shouldRefresh') === 'true';
@@ -139,4 +133,4 @@ async function initializeDirectPopup() {
   startSessionUpdates(sessionId, resultsAccessKey, shouldRefresh ? refreshAfter : null);
 }
 
-initializeDirectPopup().catch(catchErrorAlert);
+initializeDirectSession().catch(catchErrorAlert);

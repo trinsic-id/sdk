@@ -38,6 +38,7 @@ module SharedRoutes
   
       opts = {
         get_session_result_request: TrinsicApi::GetSessionResultRequest.new({
+          redirect_token: body['redirectToken'],
           results_access_key: access_key
         })
       }

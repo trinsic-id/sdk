@@ -6,10 +6,6 @@ module DirectRoutes
       send_file File.join(settings.public_folder, 'direct.html')
     end
 
-    app.get '/direct-popup' do
-      send_file File.join(settings.public_folder, 'direct-popup.html')
-    end
-
     app.post('/create-direct-session/:provider') do
       provider = params[:provider]
       redirectUrl = params[:redirectUrl]
@@ -19,6 +15,7 @@ module DirectRoutes
 
       req = TrinsicApi::CreateDirectProviderSessionRequest.new({
         redirect_url: redirectUrl,
+        enable_redirect_backwards_compatibility: false,
         provider: provider,
         capabilities: capabilities,
         fallback_to_hosted_ui: fallbackToTrinsicUI,
@@ -53,6 +50,7 @@ module DirectRoutes
 
       result = TrinsicServices::SESSIONS.get_session_result(params[:sessionId], {
         get_session_result_request: TrinsicApi::GetSessionResultRequest.new({
+          redirect_token: request_payload["redirectToken"],
           results_access_key: results_access_key
         })
       })

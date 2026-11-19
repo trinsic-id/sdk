@@ -4,14 +4,15 @@
   "main": "index.js",
   "scripts": {
     "build": "rollup -c",
-    "start": "npm run build && http-server -c-1"
+    "start": "npm run build && http-server -c-1",
+    "postinstall": "npm --prefix ../../../sdk ci && npm --prefix ../../../sdk run build"
   },
   "type": "module",
   "author": "",
   "license": "MIT",
   "description": "",
   "dependencies": {
-    "@trinsic/web-ui": "^2.0.0"
+    "@trinsic/web-ui": "file:../../../sdk"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.3.0",
