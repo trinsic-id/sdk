@@ -22,7 +22,7 @@ function fixture(t, sdk, version = "1.2.3-beta.1") {
     copyFileSync(join(root, file), join(directory, file));
   }
   writeFileSync(join(directory, "versions.json"), JSON.stringify({
-    node: version, webUIVersion: version, expoUIVersion: version,
+    node: version, webUIVersion: version,
   }));
   const log = join(directory, "commands.jsonl");
   writeFileSync(log, "");
@@ -67,7 +67,6 @@ process.exit(Number(process.env.PUBLISH_TEST_EXIT || "0"));
 const npmPackages = [
   ["api-typescript", "trinsic-api-1.2.3-beta.1.tgz"],
   ["ui-web", "trinsic-web-ui-1.2.3-beta.1.tgz"],
-  ["ui-expo", "trinsic-expo-ui-1.2.3-beta.1.tgz"],
 ];
 
 for (const [sdk, filename] of npmPackages) {
