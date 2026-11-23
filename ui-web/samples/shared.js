@@ -13,16 +13,8 @@ window.ipAddress = async () => {
 }
 
 export function catchErrorAlert(error) {
-    let errorMessage = "";
-    let errorDetails = "";
-    // Check if the error is a Trinsic error
-    if (error.success === false) {
-        console.warn("Trinsic error:", error);
-        errorMessage = `Message: ${error.msg}\nSession Id: ${error.sessionId}` || `An unknown error occurred.`;
-    } else {
-        console.error("Error:", error);
-        errorMessage = error?.message || "An unknown error occurred.";
-    }
+    console.error("Error:", error);
+    const errorMessage = error?.message || "An unknown error occurred.";
     // Defer the alert so errors are displayed after the current event completes.
     setTimeout(() => {
         alert(errorMessage);

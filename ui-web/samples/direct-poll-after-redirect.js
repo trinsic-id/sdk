@@ -30,7 +30,7 @@ async function initializePollAfterRedirect() {
   const resultsAccessKey = sessionStorage.getItem(`resultsAccessKey:${sessionId}`);
 
   document.getElementById("session-id").innerText = sessionId;
-  document.getElementById("success").innerText = "false";
+  document.getElementById("success").innerText = "Pending";
   document.getElementById("done").innerText = "false";
   document.getElementById("last-polled").innerText = new Date().toLocaleTimeString();
 
