@@ -127,7 +127,7 @@ function startSessionUpdates(sessionId, resultsAccessKey, initialRefreshAfter) {
 async function initializeDirectPopup() {
   const urlSearchParams = new URLSearchParams(window.location.search);
   const sessionId = urlSearchParams.get('sessionId');
-  const resultsAccessKey = urlSearchParams.get('resultsAccessKey');
+  const resultsAccessKey = localStorage.getItem(`resultsAccessKey:${sessionId}`);
   const nextStep = urlSearchParams.get('nextStep');
   const content = urlSearchParams.get('content');
   const shouldRefresh = urlSearchParams.get('shouldRefresh') === 'true';

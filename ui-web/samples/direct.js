@@ -50,7 +50,7 @@ async function launchDirectProvider(providerId) {
       if (session.nextStep?.method === "LaunchBrowser") {
         return session.nextStep.content;
       } else {
-        return `${location.origin}/direct-popup?sessionId=${session.sessionId}&resultsAccessKey=${session.resultCollection?.resultsAccessKey}&nextStep=${session.nextStep?.method}&content=${encodeURIComponent(session.nextStep?.content || "")}&shouldRefresh=${(session.nextStep?.refresh != null).toString().toLowerCase()}&refreshAfter=${encodeURIComponent(session.nextStep?.refresh?.refreshAfter || "")}`
+        return `${location.origin}/direct-popup?sessionId=${session.sessionId}&nextStep=${session.nextStep?.method}&content=${encodeURIComponent(session.nextStep?.content || "")}&shouldRefresh=${(session.nextStep?.refresh != null).toString().toLowerCase()}&refreshAfter=${encodeURIComponent(session.nextStep?.refresh?.refreshAfter || "")}`
       }
     }
   }).catch(e => catchErrorAlert(e));

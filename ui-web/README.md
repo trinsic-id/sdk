@@ -62,14 +62,7 @@ If you are using this library to launch Trinsic sessions from within an iFrame, 
 
 When using either flow below, the user will be redirected back to a URL controlled by your application when they are finished with a verification.
 
-The following query parameters will be appended to the redirect URL:
-
-| Parameter   | Description                                                           |
-| ----------- | --------------------------------------------------------------------- |
-| `success`   | Can be `true` or `false`. Whether the Session completed successfully. |
-| `sessionId` | The ID of the session that the user is redirecting back from.         |
-
-**Note:** These parameters can be set to arbitrary values by curious or malicious users simply by editing their browser URL bar. Don't implicitly trust the `success` parameter -- always fetch the Session results from your backend to confirm. Similarly, keep a record of the session ID you sent the user to, and correlate it against the `sessionId` query parameter.
+Match the `sessionId` query parameter to the session your backend created for the user. If the callback includes a `redirectToken`, send it to your backend for the first result fetch. Use the results access key saved at session creation to retrieve the session's status and results from the Trinsic API.
 
 ### Data residency
 

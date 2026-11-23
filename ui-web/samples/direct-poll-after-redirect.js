@@ -53,10 +53,10 @@ async function startPollingAfterRedirect(sessionId, resultsAccessKey) {
 async function initializePollAfterRedirect() {
   const urlSearchParams = new URLSearchParams(window.location.search);
   const sessionId = urlSearchParams.get('sessionId');
-  const resultsAccessKey = urlSearchParams.get('resultsAccessKey');
+  const resultsAccessKey = localStorage.getItem(`resultsAccessKey:${sessionId}`);
 
   document.getElementById("session-id").innerText = sessionId;
-  document.getElementById("success").innerText = "false";
+  document.getElementById("success").innerText = "Pending";
   document.getElementById("done").innerText = "false";
   document.getElementById("last-polled").innerText = new Date().toLocaleTimeString();
 
