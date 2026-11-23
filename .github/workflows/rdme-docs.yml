@@ -13,8 +13,6 @@ on:
       - "api-ruby/README.md"
       - "api-typescript/README.md"
       - "ui-android/README.md"
-      - "ui-expo/README.md"
-      - "ui-flutter/README.md"
       - "ui-swift/README.md"
       - "ui-web/README.md"
       - ".readme/**"
@@ -128,36 +126,6 @@ jobs:
         uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10.10.0
         with:
           rdme: reference upload .readme/ui-android.md --key=${{ secrets.README_API_KEY }} --branch=1.0
-  ui-expo:
-    name: Sync Expo SDK Readme
-    if: github.ref == 'refs/heads/main' && github.repository == 'trinsic-id/sdk' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repo
-        uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3
-        with:
-          persist-credentials: false
-      - name: Prepare readme file
-        run: cat ui-expo/README.md >> .readme/ui-expo.md
-      - name: Run `docs` command
-        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10.10.0
-        with:
-          rdme: reference upload .readme/ui-expo.md --key=${{ secrets.README_API_KEY }} --branch=1.0
-  ui-flutter:
-    name: Sync Flutter SDK Readme
-    if: github.ref == 'refs/heads/main' && github.repository == 'trinsic-id/sdk' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repo
-        uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3
-        with:
-          persist-credentials: false
-      - name: Prepare readme file
-        run: cat ui-flutter/README.md >> .readme/ui-flutter.md
-      - name: Run `docs` command
-        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10.10.0
-        with:
-          rdme: reference upload .readme/ui-flutter.md --key=${{ secrets.README_API_KEY }} --branch=1.0
   ui-swift:
     name: Sync Swift SDK Readme
     if: github.ref == 'refs/heads/main' && github.repository == 'trinsic-id/sdk' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
