@@ -18,7 +18,7 @@ export function hostedRoutes(app: Express, sessionsApi: SessionsApi) {
         verificationProfileId: process.env.TRINSIC_VERIFICATION_PROFILE_ID!,
         provider: provider,
         redirectUrl: redirectUrl,
-        enableRedirectBackwardsCompatibility: true,
+        enableRedirectBackwardsCompatibility: false,
       },
     });
 

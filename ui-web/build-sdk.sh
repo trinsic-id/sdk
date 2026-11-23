@@ -3,19 +3,18 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-source "$REPO_ROOT/helpers/common.sh"
+source "$SCRIPT_DIR/../helpers/common.sh"
 
-cp "$SCRIPT_DIR/README.md" "$SCRIPT_DIR/sdk"
+cd "$SCRIPT_DIR/sdk"
+npm ci
+npm run build
+node --test "$SCRIPT_DIR/tests/launch.test.cjs"
 
-(
-  cd "$SCRIPT_DIR/sdk"
-  npm ci
-  npm run build
-
-  version="$(get_version webUIVersion)"
-  npm version "$version" --no-git-tag-version
-
-  mkdir -p publish
-  npm pack --pack-destination "$SCRIPT_DIR/sdk/publish"
-)
+# Stamp the release version in the package without changing the checkout.
+pack_dir="$(mktemp -d)"
+trap 'rm -rf "$pack_dir"' EXIT
+cp -R dist LICENSE package.json "$SCRIPT_DIR/README.md" "$pack_dir/"
+mkdir -p publish
+cd "$pack_dir"
+npm pkg set version="$(get_version webUIVersion)"
+npm pack --pack-destination "$SCRIPT_DIR/sdk/publish"

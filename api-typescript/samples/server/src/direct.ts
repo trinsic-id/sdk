@@ -9,12 +9,6 @@ export function directRoutes(app: Express, sessionsApi: SessionsApi) {
     );
   });
 
-  app.get("/direct-popup", (req: any, res: any) => {
-    res.sendFile(
-      path.join(__dirname, "../../../../ui-web/samples/dist/direct-popup.html")
-    );
-  });
-
   app.post("/create-direct-session/:provider", async (req: any, res: any) => {
     const provider = req.params.provider;
     const redirectUrl = req.query.redirectUrl;
@@ -28,7 +22,7 @@ export function directRoutes(app: Express, sessionsApi: SessionsApi) {
         redirectUrl: redirectUrl,
         capabilities: capabilities,
         fallbackToHostedUI: fallbackToTrinsicUI === "true",
-        enableRedirectBackwardsCompatibility: true,
+        enableRedirectBackwardsCompatibility: false,
       },
     });
 
@@ -49,7 +43,7 @@ export function directRoutes(app: Express, sessionsApi: SessionsApi) {
     const resultsAccessKey = req.body.resultsAccessKey;
     const results = await sessionsApi.getSessionResult({
       sessionId: req.params.sessionId,
-      getSessionResultRequest: { resultsAccessKey },
+      getSessionResultRequest: { resultsAccessKey, redirectToken: req.body.redirectToken },
     });
     res.json(results);
   });

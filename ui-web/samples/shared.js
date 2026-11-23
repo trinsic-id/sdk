@@ -1,4 +1,3 @@
-window.exchangeResult = exchangeResult;
 window.getProviders = getProviders;
 window.ipAddress = async () => {
     try {
@@ -16,7 +15,7 @@ window.ipAddress = async () => {
 export function catchErrorAlert(error) {
     console.error("Error:", error);
     const errorMessage = error?.message || "An unknown error occurred.";
-    // Show error message after short timeout to not delay the popup closing
+    // Defer the alert so errors are displayed after the current event completes.
     setTimeout(() => {
         alert(errorMessage);
     }, 150);
@@ -28,7 +27,7 @@ export async function jsonHandleError(response) {
 
         let alertText = "Request failed: check the logs on the backend for more information.\nUrl: " + response.url;
 
-        // Show error message after short timeout to not delay the popup closing
+        // Defer the alert so errors are displayed after the current event completes.
         setTimeout(() => {
             alert(alertText);
         }, 150);
@@ -38,11 +37,7 @@ export async function jsonHandleError(response) {
     return data;
 }
 
-async function exchangeResult(response) {
-    const redirectTokenKey = `redirectToken:${response.sessionId}`;
-    // Popup completion signals contain only the session ID, so read the token
-    // saved by our same-origin redirect page before it signaled the opener.
-    const redirectToken = response.redirectToken ?? localStorage.getItem(redirectTokenKey);
+export async function exchangeResult(response) {
     const result = await fetch("/exchange-result", {
         method: "POST",
         headers: {
@@ -51,13 +46,13 @@ async function exchangeResult(response) {
         body: JSON.stringify({
             sessionId: response.sessionId,
             resultsAccessKey: response.resultsAccessKey,
-            redirectToken,
+            redirectToken: response.redirectToken,
         }),
-    }).then(r => jsonHandleError(r));
-    // Only the first successful result fetch needs the redirect token.
-    localStorage.removeItem(redirectTokenKey);
+    }).then(jsonHandleError);
+    document.getElementById("session-id").innerText = response.sessionId;
     document.getElementById("results").innerText = JSON.stringify(result, null, 2);
-    MicroModal.show('results-modal');
+    document.getElementById("result-loading").hidden = true;
+    document.getElementById("result-card").hidden = false;
 }
 
 async function getProviders(launchMethod) {

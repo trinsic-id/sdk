@@ -12,6 +12,7 @@ module HostedRoutes
       verificationProfileId = ENV['TRINSIC_VERIFICATION_PROFILE_ID']
       req = TrinsicApi::CreateHostedProviderSessionRequest.new({
         redirect_url: redirectUrl,
+        enable_redirect_backwards_compatibility: false,
         provider: provider,
         verification_profile_id: verificationProfileId
       })
