@@ -20,11 +20,12 @@ end
 
 # Connect's .github/sdk-compatibility/matrix.json waives this exact failure
 # for published 3.2.0 and 3.2.1: serialization changed .472Z to whole seconds.
-aadhaar = TrinsicApi::SignzyIndiaAadhaarFetchProviderOutput.build_from_hash(
-  'timestamp' => '2025-06-01T15:13:54.472Z'
+provider_key = 'india-digilocker-aadhaar-fetch'
+output = TrinsicApi::ProviderOutput.build_from_hash(
+  provider_key => { 'timestamp' => '2025-06-01T15:13:54.472Z' }
 )
-raise 'Lost Aadhaar milliseconds while parsing' unless aadhaar.timestamp.subsec == Rational(472, 1000)
-aadhaar_json = JSON.parse(client.object_to_http_body(aadhaar))
+raise 'Lost Aadhaar milliseconds while parsing' unless output.india_digilocker_aadhaar_fetch.timestamp.subsec == Rational(472, 1000)
+aadhaar_json = JSON.parse(client.object_to_http_body(output)).fetch(provider_key)
 raise 'Lost Aadhaar milliseconds while writing' unless aadhaar_json['timestamp'] == '2025-06-01T15:13:54.472000000Z'
 
 api = TrinsicApi::VerificationProfilesApi.new(client)

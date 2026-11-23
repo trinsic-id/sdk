@@ -4,11 +4,16 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 bundler_name=""
+sdk_tarball=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --bundler-name|-bundlerName)
       bundler_name="$2"
+      shift 2
+      ;;
+    --sdk-tarball)
+      sdk_tarball="$2"
       shift 2
       ;;
     *)
@@ -23,9 +28,15 @@ if [[ -z "$bundler_name" ]]; then
   exit 1
 fi
 
+if [[ -z "$sdk_tarball" || ! -f "$sdk_tarball" ]]; then
+  echo "--sdk-tarball must reference a packed Web UI SDK" >&2
+  exit 1
+fi
+
 (
   cd "$SCRIPT_DIR/samples/bundlers/$bundler_name"
   npm ci
+  npm install --no-save --package-lock=false "$sdk_tarball"
   echo "Building bundler $bundler_name project..."
   npm run build
 )

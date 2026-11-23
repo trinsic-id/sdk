@@ -22,6 +22,7 @@
     "types": "./dist/index.d.ts"
   },
   "scripts": {
+    "prebuild": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
     "build:esm": "esbuild src/index.ts --bundle --minify --sourcemap --format=esm --outfile=dist/index.esm.js --target=chrome58,firefox57,safari11,edge16",
     "build:iife": "esbuild src/index.ts --bundle --minify --sourcemap --format=iife --global-name=TrinsicUI --outfile=dist/index.iife.js --target=chrome58,firefox57,safari11,edge16",
     "build": "npm run build:esm && npm run build:iife",
@@ -31,9 +32,9 @@
     "esbuild": "0.23.0",
     "typescript": "5.5.4"
   },
-  "dependencies": {
-    "micromodal": "0.4.10"
-  },
   "homepage": "https://trinsic.id",
-  "license": "MIT"
+  "license": "MIT",
+  "files": [
+    "dist"
+  ]
 }

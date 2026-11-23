@@ -14,12 +14,6 @@ import java.util.UUID;
 public class Direct {
     public static void DirectRoutes(Javalin app, SessionsApi session, UUID verificationProfileId){
 
-        app.get("/direct-popup", ctx -> {
-            String query = ctx.queryString(); // grabs everything after '?'
-            String target = "/direct-popup.html" + (query != null ? "?" + query : "");
-            ctx.redirect(target);
-        });
-
         app.post("/create-direct-session/{provider}", ctx -> {
             String provider = ctx.pathParam("provider");
             String redirectUrl = ctx.queryParam("redirectUrl");
@@ -29,6 +23,7 @@ public class Direct {
             CreateDirectProviderSessionRequest req = new CreateDirectProviderSessionRequest();
             req.setProvider(provider);
             req.setRedirectUrl(redirectUrl);
+            req.setEnableRedirectBackwardsCompatibility(false);
             req.setFallbackToHostedUI(fallbackToTrinsicUI);
             req.setVerificationProfileId(verificationProfileId);
 
@@ -71,6 +66,7 @@ public class Direct {
             String resultsAccessKey = (String) body.get("resultsAccessKey");
 
             GetSessionResultRequest request = new GetSessionResultRequest();
+            if (body.get("redirectToken") instanceof String token) request.setRedirectToken(token);
             request.setResultsAccessKey(resultsAccessKey);
 
             GetSessionResultResponse result =

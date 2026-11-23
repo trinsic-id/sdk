@@ -1,44 +1,32 @@
-import { signalRedirectFromPopup } from "@trinsic/web-ui";
-import MicroModal from "micromodal";
+import { exchangeResult } from "./shared";
 
-(() => {
-  // Parse out the query parameters from the URL
-  const params = new URLSearchParams(window.location.search);
-  const postRedirectAction = params.get("postRedirectAction");
-  const sessionId = params.get("sessionId");
-  const redirectToken = params.get("redirectToken");
-
-  // Keep the token available to the opener and the poll-after-redirect page.
-  // Like resultsAccessKey below, this uses localStorage for the sample only;
-  // production applications should keep session credentials on their backend.
-  if (redirectToken) {
-    localStorage.setItem(`redirectToken:${sessionId}`, redirectToken);
+async function completeRedirect() {
+  const url = new URL(window.location.href);
+  const sessionId = url.searchParams.get("sessionId");
+  const tokenKey = `redirectToken:${sessionId}`;
+  if (url.searchParams.has("redirectToken")) {
+    // Retain the token across reloads until the first successful result request.
+    sessionStorage.setItem(tokenKey, url.searchParams.get("redirectToken"));
+    url.searchParams.delete("redirectToken");
+    history.replaceState(null, "", url);
   }
 
-  // Fetch resultsAccessKey from localStorage, which was stored there when we created the Session.
-  // NOTE: Do not do this in production. resultsAccessKey should be stored securely in your backend, correlated with your user's session.
-  const resultsAccessKey = localStorage.getItem(`resultsAccessKey:${sessionId}`);
-
-  // (Direct Sessions Only) If postRedirectAction is "poll", the results of the Session are not immediately available, so we need to poll for them
-  // (related to `PollAfterRedirect` capability)
-  if (postRedirectAction === "poll") {
-    const pollUrl = new URL("/direct-poll-after-redirect", window.location.origin);
+  if (url.searchParams.get("postRedirectAction") === "poll") {
+    const pollUrl = new URL("/direct-poll-after-redirect.html", location.origin);
     pollUrl.searchParams.set("sessionId", sessionId);
-    pollUrl.searchParams.set("resultsAccessKey", resultsAccessKey);
-    window.location.href = pollUrl.toString();
+    window.location.replace(pollUrl);
     return;
   }
 
-  // Otherwise, results are immediately available to fetch from Trinsic's API, so we should proceed.
+  // Sample only. In production, correlate session credentials on the backend.
+  await exchangeResult({
+    sessionId,
+    resultsAccessKey: sessionStorage.getItem(`resultsAccessKey:${sessionId}`),
+    redirectToken: sessionStorage.getItem(tokenKey) ?? undefined
+  });
+  sessionStorage.removeItem(tokenKey);
+}
 
-  // If this page was opened in a popup, signal the opener window
-  // Otherwise, if it's a top-level redirect, we should exchange results directly
-  if (window.opener) {
-    signalRedirectFromPopup({
-      sessionId,
-      closeWindowAfterSignal: true
-    });
-  } else {
-    exchangeResult({ resultsAccessKey, sessionId, redirectToken });
-  }
-})();
+completeRedirect().catch(error => {
+  document.getElementById("result-loading").innerText = error.message;
+});

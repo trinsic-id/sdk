@@ -21,10 +21,13 @@ async def get_providers(request: Request, sessions_api: SessionsApi = Depends())
 class GetResultsRequest(BaseModel):
     sessionId: str
     resultsAccessKey: str
+    redirectToken: str | None = None
 
 @sharedRouter.post("/exchange-result")
 async def exchange_result(request: GetResultsRequest, sessions_api: SessionsApi = Depends()):
-    req = GetSessionResultRequest(resultsAccessKey=request.resultsAccessKey)
+    req = GetSessionResultRequest(results_access_key=request.resultsAccessKey)
+    if request.redirectToken is not None:
+        req.redirect_token = request.redirectToken
     data = sessions_api.get_session_result(session_id=request.sessionId, get_session_result_request=req)
 
     return data

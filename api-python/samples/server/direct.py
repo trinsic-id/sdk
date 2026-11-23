@@ -13,18 +13,20 @@ directRouter = APIRouter()
 async def direct():
     return RedirectResponse(url="/direct.html")
 
-@directRouter.get("/direct-popup")
-async def directPopup(request: Request):
-    return RedirectResponse(url=f"/direct-popup.html?{request.query_params}")
-
-
 @directRouter.post("/create-direct-session/{provider_id}")
 async def launch(request: Request, provider_id: str, sessions_api: SessionsApi = Depends()):
     fallbackToTrinsicUI = request.query_params.get("fallbackToTrinsicUI", "").strip().lower() == "true"
 
-    request = CreateDirectProviderSessionRequest(redirect_url = request.query_params.get("redirectUrl"), verification_profile_id=os.getenv("TRINSIC_VERIFICATION_PROFILE_ID"), provider=provider_id, fallback_to_hosted_ui = fallbackToTrinsicUI, capabilities = request.query_params.get("capabilities").split(","))
+    session_request = CreateDirectProviderSessionRequest(
+        provider=provider_id,
+        verification_profile_id=os.getenv("TRINSIC_VERIFICATION_PROFILE_ID"),
+        redirect_url=request.query_params.get("redirectUrl"),
+        enable_redirect_backwards_compatibility=False,
+        fallback_to_hosted_ui=fallbackToTrinsicUI,
+        capabilities=request.query_params.get("capabilities").split(","),
+    )
 
-    result = sessions_api.create_direct_provider_session(create_direct_provider_session_request=request)
+    result = sessions_api.create_direct_provider_session(create_direct_provider_session_request=session_request)
     return JSONResponse(content=json.loads(json.dumps(result.to_dict(), default=json_serial)))
 
 def json_serial(obj):
@@ -43,7 +45,10 @@ async def poll_results(session_id: str, request: Request, sessions_api: Sessions
     if not results_access_key:
         raise HTTPException(status_code=400, detail="Missing resultsAccessKey")
     
-    result = sessions_api.get_session_result(session_id, GetSessionResultRequest(results_access_key=results_access_key))
+    result_request = GetSessionResultRequest(results_access_key=results_access_key)
+    if request_payload.get("redirectToken") is not None:
+        result_request.redirect_token = request_payload["redirectToken"]
+    result = sessions_api.get_session_result(session_id, result_request)
     
     return JSONResponse(content=json.loads(json.dumps(result.to_dict(), default=json_serial)))
 

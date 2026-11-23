@@ -18,6 +18,7 @@ public class Hosted {
             // Build request object
             CreateHostedProviderSessionRequest req = new CreateHostedProviderSessionRequest();
             req.setRedirectUrl(redirectUrl);
+            req.setEnableRedirectBackwardsCompatibility(false);
             req.setProvider(provider);
             req.setVerificationProfileId(verificationProfileId);
 

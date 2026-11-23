@@ -18,7 +18,7 @@ func SharedRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 	app.Get("/providers", func(c *fiber.Ctx) error {
 		ipAddress := c.Query("ipAddress")
 		verificationProfileId := os.Getenv("TRINSIC_VERIFICATION_PROFILE_ID")
-		
+
 		var recommendationInfo trinsic_api.NullableRecommendationInfo
 
 		if ipAddress != "" {
@@ -46,8 +46,9 @@ func SharedRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 	})
 
 	type GetResultsRequest struct {
-		SessionId string `json:"sessionId"`
-		AccessKey string `json:"resultsAccessKey"`
+		SessionId     string  `json:"sessionId"`
+		AccessKey     string  `json:"resultsAccessKey"`
+		RedirectToken *string `json:"redirectToken"`
 	}
 
 	app.Post("/exchange-result", func(c *fiber.Ctx) error {
@@ -61,6 +62,10 @@ func SharedRoutes(app *fiber.App, api *trinsic_api.APIClient) {
 
 		request := trinsic_api.GetSessionResultRequest{
 			ResultsAccessKey: req.AccessKey,
+		}
+
+		if req.RedirectToken != nil {
+			request.SetRedirectToken(*req.RedirectToken)
 		}
 
 		data, _, err := api.SessionsAPI.GetSessionResult(c.Context(), req.SessionId).GetSessionResultRequest(request).Execute()

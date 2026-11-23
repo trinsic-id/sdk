@@ -54,7 +54,7 @@ GEM
       sinatra (= 4.1.1)
       tilt (~> 2.0)
     tilt (2.8.0)
-    trinsic_api (3.2.1)
+    trinsic_api (3.3.0.pre.alpha4)
       typhoeus (~> 1.0, >= 1.0.1)
     typhoeus (1.6.0)
       ethon (>= 0.18.0)
@@ -73,7 +73,7 @@ DEPENDENCIES
   rackup (~> 2.2)
   sinatra (~> 4.1.1)
   sinatra-contrib
-  trinsic_api (~> 3.2.1)
+  trinsic_api (= 3.3.0.pre.alpha4)
 
 BUNDLED WITH
    2.6.6
