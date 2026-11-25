@@ -1,11 +1,11 @@
 {
   "backendVersion": "3.3",
-  "nodePatchVersion": "0-alpha4",
-  "csharpPatchVersion": "0-alpha4",
-  "javaPatchVersion": "0-alpha4",
-  "goPatchVersion": "0-alpha4",
-  "pythonPatchVersion": "0-alpha4",
-  "rubyPatchVersion": "0-alpha4",
+  "nodePatchVersion": "0-alpha5",
+  "csharpPatchVersion": "0-alpha5",
+  "javaPatchVersion": "0-alpha5",
+  "goPatchVersion": "0-alpha5",
+  "pythonPatchVersion": "0-alpha5",
+  "rubyPatchVersion": "0-alpha5",
   "swiftUIVersion": "2.3.0-alpha9",
   "androidUIVersion": "2.3.0-alpha7",
   "webUIVersion": "4.1.0-alpha1"
