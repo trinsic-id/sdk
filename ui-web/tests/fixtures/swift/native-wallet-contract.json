@@ -1,0 +1,200 @@
+[
+  {
+    "name": "mdl",
+    "input": {
+      "documentRequests": [
+        {
+          "documentType": "org.iso.18013.5.1.mDL",
+          "nameSpaces": {
+            "org.iso.18013.5.1": {
+              "given_name": false,
+              "family_name": true,
+              "birth_date": false,
+              "age_over_21": true
+            }
+          }
+        }
+      ]
+    },
+    "challenge": "eyJleGNoYW5nZUlkIjoiZGQ5YjVlZDEtNDQ3Yi00ZTMxLWI0YTYtYjdlYTg1MjdlZTkzIiwidHlwZSI6ImNyZWRlbnRpYWxSZXF1ZXN0IiwicGxhdGZvcm0iOiJhcHBsZS13YWxsZXQiLCJleGNoYW5nZU1lY2hhbmlzbSI6Ik5hdGl2ZUFwcCIsInJlcXVlc3RPYmplY3QiOiJ7XCJhcHBsZURvY3VtZW50VHlwZVwiOlwiRHJpdmVyc0xpY2Vuc2VcIixcInJlcXVlc3RlZEF0dHJpYnV0ZXNcIjpbe1wiYXR0cmlidXRlVHlwZVwiOlwiR2l2ZW5OYW1lXCIsXCJpbnRlbnRUb1N0b3JlXCI6MH0se1wiYXR0cmlidXRlVHlwZVwiOlwiRmFtaWx5TmFtZVwiLFwiaW50ZW50VG9TdG9yZVwiOi0xfSx7XCJhdHRyaWJ1dGVUeXBlXCI6XCJEYXRlT2ZCaXJ0aFwiLFwiaW50ZW50VG9TdG9yZVwiOjB9LHtcImF0dHJpYnV0ZVR5cGVcIjpcIkFnZUF0TGVhc3RYXCIsXCJpbnRlbnRUb1N0b3JlXCI6LTEsXCJhZ2VBdExlYXN0WEFyZ3VtZW50XCI6MjF9XSxcIm5vbmNlXCI6XCJBSCtBL3Y4PVwiLFwibWVyY2hhbnRJZFwiOlwibWVyY2hhbnQudGVzdFwiLFwidGVhbUlkXCI6XCJURUFNMTIzXCJ9In0",
+    "expected": {
+      "exchangeId": "dd9b5ed1-447b-4e31-b4a6-b7ea8527ee93",
+      "merchantId": "merchant.test",
+      "teamId": "TEAM123",
+      "documents": [
+        {
+          "appleDocumentType": "DriversLicense",
+          "requestedAttributes": [
+            {
+              "attributeType": "GivenName",
+              "intentToStore": 0
+            },
+            {
+              "attributeType": "FamilyName",
+              "intentToStore": -1
+            },
+            {
+              "attributeType": "DateOfBirth",
+              "intentToStore": 0
+            },
+            {
+              "attributeType": "AgeAtLeastX",
+              "intentToStore": -1,
+              "ageAtLeastXArgument": 21
+            }
+          ]
+        }
+      ],
+      "nonce": [
+        0,
+        127,
+        128,
+        254,
+        255
+      ]
+    }
+  },
+  {
+    "name": "photo-id",
+    "input": {
+      "documentRequests": [
+        {
+          "documentType": "org.iso.23220.photoid.1",
+          "nameSpaces": {
+            "org.iso.23220.1": {
+              "given_name_unicode": false,
+              "family_name_unicode": true,
+              "birth_date": false,
+              "age_over_21": true
+            }
+          }
+        }
+      ]
+    },
+    "challenge": "eyJleGNoYW5nZUlkIjoiZGQ5YjVlZDEtNDQ3Yi00ZTMxLWI0YTYtYjdlYTg1MjdlZTkzIiwidHlwZSI6ImNyZWRlbnRpYWxSZXF1ZXN0IiwicGxhdGZvcm0iOiJhcHBsZS13YWxsZXQiLCJleGNoYW5nZU1lY2hhbmlzbSI6Ik5hdGl2ZUFwcCIsInJlcXVlc3RPYmplY3QiOiJ7XCJhcHBsZURvY3VtZW50VHlwZVwiOlwiUGhvdG9JRFwiLFwicmVxdWVzdGVkQXR0cmlidXRlc1wiOlt7XCJhdHRyaWJ1dGVUeXBlXCI6XCJHaXZlbk5hbWVcIixcImludGVudFRvU3RvcmVcIjowfSx7XCJhdHRyaWJ1dGVUeXBlXCI6XCJGYW1pbHlOYW1lXCIsXCJpbnRlbnRUb1N0b3JlXCI6LTF9LHtcImF0dHJpYnV0ZVR5cGVcIjpcIkRhdGVPZkJpcnRoXCIsXCJpbnRlbnRUb1N0b3JlXCI6MH0se1wiYXR0cmlidXRlVHlwZVwiOlwiQWdlQXRMZWFzdFhcIixcImludGVudFRvU3RvcmVcIjotMSxcImFnZUF0TGVhc3RYQXJndW1lbnRcIjoyMX1dLFwibm9uY2VcIjpcIkFIK0Evdjg9XCIsXCJtZXJjaGFudElkXCI6XCJtZXJjaGFudC50ZXN0XCIsXCJ0ZWFtSWRcIjpcIlRFQU0xMjNcIn0ifQ",
+    "expected": {
+      "exchangeId": "dd9b5ed1-447b-4e31-b4a6-b7ea8527ee93",
+      "merchantId": "merchant.test",
+      "teamId": "TEAM123",
+      "documents": [
+        {
+          "appleDocumentType": "PhotoID",
+          "requestedAttributes": [
+            {
+              "attributeType": "GivenName",
+              "intentToStore": 0
+            },
+            {
+              "attributeType": "FamilyName",
+              "intentToStore": -1
+            },
+            {
+              "attributeType": "DateOfBirth",
+              "intentToStore": 0
+            },
+            {
+              "attributeType": "AgeAtLeastX",
+              "intentToStore": -1,
+              "ageAtLeastXArgument": 21
+            }
+          ]
+        }
+      ],
+      "nonce": [
+        0,
+        127,
+        128,
+        254,
+        255
+      ]
+    }
+  },
+  {
+    "name": "photo-id-or-mdl",
+    "input": {
+      "documentRequests": [
+        {
+          "documentType": "org.iso.23220.photoid.1",
+          "nameSpaces": {
+            "org.iso.23220.1": {
+              "given_name_unicode": false,
+              "family_name_unicode": true,
+              "birth_date": false,
+              "age_over_21": true
+            }
+          }
+        },
+        {
+          "documentType": "org.iso.18013.5.1.mDL",
+          "nameSpaces": {
+            "org.iso.18013.5.1": {
+              "given_name": false,
+              "family_name": true,
+              "birth_date": false,
+              "age_over_21": true
+            }
+          }
+        }
+      ]
+    },
+    "challenge": "eyJleGNoYW5nZUlkIjoiZGQ5YjVlZDEtNDQ3Yi00ZTMxLWI0YTYtYjdlYTg1MjdlZTkzIiwidHlwZSI6ImNyZWRlbnRpYWxSZXF1ZXN0IiwicGxhdGZvcm0iOiJhcHBsZS13YWxsZXQiLCJleGNoYW5nZU1lY2hhbmlzbSI6Ik5hdGl2ZUFwcCIsInJlcXVlc3RPYmplY3QiOiJ7XCJkb2N1bWVudFJlcXVlc3RzXCI6W3tcImFwcGxlRG9jdW1lbnRUeXBlXCI6XCJQaG90b0lEXCIsXCJyZXF1ZXN0ZWRBdHRyaWJ1dGVzXCI6W3tcImF0dHJpYnV0ZVR5cGVcIjpcIkdpdmVuTmFtZVwiLFwiaW50ZW50VG9TdG9yZVwiOjB9LHtcImF0dHJpYnV0ZVR5cGVcIjpcIkZhbWlseU5hbWVcIixcImludGVudFRvU3RvcmVcIjotMX0se1wiYXR0cmlidXRlVHlwZVwiOlwiRGF0ZU9mQmlydGhcIixcImludGVudFRvU3RvcmVcIjowfSx7XCJhdHRyaWJ1dGVUeXBlXCI6XCJBZ2VBdExlYXN0WFwiLFwiaW50ZW50VG9TdG9yZVwiOi0xLFwiYWdlQXRMZWFzdFhBcmd1bWVudFwiOjIxfV19LHtcImFwcGxlRG9jdW1lbnRUeXBlXCI6XCJEcml2ZXJzTGljZW5zZVwiLFwicmVxdWVzdGVkQXR0cmlidXRlc1wiOlt7XCJhdHRyaWJ1dGVUeXBlXCI6XCJHaXZlbk5hbWVcIixcImludGVudFRvU3RvcmVcIjowfSx7XCJhdHRyaWJ1dGVUeXBlXCI6XCJGYW1pbHlOYW1lXCIsXCJpbnRlbnRUb1N0b3JlXCI6LTF9LHtcImF0dHJpYnV0ZVR5cGVcIjpcIkRhdGVPZkJpcnRoXCIsXCJpbnRlbnRUb1N0b3JlXCI6MH0se1wiYXR0cmlidXRlVHlwZVwiOlwiQWdlQXRMZWFzdFhcIixcImludGVudFRvU3RvcmVcIjotMSxcImFnZUF0TGVhc3RYQXJndW1lbnRcIjoyMX1dfV0sXCJub25jZVwiOlwiQUgrQS92OD1cIixcIm1lcmNoYW50SWRcIjpcIm1lcmNoYW50LnRlc3RcIixcInRlYW1JZFwiOlwiVEVBTTEyM1wifSJ9",
+    "expected": {
+      "exchangeId": "dd9b5ed1-447b-4e31-b4a6-b7ea8527ee93",
+      "merchantId": "merchant.test",
+      "teamId": "TEAM123",
+      "documents": [
+        {
+          "appleDocumentType": "PhotoID",
+          "requestedAttributes": [
+            {
+              "attributeType": "GivenName",
+              "intentToStore": 0
+            },
+            {
+              "attributeType": "FamilyName",
+              "intentToStore": -1
+            },
+            {
+              "attributeType": "DateOfBirth",
+              "intentToStore": 0
+            },
+            {
+              "attributeType": "AgeAtLeastX",
+              "intentToStore": -1,
+              "ageAtLeastXArgument": 21
+            }
+          ]
+        },
+        {
+          "appleDocumentType": "DriversLicense",
+          "requestedAttributes": [
+            {
+              "attributeType": "GivenName",
+              "intentToStore": 0
+            },
+            {
+              "attributeType": "FamilyName",
+              "intentToStore": -1
+            },
+            {
+              "attributeType": "DateOfBirth",
+              "intentToStore": 0
+            },
+            {
+              "attributeType": "AgeAtLeastX",
+              "intentToStore": -1,
+              "ageAtLeastXArgument": 21
+            }
+          ]
+        }
+      ],
+      "nonce": [
+        0,
+        127,
+        128,
+        254,
+        255
+      ]
+    }
+  }
+]

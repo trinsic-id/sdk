@@ -8,7 +8,7 @@ source "$SCRIPT_DIR/../helpers/common.sh"
 cd "$SCRIPT_DIR/sdk"
 npm ci
 npm run build
-node --test "$SCRIPT_DIR/tests/launch.test.cjs"
+node --test "$SCRIPT_DIR"/tests/*.test.cjs
 
 # Stamp the release version in the package without changing the checkout.
 pack_dir="$(mktemp -d)"

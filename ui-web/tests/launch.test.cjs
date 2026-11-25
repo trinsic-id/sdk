@@ -15,7 +15,7 @@ test("the browser bundle exposes the redirect and wallet APIs", () => {
     "isUserOnEligibleAppleWalletBrowser",
     "isUserOnEligibleGoogleWalletBrowser",
     "launchRedirect",
-    "performMdlExchange",
+    "performCredentialExchange",
   ]);
 });
 
