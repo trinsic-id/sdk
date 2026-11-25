@@ -27,13 +27,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
-        uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Prepare readme file
         run: cat api-csharp/README.md >> .readme/api-csharp.md
       - name: Run `docs` command
-        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10.10.0
+        uses: readmeio/rdme@ddeeeaf11f42cfab0d49100b503ab4489817acd6 # v10.10.1
         with:
           rdme: reference upload .readme/api-csharp.md --key=${{ secrets.README_API_KEY }} --branch=1.0
   api-go:
@@ -42,13 +42,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
-        uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Prepare readme file
         run: cat api-go/README.md >> .readme/api-go.md
       - name: Run `docs` command
-        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10.10.0
+        uses: readmeio/rdme@ddeeeaf11f42cfab0d49100b503ab4489817acd6 # v10.10.1
         with:
           rdme: reference upload .readme/api-go.md --key=${{ secrets.README_API_KEY }} --branch=1.0
   api-java:
@@ -57,13 +57,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
-        uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Prepare readme file
         run: cat api-java/README.md >> .readme/api-java.md
       - name: Run `docs` command
-        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10.10.0
+        uses: readmeio/rdme@ddeeeaf11f42cfab0d49100b503ab4489817acd6 # v10.10.1
         with:
           rdme: reference upload .readme/api-java.md --key=${{ secrets.README_API_KEY }} --branch=1.0
   api-python:
@@ -72,13 +72,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
-        uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Prepare readme file
         run: cat api-python/README.md >> .readme/api-python.md
       - name: Run `docs` command
-        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10.10.0
+        uses: readmeio/rdme@ddeeeaf11f42cfab0d49100b503ab4489817acd6 # v10.10.1
         with:
           rdme: reference upload .readme/api-python.md --key=${{ secrets.README_API_KEY }} --branch=1.0
   api-ruby:
@@ -87,13 +87,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
-        uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Prepare readme file
         run: cat api-ruby/README.md >> .readme/api-ruby.md
       - name: Run `docs` command
-        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10.10.0
+        uses: readmeio/rdme@ddeeeaf11f42cfab0d49100b503ab4489817acd6 # v10.10.1
         with:
           rdme: reference upload .readme/api-ruby.md --key=${{ secrets.README_API_KEY }} --branch=1.0
   api-typescript:
@@ -102,13 +102,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
-        uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Prepare readme file
         run: cat api-typescript/README.md >> .readme/api-typescript.md
       - name: Run `docs` command
-        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10.10.0
+        uses: readmeio/rdme@ddeeeaf11f42cfab0d49100b503ab4489817acd6 # v10.10.1
         with:
           rdme: reference upload .readme/api-typescript.md --key=${{ secrets.README_API_KEY }} --branch=1.0
   ui-android:
@@ -117,13 +117,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
-        uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Prepare readme file
         run: cat ui-android/README.md >> .readme/ui-android.md
       - name: Run `docs` command
-        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10.10.0
+        uses: readmeio/rdme@ddeeeaf11f42cfab0d49100b503ab4489817acd6 # v10.10.1
         with:
           rdme: reference upload .readme/ui-android.md --key=${{ secrets.README_API_KEY }} --branch=1.0
   ui-swift:
@@ -132,13 +132,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
-        uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Prepare readme file
         run: cat ui-swift/README.md >> .readme/ui-swift.md
       - name: Run `docs` command
-        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10.10.0
+        uses: readmeio/rdme@ddeeeaf11f42cfab0d49100b503ab4489817acd6 # v10.10.1
         with:
           rdme: reference upload .readme/ui-swift.md --key=${{ secrets.README_API_KEY }} --branch=1.0
   ui-web:
@@ -147,12 +147,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
-        uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Prepare readme file
         run: cat ui-web/README.md >> .readme/ui-web.md
       - name: Run `docs` command
-        uses: readmeio/rdme@9bcf3796d4d9d25c7b216b7db309707b2936737d # v10.10.0
+        uses: readmeio/rdme@ddeeeaf11f42cfab0d49100b503ab4489817acd6 # v10.10.1
         with:
           rdme: reference upload .readme/ui-web.md --key=${{ secrets.README_API_KEY }} --branch=1.0
